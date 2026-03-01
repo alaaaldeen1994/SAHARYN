@@ -1,0 +1,2154 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="IS-CHRP v24.1-PRO: Professional-Grade Biological Simulation Research Platform. Modeling cellular health and resilience dynamics (Scientific Use Only).">
+    <meta name="author" content="Altos Labs | Institute of Computation">
+    <title>Altos Labs | IS-CHRP v24.1-PRO | Scientific Research Suite</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Three.js for 3D Waddington's Landscape -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
+
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            /* --- COLOR PRIMITIVES: OBSIDIAN & FLUORESCENCE --- */
+            --void: #000000;
+            --layer-1: #050505;
+            --layer-2: #0a0a0a;
+            --layer-3: #111111;
+
+            --border-dim: #1f1f1f;
+            --border-mid: #333333;
+            --border-high: #525252;
+
+            /* --- SEMANTIC PALETTE --- */
+            --c-brand: #2563eb;
+            /* Altos Blue */
+            --c-brand-glow: rgba(37, 99, 235, 0.4);
+
+            --c-bio: #10b981;
+            /* Biology / Stable / Safe */
+            --c-warn: #f59e0b;
+            /* Warning / Transient */
+            --c-crit: #ef4444;
+            /* Critical / Apoptosis / Tumor */
+            --c-data: #8b5cf6;
+            /* Data / Compute */
+
+            /* --- STATE COLORS --- */
+            --s-somatic: #64748b;
+            /* Slate 500 */
+            --s-ipsc: #eab308;
+            /* Yellow 500 */
+            --s-neuro: #a855f7;
+            /* Purple 500 */
+            --s-cardio: #f43f5e;
+            /* Rose 500 */
+            --s-tumor: #ef4444;
+            /* Red 500 */
+            --s-death: #1e293b;
+            /* Slate 800 */
+
+            /* --- TYPOGRAPHY --- */
+            --font-sans: 'Inter', system-ui, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+
+            /* --- METRICS --- */
+            --header-h: 48px;
+            --footer-h: 32px;
+        }
+
+        /* --- GLOBAL RESET --- */
+        * {
+            box-sizing: border-box;
+            outline: none;
+            user-select: none;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--void);
+            color: #e2e8f0;
+            font-family: var(--font-sans);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        /* --- LAYOUT ENGINE: RESPONSIVE GRID --- */
+        #architect-layout {
+            display: grid;
+            /* Adaptive Columns: Fixed Left (280px) | Fluid Center | Fixed Right (340px) */
+            /* Using minmax ensures the center canvas never collapses to 0 */
+            grid-template-columns: 280px minmax(0, 1fr) 340px;
+            grid-template-rows: var(--header-h) 1fr var(--footer-h);
+            height: 100vh;
+            width: 100vw;
+            gap: 1px;
+            background-color: var(--border-dim);
+        }
+
+        /* --- COMPONENT: PANELS --- */
+        .panel {
+            background-color: var(--layer-2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+            backdrop-filter: blur(20px);
+        }
+
+        .panel-header {
+            height: 40px;
+            min-height: 40px;
+            padding: 0 16px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, rgba(0, 0, 0, 0) 100%);
+            border-bottom: 1px solid var(--border-dim);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .panel-title {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 10px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* --- COMPONENT: SCROLL AREAS --- */
+        .scroll-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            /* Custom Scrollbar */
+            scrollbar-width: thin;
+            scrollbar-color: #333 transparent;
+        }
+
+        .scroll-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .scroll-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .scroll-container::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 3px;
+            border: 1px solid #000;
+        }
+
+        .scroll-container::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* --- COMPONENT: CONTROLS --- */
+        .control-group {
+            margin-bottom: 12px;
+            border-bottom: 1px solid var(--border-dim);
+            padding-bottom: 8px;
+        }
+
+        .control-group:last-child {
+            border: none;
+            margin-bottom: 0;
+        }
+
+        .control-label {
+            display: block;
+            font-size: 9px;
+            font-weight: 700;
+            color: #64748b;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* --- COMPONENT: INPUTS & SELECTS --- */
+        select {
+            width: 100%;
+            background: var(--layer-1);
+            border: 1px solid var(--border-mid);
+            color: #cbd5e1;
+            padding: 10px;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            border-radius: 4px;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        select:hover {
+            border-color: #525252;
+        }
+
+        select:focus {
+            border-color: var(--c-brand);
+        }
+
+        /* Custom Range Slider */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            background: transparent;
+            cursor: pointer;
+            margin: 12px 0;
+        }
+
+        input[type="range"]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            background: #1e293b;
+            border-radius: 2px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 14px;
+            width: 14px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            margin-top: -5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            transition: transform 0.1s, background 0.2s;
+            border: 2px solid #0f172a;
+        }
+
+        input[type="range"]:hover::-webkit-slider-thumb {
+            transform: scale(1.2);
+            background: var(--c-brand);
+        }
+
+        /* --- COMPONENT: BUTTONS --- */
+        .btn {
+            width: 100%;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-dim);
+            color: #cbd5e1;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-bottom: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--border-mid);
+            color: #fff;
+            transform: translateX(2px);
+        }
+
+        .btn:active:not(:disabled) {
+            transform: translateX(1px);
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* Button Variants */
+        .btn-brand {
+            border-left: 3px solid var(--c-brand);
+        }
+
+        .btn-bio {
+            border-left: 3px solid var(--c-bio);
+        }
+
+        .btn-warn {
+            border-left: 3px solid var(--c-warn);
+        }
+
+        .btn-crit {
+            border-left: 3px solid var(--c-crit);
+        }
+
+        .btn-data {
+            border-left: 3px solid var(--c-data);
+        }
+
+        /* --- COMPONENT: VISUALIZATION VIEWPORT --- */
+        #viewport-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 40%, #080808 0%, #000 100%);
+            cursor: crosshair;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* --- COMPONENT: HUD (Heads Up Display) --- */
+        .hud-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 260px;
+            background: rgba(5, 5, 5, 0.9);
+            border: 1px solid var(--border-mid);
+            border-left: 2px solid var(--c-brand);
+            padding: 16px;
+            border-radius: 4px;
+            backdrop-filter: blur(12px);
+            pointer-events: auto;
+            z-index: 10;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        .hud-row {
+            display: flex;
+            justify-content: space-between;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            margin-bottom: 6px;
+            color: #94a3b8;
+        }
+
+        .hud-value {
+            color: #f8fafc;
+            font-weight: 700;
+        }
+
+        /* --- COMPONENT: TOAST NOTIFICATIONS --- */
+        #toast-feed {
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            width: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: #0f0f0f;
+            border: 1px solid var(--border-mid);
+            border-left: 3px solid var(--c-brand);
+            padding: 12px;
+            border-radius: 4px;
+            pointer-events: auto;
+            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+
+        .toast-h {
+            font-weight: 700;
+            color: #fff;
+            font-size: 11px;
+            margin-bottom: 2px;
+        }
+
+        .toast-b {
+            color: #94a3b8;
+            font-size: 10px;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* --- COMPONENT: GENE GRID --- */
+        .gene-matrix {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1px;
+            padding: 1px;
+            background: #000;
+            border: 1px solid var(--border-dim);
+            aspect-ratio: 1;
+        }
+
+        .gene-node {
+            background: #111;
+            transition: background 0.1s linear;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-size: 9px;
+            color: #555;
+        }
+
+        /* --- COMPONENT: TERMINAL --- */
+        #terminal-output {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: #94a3b8;
+            padding-right: 4px;
+        }
+
+        .log-line {
+            padding: 2px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            display: flex;
+            gap: 10px;
+        }
+
+        .log-ts {
+            color: #475569;
+            min-width: 50px;
+        }
+
+        .log-inf {
+            color: var(--c-brand);
+        }
+
+        .log-suc {
+            color: var(--c-bio);
+        }
+
+        .log-wrn {
+            color: var(--c-warn);
+        }
+
+        .log-err {
+            color: var(--c-crit);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="toast-feed"></div>
+
+    <div id="architect-layout">
+
+        <div class="panel"
+            style="grid-column: 1 / -1; flex-direction: row; border-bottom: 1px solid #222; z-index: 50;">
+            <div class="flex items-center px-6 h-full w-[280px] border-r border-dim bg-black">
+                <div class="w-4 h-4 bg-blue-600 rounded-sm mr-4 shadow-[0_0_20px_rgba(37,99,235,0.6)] animate-pulse">
+                </div>
+                <div>
+                    <div class="text-xs font-bold text-white tracking-[0.2em]">ALTOS LABS</div>
+                    <div class="text-[9px] text-slate-400 font-mono">IS-CHRP v24.1-PRO | RESEARCH SUITE</div>
+                </div>
+            </div>
+
+            <div class="flex flex-1 items-center px-8 justify-between bg-black">
+                <div class="flex gap-12 font-mono text-[9px] text-slate-500">
+                    <div class="text-blue-500 italic flex items-center gap-2">
+                        <i data-lucide="info" class="w-3 h-3"></i>
+                        FOR IN SILICO LABORATORY SIMULATION ONLY. NOT FOR CLINICAL USE.
+                    </div>
+                    <div class="hidden xl:block">ACTIVE POPULATION: <span class="text-white font-bold"
+                            id="header-pop">0</span>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 items-center">
+                    <div class="flex items-center gap-2 bg-[#111] border border-dim rounded px-2 py-1 h-[26px]">
+                        <div id="ai-status"
+                            class="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_5px_rgba(239,68,68,0.5)] transition-colors">
+                        </div>
+                        <input type="password" id="openai-key" placeholder="API Key"
+                            class="w-24 bg-transparent border-none text-[9px] text-slate-300 focus:ring-0 placeholder-slate-600 h-full !p-0 !m-0"
+                            style="padding:0; margin:0;"
+                            oninput="BiosimStore.state.apiKey = this.value; document.getElementById('ai-status').className = this.value.length > 10 ? 'w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)] transition-colors' : 'w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_5px_rgba(239,68,68,0.5)] transition-colors'">
+                    </div>
+
+                    <div class="flex gap-1">
+                        <button
+                            class="px-3 py-1.5 bg-[#111] border border-dim text-[10px] text-slate-400 hover:text-white rounded transition-colors"
+                            title="Save Experiment Manifest" onclick="BiosimIO.saveManifest()">
+                            <i data-lucide="save" class="w-3 h-3"></i>
+                        </button>
+                        <button
+                            class="px-3 py-1.5 bg-[#111] border border-dim text-[10px] text-slate-400 hover:text-white rounded transition-colors"
+                            title="Load Experiment Manifest" onclick="document.getElementById('state-upload').click()">
+                            <i data-lucide="upload-cloud" class="w-3 h-3"></i>
+                        </button>
+                        <input type="file" id="state-upload" style="display:none" onchange="BiosimIO.loadManifest(this)"
+                            accept=".json">
+                    </div>
+
+                    <button
+                        class="px-4 py-1.5 bg-[#111] border border-dim text-[10px] text-slate-400 hover:text-white rounded transition-colors"
+                        onclick="BiosimIO.resetView()">
+                        RESET VIEW
+                    </button>
+                    <button
+                        class="px-4 py-1.5 bg-blue-900/20 border border-blue-800 text-[10px] text-blue-400 hover:text-white rounded transition-colors flex items-center gap-2"
+                        onclick="BiosimIO.exportCSV()">
+                        <i data-lucide="download" class="w-3 h-3"></i> TELEMETRY
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel" style="grid-row: 2; grid-column: 1;">
+            <div class="panel-header">
+                <span class="panel-title"><i data-lucide="sliders" class="w-3 h-3"></i> PROTOCOL DESIGN</span>
+            </div>
+
+            <div class="scroll-container">
+
+
+                <span class="control-label">1. Cell Source (Patient Derived)</span>
+                <div class="mb-3">
+                    <div class="flex justify-between text-[9px] text-slate-400 mb-1">
+                        <span>Confluency</span><span class="text-white font-mono" id="disp-pop">1200</span>
+                    </div>
+                    <input type="range" min="100" max="3000" step="100" value="1200"
+                        oninput="BiosimIO.updateAgentCount(this.value)">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <button class="btn btn-brand" onclick="BiosimEngine.boot()">
+                        <span>RESET (FIBRO)</span> <i data-lucide="rotate-ccw" class="w-3 h-3"></i>
+                    </button>
+                    <button class="btn btn-data" onclick="BiosimIO.generateReport()">
+                        <span>AI LAB REPORT</span> <i data-lucide="file-text" class="w-3 h-3"></i>
+                    </button>
+                </div>
+                <button class="btn mt-2 bg-slate-900 border-slate-700 text-slate-400 hover:text-white"
+                    onclick="BiosimDiagnostics.runSelfTest()">
+                    <span>RUN DIAGNOSTICS</span> <i data-lucide="shield-check" class="w-3 h-3"></i>
+                </button>
+            </div>
+
+            <div class="control-group">
+                <span class="control-label">2. Reprogramming Strategy</span>
+
+                <div class="mb-2">
+                    <div class="text-[9px] text-slate-500 mb-1">DELIVERY METHOD (SAFETY)</div>
+                    <select id="method-sel">
+                        <option value="RETRO">Retroviral (High Eff, High Risk)</option>
+                        <option value="MRNA">Synthetic mRNA (Safe, Slow)</option>
+                        <option value="PROTEIN">Recombinant Protein (Safest)</option>
+                        <option value="SCNT">SCNT (Gurdon - Nuclear Transfer)</option>
+                    </select>
+                </div>
+
+                <div class="mb-2">
+                    <div class="text-[9px] text-slate-500 mb-1">TRANSCRIPTION FACTORS</div>
+                    <select id="factor-sel">
+                        <option value="OSKM">OSKM (Yamanaka - iPSC)</option>
+                        <option value="LIN28">LIN28/NANOG (Thomson)</option>
+                        <option value="DIRECT_NEURO">Direct -> Neuro (Transdiff)</option>
+                        <option value="DIRECT_CARDIO">Direct -> Cardio (Transdiff)</option>
+                    </select>
+                </div>
+
+                <button class="btn btn-warn"
+                    onclick="BiosimBridge.injectVector(document.getElementById('factor-sel').value, document.getElementById('method-sel').value)">
+                    <span>TRANSFECT CELLS</span> <i data-lucide="zap" class="w-3 h-3"></i>
+                </button>
+            </div>
+
+            <div class="control-group">
+                <span class="control-label">3. "Disease in a Dish"</span>
+
+                <div class="grid grid-cols-2 gap-2 mt-3">
+                    <button class="btn btn-ctrl" onclick="BiosimBridge.induceDisease('TUMOR')">
+                        <i data-lucide="zap" class="w-3 h-3 text-red-500"></i> <span>TUMOR</span>
+                    </button>
+                    <button class="btn btn-ctrl" onclick="BiosimBridge.treatDisease('P53')">
+                        <i data-lucide="shield" class="w-3 h-3 text-blue-400"></i> <span>KILL (P53)</span>
+                    </button>
+                </div>
+
+                <div class="mt-3 pt-3 border-t border-mid">
+                    <div class="control-label mb-2">NOBEL TOOLS (2012)</div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button class="btn btn-ctrl" onclick="BiosimBridge.activateSCNT()">
+                            <i data-lucide="syringe" class="w-3 h-3 text-teal-400"></i> <span>SCNT (Gurdon)</span>
+                        </button>
+                        <button class="btn btn-ctrl"
+                            onclick="BiosimBridge.injectVector('OSKM', document.getElementById('method-sel').value)">
+                            <i data-lucide="flask-conical" class="w-3 h-3 text-green-400"></i> <span>OSKM
+                                (Yamanaka)</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="text-[9px] text-slate-500 mb-1 mt-2">THERAPEUTIC COMPOUNDS</div>
+                <div class="grid grid-cols-2 gap-2">
+                    <button class="btn btn-bio" onclick="BiosimBridge.treat('KINETIN')">
+                        <span>KINETIN (Splicing)</span> <i data-lucide="pill" class="w-3 h-3"></i>
+                    </button>
+                    <button class="btn btn-bio" onclick="BiosimBridge.treat('BETA_BLOCKER')">
+                        <span>BETA BLOCKER (Rhythm)</span> <i data-lucide="activity" class="w-3 h-3"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="control-group" style="border:none;">
+                <span class="control-label">4. Quality Control Assays</span>
+                <div class="grid grid-cols-2 gap-2">
+                    <button class="btn btn-data" onclick="BiosimBridge.performAssay('TERATOMA')">
+                        <span>TERATOMA ASSAY (In Vivo)</span> <i data-lucide="microscope" class="w-3 h-3"></i>
+                    </button>
+                    <button class="btn btn-data" onclick="BiosimBridge.performAssay('TETRAPLOID')">
+                        <span>TETRAPLOID COMP. (Gold Std)</span> <i data-lucide="award" class="w-3 h-3"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="panel" style="grid-row: 2; grid-column: 2;">
+            <div id="viewport-container" style="position: relative;">
+                <!-- View Toggle Buttons -->
+                <div class="absolute top-4 right-4 z-20 flex gap-2">
+                    <button
+                        class="bg-black/50 hover:bg-black/80 text-[9px] text-white border border-mid px-2 py-1 rounded backdrop-blur font-mono transition-colors"
+                        onclick="const modes=['TYPE','STABILITY','HEALTH','EPIGENETIC']; AlrpStore.state.viewMode = modes[(modes.indexOf(AlrpStore.state.viewMode) + 1) % modes.length]; BiosimUI.notify('View Mode', AlrpStore.state.viewMode, 'inf');">
+                        <i data-lucide="eye" class="w-3 h-3 inline mr-1"></i> VIEW MODE
+                    </button>
+                    <button id="3d-toggle-btn"
+                        class="bg-blue-900/50 hover:bg-blue-800/80 text-[9px] text-white border border-blue-700 px-2 py-1 rounded backdrop-blur font-mono transition-colors"
+                        onclick="Waddington3D.toggle()">
+                        <i data-lucide="box" class="w-3 h-3 inline mr-1"></i> 3D LANDSCAPE
+                    </button>
+                </div>
+
+                <div class="hud-panel" id="hud-main">
+                    <div id="hud-drag-handle" style="cursor: move;"
+                        class="text-[10px] font-bold text-slate-400 mb-3 pb-2 border-b border-mid flex justify-between select-none">
+                        <span>LATENT MANIFOLD DYNAMICS</span>
+                        <span
+                            class="text-green-500 text-[9px] bg-green-900/20 px-1.5 py-0.5 rounded border border-green-900"
+                            id="sim-status">STABLE</span>
+                    </div>
+
+                    <div class="hud-row"><span>Information Gain</span><span class="hud-value text-blue-400"
+                            id="hud-epi">100%</span></div>
+                    <div class="hud-row"><span>Structural Entropy</span><span class="hud-value text-slate-200"
+                            id="hud-dna">0.00</span></div>
+                    <div class="hud-row"><span>Stochastic Risk</span><span class="hud-value text-slate-500"
+                            id="hud-risk">LOW</span></div>
+                    <div class="hud-row"><span>Bound Vector</span><span class="hud-value text-yellow-400"
+                            id="hud-vec">NONE</span></div>
+
+                    <div class="mt-4 pt-2 border-t border-mid">
+                        <div class="text-[9px] font-bold text-slate-500 mb-2">AGENT INSPECTOR</div>
+                        <div class="hud-row"><span>ID</span><span class="hud-value" id="insp-id">--</span></div>
+                        <div class="hud-row"><span>Identity</span><span class="hud-value" id="insp-state">--</span>
+                        </div>
+                        <div class="hud-row"><span>Oncogenicity</span><span class="hud-value text-red-400"
+                                id="insp-onco">--</span></div>
+                    </div>
+
+                    <div class="mt-4 pt-2 border-t border-mid">
+                        <div class="text-[9px] font-bold text-slate-500 mb-2">LEGEND</div>
+                        <div class="grid grid-cols-2 gap-1 text-[9px] font-mono text-slate-400">
+                            <div class="flex items-center gap-1">
+                                <div class="w-1.5 h-1.5 rounded-full bg-slate-500"></div> FIBRO
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <div class="w-1.5 h-1.5 rounded-full bg-yellow-500"></div> IPSC
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <div class="w-1.5 h-1.5 rounded-full bg-purple-500"></div> NEURO
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <div class="w-1.5 h-1.5 rounded-full bg-red-400"></div> CARDIO
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <div class="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse"></div> TUMOR
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <canvas id="canvas"></canvas>
+                <canvas id="canvas3d" style="display:none;"></canvas>
+            </div>
+        </div>
+
+        <div class="panel" style="grid-row: 2; grid-column: 3;">
+            <div class="panel-header">
+                <span class="panel-title"><i data-lucide="bar-chart-2" class="w-3 h-3"></i> STATE SPACE</span>
+            </div>
+
+            <div class="scroll-container">
+                <div class="mb-4 bg-black border border-dim p-3 rounded">
+                    <div class="flex justify-between items-end mb-2">
+                        <span class="text-[9px] font-bold text-slate-500 uppercase">Population Density</span>
+                        <span class="text-[9px] text-slate-600">STATE ENSEMBLE</span>
+                    </div>
+                    <div class="w-full h-32 relative"><canvas id="chart-main"></canvas></div>
+                </div>
+
+                <div class="mb-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-[9px] font-bold text-slate-500 uppercase">Transcriptome profile</span>
+                        <span class="text-[9px] text-blue-500 font-mono">12D LATENT PROJECTION</span>
+                    </div>
+                    <div id="gene-grid" class="gene-matrix">
+                        <div class="gene-node" id="g0">OCT4</div>
+                        <div class="gene-node" id="g1">NEURO</div>
+                        <div class="gene-node" id="g2">CARDIO</div>
+                        <div class="gene-node" id="g3">STRESS</div>
+                    </div>
+                </div>
+
+                <div class="flex-1 bg-black border border-dim rounded p-2 h-48 overflow-hidden flex flex-col">
+                    <div class="text-[9px] font-bold text-slate-500 mb-2 border-b border-dim pb-1">KERNEL EVENTS
+                    </div>
+                    <div id="terminal-output" class="overflow-y-auto flex-1">
+                        <div class="log-line"><span class="log-ts">[00:00]</span><span class="log-inf">Kernel
+                                Loaded.</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel p-0" style="grid-row: 3; grid-column: 1 / -1; border-top: 1px solid var(--border-dim);">
+            <div class="h-full bg-[#080808] flex items-center px-6 justify-between">
+
+                <div class="flex gap-4 items-center w-full max-w-2xl">
+                    <span class="text-[9px] font-bold text-slate-500 tracking-wider">TIMELINE</span>
+                    <div class="flex-1 h-1.5 bg-[#1e293b] rounded-full overflow-hidden relative cursor-pointer group">
+                        <div id="progress-bar"
+                            class="h-full bg-gradient-to-r from-blue-700 to-blue-400 w-0 transition-all duration-100">
+                        </div>
+                    </div>
+                    <span class="text-[10px] text-blue-400 font-mono w-20 text-right" id="time-disp">T+0.0d</span>
+                </div>
+
+                <div class="flex gap-8 text-[9px] text-slate-600 font-mono">
+                    <span>RENDER: <span class="text-slate-400">HIGH_CONTRAST_2D</span></span>
+                    <span>FPS: <span id="fps-counter" class="text-white">60</span></span>
+                </div>
+            </div>
+
+            <script>
+                /*******************************************************************************************
+                 * ALTOS LABS | IS-CHRP (IN-SILICO CELLULAR HOMEOSTASIS RESEARCH PLATFORM)
+                 * VERSION: 24.5-PRO
+                 *
+                 * SYSTEM OVERVIEW:
+                 * The IS-CHRP is a production-grade scientific simulation environment designed to model
+                 * multi-dimensional gene regulatory network (GRN) trajectories and cell fate transitions.
+                 * It uses stochastic differential equations (Euler-Maruyama) to simulate cellular
+                 * identity within a Waddington-style landscape.
+                 *
+                 * WHAT THIS SYSTEM IS:
+                 * - A mechanistic research tool for visualizing cellular reprogramming (OSKM, SCNT).
+                 * - A deterministic, reproducible environment for testing in-silico biological hypotheses.
+                 * - An engineering framework for ML-driven perturbation analysis.
+                 *
+                 * WHAT THIS SYSTEM IS NOT:
+                 * - NOT a medical diagnostic tool.
+                 * - NOT a clinical predictive engine.
+                 * - NOT intended for human health decisions.
+                 * - All results are "In-Silico" approximations of cellular behavior.
+                 *
+                 * NON-CODER USAGE GUIDE:
+                 * 1. INITIALIZATION: The simulation starts automatically with default parameters.
+                 * 2. INTERACTION: Click on cells in the viewport to 'Lock' them in the Inspector.
+                 * 3. PERTURBATIONS: Use the 'TRANSFECTION' buttons to apply reprogramming factors (e.g. OSKM).
+                 * 4. ANALYSIS: Use the 'RUN DIAGNOSTICS' button to verify simulation integrity at any time.
+                 * 5. PERSISTENCE: Save/Load 'Manifests' to share or replay exact experiment trajectories.
+                 *******************************************************************************************/
+
+                /* =========================
+                   SECTION 1 â€” SYSTEM GOVERNANCE & VERSIONING
+                   ========================= */
+
+                const BIOSIM_METADATA = {
+                    id: "axial-telescope-pro",
+                    version: "24.5-PRO",
+                    author: "Altos Labs Platform Team",
+                    license: "Proprietary Scientific Suite",
+                    release_notes: [
+                        "24.5-PRO: Monolithic hardening, strict interfaces, and inline diagnostics suite.",
+                        "24.1-PRO: Integrated ML Resilience scoring and latent representation layers.",
+                        "24.0: Foundation GRN engine with Euler-Maruyama stochastic integration."
+                    ]
+                };
+                const RELEASE_NOTES = {
+                    "24.5-PRO": "Formalized monolithic architecture, internal diagnostics, and performance guardrails.",
+                    "24.1-ALRP": "Initial Alpha logic with 12D state space."
+                };
+
+                /* =========================
+                   SECTION 2 â€” DATA SCHEMAS & STORE
+                   ========================= */
+
+                /**
+                 * The AlrpStore is the immutable source of truth for configuration.
+                 * Dynamic state is separated to prevent silent side-effects.
+                 */
+                const AlrpStore = {
+                    manifest: {
+                        v: "24.6-PRO",
+                        id: `ALRP-${Date.now()}`,
+                        seed: 42,
+                        params: {
+                            dt: 0.05,
+                            sigma: 0.12, // Base diffusion scaling
+                            gamma: 0.15, // Degradation rate
+                            hill_n: 2.0, // Hill coefficient (Cooperativity)
+                            hill_k: 0.5, // Half-maximal activation constant
+                            friction: 0.94,
+                            repulsion: 0.03,
+                            agentCount: 1200,
+                            radius: 0.015,
+                            dim: 12,
+                            mitosisChance: 0.002,
+                            maxPop: 3000,
+                            crowdingLimit: 6,
+                            trailFade: 0.15,
+                            chromatinDecay: 0.02,
+                            chromatinOpening: 0.06
+                        },
+                        // Regulatory Interaction Matrix (12x12)
+                        // 0: OCT4, 1: NEURO, 2: CARDIO, 3: MYC, 4: SOX2, 5: KLF4
+                        weights: (function () {
+                            const w = new Float32Array(144).fill(0);
+                            const idx = (r, c) => r * 12 + c;
+                            // Endogenous Pluripotency Loop (The Core Circuit)
+                            // 0: OCT4, 4: SOX2, 5: KLF4, 6: NANOG
+                            w[idx(0, 0)] = 2.5;   // OCT4 self-activation
+                            w[idx(0, 4)] = 2.5;   // SOX2 activates OCT4
+                            w[idx(0, 6)] = 2.0;   // NANOG activates OCT4
+                            w[idx(4, 0)] = 2.5;   // OCT4 activates SOX2
+                            w[idx(4, 4)] = 2.5;   // SOX2 self-activation
+                            w[idx(4, 6)] = 2.0;   // NANOG activates SOX2
+                            w[idx(6, 0)] = 2.8;   // OCT4 activates NANOG
+                            w[idx(6, 4)] = 2.8;   // SOX2 activates NANOG
+                            w[idx(6, 6)] = 2.5;   // NANOG self-activation
+                            w[idx(5, 5)] = 2.0;   // KLF4 self-activation (Pioneer)
+
+                            // Somatic Identity Suppression (Direct Silencing)
+                            w[idx(1, 0)] = -5.0;  // OCT4 inhibits NEURO
+                            w[idx(2, 0)] = -5.0;  // OCT4 inhibits CARDIO
+                            w[idx(1, 6)] = -3.0;  // NANOG inhibits NEURO
+                            w[idx(2, 6)] = -3.0;  // NANOG inhibits CARDIO
+                            w[idx(1, 4)] = -3.0;  // SOX2 inhibits NEURO
+                            w[idx(2, 4)] = -3.0;  // SOX2 inhibits CARDIO
+
+                            // Somatic Maintenance (Waddington Valleys)
+                            w[idx(1, 1)] = 2.2;   // NEURO self-maintenance
+                            w[idx(2, 2)] = 2.2;   // CARDIO self-maintenance
+
+                            // Reciprocal Somatic Inhibition (Mutual Exclusion)
+                            w[idx(1, 2)] = -1.5;
+                            w[idx(2, 1)] = -1.5;
+
+                            // Oncogenic/Pioneer Influence
+                            w[idx(3, 3)] = 1.0;
+                            w[idx(3, 0)] = 0.8;   // Pluripotency-linked stress / MYC link
+                            return w;
+                        })(),
+                        limits: {
+                            maxPop: 3000,
+                            mitosisChance: 0.002,
+                            crowdingLimit: 6
+                        }
+                    },
+                    state: {
+                        running: false,
+                        tick: 0,
+                        selectedId: -1,
+                        viewMode: 'TYPE', // TYPE, STABILITY, HEALTH
+                        environment: { vector: null, method: 'MRNA', disease: null, drug: null },
+                        apiKey: ''
+                    },
+                    attractors: {
+                        SOMATIC: { x: 0.2, y: 0.8, c: '#64748b', id: 'SOMATIC', label: 'Differentiated' },
+                        IPSC: { x: 0.5, y: 0.15, c: '#eab308', id: 'IPSC', label: 'Pluripotent' },
+                        NEURO: { x: 0.85, y: 0.8, c: '#a855f7', id: 'NEURO', label: 'Ectodermal' },
+                        CARDIO: { x: 0.15, y: 0.4, c: '#f43f5e', id: 'CARDIO', label: 'Mesodermal' },
+                        TUMOR: { x: 0.85, y: 0.2, c: '#ef4444', id: 'TUMOR', label: 'Oncogenic' },
+                        DEATH: { x: 0.5, y: 0.5, c: '#1e293b', id: 'DEATH', label: 'Apoptosis' }
+                    }
+                };
+
+                // Establish ALRP as the primary system, aliasing Biosim for UI compatibility
+                const BiosimStore = AlrpStore;
+                const Store = AlrpStore;
+
+                /* =========================
+                   SECTION 3 â€” UTILITIES & CORE MATH
+                   ========================= */
+
+                /**
+                 * Deterministic Mulberry32 RNG
+                 */
+                class BiosimRandom {
+                    constructor(seed = 42) { this.seed = seed; }
+                    next() {
+                        let t = this.seed += 0x6D2B79F5;
+                        t = Math.imul(t ^ t >>> 15, t | 1);
+                        t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+                        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+                    }
+                    randn() {
+                        const u = 1 - this.next(), v = this.next();
+                        return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+                    }
+                }
+
+                const rng = new BiosimRandom(AlrpStore.manifest.seed);
+
+                /**
+                 * Professional Vector2 Library
+                 */
+                class Vector2 {
+                    constructor(x = 0, y = 0) { this.x = x; this.y = y; }
+                    add(v) { this.x += v.x; this.y += v.y; return this; }
+                    sub(v) { this.x -= v.x; this.y -= v.y; return this; }
+                    mult(s) { this.x *= s; this.y *= s; return this; }
+                    mag() { return Math.sqrt(this.x * this.x + this.y * this.y); }
+                    magSq() { return this.x * this.x + this.y * this.y; }
+                    copy() { return new Vector2(this.x, this.y); }
+                    distSq(v) { return (this.x - v.x) ** 2 + (this.y - v.y) ** 2; }
+                }
+
+                const MathUtils = {
+                    clamp: (v, min, max) => Math.max(min, Math.min(max, v))
+                };
+
+                /* =========================
+                   SECTION 4 â€” VALIDATION & SAFETY LAYER
+                   ========================= */
+
+                /**
+                 * BiologyValidator ensures that cellular states remain within physical boundaries.
+                 * Prevents non-physical gene expression and numeric instability.
+                 */
+                const BiologyValidator = {
+                    validateGRN(state) {
+                        for (let i = 0; i < state.length; i++) {
+                            if (isNaN(state[i])) state[i] = 0;
+                            state[i] = MathUtils.clamp(state[i], -1, 1);
+                        }
+                    },
+                    validateHealth(agent) {
+                        if (isNaN(agent.health)) agent.health = 0;
+                        agent.health = MathUtils.clamp(agent.health, 0, 1);
+                    }
+                };
+
+                /**
+                 * Optimized Hashed Spatial Grid
+                 */
+                class BiosimSpatialGrid {
+                    constructor(cellSize) {
+                        this.cellSize = cellSize;
+                        this.grid = new Map();
+                    }
+                    clear() { this.grid.clear(); }
+                    getKey(x, y) {
+                        const gx = Math.floor(x / this.cellSize);
+                        const gy = Math.floor(y / this.cellSize);
+                        return (gx << 16) | (gy & 0xFFFF);
+                    }
+                    insert(agent) {
+                        const key = this.getKey(agent.pos.x, agent.pos.y);
+                        if (!this.grid.has(key)) this.grid.set(key, []);
+                        this.grid.get(key).push(agent);
+                    }
+                    query(pos, radius) {
+                        const results = [];
+                        const xMin = Math.floor((pos.x - radius) / this.cellSize), xMax = Math.floor((pos.x + radius) / this.cellSize);
+                        const yMin = Math.floor((pos.y - radius) / this.cellSize), yMax = Math.floor((pos.y + radius) / this.cellSize);
+                        for (let x = xMin; x <= xMax; x++) {
+                            for (let y = yMin; y <= yMax; y++) {
+                                const key = (x << 16) | (y & 0xFFFF);
+                                const cell = this.grid.get(key);
+                                if (cell) cell.forEach(a => { if (pos.distSq(a.pos) < radius * radius) results.push(a); });
+                            }
+                        }
+                        return results;
+                    }
+                }
+
+                /* =========================
+                   SECTION 5 â€” SIMULATION CORE (The Mechanistic Engine)
+                   ========================= */
+
+                /**
+                 * AlrpNetwork represents a multi-dimensional Gene Regulatory Network.
+                 * Euler-Maruyama integration ensures stochastic scientific validity.
+                 */
+                class AlrpNetwork {
+                    constructor() {
+                        const N = AlrpStore.manifest.params.dim;
+                        this.state = new Float32Array(N);
+                        // Primordial somatic initialization
+                        for (let i = 0; i < N; i++) {
+                            this.state[i] = -0.8 + rng.next() * 0.2;
+                        }
+                        this.velocity = 0;
+                    }
+
+                    evolve(env, dt, params, accessibility = 1.0) {
+                        const s = this.state, N = s.length, ds = new Float32Array(N);
+                        const w = AlrpStore.manifest.weights;
+                        const n = params.hill_n;
+                        const K = params.hill_k;
+                        const Kn = Math.pow(K, n);
+
+                        // 1. NON-LINEAR HILL DYNAMICS WITH ACCESSIBILITY GATING
+                        for (let i = 0; i < N; i++) {
+                            let activation = 0;
+                            for (let j = 0; j < 12; j++) {
+                                const sj = Math.max(0, s[j]);
+                                const hill = Math.pow(sj, n) / (Kn + Math.pow(sj, n));
+                                let weight = w[i * 12 + j];
+
+                                // Gating: Genes 0, 4, 5 (OSK) are gated by accessibility 
+                                if ((i === 0 || i === 4 || i === 5) && weight > 0) {
+                                    weight *= (0.1 + 0.9 * accessibility);
+                                }
+
+                                activation += weight * hill;
+                            }
+                            ds[i] = activation - params.gamma * s[i];
+                        }
+
+                        // 2. CAUSAL PERTURBATIONS & SOMATIC ERASURE
+                        if (env.vector === 'OSKM') {
+                            ds[0] += 2.5; // Exogenous OCT4
+                            ds[4] += 2.5; // Exogenous SOX2
+                            ds[5] += 2.5; // Exogenous KLF4
+                            ds[3] += 1.5; // Exogenous MYC
+                        }
+
+                        // Active Somatic Erasure (Genes 1: NEURO, 2: CARDIO)
+                        // Driven by high expression of the Pluripotency Circuit
+                        const pluripotentDrive = (Math.max(0, s[0]) + Math.max(0, s[4]) + Math.max(0, s[5])) / 3;
+                        if (pluripotentDrive > 0.4) {
+                            ds[1] -= 2.0 * pluripotentDrive;
+                            ds[2] -= 2.0 * pluripotentDrive;
+                        }
+
+                        if (env.vector === 'DIRECT_NEURO') ds[1] += 2.0;
+                        if (env.vector === 'DIRECT_CARDIO') ds[2] += 2.0;
+                        if (env.disease === 'CANCER') ds[3] += 1.5;
+                        if (env.drug === 'KINETIN') ds[3] -= 2.0;
+
+                        // 3. STOCHASTIC INTEGRATION (Variable Noise)
+                        // Early OSKM phase is highly stochastic; late phase is deterministic/stable
+                        let noiseScale = params.sigma;
+                        if (env.vector === 'OSKM' && accessibility < 0.6) {
+                            noiseScale *= 2.5; // Increase noise to model stochastic barrier
+                        } else if (pluripotentDrive > 0.8) {
+                            noiseScale *= 0.5; // Stabilize as attractor locks
+                        }
+
+                        let totalL1 = 0;
+                        for (let i = 0; i < N; i++) {
+                            const si = Math.max(0.01, s[i]);
+                            const diffusion = noiseScale * Math.sqrt(si) * Math.sqrt(dt);
+                            const change = ds[i] * dt + rng.randn() * diffusion;
+                            s[i] += change;
+                            totalL1 += Math.abs(change);
+                        }
+
+                        BiologyValidator.validateGRN(s);
+                        this.velocity = totalL1 / N;
+                    }
+                }
+
+                /**
+                 * AlrpAgent represents an individual cellular unit.
+                 */
+                class AlrpAgent {
+                    constructor(id, x, y) {
+                        this.id = id;
+                        this.pos = new Vector2(
+                            x || AlrpStore.attractors.SOMATIC.x + rng.randn() * 0.05,
+                            y || AlrpStore.attractors.SOMATIC.y + rng.randn() * 0.05
+                        );
+                        this.vel = new Vector2(0, 0);
+                        this.network = new AlrpNetwork();
+                        this.type = 'SOMATIC';
+                        this.health = 1.0;
+                        this.chromatin = 0.1; // Epigenetic Accessibility (0-1)
+                        this.latent = new Float32Array(3);
+                        this.history = []; // Initialize trajectory history
+                    }
+
+                    computeLatents() {
+                        const s = this.network.state;
+                        this.latent[0] = (s[0] + 1) / 2;
+                        this.latent[1] = 1 - Math.abs(s[3]);
+                        this.latent[2] = s[1] * 0.5 + s[2] * 0.5;
+                    }
+
+                    tick(env, grid, params) {
+                        if (this.type === 'DEATH') return;
+
+                        // Epigenetic Chrome Dynamics (The Barrier)
+                        // OSKM factors (0,4,5,3) open the chromatin
+                        const s = this.network.state;
+                        const pioneerFactor = (s[3] + s[5] + 0.5) / 2; // Myc + Klf4
+                        if (env.vector === 'OSKM' || pioneerFactor > 0.5) {
+                            this.chromatin = Math.min(1.0, this.chromatin + params.chromatinOpening * params.dt);
+                        } else {
+                            this.chromatin = Math.max(0.1, this.chromatin - params.chromatinDecay * params.dt);
+                        }
+
+                        // Evolve network with accessibility gating
+                        this.network.evolve(env, params.dt, params, this.chromatin);
+
+                        // 1. Manifold Distance-Based Assignment
+                        // Calculate phenotypic scores in the latent manifold
+                        const pluripScore = Math.max(0, (s[0] + s[4] + s[5] + s[6]) / 4);
+                        const neuroScore = Math.max(0, s[1]);
+                        const cardioScore = Math.max(0, s[2]);
+                        const tumorScore = Math.max(0, s[3]);
+
+                        const total = pluripScore + neuroScore + cardioScore + tumorScore + 0.001;
+
+                        // Phenotypic Probabilities (Softmax-like projection)
+                        const p = [pluripScore / total, neuroScore / total, cardioScore / total, tumorScore / total];
+                        const maxIdx = p.indexOf(Math.max(...p));
+
+                        if (s[3] > 0.8) this.type = 'TUMOR';
+                        else if (maxIdx === 0 && pluripScore > 0.45) this.type = 'IPSC';
+                        else if (maxIdx === 1 && neuroScore > 0.5) this.type = 'NEURO';
+                        else if (maxIdx === 2 && cardioScore > 0.5) this.type = 'CARDIO';
+                        else this.type = 'SOMATIC';
+
+                        // 2. Information Theoretic Stability (Local Entropy)
+                        // H = -sum(pi * log(pi))
+                        let entropy = 0;
+                        p.forEach(val => { if (val > 0.01) entropy -= val * Math.log2(val); });
+                        this.stability = 1 - MathUtils.clamp(entropy, 0, 1);
+
+                        // Physics & Social Repulsion
+                        const force = new Vector2(0, 0);
+                        const neighbors = grid.query(this.pos, params.radius * 3);
+                        neighbors.forEach(n => {
+                            if (n !== this) {
+                                const push = this.pos.copy().sub(n.pos);
+                                const dist = Math.sqrt(this.pos.distSq(n.pos)) || 0.001;
+                                if (dist < params.radius * 2) force.add(push.mult(0.01 / dist));
+                            }
+                        });
+
+                        const target = AlrpStore.attractors[this.type];
+                        const attraction = target ? new Vector2(target.x - this.pos.x, target.y - this.pos.y).mult(0.02) : new Vector2(0, 0);
+
+                        this.vel.add(force).add(attraction).mult(params.friction);
+                        this.pos.add(this.vel);
+                        this.pos.x = MathUtils.clamp(this.pos.x, 0.05, 0.95);
+                        this.pos.y = MathUtils.clamp(this.pos.y, 0.05, 0.95);
+
+                        // Trajectory History for Selected Agent
+                        if (AlrpStore.state.selectedId === this.id) {
+                            this.history.push(this.pos.copy());
+                            if (this.history.length > 25) this.history.shift();
+                        } else if (this.history.length > 0) {
+                            this.history = [];
+                        }
+
+                        if (this.type === 'TUMOR' || s[3] > 0.7) this.health -= 0.005;
+                        BiologyValidator.validateHealth(this);
+                        if (this.health <= 0) this.type = 'DEATH';
+                    }
+
+                    mitosis(grid, limits) {
+                        if (this.type === 'DEATH' || this.health < 0.6) return null;
+                        const chance = (this.type === 'TUMOR' ? limits.mitosisChance * 2.5 : limits.mitosisChance);
+                        if (rng.next() < chance) {
+                            if (grid.query(this.pos, AlrpStore.manifest.params.radius * 2).length > limits.crowdingLimit) return null;
+                            const daughter = new AlrpAgent(-1, this.pos.x + 0.01, this.pos.y + 0.01);
+                            daughter.type = this.type;
+                            daughter.network.state.set(this.network.state);
+                            this.health -= 0.2;
+                            return daughter;
+                        }
+                        return null;
+                    }
+                }
+
+                /* =========================
+                   SECTION 6 â€” ML / INTELLIGENCE INTERFACES
+                   ========================= */
+
+                /**
+                 * AlrpIntelligence formalizes the ML layer.
+                 * Provides auditable inference contracts for causal suggestion.
+                 */
+                const AlrpIntelligence = {
+                    prevP: null,
+
+                    predictResilience(agents) {
+                        if (agents.length === 0) return { score: 1.0, risk: 'LOW', entropy: "0.000", fisher: "0.00" };
+
+                        const types = ['SOMATIC', 'IPSC', 'NEURO', 'CARDIO', 'TUMOR'];
+                        const counts = { SOMATIC: 0, IPSC: 0, NEURO: 0, CARDIO: 0, TUMOR: 0 };
+                        agents.forEach(a => { if (counts[a.type] !== undefined) counts[a.type]++; });
+
+                        const N = agents.length;
+                        const currentP = types.map(t => counts[t] / N);
+
+                        // 1. Structural Entropy (Shannon Entropy)
+                        let H = 0;
+                        currentP.forEach(p => { if (p > 0.001) H -= p * Math.log2(p); });
+
+                        // 2. Fisher Information (Information Gain / Transition Flux)
+                        let fisher = 0;
+                        if (this.prevP) {
+                            currentP.forEach((p, i) => {
+                                const dp = p - this.prevP[i];
+                                fisher += (dp * dp) / (p + 0.001);
+                            });
+                        }
+                        this.prevP = currentP;
+
+                        // Score 0.0 (High Entropy/Unstable) to 1.0 (Low Entropy/Stable)
+                        const score = Math.max(0, 1 - (H / 2.322)).toFixed(2);
+                        return {
+                            score: score,
+                            entropy: H.toFixed(3),
+                            fisher: (fisher * 500).toFixed(2), // Scaled for HUD visibility
+                            risk: H > 1.5 ? 'CRITICAL' : (H > 0.8 ? 'TRANSITION' : 'STABLE')
+                        };
+                    },
+                    suggestPerturbation(agents) {
+                        // Logic for Suggestion (Mocked for production schema)
+                        return { suggestion: "N/A", confidence: 0.0 };
+                    }
+                };
+
+                const BiosimCell = AlrpAgent;
+
+
+                /* =========================
+                   SECTION 7 â€” RENDERING ENGINE
+                   ========================= */
+
+                /**
+                 * BiosimRenderer - PROFESSIONAL MICROSCOPY ENGINE
+                 * Renders cells with organic shapes, nuclei, organelles, and fluorescent effects
+                 */
+                const BiosimRenderer = {
+                    initSprites() {
+                        // No longer using pre-rendered sprites - drawing procedurally
+                    },
+
+                    render(ctx, agents, w, h, mode, attractors) {
+                        ctx.clearRect(0, 0, w, h);
+
+                        // 1. Draw Attractors
+                        Object.values(attractors).forEach(a => {
+                            ctx.strokeStyle = a.c + '44';
+                            ctx.lineWidth = 1;
+                            ctx.beginPath();
+                            ctx.arc(a.x * w, a.y * h, 30, 0, Math.PI * 2);
+                            ctx.stroke();
+                            ctx.fillStyle = a.c + '66';
+                            ctx.font = '8px JetBrains Mono';
+                            ctx.fillText(a.label, a.x * w - 20, a.y * h + 45);
+                        });
+
+                        // 2. Draw Agents with Organic Rendering
+                        const scale = Math.min(w, h);
+                        agents.forEach(a => {
+                            const x = a.pos.x * w, y = a.pos.y * h;
+
+                            if (mode === 'HEALTH') {
+                                ctx.fillStyle = `hsl(${a.health * 120}, 70%, 50%)`;
+                                ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI * 2); ctx.fill();
+                            } else if (mode === 'STABILITY') {
+                                const v = MathUtils.clamp(a.network.velocity * 100, 0, 1);
+                                ctx.fillStyle = `hsl(${200 + v * 160}, 80%, 60%)`;
+                                ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI * 2); ctx.fill();
+                            } else if (mode === 'EPIGENETIC') {
+                                const hue = 180 + a.chromatin * 100;
+                                ctx.fillStyle = `hsla(${hue}, 80%, 60%, 0.8)`;
+                                ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fill();
+                            } else {
+                                // TYPE MODE: Professional Organic Cell Rendering
+                                this.drawOrganicCell(ctx, a, x, y, scale * 0.015);
+                            }
+
+                            // 3. Draw Trajectory Tail for Selected
+                            if (a.id === AlrpStore.state.selectedId && a.history.length > 1) {
+                                ctx.beginPath();
+                                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                                ctx.lineWidth = 1;
+                                a.history.forEach((p, idx) => {
+                                    if (idx === 0) ctx.moveTo(p.x * w, p.y * h);
+                                    else ctx.lineTo(p.x * w, p.y * h);
+                                });
+                                ctx.stroke();
+                            }
+                        });
+                    },
+
+                    drawOrganicCell(ctx, agent, x, y, baseSize) {
+                        const color = AlrpStore.attractors[agent.type]?.c || '#888';
+                        const hsl = this.hexToHSL(color);
+
+                        // BIOLOGICALLY ACCURATE SIZE SCALING
+                        const sizeMultipliers = {
+                            TUMOR: 1.8,      // Largest - uncontrolled growth
+                            IPSC: 1.4,       // Large - pluripotent stem cells
+                            NEURO: 1.2,      // Medium-large - neurons
+                            CARDIO: 1.0,     // Medium - cardiomyocytes  
+                            SOMATIC: 0.8,    // Small - fibroblasts
+                            DEATH: 0.5       // Smallest - apoptotic shrinkage
+                        };
+                        const sizeScale = sizeMultipliers[agent.type] || 1.0;
+
+                        // Pulsing animation based on agent ID and time
+                        const wobblePhase = (agent.id * 0.1 + Date.now() / 500) % (Math.PI * 2);
+                        const wobble = Math.sin(wobblePhase) * (baseSize * 0.15);
+                        const r = (baseSize * sizeScale) + wobble;
+
+                        // 1. OUTER MEMBRANE GLOW (Fluorescent Effect)
+                        const grad = ctx.createRadialGradient(x, y, r * 0.2, x, y, r * 1.5);
+                        const alpha = (agent.type === 'IPSC' || agent.type === 'TUMOR') ? 0.85 : 0.6;
+                        grad.addColorStop(0, `hsla(${hsl.h}, ${hsl.s} %, ${hsl.l + 10} %, ${alpha})`);
+                        grad.addColorStop(0.5, `hsla(${hsl.h}, ${hsl.s} %, ${hsl.l} %, 0.3)`);
+                        grad.addColorStop(1, 'transparent');
+
+                        ctx.fillStyle = grad;
+                        ctx.beginPath();
+                        this.traceOrganicBoundary(ctx, x, y, r, agent.id);
+                        ctx.fill();
+
+                        // 2. NUCLEUS (Bright Center with offset)
+                        const nucleusOffset = {
+                            x: Math.sin(agent.id * 0.5) * r * 0.2,
+                            y: Math.cos(agent.id * 0.5) * r * 0.2
+                        };
+                        const nx = x + nucleusOffset.x;
+                        const ny = y + nucleusOffset.y;
+                        const nucleusGrad = ctx.createRadialGradient(nx, ny, 0, nx, ny, r * 0.35);
+                        nucleusGrad.addColorStop(0, `hsla(${hsl.h}, 100 %, 95 %, 0.95)`);
+                        nucleusGrad.addColorStop(0.7, `hsla(${hsl.h}, 90 %, 70 %, 0.5)`);
+                        nucleusGrad.addColorStop(1, `hsla(${hsl.h}, 80 %, 60 %, 0.1)`);
+
+                        ctx.fillStyle = nucleusGrad;
+                        ctx.beginPath();
+                        ctx.arc(nx, ny, r * 0.32, 0, Math.PI * 2);
+                        ctx.fill();
+
+                        // 3. ORGANELLES (Mitochondria/Vesicles - Small Specks)
+                        ctx.fillStyle = `hsla(${hsl.h}, 100 %, 85 %, 0.6)`;
+                        for (let i = 0; i < 5; i++) {
+                            const angle = (i / 5) * Math.PI * 2 + agent.id;
+                            const dist = r * (0.4 + Math.sin(agent.id + i) * 0.15);
+                            const ox = x + Math.cos(angle) * dist;
+                            const oy = y + Math.sin(angle) * dist;
+                            ctx.beginPath();
+                            ctx.arc(ox, oy, r * 0.1, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+
+                        // 4. MEMBRANE DETAIL (Subtle edge highlight for depth)
+                        ctx.strokeStyle = `hsla(${hsl.h}, 100 %, 90 %, 0.3)`;
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        this.traceOrganicBoundary(ctx, x, y, r * 0.9, agent.id);
+                        ctx.stroke();
+                    },
+
+                    traceOrganicBoundary(ctx, x, y, r, seed) {
+                        // Creates wobbly cell membrane using sine wave perturbations
+                        const points = 12;
+                        const angleStep = (Math.PI * 2) / points;
+                        const time = Date.now() / 400;
+
+                        ctx.moveTo(x + r, y);
+                        for (let i = 1; i <= points; i++) {
+                            const angle = i * angleStep;
+                            const noise = Math.sin(time + i * 1.3 + seed * 0.4) * (r * 0.2);
+                            const px = x + Math.cos(angle) * (r + noise);
+                            const py = y + Math.sin(angle) * (r + noise);
+                            ctx.lineTo(px, py);
+                        }
+                        ctx.closePath();
+                    },
+
+                    hexToHSL(hex) {
+                        // Convert hex color to HSL for gradient control
+                        let r = 0, g = 0, b = 0;
+                        if (hex.length === 7) {
+                            r = parseInt(hex.slice(1, 3), 16) / 255;
+                            g = parseInt(hex.slice(3, 5), 16) / 255;
+                            b = parseInt(hex.slice(5, 7), 16) / 255;
+                        } else if (hex.length === 4) {
+                            r = parseInt(hex[1] + hex[1], 16) / 255;
+                            g = parseInt(hex[2] + hex[2], 16) / 255;
+                            b = parseInt(hex[3] + hex[3], 16) / 255;
+                        }
+
+                        const max = Math.max(r, g, b), min = Math.min(r, g, b);
+                        let h = 0, s = 0, l = (max + min) / 2;
+
+                        if (max !== min) {
+                            const d = max - min;
+                            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                            if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+                            else if (max === g) h = ((b - r) / d + 2) / 6;
+                            else h = ((r - g) / d + 4) / 6;
+                        }
+                        return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+                    }
+                };
+
+                /* =========================
+
+/* =========================
+   3D WADDINGTON'S LANDSCAPE MODULE
+   ========================= */
+
+/**
+ * Waddington3D - Scientific 3D Epigenetic Landscape Visualization
+ * Based on Yamanaka's Nobel Prize research (2012) and Waddington's concept (1957)
+ */
+const Waddington3D = {
+    active: false,
+    scene: null,
+    camera: null,
+    renderer: null,
+    controls: null,
+    landscapeMesh: null,
+    cellMeshes: [],
+
+    // Canvas reference
+    canvas2d: null,
+    canvas3d: null,
+
+    init(canvas2d, canvas3d) {
+        this.canvas2d = canvas2d;
+        this.canvas3d = canvas3d;
+
+        // Create Three.js scene
+        this.scene = new THREE.Scene();
+        this.scene.background = new THREE.Color(0x000000);
+        this.scene.fog = new THREE.Fog(0x000000, 10, 50);
+
+        // Create camera
+        const aspect = canvas3d.clientWidth / canvas3d.clientHeight;
+        this.camera = new THREE.PerspectiveCamera(50, aspect, 0.1, 100);
+        this.camera.position.set(5, 8, 12);
+        this.camera.lookAt(0, 0, 0);
+
+        // Create renderer
+        this.renderer = new THREE.WebGLRenderer({
+            canvas: canvas3d,
+            antialias: true,
+            alpha: true
+        });
+        this.renderer.setPixelRatio(window.devicePixelRatio);
+        this.renderer.setSize(canvas3d.clientWidth, canvas3d.clientHeight);
+        this.renderer.shadowMap.enabled = true;
+
+        // Add orbit controls
+        this.controls = new THREE.OrbitControls(this.camera, canvas3d);
+        this.controls.enableDamping = true;
+        this.controls.dampingFactor = 0.05;
+        this.controls.minDistance = 3;
+        this.controls.maxDistance = 25;
+        this.controls.maxPolarAngle = Math.PI / 2.1;
+
+        // Add lights
+        const ambientLight = new THREE.AmbientLight(0x404040, 1.5);
+        this.scene.add(ambientLight);
+
+        const mainLight = new THREE.DirectionalLight(0xffffff, 1.2);
+        mainLight.position.set(5, 10, 5);
+        mainLight.castShadow = true;
+        this.scene.add(mainLight);
+
+        const fillLight = new THREE.DirectionalLight(0x4488ff, 0.5);
+        fillLight.position.set(-5, 3, -5);
+        this.scene.add(fillLight);
+
+        // Build the landscape
+        this.buildLandscape();
+
+        BiosimUI.notify('3D Engine', 'Waddington Landscape Initialized', 'suc');
+    },
+
+    buildLandscape() {
+        // Create landscape geometry (grid-based surface)
+        const resolution = 80;
+        const size = 10;
+        const geometry = new THREE.PlaneGeometry(size, size, resolution, resolution);
+
+        // Calculate heights based on potential energy function
+        const vertices = geometry.attributes.position.array;
+        for (let i = 0; i < vertices.length; i += 3) {
+            const x = vertices[i] / size + 0.5;     // Normalize to 0-1
+            const y = vertices[i + 1] / size + 0.5;  // Normalize to 0-1
+            const z = this.potentialEnergy(x, y);
+            vertices[i + 2] = z * 2; // Scale height for visibility
+        }
+        geometry.computeVertexNormals();
+
+        // Create material with vertex coloring based on height
+        const material = new THREE.MeshStandardMaterial({
+            color: 0x1a5490,
+            metalness: 0.3,
+            roughness: 0.7,
+            wireframe: false,
+            side: THREE.DoubleSide
+        });
+
+        this.landscapeMesh = new THREE.Mesh(geometry, material);
+        this.landscapeMesh.rotation.x = -Math.PI / 2;
+        this.landscapeMesh.receiveShadow = true;
+        this.scene.add(this.landscapeMesh);
+
+        // Add grid helper
+        const gridHelper = new THREE.GridHelper(size, 20, 0x2563eb, 0x1f1f1f);
+        gridHelper.position.y = -2;
+        this.scene.add(gridHelper);
+
+        // Add valley labels (text sprites would go here in full version)
+    },
+
+    potentialEnergy(x, y) {
+        /**
+         * Energy function creating Waddington's landscape
+         * Valleys (minima) = stable cell states
+         * Hills/ridges = transition barriers
+         * 
+         * Based on gene expression:
+         * x = Pluripotency (OCT4, SOX2, NANOG)
+         * y = Differentiation (NEURO, CARDIO)
+         */
+
+        // Valley definitions: {x, y, depth, width}
+        const valleys = [
+            { x: 0.8, y: 0.2, depth: 1.2, width: 0.15, name: 'IPSC' },      // iPSC valley
+            { x: 0.2, y: 0.2, depth: 0.9, width: 0.18, name: 'SOMATIC' },  // Somatic valley
+            { x: 0.5, y: 0.85, depth: 1.0, width: 0.12, name: 'NEURO' },   // Neuro valley
+            { x: 0.15, y: 0.7, depth: 0.95, width: 0.12, name: 'CARDIO' }  // Cardio valley
+        ];
+
+        // Calculate energy as sum of Gaussian valleys
+        let energy = 0.5; // Base elevation
+
+        valleys.forEach(v => {
+            const dx = x - v.x;
+            const dy = y - v.y;
+            const distSq = dx * dx + dy * dy;
+            const valley = -v.depth * Math.exp(-distSq / (v.width * v.width));
+            energy += valley;
+        });
+
+        // Add slight upward tilt for TUMOR region (unstable)
+        const tumorPenalty = Math.max(0, (x - 0.7) * (y - 0.7)) * 0.8;
+        energy += tumorPenalty;
+
+        return energy;
+    },
+
+    updateCells(agents) {
+        if (!this.active) return;
+
+        // Remove old cell meshes
+        this.cellMeshes.forEach(mesh => this.scene.remove(mesh));
+        this.cellMeshes = [];
+
+        // Create new cell meshes
+        agents.forEach(agent => {
+            if (agent.type === 'DEATH') return;
+
+            // Map gene state to 3D position
+            const s = agent.network.state;
+            const xGene = (s[0] + s[4] + s[6] + 3) / 6;  // Pluripotency (0-1)
+            const yGene = (s[1] + s[2] + 2) / 4;          // Differentiation (0-1)
+
+            // Convert to world coordinates
+            const worldX = (xGene - 0.5) * 10;
+            const worldY = (yGene - 0.5) * 10;
+            const worldZ = this.potentialEnergy(xGene, yGene) * 2 + 0.3;
+
+            // Cell size based on type
+            const sizeMap = {
+                TUMOR: 0.25, IPSC: 0.18, NEURO: 0.16,
+                CARDIO: 0.14, SOMATIC: 0.12
+            };
+            const radius = sizeMap[agent.type] || 0.12;
+
+            // Cell color
+            const colorMap = {
+                SOMATIC: 0x64748b, IPSC: 0xeab308, NEURO: 0xa855f7,
+                CARDIO: 0xf43f5e, TUMOR: 0xef4444
+            };
+            const color = colorMap[agent.type] || 0x888888;
+
+            // Create cell sphere
+            const geometry = new THREE.SphereGeometry(radius, 16, 16);
+            const material = new THREE.MeshStandardMaterial({
+                color: color,
+                emissive: color,
+                emissiveIntensity: 0.3,
+                metalness: 0.2,
+                roughness: 0.8
+            });
+
+            const cellMesh = new THREE.Mesh(geometry, material);
+            cellMesh.position.set(worldX, worldZ, worldY);
+            cellMesh.castShadow = true;
+
+            this.scene.add(cellMesh);
+            this.cellMeshes.push(cellMesh);
+        });
+    },
+
+    toggle() {
+        this.active = !this.active;
+
+        if (this.active) {
+            // Switch to 3D view
+            this.canvas2d.style.display = 'none';
+            this.canvas3d.style.display = 'block';
+
+            // Initialize if needed
+            if (!this.scene) {
+                this.init(this.canvas2d, this.canvas3d);
+            }
+
+            // Update button style
+            const btn = document.getElementById('3d-toggle-btn');
+            if (btn) {
+                btn.className = 'bg-blue-600 hover:bg-blue-700 text-[9px] text-white border border-blue-500 px-2 py-1 rounded backdrop-blur font-mono transition-colors';
+                btn.innerHTML = '<i data-lucide="box" class="w-3 h-3 inline mr-1"></i> EXIT 3D';
+            }
+
+            BiosimUI.notify('3D View', 'Waddington Landscape Active  - Drag to rotate', 'inf');
+        } else {
+            // Switch back to 2D view
+            this.canvas2d.style.display = 'block';
+            this.canvas3d.style.display = 'none';
+
+            // Update button style
+            const btn = document.getElementById('3d-toggle-btn');
+            if (btn) {
+                btn.className = 'bg-blue-900/50 hover:bg-blue-800/80 text-[9px] text-white border border-blue-700 px-2 py-1 rounded backdrop-blur font-mono transition-colors';
+                btn.innerHTML = '<i data-lucide="box" class="w-3 h-3 inline mr-1"></i> 3D LANDSCAPE';
+            }
+            lucide.createIcons();
+
+            BiosimUI.notify('2D View', 'Returned to standard view', 'inf');
+        }
+    },
+
+    render() {
+        if (!this.active || !this.renderer) return;
+
+        this.controls.update();
+        this.renderer.render(this.scene, this.camera);
+    },
+
+    resize(width, height) {
+        if (!this.camera || !this.renderer) return;
+
+        this.camera.aspect = width / height;
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(width, height);
+    }
+};
+
+                   SECTION 8 â€” COMMAND BRIDGE (The Validated Interface)
+                   ========================= */
+
+                /**
+                 * BiosimBridge is the ONLY authorized communication channel.
+                 * It validates UI inputs before sending them to the Engine.
+                 */
+                const BiosimBridge = {
+                    injectVector(vector, method) {
+                        const validVectors = ['OSKM', 'LIN28', 'DIRECT_NEURO', 'DIRECT_CARDIO'];
+                        if (!validVectors.includes(vector)) {
+                            BiosimUI.notify('Security Violation', 'Invalid vector proposed', 'err');
+                            return;
+                        }
+                        AlrpStore.state.environment.vector = vector;
+                        AlrpStore.state.environment.method = method;
+                        BiosimUI.notify('Transfection', `Injected ${vector} via ${method} `, 'wrn');
+                        setTimeout(() => { AlrpStore.state.environment.vector = null; }, 5000);
+                    },
+
+                    induceDisease(type) {
+                        AlrpStore.state.environment.disease = type;
+                        BiosimUI.notify('Disease Induction', `Pathology: ${type} `, 'err');
+                    },
+
+                    treatDisease(drug) {
+                        AlrpStore.state.environment.drug = drug;
+                        BiosimUI.notify('Intervention', `Administered ${drug} `, 'suc');
+                        setTimeout(() => { AlrpStore.state.environment.drug = null; }, 4000);
+                    },
+
+                    performAssay(type) {
+                        BiosimUI.notify('Laboratory Assay', `Running ${type} documentation...`, 'inf');
+                    },
+
+                    activateSCNT() {
+                        AlrpStore.state.environment.method = 'SCNT';
+                        BiosimUI.notify('Protocol 404', 'SCNT alignment active. Select target cell.', 'wrn');
+                    },
+
+                    syncUI(agents) {
+                        const popDisp = document.getElementById('header-pop');
+                        const popDispSide = document.getElementById('disp-pop');
+                        if (popDisp) popDisp.innerText = agents.length;
+                        if (popDispSide) popDispSide.innerText = agents.length;
+
+                        const timeDisp = document.getElementById('time-disp');
+                        if (timeDisp) {
+                            const days = (AlrpStore.state.tick * AlrpStore.manifest.params.dt).toFixed(1);
+                            timeDisp.innerText = `T+ ${days}d`;
+                        }
+
+                        const bar = document.getElementById('progress-bar');
+                        if (bar) bar.style.width = `${(AlrpStore.state.tick / 10) % 100}% `;
+
+                        const res = AlrpIntelligence.predictResilience(agents);
+                        const hudDna = document.getElementById('hud-dna');
+                        const hudRisk = document.getElementById('hud-risk');
+                        const hudVec = document.getElementById('hud-vec');
+                        const hudEpi = document.getElementById('hud-epi');
+                        const status = document.getElementById('sim-status');
+
+                        if (hudDna) hudDna.innerText = res.entropy;
+                        if (hudRisk) hudRisk.innerText = res.risk;
+                        if (hudVec) hudVec.innerText = AlrpStore.state.environment.vector || 'NONE';
+                        if (hudEpi) hudEpi.innerText = res.fisher;
+                        if (status) {
+                            status.innerText = res.risk;
+                            status.className = `text - [9px] px - 1.5 py - 0.5 rounded border ${res.risk === 'CRITICAL' ? 'text-red-500 bg-red-900/20 border-red-900' : res.risk === 'TRANSITION' ? 'text-yellow-500 bg-yellow-900/20 border-yellow-900' : 'text-green-500 bg-green-900/20 border-green-900'} `;
+                        }
+
+                        // 2. AGENT INSPECTOR & TRANSCRIPTOME
+                        const selected = agents.find(a => a.id === AlrpStore.state.selectedId);
+                        const inspId = document.getElementById('insp-id');
+                        const inspState = document.getElementById('insp-state');
+                        const inspOnco = document.getElementById('insp-onco');
+
+                        if (selected) {
+                            if (inspId) inspId.innerText = selected.id;
+                            if (inspState) inspState.innerText = selected.type;
+                            if (inspOnco) inspOnco.innerText = (selected.network.state[3] * 100).toFixed(0) + "%";
+
+                            // Update Transcriptome Grid
+                            for (let i = 0; i < 4; i++) {
+                                const node = document.getElementById(`g${i} `);
+                                if (node) {
+                                    const val = (selected.network.state[i] + 1) / 2; // Normalize to 0-1
+                                    node.style.background = `rgba(37, 99, 235, ${val})`;
+                                    node.style.color = val > 0.5 ? '#fff' : '#555';
+                                }
+                            }
+                        } else {
+                            if (inspId) inspId.innerText = "--";
+                            if (inspState) inspState.innerText = "--";
+                            if (inspOnco) inspOnco.innerText = "--";
+                            for (let i = 0; i < 4; i++) {
+                                const node = document.getElementById(`g${i} `);
+                                if (node) node.style.background = "#111";
+                            }
+                        }
+
+                        // 3. CHART POPULATION (Aggregated)
+                        if (this.mainChart && AlrpStore.state.tick % 10 === 0) {
+                            const counts = { SOMATIC: 0, IPSC: 0, NEURO: 0, CARDIO: 0, TUMOR: 0 };
+                            agents.forEach(a => { if (counts[a.type] !== undefined) counts[a.type]++; });
+                            this.mainChart.data.datasets[0].data = Object.values(counts);
+                            this.mainChart.update('none');
+                        }
+                    }
+                };
+
+                /* =========================
+                   SECTION 9 â€” PERFORMANCE, LOGGING & I/O
+                   ========================= */
+
+                /**
+                 * PERFORMANCE LIMITS & GUARDRAILS
+                 */
+                const BIOSIM_LIMITS = {
+                    MAX_AGENTS: 5000,       // Global population ceiling
+                    TARGET_FPS: 60,         // Refresh rate target
+                    RECOVERY_THRESHOLD: 15, // FPS floor before engine degradation
+                    LATENCY_WARNING: 100    // MS per frame threshold
+                };
+
+                const BiosimTelemetry = {
+                    frameTimes: [],
+                    recordFrame(ms) {
+                        this.frameTimes.push(ms);
+                        if (this.frameTimes.length > 60) this.frameTimes.shift();
+                    },
+                    getFPS() {
+                        if (this.frameTimes.length === 0) return 60;
+                        const avg = this.frameTimes.reduce((a, b) => a + b, 0) / this.frameTimes.length;
+                        return Math.round(1000 / avg) || 60;
+                    }
+                };
+
+                const BiosimIO = {
+                    saveManifest() {
+                        const data = JSON.stringify(AlrpStore.manifest, null, 2);
+                        const blob = new Blob([data], { type: 'application/json' });
+                        const a = document.createElement('a');
+                        a.href = URL.createObjectURL(blob);
+                        a.download = `manifest_${AlrpStore.manifest.id}.json`;
+                        a.click();
+                        BiosimUI.notify('I/O Success', 'Manifest archived', 'suc');
+                    },
+                    loadManifest(input) {
+                        const file = input.files[0];
+                        if (!file) return;
+                        const r = new FileReader();
+                        r.onload = (e) => {
+                            try {
+                                const m = JSON.parse(e.target.result);
+                                if (!m.v || !m.params) throw new Error("Invalid Schema");
+                                AlrpStore.manifest = m;
+                                BiosimEngine.boot();
+                                BiosimUI.notify('I/O Success', 'Manifest restored', 'suc');
+                            } catch (err) {
+                                BiosimUI.notify('I/O Error', err.message, 'err');
+                            }
+                        };
+                        r.readAsText(file);
+                    },
+                    exportCSV() {
+                        let csv = "id,type,health,x,y\n";
+                        BiosimEngine.agents.forEach(a => {
+                            csv += `${a.id},${a.type},${a.health.toFixed(3)},${a.pos.x.toFixed(3)},${a.pos.y.toFixed(3)} \n`;
+                        });
+                        const blob = new Blob([csv], { type: 'text/csv' });
+                        const a = document.createElement('a');
+                        a.href = URL.createObjectURL(blob);
+                        a.download = `telemetry_${Date.now()}.csv`;
+                        a.click();
+                    },
+                    resetView() {
+                        BiosimEngine.resize();
+                        BiosimUI.notify('System', 'Viewport recalibrated', 'inf');
+                    },
+                    generateReport() {
+                        const agents = BiosimEngine.agents;
+                        const counts = { SOMATIC: 0, IPSC: 0, NEURO: 0, CARDIO: 0, TUMOR: 0 };
+                        agents.forEach(a => counts[a.type]++);
+                        const res = AlrpIntelligence.predictResilience(agents);
+
+                        const reportHTML = `
+                    < div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4" onclick = "this.remove()" >
+                        <div class="bg-black border border-blue-900 w-full max-w-lg p-6 rounded shadow-2xl font-mono" onclick="event.stopPropagation()">
+                            <div class="flex justify-between border-b border-blue-900 pb-4 mb-4">
+                                <div class="text-blue-500 font-bold tracking-tighter text-lg uppercase">Research Analysis Report</div>
+                                <div class="text-slate-500 text-[10px]">VER: ${AlrpStore.manifest.v}</div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 text-[10px]">
+                                <div class="space-y-2">
+                                    <div class="text-slate-500 uppercase border-b border-dim pb-1">Population Ensemble</div>
+                                    <div class="flex justify-between"><span>Somatic Units</span><span class="text-slate-300 font-bold">${counts.SOMATIC}</span></div>
+                                    <div class="flex justify-between"><span>Pluripotent</span><span class="text-yellow-500 font-bold">${counts.IPSC}</span></div>
+                                    <div class="flex justify-between"><span>Oncogenic</span><span class="text-red-500 font-bold">${counts.TUMOR}</span></div>
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="text-slate-500 uppercase border-b border-dim pb-1">Stability Metrics</div>
+                                    <div class="flex justify-between"><span>Shannon Entropy</span><span class="text-blue-400 font-bold">${res.entropy}</span></div>
+                                    <div class="flex justify-between"><span>Information Flux</span><span class="text-green-500 font-bold">${res.fisher}</span></div>
+                                    <div class="flex justify-between"><span>Risk Status</span><span class="text-orange-500 font-bold">${res.risk}</span></div>
+                                </div>
+                            </div>
+                            <div class="mt-6 pt-4 border-t border-blue-900 text-[9px] text-slate-400 italic">
+                                Summary: Population exhibits ${res.risk.toLowerCase()} identity flux. Current distribution indicates ${counts.IPSC > 0 ? "ongoing reprogramming" : "lineage stability"}.
+                            </div>
+                            <button class="mt-6 w-full py-2 bg-blue-950 border border-blue-700 text-blue-300 rounded hover:bg-blue-800 hover:text-white transition-all uppercase text-[10px] font-bold" onclick="this.parentElement.parentElement.remove()">Acknowledge</button>
+                        </div>
+                            </div >
+                    `;
+                        document.body.insertAdjacentHTML('beforeend', reportHTML);
+                        BiosimUI.notify('Report', 'Principal Investigator briefing generated', 'suc');
+                    }
+                };
+
+                /* =========================
+                   SECTION 10 â€” INLINE DIAGNOSTICS & AUDIT
+                   ========================= */
+
+                const BiosimDiagnostics = {
+                    runSelfTest() {
+                        BiosimUI.notify('Diagnostic Mode', 'Initiating system self-test...', 'data');
+                        try {
+                            const testRng = new BiosimRandom(12345);
+                            if (testRng.next() !== (new BiosimRandom(12345)).next()) throw new Error("RNG Fail");
+
+                            const testAgent = new AlrpAgent(-1, 0.5, 0.5);
+                            testAgent.health = 2.0;
+                            BiologyValidator.validateHealth(testAgent);
+                            if (testAgent.health > 1.0) throw new Error("Health Invariant Fail");
+
+                            BiosimUI.notify('Diagnostic Pass', 'Core invariants verified', 'suc');
+                        } catch (err) {
+                            BiosimUI.notify('Diagnostic Fail', err.message, 'err');
+                            return false;
+                        }
+                        return true;
+                    }
+                };
+
+                /* =========================
+                   SECTION 11 â€” CORE BOOTSTRAPPER
+                   ========================= */
+
+                const BiosimUI = {
+                    notify(title, msg, type = 'inf') {
+                        const feed = document.getElementById('toast-feed');
+                        if (!feed) return;
+                        const t = document.createElement('div');
+                        t.className = `toast border - l - 4 ${type === 'err' ? 'border-red-500' : type === 'wrn' ? 'border-yellow-500' : type === 'suc' ? 'border-green-500' : 'border-blue-500'} `;
+                        t.innerHTML = `< div class="toast-h" > ${title}</div > <div class="toast-b">${msg}</div>`;
+                        feed.appendChild(t);
+                        setTimeout(() => t.remove(), 4000);
+
+                        const term = document.getElementById('terminal-output');
+                        if (term) {
+                            const line = document.createElement('div');
+                            line.className = 'log-line';
+                            const ts = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                            line.innerHTML = `< span class="log-ts" > [${ts}]</span > <span class="log-${type}">${title}: ${msg}</span>`;
+                            term.prepend(line);
+                            if (term.childNodes.length > 50) term.lastChild.remove();
+                        }
+                    }
+                };
+
+                const BiosimEngine = {
+                    agents: [],
+                    grid: new BiosimSpatialGrid(0.05),
+                    canvas: null, ctx: null,
+                    nextId: 0,
+
+                    init(canvas) {
+                        this.canvas = canvas;
+                        this.ctx = canvas.getContext('2d');
+                        this.resize();
+                        window.addEventListener('resize', () => this.resize());
+
+                        canvas.addEventListener('mousedown', (e) => {
+                            const rect = canvas.getBoundingClientRect();
+                            const x = (e.clientX - rect.left) / rect.width;
+                            const y = (e.clientY - rect.top) / rect.height;
+                            const clickPos = new Vector2(x, y);
+
+                            const neighbors = this.grid.query(clickPos, 0.05);
+                            if (neighbors.length > 0) {
+                                const target = neighbors[0];
+                                if (AlrpStore.state.environment.method === 'SCNT') {
+                                    target.type = 'IPSC';
+                                    target.health = 0.8;
+                                    target.network.state.fill(-0.8);
+                                    target.network.state[0] = 0.9;
+                                    BiosimUI.notify('Protocol SCNT', `Reprogrammed Agent ${target.id} `, 'wrn');
+                                    AlrpStore.state.environment.method = 'MRNA';
+                                } else {
+                                    AlrpStore.state.selectedId = target.id;
+                                    BiosimUI.notify('Inspector', `Locked: Agent ${target.id} `, 'inf');
+                                }
+                            }
+                        });
+                    },
+
+                    resize() {
+                        const rect = this.canvas.parentElement.getBoundingClientRect();
+                        this.canvas.width = rect.width;
+                        this.canvas.height = rect.height;
+                    },
+
+                    boot() {
+                        this.agents = [];
+                        this.nextId = 0;
+                        const p = AlrpStore.manifest.params;
+                        for (let i = 0; i < p.agentCount; i++) {
+                            this.agents.push(new AlrpAgent(this.nextId++));
+                        }
+                        BiosimUI.notify('Kernel Boot', `${this.agents.length} agents initialized`, 'suc');
+                        AlrpStore.state.tick = 0;
+                        AlrpStore.state.running = true;
+                    },
+
+                    loop() {
+                        if (!AlrpStore.state.running) return;
+
+                        const p = AlrpStore.manifest.params;
+                        this.grid.clear();
+                        this.agents.forEach(a => this.grid.insert(a));
+
+                        const newAgents = [];
+                        this.agents.forEach(a => {
+                            a.tick(AlrpStore.state.environment, this.grid, p);
+                            const daughter = a.mitosis(this.grid, AlrpStore.manifest.limits);
+                            if (daughter) {
+                                daughter.id = this.nextId++;
+                                newAgents.push(daughter);
+                            }
+                        });
+
+                        if (this.agents.length + newAgents.length < AlrpStore.manifest.limits.maxPop) {
+                            this.agents.push(...newAgents);
+                        }
+
+                        this.agents = this.agents.filter(a => a.type !== 'DEATH');
+                        AlrpStore.state.tick++;
+                        BiosimBridge.syncUI(this.agents);
+                    }
+                };
+
+                window.onload = () => {
+                    const canvas = document.getElementById('canvas');
+                    if (!canvas) return;
+
+                    BiosimEngine.init(canvas);
+                    BiosimRenderer.initSprites();
+                    BiosimEngine.boot();
+
+                    if (window.lucide) window.lucide.createIcons();
+
+                    // Initialize State Density Chart
+                    const chartCtx = document.getElementById('chart-main');
+                    if (chartCtx) {
+                        BiosimBridge.mainChart = new Chart(chartCtx, {
+                            type: 'bar',
+                            data: {
+                                labels: ['SOM', 'iPS', 'NEU', 'CAR', 'TUM'],
+                                datasets: [{
+                                    data: [0, 0, 0, 0, 0],
+                                    backgroundColor: ['#64748b', '#eab308', '#a855f7', '#f43f5e', '#ef4444'],
+                                    borderWidth: 0
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: { legend: { display: false } },
+                                scales: {
+                                    y: { display: false, beginAtZero: true },
+                                    x: { grid: { display: false }, ticks: { color: '#475569', font: { size: 8 } } }
+                                }
+                            }
+                        });
+                    }
+
+                    // Initialize Waddington3D
+                    const canvas2d = document.getElementById('canvas');
+                    const canvas3d = document.getElementById('canvas3d');
+                    if (canvas2d && canvas3d) {
+                        Waddington3D.canvas2d = canvas2d;
+                        Waddington3D.canvas3d = canvas3d;
+                    }
+
+                    // Implement Draggable HUD ("Table Move")
+                    const hud = document.getElementById('hud-main');
+                    const handle = document.getElementById('hud-drag-handle');
+                    if (hud && handle) {
+                        let isDragging = false;
+                        let offsetX, offsetY;
+
+                        handle.addEventListener('mousedown', (e) => {
+                            isDragging = true;
+                            offsetX = e.clientX - hud.getBoundingClientRect().left;
+                            offsetY = e.clientY - hud.getBoundingClientRect().top;
+                            handle.style.cursor = 'grabbing';
+                        });
+
+                        window.addEventListener('mousemove', (e) => {
+                            if (!isDragging) return;
+                            const x = e.clientX - offsetX;
+                            const y = e.clientY - offsetY;
+                            hud.style.left = `${x} px`;
+                            hud.style.top = `${y} px`;
+                            hud.style.right = 'auto'; // Necessary to override absolute anchoring
+                        });
+
+                        window.addEventListener('mouseup', () => {
+                            isDragging = false;
+                            handle.style.cursor = 'move';
+                        });
+                    }
+
+                    let last = 0;
+                    function frame(time) {
+                        const delta = time - last;
+                        last = time;
+                        BiosimTelemetry.recordFrame(delta);
+                        const fps = document.getElementById('fps-counter');
+                        if (fps) fps.innerText = BiosimTelemetry.getFPS();
+
+                        BiosimEngine.loop();
+
+                        // Render based on active mode
+                        if (Waddington3D.active) {
+                            Waddington3D.updateCells(BiosimEngine.agents);
+                            Waddington3D.render();
+                        } else {
+                            BiosimRenderer.render(
+                                BiosimEngine.ctx,
+                                BiosimEngine.agents,
+                                BiosimEngine.canvas.width,
+                                BiosimEngine.canvas.height,
+                                AlrpStore.state.viewMode,
+                                AlrpStore.attractors
+                            );
+                        }
+
+                        requestAnimationFrame(frame);
+                    }
+                    requestAnimationFrame(frame);
+                };
+            </script>
+        </div>
+</body>
+
+</html>

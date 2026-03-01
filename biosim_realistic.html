@@ -1,0 +1,2060 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="IS-CHRP v24.2-REAL: Realistic Biological Simulation. Modeling cellular health with high-fidelity microscopy rendering.">
+    <meta name="author" content="Altos Labs | Institute of Computation">
+    <title>Altos Labs | IS-CHRP v24.2-REAL+ | 3D Microscopy Suite</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            /* --- COLOR PRIMITIVES --- */
+            --void: #000000;
+            --layer-1: #050505;
+            --layer-2: #0a0a0a;
+            --border-dim: #1f1f1f;
+            --border-mid: #333333;
+            --c-brand: #2563eb;
+            --font-sans: 'Inter', system-ui, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --header-h: 48px;
+            --footer-h: 32px;
+        }
+
+        * {
+            box-sizing: border-box;
+            outline: none;
+            user-select: none;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--void);
+            color: #e2e8f0;
+            font-family: var(--font-sans);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        #architect-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr 400px;
+            grid-template-rows: var(--header-h) 1fr var(--footer-h);
+            height: 100vh;
+            width: 100vw;
+            gap: 1px;
+            background-color: var(--border-dim);
+        }
+
+        .panel {
+            background-color: var(--layer-2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+            backdrop-filter: blur(20px);
+        }
+
+        .panel-header {
+            height: 40px;
+            min-height: 40px;
+            padding: 0 16px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, rgba(0, 0, 0, 0) 100%);
+            border-bottom: 1px solid var(--border-dim);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .panel-title {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 10px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .scroll-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            scrollbar-width: thin;
+            scrollbar-color: #333 transparent;
+        }
+
+        .control-group {
+            margin-bottom: 12px;
+            border-bottom: 1px solid var(--border-dim);
+            padding-bottom: 8px;
+        }
+
+        .control-label {
+            display: block;
+            font-size: 9px;
+            font-weight: 700;
+            color: #64748b;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        select {
+            width: 100%;
+            background: var(--layer-1);
+            border: 1px solid var(--border-mid);
+            color: #cbd5e1;
+            padding: 10px;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            border-radius: 4px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-dim);
+            color: #cbd5e1;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.15s;
+            margin-bottom: 4px;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--border-mid);
+            color: #fff;
+        }
+
+        .btn-brand {
+            border-left: 3px solid var(--c-brand);
+        }
+
+        .btn-bio {
+            border-left: 3px solid #10b981;
+        }
+
+        .btn-warn {
+            border-left: 3px solid #f59e0b;
+        }
+
+        .btn-crit {
+            border-left: 3px solid #ef4444;
+        }
+
+        .btn-data {
+            border-left: 3px solid #8b5cf6;
+        }
+
+        #viewport-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            cursor: crosshair;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .hud-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 260px;
+            background: rgba(5, 5, 5, 0.85);
+            border: 1px solid var(--border-mid);
+            border-left: 2px solid var(--c-brand);
+            padding: 16px;
+            border-radius: 4px;
+            backdrop-filter: blur(8px);
+            z-index: 10;
+        }
+
+        .hud-row {
+            display: flex;
+            justify-content: space-between;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            margin-bottom: 6px;
+            color: #94a3b8;
+        }
+
+        .gene-matrix {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1px;
+            padding: 1px;
+            background: #000;
+            border: 1px solid var(--border-dim);
+            aspect-ratio: 1;
+        }
+
+        .gene-node {
+            background: #111;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-size: 9px;
+            color: #555;
+        }
+
+        /* Toast notifications */
+        #toast-feed {
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            width: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: #0f0f0f;
+            border: 1px solid var(--border-mid);
+            padding: 12px;
+            border-radius: 4px;
+            pointer-events: auto;
+            color: #ccc;
+        }
+
+        .toast-h {
+            font-weight: 700;
+            color: #fff;
+            font-size: 11px;
+            margin-bottom: 2px;
+        }
+
+        /* Term/Log */
+        .log-line {
+            padding: 2px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            display: flex;
+            gap: 10px;
+            font-family: var(--font-mono);
+            font-size: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="toast-feed"></div>
+
+    <!-- AI ASSISTANT FLOATING PANEL -->
+    <div id="ai-panel"
+        style="position: fixed; bottom: 20px; left: 20px; width: 360px; height: 480px; background: rgba(5,5,5,0.95); border: 1px solid #2563eb; border-radius: 8px; display: none; flex-direction: column; z-index: 1000; box-shadow: 0 0 30px rgba(37,99,235,0.3);">
+        <!-- Header -->
+        <div
+            style="padding: 12px; background: linear-gradient(180deg, #1e3a8a 0%, #1e293b 100%); border-bottom: 1px solid #2563eb; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 16px;">🤖</span>
+                <span
+                    style="color: white; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: bold;">AI
+                    ASSISTANT</span>
+            </div>
+            <button
+                onclick="document.getElementById('ai-panel').style.display='none'; document.getElementById('ai-toggle-btn').style.display='block';"
+                style="background: transparent; border: none; color: #94a3b8; cursor: pointer; font-size: 18px;">&times;</button>
+        </div>
+
+        <!-- API Key Setup -->
+        <div id="ai-setup-area" style="padding: 12px; background: #0f172a; border-bottom: 1px solid #1e293b;">
+            <div style="font-size: 9px; color: #64748b; margin-bottom: 6px; font-family: 'JetBrains Mono', monospace;">
+                OPENAI API KEY:</div>
+            <input type="password" id="api-key-input" placeholder="sk-..."
+                style="width: 100%; background: #000; border: 1px solid #334155; color: #e2e8f0; padding: 8px; font-size: 10px; border-radius: 4px; font-family: 'JetBrains Mono', monospace;" />
+            <div style="display: flex; gap: 8px; margin-top: 8px;">
+                <button
+                    onclick="AIAssistant.setApiKey(document.getElementById('api-key-input').value); document.getElementById('ai-setup-area').style.display='none'; document.getElementById('ai-chat-area').style.display='flex';"
+                    style="flex: 1; background: #2563eb; color: white; border: none; padding: 6px; border-radius: 4px; font-size: 9px; cursor: pointer; font-family: 'JetBrains Mono', monospace;">SAVE
+                    KEY</button>
+                <a href="https://platform.openai.com/api-keys" target="_blank"
+                    style="flex: 1; background: #1e293b; color: #60a5fa; border: 1px solid #334155; padding: 6px; border-radius: 4px; font-size: 9px; text-align: center; text-decoration: none; font-family: 'JetBrains Mono', monospace;">GET
+                    KEY</a>
+            </div>
+        </div>
+
+        <!-- Chat Area (hidden initially) -->
+        <div id="ai-chat-area" style="display: none; flex: 1; flex-direction: column; min-height: 0;">
+            <!-- Knowledge Hub (Prominent Upload Area) -->
+            <div id="ai-knowledge-hub"
+                style="margin: 12px; padding: 16px; border: 2px dashed #1e3a8a; border-radius: 8px; background: rgba(30, 58, 138, 0.1); text-align: center; transition: all 0.3s ease;">
+                <div style="color: #60a5fa; font-size: 11px; font-weight: bold; margin-bottom: 4px;">📂 KNOWLEDGE HUB
+                </div>
+                <div style="color: #94a3b8; font-size: 8px; line-height: 1.4; margin-bottom: 8px;">
+                    Drop research papers, protocols, or logs here to enhance the AI Assistant's knowledge.
+                </div>
+                <input type="file" id="hub-file-input" style="display: none;"
+                    onchange="AIAssistant.handleFileUpload(event)" />
+                <button onclick="document.getElementById('hub-file-input').click()"
+                    style="background: #2563eb; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 9px; cursor: pointer; font-weight: bold; transition: background 0.2s;">
+                    UPLOAD RESEARCH
+                </button>
+            </div>
+
+            <!-- Messages -->
+            <div id="ai-messages"
+                style="flex: 1; overflow-y: auto; overflow-x: hidden; padding: 12px; font-size: 10px; line-height: 1.5; color: #cbd5e1; font-family: system-ui, sans-serif; word-wrap: break-word; overflow-wrap: break-word; border-top: 1px solid #1e293b;">
+                <div style="color: #64748b; font-size: 9px; font-style: italic; margin-bottom: 12px;">💡 Ask about
+                    reprogramming, genes, or analyze your simulation!</div>
+            </div>
+
+            <!-- Knowledge Base Inventory -->
+            <div id="ai-kb-list"
+                style="padding: 4px 12px; border-top: 1px solid #1e293b; background: rgba(0,0,0,0.3); display: none;">
+                <div
+                    style="font-size: 7px; color: #60a5fa; font-weight: bold; text-transform: uppercase; margin-bottom: 4px; display: flex; justify-content: space-between;">
+                    <span>Knowledge Base</span>
+                    <span id="kb-count">0 Docs</span>
+                </div>
+                <div id="kb-items" style="display: flex; flex-wrap: wrap; gap: 4px;"></div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div
+                style="padding: 8px; border-top: 1px solid #1e293b; display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
+                <button onclick="AIAssistant.askPreset('What is OSKM reprogramming?')"
+                    style="background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 6px; border-radius: 4px; font-size: 8px; cursor: pointer;">Explain
+                    OSKM</button>
+                <button onclick="AIAssistant.askPreset('Analyze current cell populations')"
+                    style="background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 6px; border-radius: 4px; font-size: 8px; cursor: pointer;">Analyze
+                    Cells</button>
+            </div>
+
+            <!-- Input -->
+            <div style="padding: 12px; border-top: 1px solid #1e293b; display: flex; gap: 8px; align-items: center;">
+                <input type="text" id="ai-prompt" placeholder="Ask about the simulation..."
+                    style="flex: 1; background: #000; border: 1px solid #334155; color: #e2e8f0; padding: 8px; font-size: 10px; border-radius: 4px;"
+                    onkeypress="if(event.key==='Enter') AIAssistant.sendMessage()" />
+                <button onclick="AIAssistant.sendMessage()"
+                    style="background: #2563eb; color: white; border: none; padding: 8px 16px; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: bold;">SEND</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toggle Button (if panel is hidden) -->
+    <button id="ai-toggle-btn"
+        onclick="document.getElementById('ai-panel').style.display='flex'; this.style.display='none';"
+        style="position: fixed; bottom: 20px; left: 20px; background: #2563eb; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 11px; cursor: pointer; box-shadow: 0 0 20px rgba(37,99,235,0.5); font-family: 'JetBrains Mono', monospace; font-weight: bold; z-index: 999; display: block;">
+        🤖 AI ASSISTANT
+    </button>
+
+    <div id="architect-layout">
+
+        <!-- HEADER -->
+        <div class="panel"
+            style="grid-column: 1 / -1; flex-direction: row; border-bottom: 1px solid #222; z-index: 50;">
+            <div class="flex items-center px-6 h-full w-[280px] border-r border-dim bg-black">
+                <div class="w-4 h-4 bg-blue-600 rounded-sm mr-4 shadow-[0_0_20px_rgba(37,99,235,0.6)] animate-pulse">
+                </div>
+                <div>
+                    <div class="text-xs font-bold text-white tracking-[0.2em]">ALTOS LABS</div>
+                    <div class="text-[9px] text-slate-400 font-mono">IS-CHRP v24.2-REAL | MICROSCOPY</div>
+                </div>
+            </div>
+            <div class="flex flex-1 items-center px-8 justify-between bg-black">
+                <div class="flex gap-6">
+                    <div class="font-mono text-[9px] text-slate-500">ACTIVE: <span class="text-white font-bold"
+                            id="header-pop">0</span></div>
+                    <div class="font-mono text-[9px] text-slate-500">RUN: <span class="text-yellow-400 font-bold"
+                            id="run-counter">#1</span></div>
+                </div>
+                <div class="flex gap-2">
+                    <button
+                        class="px-4 py-1.5 bg-[#111] border border-dim text-[10px] text-slate-400 hover:text-white rounded"
+                        onclick="BiosimIO.resetView()">RESET VIEW</button>
+                    <button
+                        class="px-4 py-1.5 bg-green-900/20 border border-green-800 text-[10px] text-green-400 hover:text-white rounded"
+                        onclick="BiosimIO.downloadData()">📥 DOWNLOAD DATA</button>
+                    <button
+                        class="px-4 py-1.5 bg-blue-900/20 border border-blue-800 text-[10px] text-blue-400 hover:text-white rounded"
+                        onclick="BiosimEngine.boot()">REBOOT SYSTEM</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- LEFT PANEL (CONTROLS) -->
+        <div class="panel" style="grid-row: 2; grid-column: 1;">
+            <div class="panel-header">
+                <span class="panel-title"><i data-lucide="sliders" class="w-3 h-3"></i> PROTOCOL DESIGN</span>
+            </div>
+            <div class="scroll-container">
+                <div class="control-group">
+                    <span class="control-label">1. Reprogramming Factors</span>
+                    <div class="mb-2">
+                        <div class="text-[9px] text-slate-500 mb-1">TARGET TRANSCRIPTION</div>
+                        <select id="factor-sel">
+                            <option value="OSKM">OSKM (Yamanaka - iPSC)</option>
+                            <option value="LIN28">LIN28/NANOG (Thomson)</option>
+                            <option value="DIRECT_NEURO">Direct -> Neuro (Transdiff)</option>
+                            <option value="DIRECT_CARDIO">Direct -> Cardio (Transdiff)</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-warn"
+                        onclick="BiosimBridge.injectVector(document.getElementById('factor-sel').value)">
+                        <span>TRANSFECT POPULATION</span> <i data-lucide="zap" class="w-3 h-3"></i>
+                    </button>
+                </div>
+
+                <div class="control-group">
+                    <span class="control-label">2. Perturbations</span>
+                    <div class="grid grid-cols-2 gap-2 mt-2">
+                        <button class="btn btn-crit" onclick="BiosimBridge.induceDisease('TUMOR')">
+                            <span>INDUCE TUMOR</span>
+                        </button>
+                        <button class="btn btn-bio" onclick="BiosimBridge.treatDisease('P53')">
+                            <span>P53 THERAPY</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- NEW KNOWLEDGE INTEGRATION SECTION -->
+                <div class="control-group bg-blue-900/10 border border-blue-500/20 p-3 rounded-lg">
+                    <div class="text-[10px] font-bold text-blue-400 mb-2 flex items-center gap-2">
+                        <i data-lucide="database" class="w-3 h-3"></i> KNOWLEDGE INTEGRATION
+                    </div>
+                    <div class="text-[8px] text-slate-500 mb-3 leading-tight">
+                        Upload research papers or protocols. The AI will reorganize messy data to sort out simulation
+                        problems.
+                    </div>
+
+                    <input type="file" id="sidebar-kb-input" style="display: none;"
+                        onchange="AIAssistant.handleFileUpload(event)" />
+                    <button
+                        class="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white text-[9px] font-bold rounded flex items-center justify-center gap-2 mb-3 transition-colors shadow-lg shadow-blue-900/20"
+                        onclick="document.getElementById('sidebar-kb-input').click()">
+                        <i data-lucide="file-up" class="w-3 h-3"></i> UPLOAD RESEARCH DATA
+                    </button>
+
+                    <div id="sidebar-kb-list" style="display: none;">
+                        <div class="text-[7px] text-blue-300 font-bold uppercase mb-2 tracking-widest">Learned Knowledge
+                        </div>
+                        <div id="sidebar-kb-items" class="space-y-1 mb-3"></div>
+
+                        <!-- GUIDED RESEARCH ACTIONS -->
+                        <div class="space-y-2 border-t border-blue-500/10 pt-3 mt-1">
+                            <div class="text-[7px] text-slate-500 font-bold uppercase mb-1">Research Actions</div>
+                            <button
+                                onclick="AIAssistant.askPreset('Compare my uploaded docs with the current simulation state')"
+                                class="w-full py-1.5 bg-blue-900/40 border border-blue-800 text-blue-300 text-[8px] rounded hover:bg-blue-800 hover:text-white transition-all flex items-center justify-center gap-2">
+                                <i data-lucide="microscope" class="w-2.5 h-2.5"></i> COMPARE WITH SIM
+                            </button>
+                            <button
+                                onclick="AIAssistant.askPreset('Summarize the findings from my integrated knowledge base')"
+                                class="w-full py-1.5 bg-slate-800 border border-slate-700 text-slate-400 text-[8px] rounded hover:bg-slate-700 hover:text-white transition-all flex items-center justify-center gap-2">
+                                <i data-lucide="file-text" class="w-2.5 h-2.5"></i> SCIENTIFIC SUMMARY
+                            </button>
+                            <button
+                                onclick="AIAssistant.askPreset('Suggest protocol optimizations based on my uploaded research')"
+                                class="w-full py-1.5 bg-green-900/20 border border-green-800/40 text-green-400 text-[8px] rounded hover:bg-green-800/40 hover:text-white transition-all flex items-center justify-center gap-2">
+                                <i data-lucide="lightbulb" class="w-2.5 h-2.5"></i> PROTOCOL ADVICE
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-group" style="border:none;">
+                    <span class="control-label">3. Rendering</span>
+                    <div class="text-[9px] text-slate-500 mb-2">MICROSCOPY MODE</div>
+                    <button class="btn btn-data mb-4" onclick="BiosimRenderer.toggleStyle()">
+                        <span>TOGGLE: PHASE/FLUORO</span> <i data-lucide="eye" class="w-3 h-3"></i>
+                    </button>
+                </div>
+
+                <div class="control-group bg-[#0a0a0a] border border-blue-900/30 p-3 rounded-lg">
+                    <div class="text-[10px] font-bold text-blue-400 mb-2 flex items-center gap-2">
+                        <i data-lucide="settings-2" class="w-3 h-3"></i> RESEARCH LABORATORY
+                    </div>
+
+                    <!-- Research Goal -->
+                    <div class="mb-4 p-2 bg-blue-900/10 border border-blue-500/30 rounded text-center">
+                        <div class="text-[7px] text-blue-300 font-bold uppercase tracking-widest">Active Objective</div>
+                        <div class="text-[9px] text-white mt-1" id="research-goal">Achieve >150 iPSCs with 0 Tumors
+                        </div>
+                    </div>
+
+                    <!-- Scenario Presets -->
+                    <div class="mb-4">
+                        <div class="text-[8px] text-slate-500 font-bold uppercase mb-2">Scenario Presets</div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button class="btn text-[8px] py-1 bg-slate-800 border-slate-700"
+                                onclick="BiosimLab.applyPreset('STANDARD')">🔬 STANDARD</button>
+                            <button class="btn text-[8px] py-1 bg-red-900/20 border-red-900/40 text-red-400"
+                                onclick="BiosimLab.applyPreset('HARSH')">☣️ HARSH</button>
+                            <button class="btn text-[8px] py-1 bg-green-900/20 border-green-900/40 text-green-400"
+                                onclick="BiosimLab.applyPreset('CLINICAL')">🛡️ CLINICAL</button>
+                            <button class="btn text-[8px] py-1 bg-purple-900/20 border-purple-900/40 text-purple-400"
+                                onclick="BiosimLab.applyPreset('DISCOVERY')">🌌 DISCOVERY</button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <!-- Stochastic Noise Slider -->
+                        <div>
+                            <div class="flex justify-between text-[8px] text-slate-400 mb-1">
+                                <span>GENETIC NOISE</span>
+                                <span id="val-noise">0.015</span>
+                            </div>
+                            <input type="range" id="slide-noise" min="0" max="0.05" step="0.001" value="0.015"
+                                class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                                oninput="BiosimLab.updateConfig('stochastic.noiseStrength', this.value, 'val-noise')">
+                        </div>
+
+                        <!-- Mutation Rate Slider -->
+                        <div>
+                            <div class="flex justify-between text-[8px] text-slate-400 mb-1">
+                                <span>MUTATION PROBABILITY</span>
+                                <span id="val-mut">0.05%</span>
+                            </div>
+                            <input type="range" id="slide-mut" min="0" max="0.005" step="0.0001" value="0.0005"
+                                class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-red-600"
+                                oninput="BiosimLab.updateConfig('stochastic.mutationRate', this.value, 'val-mut', true)">
+                        </div>
+
+                        <!-- Conversion Potency -->
+                        <div>
+                            <div class="flex justify-between text-[8px] text-slate-400 mb-1">
+                                <span>PROTOCOL POTENCY</span>
+                                <span id="val-pot">100%</span>
+                            </div>
+                            <input type="range" id="slide-pot" min="0.5" max="2.0" step="0.1" value="1.0"
+                                class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-green-600"
+                                oninput="BiosimLab.updateConfig('reprogramming.potency', this.value, 'val-pot', false, true)">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CENTER PANEL (VIEWPORT) -->
+        <div class="panel" style="grid-row: 2; grid-column: 2;">
+            <div id="viewport-container">
+                <div class="hud-panel" id="hud-main">
+                    <div
+                        class="text-[10px] font-bold text-slate-400 mb-3 pb-2 border-b border-mid flex justify-between">
+                        <span>LIVE TELEMETRY</span>
+                        <span class="text-green-500 text-[9px] border border-green-900 px-1 rounded">LIVE</span>
+                    </div>
+                    <div class="hud-row"><span>Entropy</span><span class="hud-value text-blue-400"
+                            id="hud-epi">--</span></div>
+                    <div class="hud-row"><span>Genomic Stability</span><span class="hud-value text-slate-200"
+                            id="hud-dna">--</span></div>
+
+                    <div class="mt-4 pt-2 border-t border-mid">
+                        <div class="text-[9px] font-bold text-slate-500 mb-2">SELECTED CELL</div>
+                        <div class="hud-row"><span>Type</span><span class="hud-value" id="insp-state">--</span></div>
+                        <div class="hud-row"><span>Health</span><span class="hud-value" id="insp-health">--</span></div>
+                    </div>
+                </div>
+                <!-- CANVAS -->
+                <canvas id="canvas"></canvas>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL (DATA) -->
+        <div class="panel" style="grid-row: 2; grid-column: 3;">
+            <div class="panel-header">
+                <span class="panel-title"><i data-lucide="bar-chart-2" class="w-3 h-3"></i> ANALYTICS</span>
+            </div>
+            <div class="scroll-container">
+                <div class="mb-4 bg-black border border-dim p-3 rounded">
+                    <span class="text-[9px] font-bold text-slate-500 uppercase">Population Count (Current)</span>
+                    <div class="w-full h-32 relative"><canvas id="chart-main"></canvas></div>
+                </div>
+
+                <div class="mb-4 bg-black border border-dim p-3 rounded">
+                    <span class="text-[9px] font-bold text-slate-500 uppercase">Time Course (60s)</span>
+                    <div class="w-full h-32 relative"><canvas id="chart-timecourse"></canvas></div>
+                </div>
+
+                <div class="mb-4">
+                    <span class="text-[9px] font-bold text-slate-500 uppercase">12D Transcriptome (Click Cell)</span>
+                    <div id="gene-grid" class="gene-matrix" style="grid-template-columns: repeat(3, 1fr);">
+                        <div class="gene-node" id="g0">OCT4</div>
+                        <div class="gene-node" id="g4">SOX2</div>
+                        <div class="gene-node" id="g6">NANOG</div>
+                        <div class="gene-node" id="g5">KLF4</div>
+                        <div class="gene-node" id="g1">NEURO</div>
+                        <div class="gene-node" id="g2">CARDIO</div>
+                        <div class="gene-node" id="g9">PAX6</div>
+                        <div class="gene-node" id="g8">GATA4</div>
+                        <div class="gene-node" id="g3">MYC</div>
+                        <div class="gene-node" id="g7">P53</div>
+                        <div class="gene-node" id="g10">BRACH</div>
+                        <div class="gene-node" id="g11">CHROM</div>
+                    </div>
+                </div>
+
+                <div class="bg-black border border-dim rounded p-2 h-40 overflow-hidden flex flex-col mb-4">
+                    <div class="text-[9px] font-bold text-slate-500 mb-2 border-b border-dim pb-1 flex justify-between">
+                        <span>SYSTEM LOG</span>
+                        <i data-lucide="terminal" class="w-2 h-2"></i>
+                    </div>
+                    <div id="terminal-output" class="overflow-y-auto flex-1">
+                        <div class="log-line"><span>System Initialized.</span></div>
+                    </div>
+                </div>
+
+                <div class="bg-black border border-blue-900/20 rounded p-2 h-48 overflow-hidden flex flex-col">
+                    <div
+                        class="text-[9px] font-bold text-blue-400 mb-2 border-b border-blue-900/30 pb-1 flex justify-between">
+                        <span>RESEARCH LOG (HISTORY)</span>
+                        <i data-lucide="database" class="w-2 h-2"></i>
+                    </div>
+                    <div id="research-log" class="overflow-y-auto flex-1">
+                        <!-- History table injected here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="panel p-0" style="grid-row: 3; grid-column: 1 / -1; border-top: 1px solid var(--border-dim);">
+            <div class="h-full bg-[#080808] flex items-center px-6 justify-between text-[9px] text-slate-600 font-mono">
+                <div>MODE: HIGH_FIDELITY_MICROSCOPY</div>
+                <div id="fps-counter" class="text-white">60 FPS</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SIMULATION LOGIC -->
+    <script>
+        // --- CONFIGURATION ---
+        const CONFIG = {
+            agentCount: 400,
+            maxPop: 1500,
+            dt: 0.1,
+            friction: 0.92,
+
+            // Stochastic dynamics parameters
+            stochastic: {
+                noiseStrength: 0.015,           // Langevin noise amplitude
+                mutationRate: 0.0005,           // 0.05% chance per tick
+                chromatinFluctuationRate: 0.01, // 1% chance per tick
+                mutationMagnitude: 0.2          // MYC spike size
+            },
+
+            // Initial gene expression ranges (baseline + random range)
+            geneInit: {
+                OCT4: { base: 0.05, range: 0.05 },
+                NEURO: { base: 0.08, range: 0.08 },
+                CARDIO: { base: 0.08, range: 0.08 },
+                MYC: { base: 0.02, range: 0.03 },
+                SOX2: { base: 0.03, range: 0.04 },
+                KLF4: { base: 0.02, range: 0.03 },
+                NANOG: { base: 0.01, range: 0.02 },
+                P53: { base: 0.4, range: 0.2 },
+                GATA4: { base: 0.05, range: 0.05 },
+                PAX6: { base: 0.05, range: 0.05 },
+                BRACHYURY: { base: 0.03, range: 0.04 },
+                CHROMATIN: { base: 0.15, range: 0.15 }
+            },
+
+            // Reprogramming efficiency range
+            reprogramming: {
+                efficiencyMin: 0.7,
+                efficiencyMax: 1.3,
+                potency: 1.0
+            },
+
+            colors: {
+                SOMATIC: { h: 210, s: 20, l: 40 }, // Slate Blue
+                IPSC: { h: 45, s: 90, l: 60 }, // Gold/Yellow
+                NEURO: { h: 270, s: 80, l: 60 }, // Purple
+                CARDIO: { h: 340, s: 80, l: 50 }, // Red/Pink
+                TUMOR: { h: 0, s: 90, l: 40 }, // Deep Red
+                DEATH: { h: 0, s: 0, l: 10 }  // Black
+            }
+        };
+
+        // --- MATH UTILS ---
+        const rng = () => Math.random();
+        const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+
+        // --- BIOLOGY ENGINE ---
+        // === 12D GENE REGULATORY NETWORK ===
+        // 0: OCT4, 1: NEURO, 2: CARDIO, 3: MYC, 4: SOX2, 5: KLF4, 
+        // 6: NANOG, 7: P53, 8: GATA4, 9: PAX6, 10: BRACHYURY, 11: CHROMATIN
+
+        class Agent {
+            constructor(id) {
+                this.id = id;
+                this.pos = { x: 0.5 + (rng() - 0.5) * 0.2, y: 0.5 + (rng() - 0.5) * 0.2 };
+                this.vel = { x: 0, y: 0 };
+                this.type = 'SOMATIC';
+
+                // === STOCHASTIC INITIAL CONDITIONS ===
+                // 12-Dimensional Gene State with RANDOMNESS
+                this.genes = new Float32Array(12);
+
+                // Somatic fibroblast baseline + random variation
+                // Each cell is slightly different (biological noise)
+                const gi = CONFIG.geneInit; // Shorthand
+                this.genes[0] = gi.OCT4.base + rng() * gi.OCT4.range;
+                this.genes[1] = gi.NEURO.base + rng() * gi.NEURO.range;
+                this.genes[2] = gi.CARDIO.base + rng() * gi.CARDIO.range;
+                this.genes[3] = gi.MYC.base + rng() * gi.MYC.range;
+                this.genes[4] = gi.SOX2.base + rng() * gi.SOX2.range;
+                this.genes[5] = gi.KLF4.base + rng() * gi.KLF4.range;
+                this.genes[6] = gi.NANOG.base + rng() * gi.NANOG.range;
+                this.genes[7] = gi.P53.base + rng() * gi.P53.range;
+                this.genes[8] = gi.GATA4.base + rng() * gi.GATA4.range;
+                this.genes[9] = gi.PAX6.base + rng() * gi.PAX6.range;
+                this.genes[10] = gi.BRACHYURY.base + rng() * gi.BRACHYURY.range;
+                this.genes[11] = gi.CHROMATIN.base + rng() * gi.CHROMATIN.range;
+
+                // Random health variation (some cells healthier than others)
+                this.health = 0.9 + rng() * 0.1;
+                this.radius = 0.015;
+
+                // Random reprogramming efficiency (some cells are "resistant")
+                this.reprogrammingEfficiency = CONFIG.reprogramming.efficiencyMin +
+                    rng() * (CONFIG.reprogramming.efficiencyMax - CONFIG.reprogramming.efficiencyMin);
+
+                // Visual variation (Phenotype)
+                this.wobblePhase = rng() * Math.PI * 2;
+                this.shapeIrregularity = rng();
+                this.nucleusPos = { x: (rng() - 0.5) * 0.3, y: (rng() - 0.5) * 0.3 };
+            }
+
+
+            // Hill function for cooperative gene regulation
+            hill(x, k = 0.5, n = 2.0) {
+                return Math.pow(x, n) / (Math.pow(k, n) + Math.pow(x, n));
+            }
+
+            tick(env) {
+                if (this.type === 'DEATH') return;
+
+                // === 12D GENE REGULATORY NETWORK DYNAMICS ===
+                const g = this.genes; // Shorthand
+                const dt = 0.05; // Time step
+                const degradation = 0.95; // Basal decay rate
+
+                // Store new state
+                const newGenes = new Float32Array(12);
+
+                // --- PLURIPOTENCY CORE CIRCUIT (OCT4, SOX2, NANOG, KLF4) ---
+                // 0: OCT4
+                newGenes[0] = g[0] * degradation + dt * (
+                    0.3 * this.hill(g[4] + g[6], 0.5, 2.5) +  // SOX2 + NANOG activate
+                    0.2 * this.hill(g[0], 0.3, 2.0) -         // Self-activation
+                    0.4 * this.hill(g[1] + g[2], 0.6, 2.0)    // Somatic genes inhibit
+                );
+
+                // 4: SOX2
+                newGenes[4] = g[4] * degradation + dt * (
+                    0.3 * this.hill(g[0] + g[6], 0.5, 2.5) +  // OCT4 + NANOG activate
+                    0.2 * this.hill(g[4], 0.3, 2.0) -         // Self-activation
+                    0.3 * this.hill(g[1] + g[2], 0.6, 2.0)    // Somatic inhibition
+                );
+
+                // 6: NANOG
+                newGenes[6] = g[6] * degradation + dt * (
+                    0.4 * this.hill(g[0] + g[4], 0.5, 2.8) +  // OCT4 + SOX2 strongly activate
+                    0.2 * this.hill(g[6], 0.4, 2.0) -         // Self-activation
+                    0.3 * this.hill(g[1] + g[2], 0.7, 2.0)    // Somatic inhibition
+                );
+
+                // 5: KLF4 (Pioneer factor - opens chromatin)
+                newGenes[5] = g[5] * degradation + dt * (
+                    0.2 * this.hill(g[5], 0.3, 1.8) +         // Self-activation
+                    0.1 * this.hill(g[0], 0.4, 2.0) -         // OCT4 support
+                    0.2 * this.hill(g[7], 0.6, 2.0)           // P53 suppresses
+                );
+
+                // --- LINEAGE SPECIFICATION GENES ---
+                // 1: NEURO (PAX6-dependent)
+                newGenes[1] = g[1] * degradation + dt * (
+                    0.3 * this.hill(g[9], 0.4, 2.5) +         // PAX6 drives NEURO
+                    0.2 * this.hill(g[1], 0.3, 2.2) -         // Self-maintenance
+                    0.5 * this.hill(g[0] + g[6], 0.6, 2.5) -  // Pluripotency inhibits
+                    0.2 * this.hill(g[2], 0.5, 2.0)           // CARDIO mutual exclusion
+                );
+
+                // 2: CARDIO (GATA4-dependent)
+                newGenes[2] = g[2] * degradation + dt * (
+                    0.3 * this.hill(g[8], 0.4, 2.5) +         // GATA4 drives CARDIO
+                    0.2 * this.hill(g[2], 0.3, 2.2) -         // Self-maintenance
+                    0.5 * this.hill(g[0] + g[6], 0.6, 2.5) -  // Pluripotency inhibits
+                    0.2 * this.hill(g[1], 0.5, 2.0)           // NEURO mutual exclusion
+                );
+
+                // 8: GATA4 (Cardiac master regulator)
+                newGenes[8] = g[8] * degradation + dt * (
+                    0.2 * this.hill(g[10], 0.4, 2.0) +        // BRACHYURY upstream
+                    0.2 * this.hill(g[8], 0.3, 2.0) -         // Self-activation
+                    0.4 * this.hill(g[0], 0.5, 2.5)           // OCT4 inhibits
+                );
+
+                // 9: PAX6 (Neural master regulator)
+                newGenes[9] = g[9] * degradation + dt * (
+                    0.3 * this.hill(g[9], 0.3, 2.0) -         // Self-activation
+                    0.4 * this.hill(g[0] + g[4], 0.5, 2.5)    // Pluripotency inhibits
+                );
+
+                // 10: BRACHYURY (Mesoderm marker)
+                newGenes[10] = g[10] * degradation + dt * (
+                    0.2 * this.hill(g[10], 0.3, 1.8) -        // Self-activation
+                    0.3 * this.hill(g[0], 0.5, 2.0)           // Pluripotency inhibits
+                );
+
+                // --- STRESS & ONCOGENE ---
+                // 3: MYC (Proliferation & Stress)
+                newGenes[3] = g[3] * degradation + dt * (
+                    0.15 * this.hill(g[0], 0.4, 1.5) +        // OCT4 link
+                    0.1 * this.hill(g[3], 0.5, 1.2) -         // Weak self-activation
+                    0.3 * this.hill(g[7], 0.6, 2.5)           // P53 strongly suppresses
+                );
+
+                // 7: P53 (Guardian of the Genome)
+                newGenes[7] = g[7] * degradation + dt * (
+                    0.2 * this.hill(g[3], 0.7, 2.5) +         // MYC stress activates P53
+                    0.1 * (1 - this.health) * 2.0              // Damage activates P53
+                );
+
+                // 11: CHROMATIN (Epigenetic accessibility)
+                newGenes[11] = g[11] * degradation + dt * (
+                    0.3 * this.hill(g[5], 0.4, 2.0) +         // KLF4 opens chromatin
+                    0.2 * this.hill(g[0] + g[4], 0.5, 2.0) -  // Pluripotency opens
+                    0.2 * this.hill(g[1] + g[2], 0.6, 2.0)    // Differentiation closes
+                );
+
+                // --- EXTERNAL PERTURBATIONS (with stochastic efficiency) ---
+                if (env.vector === 'OSKM') {
+                    // Apply reprogramming with random efficiency and user-defined potency
+                    const potency = CONFIG.reprogramming.potency;
+                    const efficiency = this.reprogrammingEfficiency * potency;
+                    newGenes[0] += 0.08 * efficiency; // OCT4
+                    newGenes[4] += 0.08 * efficiency; // SOX2
+                    newGenes[5] += 0.06 * efficiency; // KLF4
+                    newGenes[3] += 0.03 * efficiency; // MYC
+                }
+                if (env.vector === 'LIN28') {
+                    newGenes[6] += 0.1 * this.reprogrammingEfficiency * CONFIG.reprogramming.potency;
+                }
+                if (env.vector === 'DIRECT_NEURO') {
+                    newGenes[9] += 0.1 * this.reprogrammingEfficiency * CONFIG.reprogramming.potency;
+                }
+                if (env.vector === 'DIRECT_CARDIO') {
+                    newGenes[8] += 0.1 * this.reprogrammingEfficiency * CONFIG.reprogramming.potency;
+                }
+                if (env.disease === 'TUMOR') {
+                    newGenes[3] += 0.08; // MYC oncogenic stress
+                    newGenes[7] -= 0.05; // P53 loss
+                }
+
+                // === STOCHASTIC NOISE (Langevin dynamics) ===
+                // Add random fluctuations to simulate biological noise
+                const noiseStrength = CONFIG.stochastic.noiseStrength;
+                for (let i = 0; i < 12; i++) {
+                    // Gaussian-like noise using Box-Muller transform approximation
+                    const noise = (rng() + rng() + rng() + rng() - 2) * noiseStrength;
+                    newGenes[i] += noise;
+                }
+
+                // === SPONTANEOUS RANDOM EVENTS ===
+                // Random mutations (very rare)
+                if (rng() < CONFIG.stochastic.mutationRate) {
+                    newGenes[3] += CONFIG.stochastic.mutationMagnitude; // Spontaneous MYC spike
+                }
+
+                // Random chromatin opening (epigenetic noise)
+                if (rng() < CONFIG.stochastic.chromatinFluctuationRate) {
+                    newGenes[11] += (rng() - 0.5) * 0.1; // Random chromatin change
+                }
+
+                // Clamp all genes to [0, 1]
+                for (let i = 0; i < 12; i++) {
+                    this.genes[i] = clamp(newGenes[i], 0, 1);
+                }
+
+                // === CELL TYPE CLASSIFICATION ===
+                const pluriScore = g[0] + g[4] + g[6]; // OCT4 + SOX2 + NANOG
+                const neuroScore = g[1] + g[9];        // NEURO + PAX6
+                const cardioScore = g[2] + g[8];       // CARDIO + GATA4
+
+                if (g[3] > 0.9 && g[7] < 0.3) this.type = 'TUMOR';      // High MYC, low P53
+                else if (pluriScore > 1.5) this.type = 'IPSC';          // Pluripotent
+                else if (neuroScore > 1.2) this.type = 'NEURO';        // Neural
+                else if (cardioScore > 1.2) this.type = 'CARDIO';      // Cardiac
+                else this.type = 'SOMATIC';                             // Fibroblast
+
+                // Health decay from stress
+                if (g[3] > 0.8) this.health -= 0.001; // MYC stress
+                if (g[7] < 0.2) this.health -= 0.002; // P53 loss
+                if (this.health < 0.1) this.type = 'DEATH';
+
+                // Physical update
+                this.pos.x += this.vel.x;
+                this.pos.y += this.vel.y;
+                this.vel.x *= CONFIG.friction;
+                this.vel.y *= CONFIG.friction;
+
+                // Bounds
+                if (this.pos.x < 0) this.pos.x = 0; if (this.pos.x > 1) this.pos.x = 1;
+                if (this.pos.y < 0) this.pos.y = 0; if (this.pos.y > 1) this.pos.y = 1;
+
+                // Wobble animation
+                this.wobblePhase += 0.1;
+            }
+        }
+
+        // --- RENDERER (THE UPGRADE) ---
+        const BiosimRenderer = {
+            mode: 'FLUORO', // or PHASE
+
+            toggleStyle() {
+                this.mode = (this.mode === 'FLUORO') ? 'PHASE' : 'FLUORO';
+                BiosimUI.notify('Rendering', `Switched to ${this.mode} Contrast`, 'inf');
+            },
+
+            drawCell(ctx, agent, x, y, size) {
+                const type = agent.type;
+                const hsl = CONFIG.colors[type];
+
+                // Dynamic radius based on wobble
+                const wobble = Math.sin(agent.wobblePhase) * 2;
+                const r = size + wobble;
+
+                if (this.mode === 'FLUORO') {
+                    // === ENHANCED 3D RENDERING with DEPTH ===
+
+                    // 1. DROP SHADOW (for depth perception)
+                    ctx.save();
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+                    ctx.shadowBlur = r * 0.3;
+                    ctx.shadowOffsetX = r * 0.1;
+                    ctx.shadowOffsetY = r * 0.15;
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+                    ctx.beginPath();
+                    this.traceOrganicShape(ctx, x, y, r, agent);
+                    ctx.fill();
+                    ctx.restore();
+
+                    // 2. BOTTOM HEMISPHERE (Dark base for 3D depth)
+                    const depthGrad = ctx.createRadialGradient(
+                        x, y + r * 0.3, 0,
+                        x, y + r * 0.3, r * 1.2
+                    );
+                    depthGrad.addColorStop(0, `hsla(${hsl.h}, ${hsl.s}%, ${Math.max(5, hsl.l - 30)}%, 0.7)`);
+                    depthGrad.addColorStop(0.6, `hsla(${hsl.h}, ${hsl.s}%, ${hsl.l - 15}%, 0.4)`);
+                    depthGrad.addColorStop(1, 'transparent');
+
+                    ctx.fillStyle = depthGrad;
+                    ctx.beginPath();
+                    this.traceOrganicShape(ctx, x, y, r, agent);
+                    ctx.fill();
+
+                    // 3. MAIN CELL BODY (Top-lit gradient for volume)
+                    const bodyGrad = ctx.createRadialGradient(
+                        x, y - r * 0.2, r * 0.1,
+                        x, y, r * 1.4
+                    );
+                    const alpha = (type === 'IPSC' || type === 'TUMOR') ? 0.95 : 0.75;
+                    bodyGrad.addColorStop(0, `hsla(${hsl.h}, ${hsl.s}%, ${Math.min(95, hsl.l + 25)}%, ${alpha})`);
+                    bodyGrad.addColorStop(0.4, `hsla(${hsl.h}, ${hsl.s}%, ${hsl.l + 10}%, ${alpha * 0.9})`);
+                    bodyGrad.addColorStop(0.7, `hsla(${hsl.h}, ${hsl.s}%, ${hsl.l}%, ${alpha * 0.7})`);
+                    bodyGrad.addColorStop(1, `hsla(${hsl.h}, ${hsl.s}%, ${Math.max(10, hsl.l - 20)}%, 0.2)`);
+
+                    ctx.fillStyle = bodyGrad;
+                    ctx.beginPath();
+                    this.traceOrganicShape(ctx, x, y, r, agent);
+                    ctx.fill();
+
+                    // 4. SPECULAR HIGHLIGHT (Glossy shine for realism)
+                    const highlightGrad = ctx.createRadialGradient(
+                        x - r * 0.3, y - r * 0.35, 0,
+                        x - r * 0.3, y - r * 0.35, r * 0.6
+                    );
+                    highlightGrad.addColorStop(0, 'rgba(255, 255, 255, 0.7)');
+                    highlightGrad.addColorStop(0.3, 'rgba(255, 255, 255, 0.4)');
+                    highlightGrad.addColorStop(1, 'transparent');
+
+                    ctx.fillStyle = highlightGrad;
+                    ctx.beginPath();
+                    ctx.arc(x - r * 0.3, y - r * 0.35, r * 0.6, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // 5. NUCLEUS (3D sphere with its own depth)
+                    const nx = x + agent.nucleusPos.x * r * 0.5;
+                    const ny = y + agent.nucleusPos.y * r * 0.5;
+                    const nr = r * 0.3;
+
+                    const nucleusGrad = ctx.createRadialGradient(
+                        nx - nr * 0.3, ny - nr * 0.3, 0,
+                        nx, ny, nr
+                    );
+                    nucleusGrad.addColorStop(0, `hsla(${hsl.h}, 100%, 95%, 0.95)`);
+                    nucleusGrad.addColorStop(0.5, `hsla(${hsl.h}, 90%, 85%, 0.9)`);
+                    nucleusGrad.addColorStop(1, `hsla(${hsl.h}, 80%, 70%, 0.7)`);
+
+                    ctx.fillStyle = nucleusGrad;
+                    ctx.beginPath();
+                    ctx.arc(nx, ny, nr, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // 6. ORGANELLES (3D specks with subtle highlights)
+                    ctx.fillStyle = `hsla(${hsl.h}, 100%, 80%, 0.5)`;
+                    for (let i = 0; i < 3; i++) {
+                        let ox = x + (rng() - 0.5) * r * 0.8;
+                        let oy = y + (rng() - 0.5) * r * 0.8;
+                        let or = r * 0.08;
+
+                        // Organelle with tiny highlight
+                        const orgGrad = ctx.createRadialGradient(
+                            ox - or * 0.3, oy - or * 0.3, 0,
+                            ox, oy, or
+                        );
+                        orgGrad.addColorStop(0, `hsla(${hsl.h}, 100%, 85%, 0.6)`);
+                        orgGrad.addColorStop(1, `hsla(${hsl.h}, 90%, 70%, 0.3)`);
+
+                        ctx.fillStyle = orgGrad;
+                        ctx.beginPath();
+                        ctx.arc(ox, oy, or, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+
+                    // 7. OUTER GLOW (volumetric effect)
+                    const glowGrad = ctx.createRadialGradient(x, y, r * 0.5, x, y, r * 1.8);
+                    glowGrad.addColorStop(0.5, `hsla(${hsl.h}, ${hsl.s}%, ${hsl.l}%, 0.15)`);
+                    glowGrad.addColorStop(1, 'transparent');
+
+                    ctx.fillStyle = glowGrad;
+                    ctx.beginPath();
+                    ctx.arc(x, y, r * 1.8, 0, Math.PI * 2);
+                    ctx.fill();
+
+                } else {
+                    // PHASE CONTRAST LOOK (Grayscale, Halo)
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 2;
+                    ctx.shadowBlur = 5;
+                    ctx.shadowColor = '#fff';
+
+                    ctx.beginPath();
+                    this.traceOrganicShape(ctx, x, y, r, agent);
+                    ctx.stroke();
+                    ctx.shadowBlur = 0; // Reset
+
+                    // Dark interior
+                    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+                    ctx.fill();
+
+                    // Nucleus
+                    ctx.fillStyle = '#aaa';
+                    ctx.beginPath();
+                    ctx.arc(x, y, r * 0.25, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            },
+
+            traceOrganicShape(ctx, x, y, r, agent) {
+                // Creates a wobbly circle using sine waves
+                const points = 8;
+                const angleStep = (Math.PI * 2) / points;
+
+                // Use agent's fixed irregularity plus live wobble
+                const time = Date.now() / 200;
+
+                ctx.moveTo(x + r, y);
+                for (let i = 1; i <= points; i++) {
+                    const angle = i * angleStep;
+                    // Noise function approximation
+                    const offset = Math.sin(time + i * 130 + agent.id) * (r * 0.2 * agent.shapeIrregularity);
+                    const px = x + Math.cos(angle) * (r + offset);
+                    const py = y + Math.sin(angle) * (r + offset);
+                    ctx.lineTo(px, py);
+                }
+                ctx.closePath();
+            }
+        };
+
+        // --- ENGINE CORE ---
+        const BiosimEngine = {
+            agents: [],
+            canvas: null,
+            ctx: null,
+
+            init() {
+                this.canvas = document.getElementById('canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+
+                // Interaction
+                this.canvas.addEventListener('mousedown', (e) => {
+                    const rect = this.canvas.getBoundingClientRect();
+                    const x = (e.clientX - rect.left) / rect.width;
+                    const y = (e.clientY - rect.top) / rect.height;
+                    // Find closest
+                    let closest = null, minD = 100;
+                    this.agents.forEach(a => {
+                        const dx = a.pos.x - x; const dy = a.pos.y - y;
+                        const d = dx * dx + dy * dy;
+                        if (d < 0.005 && d < minD) { minD = d; closest = a; }
+                    });
+
+                    if (closest) {
+                        BiosimUI.updateInspector(closest);
+                        BiosimUI.notify('Microscope', `Focused Cell ID #${closest.id}`, 'inf');
+                    }
+                });
+
+                this.boot();
+                this.loop();
+            },
+
+            resize() {
+                const p = this.canvas.parentElement;
+                this.canvas.width = p.clientWidth;
+                this.canvas.height = p.clientHeight;
+            },
+
+            boot() {
+                // Log the previous experiment before clearing
+                if (this.agents.length > 0) {
+                    BiosimLab.logExperiment();
+                }
+
+                this.agents = [];
+                for (let i = 0; i < CONFIG.agentCount; i++) {
+                    this.agents.push(new Agent(i));
+                }
+
+                // Increment Run Counter
+                window.simulationRunCount = (window.simulationRunCount || 1) + 1;
+                const counterEl = document.getElementById('run-counter');
+                if (counterEl) counterEl.innerText = `#${window.simulationRunCount}`;
+
+                BiosimLab.resetFlags();
+                BiosimUI.notify('System', `Run #${window.simulationRunCount} Initialized`, 'suc');
+            },
+
+            loop() {
+                // Physics & Logic
+                // Simple N^2 repulsion for this demo (optimized with grid in full version)
+                const w = this.canvas.width;
+                const h = this.canvas.height;
+                const aspect = w / h;
+
+                for (let i = 0; i < this.agents.length; i++) {
+                    const A = this.agents[i];
+                    A.tick(BiosimStore.env);
+
+                    // Inter-cell collision
+                    for (let j = i + 1; j < this.agents.length; j++) {
+                        const B = this.agents[j];
+                        const dx = A.pos.x - B.pos.x;
+                        const dy = (A.pos.y - B.pos.y) / aspect; // Correct aspect ratio
+                        const distSq = dx * dx + dy * dy;
+                        const minDist = 0.02; // Roughly (radius * 2)
+
+                        if (distSq < minDist * minDist && distSq > 0) {
+                            const dist = Math.sqrt(distSq);
+                            const force = (minDist - dist) / dist * 0.005;
+                            const fx = dx * force;
+                            const fy = dy * force;
+
+                            A.vel.x += fx; A.vel.y += fy;
+                            B.vel.x -= fx; B.vel.y -= fy;
+                        }
+                    }
+                }
+
+                // Render
+                this.ctx.fillStyle = '#000';
+                this.ctx.fillRect(0, 0, w, h);
+
+                // Draw Attractor Backgrounds (Subtle)
+                // ... skipped for brevity, keeping focus on cells
+
+                const scale = Math.min(w, h);
+                this.agents.forEach(a => {
+                    BiosimRenderer.drawCell(this.ctx, a, a.pos.x * w, a.pos.y * h, scale * 0.015);
+                });
+
+                requestAnimationFrame(() => this.loop());
+
+                // UI Sync (lazy, every 10 frames)
+                if (Date.now() % 10 === 0) BiosimBridge.updateCharts();
+            }
+        };
+
+        // --- UI GLUE ---
+        const BiosimStore = { env: { vector: null, disease: null } };
+
+        const BiosimBridge = {
+            injectVector(v) {
+                BiosimStore.env.vector = v;
+                setTimeout(() => BiosimStore.env.vector = null, 2000); // 2s pulse
+                BiosimUI.notify('Protocol', `Injected ${v}`, 'warn');
+            },
+            induceDisease(d) {
+                BiosimStore.env.disease = d;
+                BiosimUI.notify('Warning', 'Oncogenic Stress Induced', 'err');
+            },
+            treatDisease(d) {
+                // Reset tumors
+                BiosimEngine.agents.forEach(a => {
+                    if (a.type === 'TUMOR') { a.health = 0; a.type = 'DEATH'; }
+                });
+                BiosimUI.notify('Therapy', `p53 Pathway Activated`, 'suc');
+            },
+            updateCharts() {
+                document.getElementById('header-pop').innerText = BiosimEngine.agents.length;
+
+                // Count populations
+                const counts = [0, 0, 0, 0, 0];
+                BiosimEngine.agents.forEach(a => {
+                    if (a.type == 'SOMATIC') counts[0]++;
+                    if (a.type == 'IPSC') counts[1]++;
+                    if (a.type == 'NEURO') counts[2]++;
+                    if (a.type == 'CARDIO') counts[3]++;
+                    if (a.type == 'TUMOR') counts[4]++;
+                });
+
+                // Update bar chart
+                if (window.myChart) {
+                    window.myChart.data.datasets[0].data = counts;
+                    window.myChart.update('none');
+                }
+
+                // Check Research Goals (PI Feedback)
+                BiosimLab.checkGoals({
+                    SOMATIC: counts[0], IPSC: counts[1], NEURO: counts[2], CARDIO: counts[3], TUMOR: counts[4]
+                });
+
+                // Update time-course chart (every 1 second)
+                if (window.timeChart && window.timeCourseData) {
+                    const now = Date.now();
+                    const elapsed = (now - window.timeCourseData.startTime) / 1000; // seconds
+
+                    // Record data every 1 second (avoid too many points)
+                    const lastTime = window.timeCourseData.timePoints.length > 0
+                        ? window.timeCourseData.timePoints[window.timeCourseData.timePoints.length - 1]
+                        : -1;
+
+                    if (elapsed - lastTime >= 1.0) {
+                        window.timeCourseData.timePoints.push(Math.floor(elapsed));
+                        window.timeCourseData.history.SOMATIC.push(counts[0]);
+                        window.timeCourseData.history.IPSC.push(counts[1]);
+                        window.timeCourseData.history.NEURO.push(counts[2]);
+                        window.timeCourseData.history.CARDIO.push(counts[3]);
+                        window.timeCourseData.history.TUMOR.push(counts[4]);
+
+                        // Keep only last 60 seconds
+                        if (window.timeCourseData.timePoints.length > 60) {
+                            window.timeCourseData.timePoints.shift();
+                            window.timeCourseData.history.SOMATIC.shift();
+                            window.timeCourseData.history.IPSC.shift();
+                            window.timeCourseData.history.NEURO.shift();
+                            window.timeCourseData.history.CARDIO.shift();
+                            window.timeCourseData.history.TUMOR.shift();
+                        }
+
+                        // Update chart
+                        window.timeChart.data.labels = window.timeCourseData.timePoints.map(t => t + 's');
+                        window.timeChart.data.datasets[0].data = window.timeCourseData.history.SOMATIC;
+                        window.timeChart.data.datasets[1].data = window.timeCourseData.history.IPSC;
+                        window.timeChart.data.datasets[2].data = window.timeCourseData.history.NEURO;
+                        window.timeChart.data.datasets[3].data = window.timeCourseData.history.CARDIO;
+                        window.timeChart.data.datasets[4].data = window.timeCourseData.history.TUMOR;
+                        window.timeChart.update('none');
+                    }
+                }
+            }
+        };
+
+        const BiosimUI = {
+            notify(h, m, t) {
+                const el = document.getElementById('toast-feed');
+                const div = document.createElement('div');
+                div.className = 'toast';
+                div.innerHTML = `<div class="toast-h">${h}</div><div class="text-[10px] text-slate-400">${m}</div>`;
+                if (t === 'err') div.style.borderLeft = '3px solid red';
+                if (t === 'warn') div.style.borderLeft = '3px solid orange';
+                else div.style.borderLeft = '3px solid blue';
+                el.appendChild(div);
+                setTimeout(() => div.remove(), 3000);
+            },
+            updateInspector(a) {
+                document.getElementById('insp-state').innerText = a.type;
+                document.getElementById('insp-health').innerText = (a.health * 100).toFixed(0) + '%';
+
+                // Update Gene Grid Colors
+                const [o, n, c, m] = a.genes;
+                document.getElementById('g0').style.opacity = 0.3 + o;
+                document.getElementById('g1').style.opacity = 0.3 + n;
+                document.getElementById('g2').style.opacity = 0.3 + c;
+                document.getElementById('g3').style.opacity = 0.3 + m;
+
+                if (m > 0.8) document.getElementById('g3').style.color = 'red';
+            }
+        };
+
+        // === DATA EXPORT MODULE ===
+        const BiosimIO = {
+            resetView() {
+                BiosimUI.notify('View', 'View reset', 'suc');
+            },
+
+            downloadData() {
+                // Safety check
+                if (!window.BiosimEngine || !window.BiosimEngine.agents) {
+                    BiosimUI.notify('Error', 'No simulation data available', 'err');
+                    return;
+                }
+
+                const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+                const counts = { SOMATIC: 0, IPSC: 0, NEURO: 0, CARDIO: 0, TUMOR: 0, DEATH: 0 };
+                BiosimEngine.agents.forEach(a => {
+                    if (counts[a.type] !== undefined) counts[a.type]++;
+                });
+
+                // Excel-compatible CSV (no # markers)
+                let csv = 'Biosim Realistic - Simulation Data\n';
+                csv += `Export Date,${new Date().toISOString()}\n`;
+                csv += `Run Number,${window.simulationRunCount || 1}\n`;
+                csv += `Total Cells,${BiosimEngine.agents.length}\n\n`;
+                csv += 'Cell Type,Count\n';
+                Object.entries(counts).forEach(([type, count]) => csv += `${type},${count}\n`);
+
+                if (window.timeCourseData && window.timeCourseData.timePoints.length > 0) {
+                    const tc = window.timeCourseData;
+                    csv += '\nTime (s),SOMATIC,IPSC,NEURO,CARDIO,TUMOR\n';
+                    for (let i = 0; i < tc.timePoints.length; i++) {
+                        csv += `${tc.timePoints[i]},${tc.history.SOMATIC[i]},${tc.history.IPSC[i]},${tc.history.NEURO[i]},${tc.history.CARDIO[i]},${tc.history.TUMOR[i]}\n`;
+                    }
+                }
+
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `biosim_data_${timestamp}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                BiosimUI.notify('Export', 'Data downloaded as CSV', 'suc');
+            }
+        };
+
+        // === AI ASSISTANT MODULE (ChatGPT Integration) ===
+        const AIAssistant = {
+            apiKey: null,
+            messages: [],
+            knowledgeBase: [], // Stores structured document content
+
+            setApiKey(key) {
+                this.apiKey = key;
+                localStorage.setItem('openai_api_key', key);
+                BiosimUI.notify('AI', 'API Key saved', 'suc');
+            },
+
+            async sendMessage() {
+                const input = document.getElementById('ai-prompt');
+                if (!input) return;
+
+                const userMessage = input.value.trim();
+                if (!userMessage) return;
+
+                if (!this.apiKey) {
+                    BiosimUI.notify('AI Error', 'Please enter API key first', 'err');
+                    return;
+                }
+
+                // Add user message to chat
+                this.addMessage('user', userMessage);
+                input.value = '';
+
+                // Get simulation context
+                const context = this.getSimulationContext();
+
+                // Show loading
+                const loadingId = this.addMessage('assistant', '🤔 Thinking...');
+
+                try {
+                    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${this.apiKey}`
+                        },
+                        body: JSON.stringify({
+                            model: 'gpt-4',
+                            messages: [
+                                {
+                                    role: 'system',
+                                    content: `You are an expert in cellular reprogramming and stem cell biology. You're assisting with a simulation of Yamanaka's OSKM-based iPSC reprogramming.
+                                    
+Current simulation state:
+${context}
+
+External Knowledge (Structured Documents):
+${this.knowledgeBase.length > 0 ? this.knowledgeBase.map(k => `[File: ${k.name}]\n${k.content}`).join('\n\n') : 'No external documents uploaded.'}
+
+Instructions:
+1. Provide concise, scientific explanations based on both simulation data and any uploaded documents.
+2. If the user asks about an uploaded document, analyze it in the context of the current simulation.
+3. If Knowledge Base is available, use it to enhance your analysis.`
+                                },
+                                ...this.messages.slice(-10), // Last 10 messages for context
+                                {
+                                    role: 'user',
+                                    content: userMessage
+                                }
+                            ],
+                            temperature: 0.7,
+                            max_tokens: 500
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.error?.message || 'API request failed');
+                    }
+
+                    const data = await response.json();
+                    const aiReply = data.choices[0].message.content;
+
+                    // Remove loading, add real response
+                    document.getElementById(loadingId)?.remove();
+                    this.addMessage('assistant', aiReply);
+
+                } catch (error) {
+                    document.getElementById(loadingId)?.remove();
+                    this.addMessage('assistant', `❌ Error: ${error.message}`);
+                    BiosimUI.notify('AI Error', error.message, 'err');
+                }
+            },
+
+            addMessage(role, content) {
+                const container = document.getElementById('ai-messages');
+                if (!container) return;
+
+                const msgId = 'msg-' + Date.now();
+                const div = document.createElement('div');
+                div.id = msgId;
+                div.className = role === 'user' ? 'text-blue-300' : 'text-slate-300';
+                div.style.fontSize = '9px';
+                div.style.lineHeight = '1.4';
+                div.style.wordWrap = 'break-word';
+                div.style.overflowWrap = 'break-word';
+                div.style.maxWidth = '100%';
+                div.style.marginBottom = '8px';
+                const isAI = role !== 'user';
+                div.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                        <div style="flex: 1;">
+                            <strong>${role === 'user' ? 'YOU' : '🤖 AI'}:</strong> ${content.replace(/\n/g, '<br>')}
+                        </div>
+                        ${isAI ? `
+                            <button onclick="AIAssistant.copyMessage(this, \`${content.replace(/`/g, '\\`').replace(/\$\{/g, '\\${')}\`)" 
+                                title="Copy to clipboard"
+                                style="background: transparent; border: none; color: #64748b; cursor: pointer; padding: 2px; display: flex; align-items: center; transition: color 0.2s;">
+                                <i data-lucide="copy" style="width: 10px; height: 10px;"></i>
+                            </button>
+                        ` : ''}
+                    </div>
+                `;
+
+                container.appendChild(div);
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+                container.scrollTop = container.scrollHeight;
+
+                this.messages.push({ role, content });
+                return msgId;
+            },
+
+            async copyMessage(btn, text) {
+                try {
+                    await navigator.clipboard.writeText(text);
+                    const originalHTML = btn.innerHTML;
+                    btn.innerHTML = '<i data-lucide="check" style="width: 10px; height: 10px; color: #10b981;"></i>';
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+
+                    BiosimUI.notify('Copied', 'Message to clipboard', 'suc');
+
+                    setTimeout(() => {
+                        btn.innerHTML = originalHTML;
+                        if (typeof lucide !== 'undefined') lucide.createIcons();
+                    }, 2000);
+                } catch (err) {
+                    BiosimUI.notify('Error', 'Clipboard access failed', 'err');
+                }
+            },
+
+            getSimulationContext() {
+                // Count current populations
+                const counts = { SOMATIC: 0, IPSC: 0, NEURO: 0, CARDIO: 0, TUMOR: 0 };
+                BiosimEngine.agents.forEach(a => {
+                    if (counts[a.type] !== undefined) counts[a.type]++;
+                });
+
+                // Get elapsed time
+                const elapsed = window.timeCourseData
+                    ? Math.floor((Date.now() - window.timeCourseData.startTime) / 1000)
+                    : 0;
+
+                return `
+Population: ${counts.SOMATIC} Somatic, ${counts.IPSC} iPSC, ${counts.NEURO} Neural, ${counts.CARDIO} Cardiac, ${counts.TUMOR} Tumor
+Total Cells: ${BiosimEngine.agents.length}
+Time Elapsed: ${elapsed}s
+Active Protocol: ${BiosimStore.env.vector || 'none'}
+Knowledge Base: ${this.knowledgeBase.length > 0 ? this.knowledgeBase.map(k => k.name).join(', ') : 'none'}
+                `.trim();
+            },
+
+            async handleFileUpload(event) {
+                let file;
+                if (event.dataTransfer) {
+                    file = event.dataTransfer.files[0];
+                } else {
+                    file = event.target.files[0];
+                }
+
+                if (!file) return;
+
+                if (!this.apiKey) {
+                    BiosimUI.notify('AI Error', 'Please enter API key first', 'err');
+                    return;
+                }
+
+                const loadingId = this.addMessage('assistant', `📖 Reading ${file.name}...`);
+
+                try {
+                    const text = await file.text();
+                    const structuredKnowledge = await this.reorganizeDocument(file.name, text);
+
+                    this.knowledgeBase.push({
+                        name: file.name,
+                        content: structuredKnowledge
+                    });
+
+                    this.renderKnowledgeBase();
+
+                    document.getElementById(loadingId)?.remove();
+                    this.addMessage('assistant', `✅ **Knowledge Integrated:** ${file.name}\n\nI have reorganized this document for research. You can now use the **Research Action** buttons in the sidebar to compare it with the simulation or get a summary.`);
+                    BiosimUI.notify('Knowledge', `Learned from ${file.name}`, 'suc');
+
+                } catch (error) {
+                    document.getElementById(loadingId)?.remove();
+                    this.addMessage('assistant', `❌ Error reading file: ${error.message}`);
+                }
+            },
+
+            renderKnowledgeBase() {
+                const list = document.getElementById('ai-kb-list');
+                const items = document.getElementById('kb-items');
+                const sidebarList = document.getElementById('sidebar-kb-list');
+                const sidebarItems = document.getElementById('sidebar-kb-items');
+
+                if (this.knowledgeBase.length > 0) {
+                    // Update AI Panel List
+                    if (list && items) {
+                        list.style.display = 'block';
+                        document.getElementById('kb-count').innerText = `${this.knowledgeBase.length} Docs`;
+                        items.innerHTML = this.knowledgeBase.map(k => `
+                            <div style="background: #1e3a8a; color: #60a5fa; font-size: 7px; padding: 2px 6px; border-radius: 2px; border: 1px solid #2563eb; display: flex; align-items: center; gap: 4px;">
+                                <i data-lucide="file-text" style="width: 8px; height: 8px;"></i> ${k.name}
+                            </div>
+                        `).join('');
+                    }
+
+                    // Update Sidebar List
+                    if (sidebarList && sidebarItems) {
+                        sidebarList.style.display = 'block';
+                        sidebarItems.innerHTML = this.knowledgeBase.map(k => `
+                            <div class="flex items-center gap-2 p-1.5 bg-blue-900/20 border border-blue-500/10 rounded">
+                                <i data-lucide="file-check" class="w-2.5 h-2.5 text-blue-400"></i>
+                                <span class="text-[8px] text-blue-200 truncate font-mono">${k.name}</span>
+                            </div>
+                        `).join('');
+                    }
+
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                } else {
+                    if (list) list.style.display = 'none';
+                    if (sidebarList) sidebarList.style.display = 'none';
+                }
+            },
+
+            async reorganizeDocument(name, text) {
+                this.addMessage('assistant', `🔄 AI is reorganizing ${name} for research...`);
+
+                try {
+                    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${this.apiKey}`
+                        },
+                        body: JSON.stringify({
+                            model: 'gpt-4',
+                            messages: [
+                                {
+                                    role: 'system',
+                                    content: 'You are a scientific data reorganizer. Your task is to take messy or raw research notes, protocols, or logs and structure them into a clean, concise, and professional reference format. Remove noise, fix formatting, and focus on the core scientific data.'
+                                },
+                                {
+                                    role: 'user',
+                                    content: `Please reorganize the following document titled "${name}":\n\n${text}`
+                                }
+                            ]
+                        })
+                    });
+
+                    const data = await response.json();
+                    return data.choices[0].message.content;
+                } catch (error) {
+                    return `Raw content (Reorganization failed): ${text.substring(0, 500)}`;
+                }
+            },
+
+            askPreset(question) {
+                const input = document.getElementById('ai-prompt');
+                if (input) {
+                    input.value = question;
+                    this.sendMessage();
+                }
+            },
+
+            togglePanel() {
+                // Simple toggle for now
+                BiosimUI.notify('AI', 'Full panel in development', 'inf');
+            }
+        };
+
+        // Load saved API key on page load
+        if (localStorage.getItem('openai_api_key')) {
+            AIAssistant.apiKey = localStorage.getItem('openai_api_key');
+        }
+
+        // === MAKE AI PANEL DRAGGABLE ===
+        window.addEventListener('DOMContentLoaded', () => {
+            const panel = document.getElementById('ai-panel');
+            const header = panel?.querySelector('div'); // First div is the header
+
+            if (!panel || !header) return;
+
+            let isDragging = false;
+            let currentX, currentY, initialX, initialY;
+
+            header.style.cursor = 'move';
+
+            header.addEventListener('mousedown', (e) => {
+                // Don't drag if clicking close button
+                if (e.target.tagName === 'BUTTON') return;
+
+                isDragging = true;
+                initialX = e.clientX - panel.offsetLeft;
+                initialY = e.clientY - panel.offsetTop;
+                header.style.cursor = 'grabbing';
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+
+                e.preventDefault();
+                currentX = e.clientX - initialX;
+                currentY = e.clientY - initialY;
+
+                // Keep panel within viewport
+                const maxX = window.innerWidth - panel.offsetWidth;
+                const maxY = window.innerHeight - panel.offsetHeight;
+
+                currentX = Math.max(0, Math.min(currentX, maxX));
+                currentY = Math.max(0, Math.min(currentY, maxY));
+
+                panel.style.left = currentX + 'px';
+                panel.style.top = currentY + 'px';
+                panel.style.bottom = 'auto'; // Override bottom positioning
+                panel.style.right = 'auto';  // Override right positioning
+            });
+
+            document.addEventListener('mouseup', () => {
+                if (isDragging) {
+                    isDragging = false;
+                    header.style.cursor = 'move';
+                }
+            });
+
+            // --- MAKE TELEMETRY HUD DRAGGABLE ---
+            const hud = document.getElementById('hud-main');
+            if (hud) {
+                let isHudDragging = false;
+                let hudInitialX, hudInitialY;
+
+                hud.style.cursor = 'move';
+
+                hud.addEventListener('mousedown', (e) => {
+                    isHudDragging = true;
+                    hudInitialX = e.clientX - hud.offsetLeft;
+                    hudInitialY = e.clientY - hud.offsetTop;
+                    hud.style.cursor = 'grabbing';
+                });
+
+                document.addEventListener('mousemove', (e) => {
+                    if (!isHudDragging) return;
+                    e.preventDefault();
+                    let x = e.clientX - hudInitialX;
+                    let y = e.clientY - hudInitialY;
+
+                    // Bound to viewport area (roughly)
+                    const container = document.getElementById('viewport-container');
+                    if (container) {
+                        const maxW = container.offsetWidth - hud.offsetWidth;
+                        const maxH = container.offsetHeight - hud.offsetHeight;
+                        x = Math.max(0, Math.min(x, maxW));
+                        y = Math.max(0, Math.min(y, maxH));
+                    }
+
+                    hud.style.left = x + 'px';
+                    hud.style.top = y + 'px';
+                });
+
+                document.addEventListener('mouseup', () => {
+                    if (isHudDragging) {
+                        isHudDragging = false;
+                        hud.style.cursor = 'move';
+                    }
+                });
+            }
+
+            // --- KNOWLEDGE HUB DRAG & DROP ---
+            const hub = document.getElementById('ai-knowledge-hub');
+            if (hub) {
+                hub.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    hub.style.borderColor = '#2563eb';
+                    hub.style.background = 'rgba(37, 99, 235, 0.15)';
+                    hub.style.transform = 'scale(1.02)';
+                });
+
+                hub.addEventListener('dragleave', () => {
+                    hub.style.borderColor = '#1e3a8a';
+                    hub.style.background = 'rgba(30, 58, 138, 0.1)';
+                    hub.style.transform = 'scale(1)';
+                });
+
+                hub.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    hub.style.borderColor = '#1e3a8a';
+                    hub.style.background = 'rgba(30, 58, 138, 0.1)';
+                    hub.style.transform = 'scale(1)';
+                    AIAssistant.handleFileUpload(e);
+                });
+            }
+        });
+
+        // === RESEARCH LABORATORY MODULE ===
+        const BiosimLab = {
+            history: JSON.parse(localStorage.getItem('biosim_history') || '[]'),
+
+            updateConfig(path, value, labelId, isPercent = false, isPotency = false) {
+                const keys = path.split('.');
+                let obj = CONFIG;
+                for (let i = 0; i < keys.length - 1; i++) obj = obj[keys[i]];
+
+                const numVal = parseFloat(value);
+                obj[keys[keys.length - 1]] = numVal;
+
+                if (labelId) {
+                    let displayVal = numVal;
+                    if (isPercent) displayVal = (numVal * 100).toFixed(2) + '%';
+                    else if (isPotency) displayVal = (numVal * 100).toFixed(0) + '%';
+                    else displayVal = numVal.toFixed(3);
+                    document.getElementById(labelId).innerText = displayVal;
+                }
+
+                BiosimUI.notify('Config', `Set ${keys[keys.length - 1]} to ${numVal}`, 'suc');
+            },
+
+            applyPreset(type) {
+                const presets = {
+                    'STANDARD': { noise: 0.015, mut: 0.0005, potency: 1.0 },
+                    'HARSH': { noise: 0.040, mut: 0.0020, potency: 1.2 },
+                    'CLINICAL': { noise: 0.005, mut: 0.0001, potency: 0.8 },
+                    'DISCOVERY': { noise: 0.025, mut: 0.0010, potency: 1.5 }
+                };
+
+                const p = presets[type];
+                if (!p) return;
+
+                CONFIG.stochastic.noiseStrength = p.noise;
+                CONFIG.stochastic.mutationRate = p.mut;
+                CONFIG.reprogramming.potency = p.potency;
+
+                // Sync UI sliders Labels
+                document.getElementById('val-noise').innerText = p.noise.toFixed(3);
+                document.getElementById('val-mut').innerText = (p.mut * 100).toFixed(2) + '%';
+                document.getElementById('val-pot').innerText = (p.potency * 100).toFixed(0) + '%';
+
+                // Sync Range Input positions
+                if (document.getElementById('slide-noise')) document.getElementById('slide-noise').value = p.noise;
+                if (document.getElementById('slide-mut')) document.getElementById('slide-mut').value = p.mut;
+                if (document.getElementById('slide-pot')) document.getElementById('slide-pot').value = p.potency;
+
+                BiosimUI.notify('Preset', `${type} Mode Activated`, 'suc');
+            },
+
+            logExperiment() {
+                const counts = { SOMATIC: 0, IPSC: 0, NEURO: 0, CARDIO: 0, TUMOR: 0 };
+                BiosimEngine.agents.forEach(a => { if (counts[a.type] !== undefined) counts[a.type]++; });
+
+                const entry = {
+                    id: window.simulationRunCount || 1,
+                    timestamp: new Date().toLocaleTimeString(),
+                    ipsc: counts.IPSC,
+                    tumor: counts.TUMOR,
+                    noise: CONFIG.stochastic.noiseStrength,
+                    mut: CONFIG.stochastic.mutationRate
+                };
+
+                this.history.unshift(entry);
+                if (this.history.length > 10) this.history.pop();
+                localStorage.setItem('biosim_history', JSON.stringify(this.history));
+                this.renderLog();
+            },
+
+            resetFlags() {
+                this.milestones = { stable: false, master: false, cancer: false, differentiation: false };
+                const goalEl = document.getElementById('research-goal');
+                if (goalEl) goalEl.innerHTML = 'Achieve >150 iPSCs with 0 Tumors';
+            },
+
+            checkGoals(counts) {
+                const goalEl = document.getElementById('research-goal');
+                if (!goalEl || !this.milestones) return;
+
+                // 1. Stable Pluripotency
+                if (counts.IPSC > 150 && counts.TUMOR === 0 && !this.milestones.stable) {
+                    BiosimUI.notify('MILESTONE', 'Stable iPSC Lineage Established', 'suc');
+                    goalEl.innerHTML = '<span class="text-green-400">✅ ACHIEVED: Stable Reprogramming</span>';
+                    this.milestones.stable = true;
+                }
+
+                // 2. Master Reprogrammer (>90% efficiency)
+                if (counts.IPSC > 350 && !this.milestones.master) {
+                    BiosimUI.notify('DISCOVERY', 'Master Reprogrammer: Exceptional Efficiency', 'suc');
+                    this.milestones.master = true;
+                }
+
+                // 3. Lineage Commitment
+                if ((counts.NEURO > 100 || counts.CARDIO > 100) && !this.milestones.differentiation) {
+                    BiosimUI.notify('DISCOVERY', 'Lineage Commitment: Specialized Cell Types', 'suc');
+                    this.milestones.differentiation = true;
+                }
+
+                // 4. Malignant Transformation Check
+                if (counts.TUMOR > 10) {
+                    goalEl.innerHTML = '<span class="text-red-400">❌ ALERT: Malignant Transformation</span>';
+                }
+            },
+
+            renderLog() {
+                const container = document.getElementById('research-log');
+                if (!container) return;
+
+                if (this.history.length === 0) {
+                    container.innerHTML = '<div class="text-[8px] text-slate-600 italic">No experiments logged yet.</div>';
+                    return;
+                }
+
+                let html = '<table class="w-full text-[8px] text-slate-400 border-collapse">';
+                html += '<tr class="border-b border-slate-800 text-slate-500"><th class="text-left py-1">RUN</th><th class="text-center">iPSC</th><th class="text-center">TUMOR</th><th class="text-right">NOISE</th></tr>';
+
+                this.history.forEach(e => {
+                    html += `<tr class="border-b border-slate-900/50 hover:bg-slate-900/30">
+                        <td class="py-1">#${e.id} <span class="text-[7px] text-slate-600">${e.timestamp}</span></td>
+                        <td class="text-center text-yellow-500 font-bold">${e.ipsc}</td>
+                        <td class="text-center ${e.tumor > 0 ? 'text-red-500' : 'text-slate-700'}">${e.tumor}</td>
+                        <td class="text-right font-mono">${e.noise.toFixed(3)}</td>
+                    </tr>`;
+                });
+                html += '</table>';
+                container.innerHTML = html;
+            }
+        };
+
+        window.addEventListener('load', () => BiosimLab.renderLog());
+        // Initialize run counter
+        window.simulationRunCount = 1;
+
+        BiosimEngine.init();
+        lucide.createIcons();
+
+        // Init Bar Chart (Current Population)
+        const ctx = document.getElementById('chart-main');
+        window.myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['SOM', 'iPS', 'NEU', 'CAR', 'TUM'],
+                datasets: [{
+                    data: [1, 1, 1, 1, 1],
+                    backgroundColor: ['#64748b', '#eab308', '#a855f7', '#f43f5e', '#ef4444']
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { x: { display: false }, y: { display: false } }
+            }
+        });
+
+        // Init Time-Course Line Chart
+        const ctxTime = document.getElementById('chart-timecourse');
+        window.timeChart = new Chart(ctxTime, {
+            type: 'line',
+            data: {
+                labels: [], // Time points (0s, 1s, 2s...)
+                datasets: [
+                    {
+                        label: 'SOM',
+                        data: [],
+                        borderColor: '#64748b',
+                        backgroundColor: 'rgba(100, 116, 139, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        pointRadius: 0
+                    },
+                    {
+                        label: 'iPS',
+                        data: [],
+                        borderColor: '#eab308',
+                        backgroundColor: 'rgba(234, 179, 8, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        pointRadius: 0
+                    },
+                    {
+                        label: 'NEU',
+                        data: [],
+                        borderColor: '#a855f7',
+                        backgroundColor: 'rgba(168, 85, 247, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        pointRadius: 0
+                    },
+                    {
+                        label: 'CAR',
+                        data: [],
+                        borderColor: '#f43f5e',
+                        backgroundColor: 'rgba(244, 63, 94, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        pointRadius: 0
+                    },
+                    {
+                        label: 'TUM',
+                        data: [],
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        pointRadius: 0
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false, // Disable for performance
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            color: '#94a3b8',
+                            font: { size: 8, family: 'JetBrains Mono' },
+                            boxWidth: 10,
+                            boxHeight: 2
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        display: true,
+                        ticks: {
+                            color: '#475569',
+                            font: { size: 8 },
+                            maxTicksLimit: 6
+                        },
+                        grid: { display: false }
+                    },
+                    y: {
+                        display: true,
+                        ticks: {
+                            color: '#475569',
+                            font: { size: 8 },
+                            maxTicksLimit: 4
+                        },
+                        grid: {
+                            color: '#1f1f1f',
+                            lineWidth: 1
+                        },
+                        beginAtZero: true
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                }
+            }
+        });
+
+        // Initialize time tracking
+        window.timeCourseData = {
+            startTime: Date.now(),
+            timePoints: [],
+            history: {
+                SOMATIC: [],
+                IPSC: [],
+                NEURO: [],
+                CARDIO: [],
+                TUMOR: []
+            }
+        };
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+.venv
+env/
+venv/
+build/
+dist/
+*.egg-info/
+.pytest_cache/
+
+# Git/System
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.bak
+
+# Project Specific
+sample_data.grib*
+*.idx
+gateway.log
+gateway_utf8.log
+node_modules/
+.idea/
+.vscode/

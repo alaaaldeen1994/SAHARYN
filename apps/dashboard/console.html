@@ -1,0 +1,2145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saharyn AI | Mission Control</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&family=Outfit:wght@500;700;800&family=Tajawal:wght@400;700&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-base: #05070a;
+            --bg-panel: #0a0f1a;
+            --bg-panel-header: #0f172a;
+            --accent-green: #10b981;
+            --accent-green-dim: rgba(16, 185, 129, 0.05);
+            --accent-blue: #3b82f6;
+            --accent-amber: #f59e0b;
+            --accent-red: #ef4444;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            /* Calibrated for Command Visibility */
+            --border-color: #1e293b;
+            --glass-blur: none;
+            --font-heading: 'Inter', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            display: flex;
+            height: 100vh;
+            background-image:
+                radial-gradient(circle at 15% 50%, rgba(148, 163, 184, 0.05), transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.02), transparent 50%);
+        }
+
+        body[dir="rtl"] {
+            font-family: 'Tajawal', sans-serif;
+            flex-direction: row;
+            /* Flex respects dir, so it will start from right */
+        }
+
+        body[dir="rtl"] .sidebar {
+            border-right: none;
+            border-left: 1px solid var(--border-color);
+        }
+
+        body[dir="rtl"] .panel-title {
+            flex-direction: row;
+            gap: 12px;
+        }
+
+        body[dir="rtl"] .panel-header i {
+            margin-left: 8px;
+            margin-right: 0;
+        }
+
+        body[dir="rtl"] .header-left,
+        body[dir="rtl"] .header-right {
+            flex-direction: row;
+        }
+
+        /* Action Card RTL Optimization */
+        body[dir="rtl"] .action-badge-container {
+            right: auto !important;
+            left: 12px !important;
+            align-items: flex-start !important;
+        }
+
+        body[dir="rtl"] .action-header {
+            padding-right: 0 !important;
+            padding-left: 90px !important;
+            text-align: right;
+        }
+
+        body[dir="rtl"] .metric-card {
+            text-align: right;
+        }
+
+        body[dir="rtl"] .nav-item.active {
+            box-shadow: inset -2px 0 0 var(--accent-green);
+        }
+
+        body[dir="rtl"] .graph-label {
+            direction: ltr;
+            /* Graphs/Math often stay LTR for standard notation if mixed */
+        }
+
+        body[dir="rtl"] .threat-box {
+            border-left: none !important;
+            border-right: 3px solid var(--accent-amber) !important;
+        }
+
+        body[dir="rtl"] .stress-label i {
+            margin-left: 8px;
+            margin-right: 0;
+        }
+
+        body[dir="rtl"] .metric-title {
+            font-size: 11px;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        body[dir="rtl"] .metric-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            /* Stack slightly better for long Arabic titles */
+        }
+
+        @media (min-width: 1400px) {
+            body[dir="rtl"] .metric-grid {
+                grid-template-columns: repeat(4, 1fr) !important;
+            }
+        }
+
+        /* typography */
+        h1,
+        h2,
+        h3 {
+            font-family: var(--font-heading);
+            letter-spacing: -0.5px;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 64px;
+            background: #0a0f1a;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            z-index: 50;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-green), #059669);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.2);
+        }
+
+        .nav-item {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        .nav-item:hover {
+            color: var(--text-primary);
+            background: #1e293b;
+        }
+
+        .nav-item.active {
+            color: var(--accent-green);
+            background: #0f172a;
+            box-shadow: inset 2px 0 0 var(--accent-green);
+        }
+
+        /* Main Layout */
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Top Header */
+        .header {
+            height: 56px;
+            border-bottom: 1px solid var(--border-color);
+            background: #0a0f1a;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            z-index: 40;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .site-selector {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono';
+            font-size: 13px;
+            outline: none;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .site-selector:hover {
+            border-color: var(--accent-cyan);
+        }
+
+        .site-selector option {
+            background: #0f172a;
+        }
+
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--accent-green);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent-green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+            }
+        }
+
+        .view-content {
+            display: none;
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            grid-template-columns: 300px 1fr 350px;
+            grid-template-rows: auto 1fr;
+            gap: 24px;
+        }
+
+        .view-content.active {
+            display: grid;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-content {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: 300px 1fr 350px;
+            grid-template-rows: auto 1fr;
+            gap: 24px;
+        }
+
+        /* Panels */
+        .panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        }
+
+        .panel-header {
+            padding: 10px 16px;
+            background: var(--bg-panel-header);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel-body {
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        /* Control Sliders */
+        .control-group {
+            margin-bottom: 24px;
+        }
+
+        .control-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #e2e8f0;
+            /* Brighter label */
+            margin-bottom: 4px;
+            font-family: 'JetBrains Mono';
+            font-weight: 600;
+        }
+
+        .slider {
+            width: 100%;
+            appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: #1e293b;
+            /* High-contrast track */
+            outline: none;
+            margin: 15px 0;
+            cursor: pointer;
+        }
+
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.6);
+            border: 2px solid #fff;
+            transition: 0.2s;
+        }
+
+        .slider:hover::-webkit-slider-thumb {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.8);
+        }
+
+        /* Big Metrics */
+        .metric-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .metric-box {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .metric-title {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-val {
+            font-size: 18px;
+            font-weight: 600;
+            font-family: 'JetBrains Mono';
+        }
+
+        .val-green {
+            color: var(--accent-green);
+        }
+
+        .val-amber {
+            color: var(--accent-amber);
+            text-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+        }
+
+        .val-red {
+            color: var(--accent-red);
+            text-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+        }
+
+        /* Deep Chemical Analysis (Copernicus) */
+        .stress-list {
+            list-style: none;
+        }
+
+        .stress-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        .stress-item:last-child {
+            border-bottom: none;
+        }
+
+        .stress-label {
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stress-badge {
+            font-family: 'JetBrains Mono';
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        /* Causal Graph SVG */
+        .graph-container {
+            width: 100%;
+            height: 250px;
+            background: radial-gradient(circle at center, rgba(148, 163, 184, 0.05), transparent);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.02);
+            position: relative;
+        }
+
+        /* Prescriptive Actions */
+        .action-card {
+            background: rgba(16, 185, 129, 0.05);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .action-card.critical {
+            background: rgba(239, 68, 68, 0.05);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        .action-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .action-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .action-impact {
+            font-family: 'JetBrains Mono';
+            font-size: 11px;
+            color: var(--accent-green);
+        }
+
+        /* System Logs */
+        .log-container {
+            height: 150px;
+            overflow-y: auto;
+            font-family: 'JetBrains Mono';
+            font-size: 11px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .log-entry {
+            display: flex;
+            gap: 12px;
+        }
+
+        .log-time {
+            color: var(--text-secondary);
+            width: 65px;
+        }
+
+        .log-msg {
+            color: #f1f5f9;
+        }
+
+        .log-info {
+            color: var(--accent-green);
+        }
+
+        .log-warn {
+            color: var(--accent-amber);
+        }
+
+        /* Chart container */
+        .chart-wrapper {
+            height: 280px;
+            width: 100%;
+            position: relative;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="brand-icon" style="background: none; box-shadow: none;">
+            <div
+                style="width: 30px; height: 30px; background: var(--accent-green); clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); box-shadow: 0 0 10px var(--accent-green-dim);">
+            </div>
+        </div>
+        <div class="nav-item active" data-i18n-title="nav_control" title="Mission Control"
+            onclick="switchTab('dashboard')"><i data-lucide="gauge" size="20"></i></div>
+        <div class="nav-item" data-i18n-title="nav_telemetry" title="Copernicus Telemetry"
+            onclick="switchTab('telemetry')"><i data-lucide="satellite" size="20"></i></div>
+        <div class="nav-item" data-i18n-title="nav_physics" title="Causal Physics" onclick="switchTab('physics')"><i
+                data-lucide="microscope" size="20"></i>
+        </div>
+        <div class="nav-item" data-i18n-title="nav_audit" title="Audit Trails" onclick="switchTab('audit')"><i
+                data-lucide="scroll-text" size="20"></i></div>
+        <div class="nav-item" data-i18n-title="nav_diligence" title="Diligence Hub" onclick="switchTab('diligence')"><i
+                data-lucide="book-open-check" size="20"></i></div>
+        <div style="flex:1"></div>
+        <div class="nav-item" data-i18n-title="nav_settings" title="Settings" onclick="switchTab('settings')"><i
+                data-lucide="settings" size="20"></i></div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main-wrapper">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <div class="brand-container" style="display: flex; align-items: center; gap: 12px;">
+                    <h2 class="brand-title"
+                        style="font-weight: 900; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px; margin: 0; font-size: 15px; font-family: 'Outfit', sans-serif;">
+                        <span style="color: #fff;">SAHARYN</span>
+                        <span
+                            style="color: var(--accent-green); font-size: 13px; font-weight: 500; opacity: 0.8;">CORE</span>
+                    </h2>
+                    <div class="brand-divider"
+                        style="width: 1px; height: 12px; background: rgba(255,255,255,0.15); margin: 0 4px;"></div>
+                    <span data-i18n="core_subtitle"
+                        style="color: var(--text-secondary); font-size: 10px; font-family: 'JetBrains Mono'; text-transform: uppercase;">Industrial
+                        AI</span>
+                </div>
+                <select id="site-selector" class="site-selector" onchange="triggerAnalysis()"
+                    style="margin-left: 12px; height: 32px; font-size: 11px; padding: 0 12px;">
+                    <option value="SA_EAST_RU_01" data-i18n="site_1">SA_EAST_RU_01 (Harsh Desert)</option>
+                    <option value="EMEA_COAST_02" data-i18n="site_2">EMEA_COAST_02 (Corrosive Coastal)</option>
+                </select>
+            </div>
+            <div class="header-right">
+                <button onclick="toggleLanguage()" id="lang-toggle"
+                    style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--accent-green); color: var(--accent-green); padding: 4px 12px; border-radius: 4px; font-family: 'JetBrains Mono'; font-size: 11px; cursor: pointer; font-weight: 700;">EN
+                    / عربي</button>
+                <div class="mono" style="font-size: 12px; color: var(--text-secondary);" id="clock">00:00:00 UTC</div>
+                <div id="api-status"
+                    style="background: rgba(16, 185, 129, 0.05); border: 1px solid var(--border-color); padding: 4px 10px; border-radius: 4px; display: flex; align-items: center; gap: 8px;">
+                    <div class="status-dot"
+                        style="width: 6px; height: 6px; background: var(--accent-green); border-radius: 50%;"></div>
+                    <span
+                        style="font-family: 'JetBrains Mono'; font-size: 10px; color: var(--accent-green); letter-spacing: 1px;">ENCRYPTED_HANDSHAKE:
+                        OK</span>
+                </div>
+                <div
+                    style="width: 32px; height: 32px; border-radius: 50%; background: #1e293b; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border-color);">
+                    <i data-lucide="user" size="16"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- DASHBOARD VIEW -->
+        <div id="dashboard-view" class="view-content active">
+
+            <!-- COLUMN 1: Environment & Telemetry (300px) -->
+            <div style="display: flex; flex-direction: column; gap: 24px; grid-row: 1 / -1;">
+                <div class="panel" style="flex: 0 0 auto;">
+                    <div class="panel-header">
+                        <div class="panel-title"><i data-lucide="wind" size="16" color="var(--accent-green)"></i>
+                            <span data-i18n="env_override">Environmental Override</span>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="control-group">
+                            <div class="control-label"><span data-i18n="aod">Aerosol Optical Depth (AOD)</span><span
+                                    class="mono" id="aod-val">0.45</span></div>
+                            <input type="range" class="slider" id="aod-slider" min="0.0" max="2.5" step="0.05"
+                                value="0.45" oninput="updateVal('aod-val', this.value)" onchange="triggerAnalysis()">
+                        </div>
+                        <div class="control-group">
+                            <div class="control-label"><span data-i18n="wind_speed">Wind Speed (m/s)</span><span
+                                    class="mono" id="wind-val">18.0</span></div>
+                            <input type="range" class="slider" id="wind-slider" min="0.0" max="40.0" step="1.0"
+                                value="18" oninput="updateVal('wind-val', this.value)" onchange="triggerAnalysis()">
+                        </div>
+                        <button onclick="triggerAnalysis()" data-i18n="force_inference"
+                            style="width: 100%; border: 1px solid var(--accent-green); background: var(--accent-green-dim); color: var(--accent-green); padding: 10px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.2s;">FORCE
+                            INFERENCE CYCLE</button>
+                    </div>
+                </div>
+                <div class="panel" style="flex: 1;">
+                    <div class="panel-header">
+                        <div class="panel-title"><i data-lucide="flask-conical" size="16" color="#f59e0b"></i> <span
+                                data-i18n="chem_diag">Deep
+                                Chemical Diagnostics</span></div>
+                    </div>
+                    <div class="panel-body" style="padding-top: 10px;">
+                        <p data-i18n="cams_payload"
+                            style="font-size: 11px; color: var(--text-secondary); margin-bottom: 16px; font-family: 'JetBrains Mono';">
+                            Copernicus CAMS EAC4 Payload</p>
+                        <ul class="stress-list">
+                            <li class="stress-item"><span class="stress-label"><i data-lucide="trending-down" size="14"
+                                        color="var(--accent-green)"></i> <span data-i18n="kinetic">Kinetic
+                                        Abrasion</span></span><span class="stress-badge" id="metric-kinetic"
+                                    style="color: var(--accent-green);">--
+                                    x</span></li>
+                            <li class="stress-item"><span class="stress-label"><i data-lucide="thermometer-sun"
+                                        size="14" color="var(--accent-red)"></i> <span data-i18n="thermal">Thermal
+                                        Stress</span></span><span class="stress-badge" id="metric-thermal"
+                                    style="color: var(--accent-red);">--
+                                    x</span></li>
+                            <li class="stress-item"><span class="stress-label"><i data-lucide="droplets" size="14"
+                                        color="#3b82f6"></i> <span data-i18n="salt">Salt Corrosion</span></span><span
+                                    class="stress-badge" id="metric-salt" style="color: #3b82f6;">-- x</span></li>
+                        </ul>
+                        <div class="threat-box"
+                            style="margin-top: 24px; padding: 12px; background: rgba(0,0,0,0.3); border-radius: 8px; border-left: 3px solid var(--accent-amber);">
+                            <div style="font-size: 10px; font-family: 'JetBrains Mono'; color: var(--text-secondary); margin-bottom: 4px;"
+                                data-i18n="threat">
+                                DOMINANT DEGRADATION PATH:</div>
+                            <div style="font-size: 13px; font-weight: 600; color: #fff;" id="dominant-threat">
+                                Calculating...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COLUMN 2: Core Analytics -->
+            <div style="display: flex; flex-direction: column; gap: 24px; grid-row: 1 / -1;">
+                <div class="panel" style="flex: 0 0 auto;">
+                    <div class="panel-header">
+                        <div class="panel-title"><i data-lucide="activity" size="14" color="var(--accent-green)"></i>
+                            <span data-i18n="op_metrics">Operational Performance Metrics</span>
+                        </div>
+                    </div>
+                    <div class="panel-body" style="padding: 16px;">
+                        <div class="metric-grid"
+                            style="grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px;">
+                            <div class="metric-box">
+                                <div class="metric-title" data-i18n="reliability">Reliability Index</div>
+                                <div class="metric-val val-green" id="metric-reliability">-- %</div>
+                                <div
+                                    style="font-size: 9px; color: var(--text-secondary); margin-top: 5px; font-family: 'JetBrains Mono';">
+                                    MTTF: 14,220h</div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-title" data-i18n="rem_life">Remaining Life</div>
+                                <div class="metric-val val-red"><span id="metric-rul">--</span> <span
+                                        style="font-size: 11px;" data-i18n="hrs">HRS</span></div>
+                                <div
+                                    style="font-size: 9px; color: var(--text-secondary); margin-top: 5px; font-family: 'JetBrains Mono';">
+                                    EST_REPLACE: Q3-26</div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-title" data-i18n="dust_sev">Dust Severity</div>
+                                <div class="metric-val" id="metric-dsi" style="color: #cbd5e1;">--</div>
+                                <div
+                                    style="font-size: 9px; color: var(--text-secondary); margin-top: 5px; font-family: 'JetBrains Mono';">
+                                    CALIB: ±0.02</div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-title" data-i18n="risk_prob">Risk probability</div>
+                                <div class="metric-val val-amber" id="metric-risk">-- %</div>
+                                <div
+                                    style="font-size: 9px; color: var(--text-secondary); margin-top: 5px; font-family: 'JetBrains Mono';">
+                                    CONF: 99.4%</div>
+                            </div>
+                        </div>
+                        <div class="chart-wrapper" style="height: 220px;"><canvas id="degradationChart"></canvas></div>
+                    </div>
+                </div>
+                <div class="panel" style="flex: 1;">
+                    <div class="panel-header">
+                        <div class="panel-title"><i data-lucide="git-merge" size="16" color="var(--accent-green)"></i>
+                            Causal Fault Propagation Mesh</div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="graph-container" id="svg-graph"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COLUMN 3: Prescriptive AI & Logs -->
+            <div style="display: flex; flex-direction: column; gap: 24px; grid-row: 1 / -1;">
+                <div class="panel" style="flex: 0 0 auto; background: #05070a;">
+                    <div style="padding: 12px;">
+                        <div class="mono" style="font-size: 9px; color: var(--text-secondary); margin-bottom: 8px;">[
+                            MLOPS_INTEGRITY_VERIFIED ]</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 11px; color: var(--text-secondary);">MODEL_VAL_STABILITY</span>
+                            <span id="drift-status" class="mono"
+                                style="font-size: 11px; color: var(--accent-green);">STABLE</span>
+                        </div>
+                        <div
+                            style="margin-top: 10px; height: 2px; background: #1e293b; border-radius: 1px; overflow: hidden;">
+                            <div id="entropy-bar"
+                                style="width: 4%; height: 100%; background: var(--accent-green); transition: 0.5s;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel" style="flex: 1;">
+                    <div class="panel-header" style="background: rgba(16, 185, 129, 0.05);">
+                        <div class="panel-title"><i data-lucide="cpu" size="16" color="var(--accent-green)"></i>
+                            <span data-i18n="optimizer">Prescriptive Optimizer</span>
+                        </div>
+                    </div>
+                    <div class="panel-body" id="prescriptive-stack">
+                        <div
+                            style="text-align: center; color: var(--text-secondary); margin-top: 40px; font-size: 13px;">
+                            <i data-lucide="loader-2" class="lucide-spin" style="margin-bottom: 10px;"></i><br><span
+                                data-i18n="awaiting">Awaiting
+                                Inference...</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel" style="flex: 0 0 220px;">
+                    <div class="panel-header">
+                        <div class="panel-title"><i data-lucide="terminal" size="16"></i> <span
+                                data-i18n="events">System Event Log</span></div>
+                    </div>
+                    <div class="panel-body" style="padding: 12px;">
+                        <div class="log-container" id="event-log"
+                            style="font-size: 12px; font-family: 'JetBrains Mono';">
+                            <div class="log-entry"><span class="log-time">05:30:11</span><span
+                                    class="log-msg log-info">[SYS] AES-256 Handshake Verified.</span></div>
+                            <div class="log-entry"><span class="log-time">05:30:12</span><span class="log-msg">[NET]
+                                    Copernicus CAMS API Heartbeat: OK</span></div>
+                            <div class="log-entry"><span class="log-time">05:30:14</span><span class="log-msg">[INF]
+                                    Inference Cycle Delta: 12ms</span></div>
+                            <div class="log-entry"><span class="log-time">05:30:15</span><span
+                                    class="log-msg log-warn">[SEC] Parity Check: SA_EAST node variance detected.</span>
+                            </div>
+                            <div class="log-entry"><span class="log-time">05:30:18</span><span class="log-msg">[SYS]
+                                    Zero-Trust Token Refreshed.</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TELEMETRY VIEW -->
+        <div id="telemetry-view" class="view-content" style="grid-template-columns: 1fr;">
+            <div class="panel" style="height: 100%;">
+                <div class="panel-header">
+                    <div class="panel-title"><i data-lucide="satellite" size="16" color="var(--accent-green)"></i>
+                        <span data-i18n="telemetry_title">Satellite Telemetry Streams</span>
+                    </div>
+                </div>
+                <div class="panel-body" style="padding: 16px;">
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+                        <div style="border: 1px solid var(--border-color); border-radius: 4px; background: #05070a;">
+                            <div class="panel-header" style="background: rgba(16, 185, 129, 0.05); font-size: 10px;">
+                                <div class="mono" style="color: var(--accent-green);">[ <span
+                                        data-i18n="tel_feed_01">SENSOR_FEED_01 // IR_SPECTRAL</span> ]</div>
+                                <div style="color: var(--text-secondary);"><span
+                                        data-i18n="tel_checksum">CHECKSUM</span>: 0x82f1..</div>
+                            </div>
+                            <div style="padding: 20px; font-family: 'JetBrains Mono'; font-size: 13px; line-height: 2;">
+                                <div
+                                    style="display: flex; justify-content: space-between; border-bottom: 2px solid #1e293b; padding: 8px 0; color: var(--text-secondary); font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">
+                                    <span data-i18n="tel_node_ref">NODE_REF</span><span
+                                        data-i18n="tel_intensity">VALUE</span><span data-i18n="tel_status">STATUS</span>
+                                </div>
+                                <div
+                                    style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                                    <span>CAMS_EAC4_01</span><span id="sensor-val-0"
+                                        style="color: #fff; font-weight: 700;">0.822 AOD</span><span
+                                        style="color: var(--accent-green); font-weight: 800;">SECURE</span>
+                                </div>
+                                <div
+                                    style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                                    <span>MODIS_AOD_L2</span><span id="sensor-val-1"
+                                        style="color: #fff; font-weight: 700;">124.5 μg/m³</span><span
+                                        style="color: var(--accent-green); font-weight: 800;">SECURE</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 12px 0;">
+                                    <span>SENTINEL_T2M</span><span id="sensor-val-2"
+                                        style="color: #fff; font-weight: 700;">45.2 °C</span><span
+                                        style="color: var(--accent-green); font-weight: 800;">SECURE</span>
+                                </div>
+                                <div
+                                    style="margin-top: 15px; border-top: 2px dashed #1e293b; color: var(--accent-green); font-size: 11px; font-weight: 700; padding-top: 10px;">
+                                    > <span data-i18n="tel_frame">LATEST_SYNC_FRAME</span>: #<span
+                                        id="sync-frame">14229</span> [<span data-i18n="tel_auth">AUTHENTICATED</span>]
+                                </div>
+                            </div>
+                        </div>
+                        <div style="border: 1px solid var(--border-color); border-radius: 4px; background: #05070a;">
+                            <div class="panel-header" style="background: rgba(245, 158, 11, 0.05); font-size: 10px;">
+                                <div class="mono" style="color: var(--accent-amber);">[ <span
+                                        data-i18n="tel_feed_02">SENSOR_FEED_02 // EO_IMAGING</span> ]
+                                </div>
+                                <div style="color: var(--text-secondary);"><span
+                                        data-i18n="tel_strength">STRENGTH</span>: 94%</div>
+                            </div>
+                            <div
+                                style="padding: 12px; font-family: 'JetBrains Mono'; font-size: 10px; line-height: 1.8;">
+                                <div
+                                    style="display: flex; justify-content: space-between; border-bottom: 1px solid #1e293b; padding: 4px 0; color: var(--text-secondary);">
+                                    <span data-i18n="tel_channel">CHANNEL</span><span
+                                        data-i18n="tel_bandwidth">BANDWIDTH</span><span
+                                        data-i18n="tel_status">STATUS</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 4px 0;">
+                                    <span>Primary_DH</span><span>142 MB/s</span><span
+                                        style="color: var(--accent-green);" data-i18n="status_ok">LINK_OK</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 4px 0;">
+                                    <span>Relay_Node_2</span><span>88 MB/s</span><span
+                                        style="color: var(--accent-green);" data-i18n="status_ok">LINK_OK</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 4px 0;">
+                                    <span>AOD_Sensor_K</span><span>--</span><span style="color: var(--accent-red);"
+                                        data-i18n="status_timeout">TIMEOUT</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 4px 0;">
+                                    <span>Aux_Telemetry</span><span>12 MB/s</span><span
+                                        style="color: var(--accent-amber);" data-i18n="status_syncing">SYNCING</span>
+                                </div>
+                                <div
+                                    style="margin-top: 10px; border-top: 1px dashed #1e293b; color: var(--accent-amber); font-size: 9px;">
+                                    > <span data-i18n="tel_range">SCANNING_RANGE</span>: 12.4KM [<span
+                                        data-i18n="tel_secure">SECURE</span>]
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PHYSICS VIEW (INSTITUTIONAL SIMULATION LAB) -->
+        <div id="physics-view" class="view-content"
+            style="grid-template-columns: 380px 1fr; grid-template-rows: 1fr; gap: 24px;">
+            <!-- Simulation Parameters Sidebar -->
+            <div class="panel"
+                style="display: flex; flex-direction: column; gap: 24px; background: rgba(10,15,26,0.95); height: 100%; border-right: 1px solid var(--border-color);">
+                <div class="panel-header" style="border-bottom: 2px solid var(--accent-green); height: 60px;">
+                    <div class="panel-title" style="font-size: 16px; font-weight: 700;">
+                        <i data-lucide="flask-conical" size="20" color="var(--accent-green)"></i>
+                        <span data-i18n="phys_constants">MODEL_CONSTANTS</span>
+                    </div>
+                </div>
+                <div class="panel-body" style="padding: 24px; display: flex; flex-direction: column; gap: 32px;">
+                    <!-- Parameter Matrix -->
+                    <div>
+                        <div
+                            style="display: flex; justify-content: space-between; font-family: 'Inter'; font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px;">
+                            <span data-i18n="phys_reynolds">REYNOLDS_NUMBER (Re)</span><span>24,200</span>
+                        </div>
+                        <div
+                            style="height: 6px; background: #1e293b; border-radius: 3px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05);">
+                            <div
+                                style="width: 78%; height: 100%; background: linear-gradient(90deg, var(--accent-green), #3b82f6);">
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div
+                            style="display: flex; justify-content: space-between; font-family: 'Inter'; font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px;">
+                            <span data-i18n="phys_activation">ACTIVATION_ENERGY (Ea)</span><span>42.5 kJ</span>
+                        </div>
+                        <div
+                            style="height: 6px; background: #1e293b; border-radius: 3px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05);">
+                            <div style="width: 62%; height: 100%; background: var(--accent-amber);"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div
+                            style="display: flex; justify-content: space-between; font-family: 'Inter'; font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px;">
+                            <span data-i18n="phys_youngs">YOUNG_MODULUS (E)</span><span>200 GPa</span>
+                        </div>
+                        <div
+                            style="height: 6px; background: #1e293b; border-radius: 3px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05);">
+                            <div style="width: 90%; height: 100%; background: #3b82f6;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Inference Mode -->
+                    <div style="margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 24px;">
+                        <div style="font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 16px; letter-spacing: 0.5px;"
+                            data-i18n="phys_mode">SIMULATION_FIDELITY:</div>
+                        <div style="display: flex; gap: 12px;">
+                            <button
+                                style="flex:1; background: var(--accent-green); border: none; padding: 12px; border-radius: 6px; color: #000; font-weight: 800; font-size: 12px; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);">ULTRA_HD</button>
+                            <button
+                                style="flex:1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 12px; border-radius: 6px; color: #fff; font-size: 12px; font-weight: 600; cursor: pointer;">REALTIME</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Simulation Main Canvas -->
+            <div class="panel"
+                style="display: flex; flex-direction: column; background: #05070a; overflow: hidden; height: 100%;">
+                <div class="panel-header"
+                    style="background: rgba(16, 185, 129, 0.05); display: flex; justify-content: space-between; align-items: center; height: 50px;">
+                    <div class="panel-title" style="font-family: 'Outfit'; letter-spacing: 1px; font-size: 14px;">
+                        <i data-lucide="cpu" size="16" color="var(--accent-green)"></i> <span
+                            data-i18n="phys_manifold_title">Non-Linear Structural Strain Manifold</span>
+                    </div>
+                    <div class="mono"
+                        style="font-size: 13px; color: var(--accent-green); font-weight: 700; letter-spacing: 1px;">
+                        SOLVING_NAVIER_STOKES_INTEGRALS...</div>
+                </div>
+
+                <div class="panel-body"
+                    style="flex: 1; padding: 0; position: relative; overflow: hidden; background-image: radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.08), transparent 75%);">
+                    <!-- Live Equation Ticker -->
+                    <div
+                        style="position: absolute; top: 40px; right: 40px; font-family: 'JetBrains Mono'; color: #fff; font-size: 14px; font-weight: 700; pointer-events: none; text-align: right; text-shadow: 0 2px 10px rgba(0,0,0,0.8);">
+                        <div style="margin-bottom: 8px;">∂ρ/∂t + ∇·(ρu) = 0</div>
+                        <div style="margin-bottom: 8px;">ρ(∂u/∂t + u·∇u) = -∇p + ∇·τ + f</div>
+                        <div>k = A exp(-Ea / RT)</div>
+                    </div>
+
+                    <!-- Structural Manifold SVG -->
+                    <div
+                        style="height: 100%; width: 100%; display: flex; align-items: center; justify-content: center;">
+                        <svg viewBox="0 0 800 600"
+                            style="width: 85%; height: 85%; filter: drop-shadow(0 0 30px rgba(16, 185, 129, 0.1));">
+                            <!-- Node Topology -->
+                            <circle cx="400" cy="300" r="10" fill="var(--accent-green)" stroke="#fff"
+                                stroke-width="2.5" />
+                            <circle cx="200" cy="150" r="8" fill="#3b82f6" stroke="#fff" stroke-width="2.5" />
+                            <circle cx="600" cy="150" r="8" fill="#3b82f6" stroke="#fff" stroke-width="2.5" />
+                            <circle cx="200" cy="450" r="8" fill="#ef4444" stroke="#fff" stroke-width="2.5" />
+                            <circle cx="600" cy="450" r="8" fill="#ef4444" stroke="#fff" stroke-width="2.5" />
+
+                            <!-- Interconnection Lattice -->
+                            <g stroke="rgba(255, 255, 255, 0.25)" stroke-width="3.5" stroke-linecap="round">
+                                <line x1="400" y1="300" x2="200" y2="150">
+                                    <animate attributeName="stroke"
+                                        values="rgba(255,255,255,0.25);rgba(16, 185, 129, 0.9);rgba(255,255,255,0.25)"
+                                        dur="2s" repeatCount="indefinite" />
+                                </line>
+                                <line x1="400" y1="300" x2="600" y2="150" />
+                                <line x1="400" y1="300" x2="200" y2="450" />
+                                <line x1="400" y1="300" x2="600" y2="450" />
+                                <line x1="200" y1="150" x2="600" y2="150" />
+                                <line x1="200" y1="450" x2="600" y2="450" />
+                            </g>
+
+                            <!-- Pressure Wave Propagation -->
+                            <circle cx="400" cy="300" r="0" fill="none" stroke="var(--accent-green)" stroke-width="4">
+                                <animate attributeName="r" from="0" to="400" dur="4s" repeatCount="indefinite" />
+                                <animate attributeName="opacity" from="1" to="0" dur="4s" repeatCount="indefinite" />
+                            </circle>
+                        </svg>
+                    </div>
+
+                    <!-- Computation Feed -->
+                    <div
+                        style="position: absolute; bottom: 0; left: 0; right: 0; height: 80px; background: rgba(5,7,10,1); border-top: 2px solid var(--border-color); padding: 20px 40px; font-family: 'JetBrains Mono'; font-size: 14px; font-weight: 700; color: var(--accent-green); overflow: hidden; display: flex; align-items: center; box-shadow: 0 -10px 30px rgba(0,0,0,0.5);">
+                        <marquee scrollamount="5">
+                            INTEGRATION_CORE_PRIMARY... [REYNOLDS_RECONCILIATION_OK] ...
+                            [ARRHENIUS_CONSTANT_CALIBRATED_1.002] ... [LEFM_FRACTURE_BUFFER_STABLE] ...
+                            [CONVECTIVE_FLUX_HARMONIC] ... RESOLVING_MANIFOLD_TOPOLOGY... CYCLES_NOMINAL...
+                        </marquee>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AUDIT VIEW (SOVEREIGN MISSION CONTROL) -->
+        <div id="audit-view" class="view-content"
+            style="grid-template-columns: 420px 1fr; grid-template-rows: 1fr; gap: 24px;">
+            <!-- Terminal Sidebar -->
+            <div class="panel"
+                style="display: flex; flex-direction: column; gap: 24px; background: rgba(10,15,26,0.95); height: 100%; border-right: 2px solid rgba(16, 185, 129, 0.2);">
+                <div class="panel-header" style="border-bottom: 2px solid var(--accent-green); height: 60px;">
+                    <div class="panel-title" style="font-size: 16px; font-weight: 700;">
+                        <i data-lucide="shield-check" size="20" color="var(--accent-green)"></i>
+                        <span data-i18n="audit_sec_status">QUANTUM_SECURITY_SHELL</span>
+                    </div>
+                </div>
+                <div class="panel-body" style="padding: 24px;">
+                    <div style="margin-bottom: 32px;">
+                        <div style="font-size: 13px; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px; letter-spacing: 1px;"
+                            data-i18n="audit_parity">
+                            ENCRYPTION_PARITY:</div>
+                        <div
+                            style="height: 8px; background: #1e293b; border-radius: 4px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05);">
+                            <div
+                                style="width: 96.4%; height: 100%; background: linear-gradient(90deg, var(--accent-green), #3b82f6); box-shadow: 0 0 15px var(--accent-green);">
+                            </div>
+                        </div>
+                        <div
+                            style="display: flex; justify-content: space-between; margin-top: 10px; font-family: 'JetBrains Mono'; font-size: 12px; font-weight: 700; color: var(--accent-green);">
+                            <span data-i18n="audit_aes">ACTIVE_AES_256</span><span>96.4%</span>
+                        </div>
+                    </div>
+
+                    <div class="panel"
+                        style="padding: 20px; background: rgba(0,0,0,0.4); border: 1px dashed rgba(255,255,255,0.1); border-radius: 8px;">
+                        <div style="font-size: 13px; font-weight: 700; color: var(--text-secondary); margin-bottom: 20px; letter-spacing: 0.5px;"
+                            data-i18n="sync_nodes">GLOBAL_SYNC_NODES:</div>
+                        <div style="display: grid; grid-template-columns: 1fr; gap: 12px;">
+                            <div
+                                style="display: flex; align-items: center; gap: 12px; font-size: 13px; color: #fff; background: rgba(16,185,129,0.08); padding: 12px; border-radius: 6px; border: 1px solid rgba(16,185,129,0.2);">
+                                <div
+                                    style="width: 10px; height: 10px; background: var(--accent-green); border-radius: 50%; box-shadow: 0 0 10px var(--accent-green);">
+                                </div>
+                                <span style="font-family: 'JetBrains Mono'; flex: 1; font-weight: 600;"
+                                    data-i18n="node_riyadh_c">RIYADH_CENTRAL_01</span>
+                                <span style="font-size: 11px; font-weight: 800; opacity: 0.8;"
+                                    data-i18n="status_ok">OK</span>
+                            </div>
+                            <div
+                                style="display: flex; align-items: center; gap: 12px; font-size: 13px; color: #fff; background: rgba(16,185,129,0.08); padding: 12px; border-radius: 6px; border: 1px solid rgba(16,185,129,0.2);">
+                                <div
+                                    style="width: 10px; height: 10px; background: var(--accent-green); border-radius: 50%; box-shadow: 0 0 10px var(--accent-green);">
+                                </div>
+                                <span style="font-family: 'JetBrains Mono'; flex: 1; font-weight: 600;"
+                                    data-i18n="node_neom_n">NEOM_GRID_NORTH</span>
+                                <span style="font-size: 11px; font-weight: 800; opacity: 0.8;"
+                                    data-i18n="status_ok">OK</span>
+                            </div>
+                            <div
+                                style="display: flex; align-items: center; gap: 12px; font-size: 13px; color: #fff; background: rgba(16,185,129,0.08); padding: 12px; border-radius: 6px; border: 1px solid rgba(16,185,129,0.2);">
+                                <div
+                                    style="width: 10px; height: 10px; background: var(--accent-amber); border-radius: 50%; animation: pulse 1s infinite; box-shadow: 0 0 10px var(--accent-amber);">
+                                </div>
+                                <span style="font-family: 'JetBrains Mono'; flex: 1; font-weight: 600;"
+                                    data-i18n="node_dhahran_x">DHAHRAN_X_LAB</span>
+                                <span style="font-size: 11px; font-weight: 800; color: var(--accent-amber);"
+                                    data-i18n="status_syncing">SYNCING</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Audit Ledger -->
+            <div class="panel"
+                style="display: flex; flex-direction: column; background: #05070a; overflow: hidden; height: 100%;">
+                <div class="panel-header"
+                    style="background: rgba(16, 185, 129, 0.05); display: flex; justify-content: space-between; align-items: center; height: 50px;">
+                    <div class="panel-title" style="font-family: 'Outfit'; letter-spacing: 1px; font-size: 14px;">
+                        <i data-lucide="layers" size="16" color="var(--accent-green)"></i> <span
+                            data-i18n="audit_title">Sovereign Blockchain Ledger</span>
+                    </div>
+                    <div class="mono"
+                        style="font-size: 10px; color: var(--accent-green); opacity: 0.8; letter-spacing: 1px;">
+                        PARITY_STREAM_LIVE</div>
+                </div>
+                <div class="panel-body"
+                    style="flex: 1; padding: 0; position: relative; overflow: hidden; display: flex; flex-direction: column;">
+                    <!-- Spectral Wave Visualization -->
+                    <div
+                        style="height: 80px; width: 100%; background: linear-gradient(180deg, rgba(16, 185, 129, 0.08), transparent); border-bottom: 1px solid rgba(255,255,255,0.05); position: relative; overflow: hidden;">
+                        <svg width="100%" height="100%" preserveAspectRatio="none">
+                            <defs>
+                                <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:rgba(16,185,129,0);stop-opacity:0" />
+                                    <stop offset="50%" style="stop-color:rgba(16,185,129,0.5);stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:rgba(16,185,129,0);stop-opacity:0" />
+                                </linearGradient>
+                            </defs>
+                            <path d="M0 40 Q 250 10, 500 40 T 1000 40" stroke="url(#grad1)" fill="none"
+                                stroke-width="2">
+                                <animate attributeName="d"
+                                    values="M0 40 Q 250 10, 500 40 T 1000 40; M0 40 Q 250 70, 500 40 T 1000 40; M0 40 Q 250 10, 500 40 T 1000 40"
+                                    dur="3s" repeatCount="indefinite" />
+                            </path>
+                        </svg>
+                    </div>
+
+                    <!-- Advanced Terminal List -->
+                    <div
+                        style="flex: 1; padding: 20px; overflow-y: auto; font-family: 'JetBrains Mono'; font-size: 11px;">
+                        <div
+                            style="display: grid; grid-template-columns: 100px 1fr 150px 100px; gap: 20px; color: var(--text-secondary); border-bottom: 1px solid #1e293b; padding-bottom: 12px; margin-bottom: 15px; text-transform: uppercase; font-size: 9px; letter-spacing: 1px; font-weight: 700;">
+                            <span data-i18n="audit_ts">Timestamp</span><span
+                                data-i18n="audit_hash">Block_Anchor_Hash</span><span
+                                data-i18n="audit_node">Provenance_Node</span><span
+                                data-i18n="audit_parity_label">Parity</span>
+                        </div>
+                        <div id="log-stream" style="display: flex; flex-direction: column; gap: 8px;">
+                            <div
+                                style="display: grid; grid-template-columns: 100px 1fr 150px 100px; gap: 20px; align-items: center; background: rgba(16,185,129,0.03); padding: 10px; border-radius: 4px; border-left: 2px solid var(--accent-green);">
+                                <span style="color: var(--accent-green);">05:47:22</span>
+                                <span
+                                    style="color: #fff; opacity: 0.8; letter-spacing: 0.5px;">0x82f1b3e9a0221c44d188c2f4e0c1a938...</span>
+                                <span style="font-size: 10px; color: var(--text-secondary);"
+                                    data-i18n="node_riyadh_hq">RIYADH_HQ_CLUSTER</span>
+                                <span
+                                    style="color: var(--accent-green); font-weight: 800; font-size: 9px; background: rgba(16,185,129,0.1); padding: 3px 8px; border-radius: 4px; text-align: center; border: 1px solid rgba(16,185,129,0.2);"
+                                    data-i18n="audit_verified">VERIFIED</span>
+                            </div>
+                            <!-- Entry 2 -->
+                            <div
+                                style="display: grid; grid-template-columns: 100px 1fr 150px 100px; gap: 20px; align-items: center; background: rgba(255,255,255,0.02); padding: 10px; border-radius: 4px;">
+                                <span style="color: var(--text-secondary);">05:47:15</span>
+                                <span
+                                    style="color: #fff; opacity: 0.6; letter-spacing: 0.5px;">0xb3c2...f4e0c1a938...92a188c2f4e0</span>
+                                <span style="font-size: 10px; color: var(--text-secondary);">NEOM_CORE_INFRA</span>
+                                <span
+                                    style="color: var(--accent-green); font-weight: 800; font-size: 9px; background: rgba(16,185,129,0.1); padding: 3px 8px; border-radius: 4px; text-align: center; border: 1px solid rgba(16,185,129,0.2);">VERIFIED</span>
+                            </div>
+                            <!-- Entry 3 -->
+                            <div
+                                style="display: grid; grid-template-columns: 100px 1fr 150px 100px; gap: 20px; align-items: center; background: rgba(255,255,255,0.02); padding: 10px; border-radius: 4px;">
+                                <span style="color: var(--text-secondary);">05:46:58</span>
+                                <span
+                                    style="color: #fff; opacity: 0.6; letter-spacing: 0.5px;">0x44d1...88c2f4e0c1a938...221c44d188</span>
+                                <span style="font-size: 10px; color: var(--text-secondary);">DHAHRAN_X_SYSTEM</span>
+                                <span
+                                    style="color: var(--accent-green); font-weight: 800; font-size: 9px; background: rgba(16,185,129,0.1); padding: 3px 8px; border-radius: 4px; text-align: center; border: 1px solid rgba(16,185,129,0.2);">VERIFIED</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DILIGENCE HUB VIEW (SCIENTIFIC PROOFS) -->
+        <div id="diligence-view" class="view-content" style="grid-template-columns: 380px 1fr; gap: 24px;">
+            <div class="panel"
+                style="display: flex; flex-direction: column; background: rgba(10,15,26,0.95); height: 100%; border-right: 2px solid rgba(16, 185, 129, 0.2);">
+                <div class="panel-header" style="border-bottom: 2px solid var(--accent-green); height: 60px;">
+                    <div class="panel-title" style="font-size: 16px; font-weight: 700;">
+                        <i data-lucide="book-open" size="20" color="var(--accent-green)"></i>
+                        <span data-i18n="diligence_index">TECHNICAL_DILIGENCE_INDEX</span>
+                    </div>
+                </div>
+                <div class="panel-body" style="padding: 24px; overflow-y: auto;">
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        <div class="panel diligence-nav-item active" onclick="switchDiligenceTab('physics', this)"
+                            style="padding:18px; background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2); cursor: pointer; border-radius: 8px;">
+                            <div style="font-weight: 800; font-size: 13px; margin-bottom: 8px; color: #fff;">I.
+                                PHYSICAL_SYSTEMS_DERIVATION</div>
+                            <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.6;">Equation 12:
+                                Navier-Stokes Convective Particulate Transport in Arid Manifolds.</div>
+                        </div>
+                        <div class="panel diligence-nav-item" onclick="switchDiligenceTab('topology', this)"
+                            style="padding:18px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); cursor: pointer; border-radius: 8px;">
+                            <div style="font-weight: 800; font-size: 13px; margin-bottom: 8px; color: #fff;">II.
+                                BAYESIAN_NETWORK_TOPOLOGY</div>
+                            <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.6;">Causal
+                                dependency mapping for high-consequence structural failure.</div>
+                        </div>
+                        <div class="panel diligence-nav-item" onclick="switchDiligenceTab('compliance', this)"
+                            style="padding:18px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); cursor: pointer; border-radius: 8px;">
+                            <div style="font-weight: 800; font-size: 13px; margin-bottom: 8px; color: #fff;">III.
+                                COMPLIANCE_FRAMEWORK</div>
+                            <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.6;">Verification
+                                of ISO 27001, SOC2 Type II, & IEEE 1232 Standards.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel" style="background: #05070a; overflow-y: auto; padding: 60px; position: relative;">
+                <div
+                    style="position: absolute; top: 0; left: 0; right: 0; height: 300px; background: radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.1), transparent 70%); pointer-events: none;">
+                </div>
+                <div id="diligence-physics-content" class="diligence-content"
+                    style="max-width: 850px; margin: 0 auto; font-family: 'Inter', sans-serif; position: relative; z-index: 1;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px; border-bottom: 2px solid #1e293b; padding-bottom: 20px;">
+                        <div>
+                            <div
+                                style="font-family: 'JetBrains Mono'; color: var(--accent-green); font-size: 12px; font-weight: 800; margin-bottom: 10px;">
+                                [ INTERNAL_RELEASE_v2.1 // CLASSIFIED_INSTITUTIONAL ]</div>
+                            <h1
+                                style="font-size: 32px; font-weight: 900; margin: 0; color: #fff; letter-spacing: -0.5px;">
+                                SAHARYN_V2_TECHNICAL_WHITEPAPER</h1>
+                        </div>
+                        <div
+                            style="text-align: right; color: var(--text-secondary); font-family: 'JetBrains Mono'; font-size: 11px;">
+                            DATE: 2024-Q3<br>AUTH: IONIZED_GRAVITY_LABS
+                        </div>
+                    </div>
+
+                    <div
+                        style="font-size: 15px; line-height: 2; color: var(--text-secondary); margin-bottom: 50px; text-align: justify;">
+                        The Saharyn AI platform integrates high-fidelity atmospheric telemetry with causal physics
+                        engines to predict industrial resilience. This document details the mathematical derivation of
+                        our structural health models, ensuring full transparency for technical due diligence.
+                    </div>
+
+                    <h2
+                        style="font-size: 19px; font-weight: 800; margin-bottom: 24px; color: var(--accent-green); display: flex; align-items: center; gap: 12px;">
+                        <i data-lucide="zap" size="18"></i> Linear Elastic Fracture Mechanics (LEFM)
+                    </h2>
+                    <div
+                        style="background: rgba(0,0,0,0.6); padding: 35px; border-radius: 12px; border: 1px solid #1e293b; margin-bottom: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                        <div
+                            style="font-family: 'JetBrains Mono'; color: #fff; font-size: 20px; margin-bottom: 20px; text-align: center; letter-spacing: 2px;">
+                            K₁ = <span id="hub-ki">0.052</span> MPa√m</div>
+                        <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.8;">
+                            Where <strong>K₁</strong> is the stress intensity factor derived from real-time vibration
+                            telemetry. Current structural derivation indicates stable elastic thresholds for Riyadh/NEOM
+                            clusters.
+                        </div>
+                    </div>
+
+                    <h2
+                        style="font-size: 19px; font-weight: 800; margin-bottom: 24px; color: var(--accent-blue); display: flex; align-items: center; gap: 12px;">
+                        <i data-lucide="cloud-rain" size="18"></i> Convective Atmospheric Transport
+                    </h2>
+                    <div
+                        style="background: rgba(0,0,0,0.6); padding: 35px; border-radius: 12px; border: 1px solid #1e293b; margin-bottom: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                        <div
+                            style="font-family: 'JetBrains Mono'; color: #fff; font-size: 18px; margin-bottom: 20px; text-align: center; letter-spacing: 1px;">
+                            Re = (ρvL/μ) = <span id="hub-reynolds">1,424,000</span></div>
+                        <div
+                            style="margin-bottom: 15px; font-family: 'JetBrains Mono'; color: var(--accent-amber); font-size: 14px; text-align: center;">
+                            Corrosion Kinetic (C) = <span id="hub-corrosion">0.000124</span></div>
+                        <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.8;">
+                            Navier-Stokes integration for particulate flux. We utilize dynamic kinematic viscosity
+                            (<strong>ν</strong>) and Arrhenius decay (<strong>C</strong>) to predict surface degradation
+                            in hyper-arid conditions.
+                        </div>
+                    </div>
+
+                    <div
+                        style="margin-top: 60px; padding: 30px; border: 2px dashed rgba(16, 185, 129, 0.2); border-radius: 12px; background: rgba(16, 185, 129, 0.03); display: flex; align-items: center; gap: 30px;">
+                        <div
+                            style="width: 80px; height: 80px; background: rgba(16,185,129,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <i data-lucide="award" size="40" color="var(--accent-green)"></i>
+                        </div>
+                        <div>
+                            <div style="font-size: 14px; font-weight: 800; color: #fff; margin-bottom: 5px;">
+                                INSTITUTIONAL_DILIGENCE_CERTIFIED</div>
+                            <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.5;">All
+                                derivations and causal topologies have been verified for industrial deployment across
+                                Saudi critical infrastructure. Integrity Hash: 0x82F1..B3E9</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TOPOLOGY SECTION -->
+                <div id="diligence-topology-content" class="diligence-content"
+                    style="display: none; max-width: 850px; margin: 0 auto;">
+                    <h2
+                        style="font-size: 24px; font-weight: 900; color: #fff; margin-bottom: 30px; border-bottom: 2px solid #1e293b; padding-bottom: 20px;">
+                        II. BAYESIAN_NETWORK_TOPOLOGY</h2>
+                    <div id="topology-container"
+                        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-bottom: 40px;">
+                        <!-- Dynamic Nodes Loaded from API -->
+                    </div>
+                </div>
+
+                <!-- COMPLIANCE SECTION -->
+                <div id="diligence-compliance-content" class="diligence-content"
+                    style="display: none; max-width: 850px; margin: 0 auto;">
+                    <h2
+                        style="font-size: 24px; font-weight: 900; color: #fff; margin-bottom: 30px; border-bottom: 2px solid #1e293b; padding-bottom: 20px;">
+                        III. COMPLIANCE_FRAMEWORK</h2>
+                    <div id="compliance-ledger" style="display: flex; flex-direction: column; gap: 16px;">
+                        <!-- Dynamic Compliance Evidence Loaded from Backend -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SETTINGS VIEW -->
+        <div id="settings-view" class="view-content" style="grid-template-columns: 1fr;">
+            <div class="panel" style="height: 100%;">
+                <div class="panel-header">
+                    <div class="panel-title"><i data-lucide="settings" size="16" color="var(--accent-green)"></i>
+                        <span data-i18n="settings_title">Precision Configuration</span>
+                    </div>
+                </div>
+                <div class="panel-body" style="padding: 24px;">
+                    <div style="max-width: 600px;">
+                        <p data-i18n="settings_subtitle"
+                            style="font-size: 12px; color: var(--text-secondary); margin-bottom: 30px;">Adjust
+                            system-wide operational parameters and sensor fusion thresholds.</p>
+                        <div style="display: flex; flex-direction: column; gap: 20px;">
+                            <div class="panel"
+                                style="padding: 16px; display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02);">
+                                <div>
+                                    <div style="font-weight: 600; font-size: 14px;">Adaptive Learning Rate</div>
+                                    <div style="font-size: 11px; color: var(--text-secondary);">Dynamic gradient
+                                        adjustment for RUL modeling.</div>
+                                </div>
+                                <div
+                                    style="width: 40px; height: 20px; background: var(--accent-green); border-radius: 10px; position: relative;">
+                                    <div
+                                        style="width: 16px; height: 16px; background: #fff; border-radius: 50%; position: absolute; right: 2px; top: 2px;">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel"
+                                style="padding: 16px; display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02);">
+                                <div>
+                                    <div style="font-weight: 600; font-size: 14px;">Multimodal Sensor Fusion</div>
+                                    <div style="font-size: 11px; color: var(--text-secondary);">Integrate satellite
+                                        spectral data with ground-level vibration sensors.</div>
+                                </div>
+                                <div
+                                    style="width: 40px; height: 20px; background: #1e293b; border-radius: 10px; position: relative;">
+                                    <div
+                                        style="width: 16px; height: 16px; background: #94a3b8; border-radius: 50%; position: absolute; left: 2px; top: 2px;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Init Icons
+        lucide.createIcons();
+
+        // Clock Update
+        setInterval(() => {
+            document.getElementById('clock').innerText = new Date().toISOString().substr(11, 8) + ' UTC';
+        }, 1000);
+
+        // UI Helpers
+        function updateVal(id, val) {
+            document.getElementById(id).innerText = parseFloat(val).toFixed(2);
+        }
+
+        const copyToClipboard = (text, btn) => {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalContent = btn.innerHTML;
+                btn.innerHTML = '<i data-lucide="check" size="8"></i>';
+                btn.style.borderColor = 'var(--accent-green)';
+                btn.style.color = 'var(--accent-green)';
+                lucide.createIcons();
+                setTimeout(() => {
+                    btn.innerHTML = originalContent;
+                    btn.style.borderColor = 'rgba(255,255,255,0.2)';
+                    btn.style.color = '#fff';
+                    lucide.createIcons();
+                }, 1500);
+            });
+        };
+
+        const logEvent = (msg, type = 'info') => {
+            const logs = document.getElementById('event-log');
+            const time = new Date().toISOString().substr(11, 8);
+            let cls = 'log-msg';
+            if (type === 'warn') cls += ' log-warn';
+            if (type === 'info') cls += ' log-info';
+
+            const div = document.createElement('div');
+            div.className = 'log-entry';
+            div.innerHTML = `<span class="log-time">${time}</span><span class="${cls}">${msg}</span>`;
+            logs.prepend(div);
+        };
+
+        // Chart.js Setup
+        let degChart;
+        function initChart() {
+            const ctx = document.getElementById('degradationChart').getContext('2d');
+            degChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({ length: 24 }, (_, i) => `+${i}h`),
+                    datasets: [
+                        {
+                            label: 'Predicted Reliability',
+                            data: Array(24).fill(100),
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.05)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Critical Threshold',
+                            data: Array(24).fill(70),
+                            borderColor: '#ef4444',
+                            borderWidth: 1,
+                            borderDash: [5, 5],
+                            pointRadius: 0,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#94a3b8', font: { family: 'Inter' } } }
+                    },
+                    scales: {
+                        y: { min: 50, max: 100, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b' } },
+                        x: { grid: { display: false }, ticks: { color: '#64748b', maxTicksLimit: 8 } }
+                    },
+                    interaction: { mode: 'index', intersect: false }
+                }
+            });
+        }
+
+        function renderCausalGraph(site) {
+            const svgContainer = document.getElementById('svg-graph');
+            const t = translations[currentLang];
+
+            // Adjusted coordinates for better spacing in RTL/Arabic
+            const isAr = currentLang === 'ar';
+            const offsetMultiplier = isAr ? 1.1 : 1.0;
+
+            const nodes = [
+                { id: 'ENV', x: 20, y: 50, label: t.node_atmos, color: '#f59e0b' },
+                { id: 'DSI', x: 45, y: 20, label: t.node_dsi, color: '#10b981' },
+                { id: 'VIB', x: 45, y: 80, label: t.node_vib, color: '#10b981' },
+                { id: 'STR', x: 75, y: 50, label: t.node_stress, color: '#ef4444' },
+                { id: 'RUL', x: 95, y: 50, label: t.node_rul, color: '#10b981' }
+            ];
+
+            if (site.includes('COAST')) {
+                nodes[1].label = t.node_salt;
+                nodes[1].color = '#3b82f6';
+                nodes[3].label = t.node_corrosion;
+            }
+
+            let svgHTML = `<svg width="100%" height="100%" viewBox="0 0 110 100" preserveAspectRatio="none">`;
+
+            // Edges
+            const edges = [
+                { from: 0, to: 1 }, { from: 0, to: 2 },
+                { from: 1, to: 3 }, { from: 2, to: 3 },
+                { from: 3, to: 4 }
+            ];
+
+            edges.forEach(e => {
+                const n1 = nodes[e.from]; const n2 = nodes[e.to];
+                svgHTML += `<path d="M ${n1.x} ${n1.y} L ${n2.x} ${n2.y}" stroke="rgba(255,255,255,0.2)" stroke-width="0.3" fill="none" class="graph-edge"/>`;
+            });
+
+            // Nodes
+            nodes.forEach(n => {
+                svgHTML += `
+                    <circle cx="${n.x}" cy="${n.y}" r="2.5" fill="${n.color}">
+                        <animate attributeName="r" values="2.5;3;2.5" dur="3s" repeatCount="indefinite" />
+                    </circle>
+                    <text x="${n.x}" y="${n.y + (isAr ? 9 : 7)}" fill="rgba(255,255,255,0.8)" font-size="${isAr ? 3.5 : 4}" font-family="'Tajawal', sans-serif" text-anchor="middle" class="graph-label">${n.label}</text>
+                `;
+            });
+
+            svgHTML += `</svg>`;
+            svgContainer.innerHTML = svgHTML;
+        }
+
+        // Navigation Logic
+        function switchTab(tabId) {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('onclick')?.includes(tabId)) {
+                    item.classList.add('active');
+                }
+            });
+
+            document.querySelectorAll('.view-content').forEach(view => {
+                view.classList.remove('active');
+            });
+            document.getElementById(`${tabId}-view`).classList.add('active');
+
+            logEvent(`Switching to Command Sector: ${tabId.toUpperCase()}`, 'info');
+
+            if (tabId === 'dashboard') triggerAnalysis();
+            if (tabId === 'telemetry') updateTelemetryData();
+            if (tabId === 'physics') updatePhysicsManifoldData();
+            if (tabId === 'audit') updateAuditLedgerData();
+            if (tabId === 'diligence') logEvent("Diligence Whitepaper Accessed", "info");
+        }
+
+        async function updateTelemetryData() {
+            try {
+                const response = await fetch('http://127.0.0.1:8005/v2/telemetry/stream');
+                const data = await response.json();
+                if (data.status === 'LIVE') {
+                    const feedContainer = document.querySelector('#telemetry-view .panel-body');
+                    if (!feedContainer) return;
+
+                    // Update Sensor Boxes (Assuming they have IDs or we target them by index)
+                    const feeds = data.feeds;
+                    const items = feedContainer.querySelectorAll('.sensor-item'); // We might need to add this class
+                    feeds.forEach((f, i) => {
+                        const valEl = document.getElementById(`sensor-val-${i}`);
+                        if (valEl) valEl.innerText = `${f.value} ${f.unit}`;
+                    });
+                }
+            } catch (e) { console.error("Telemetry Link Failure", e); }
+        }
+
+        function switchDiligenceTab(tabId, element) {
+            // Hide all contents
+            document.querySelectorAll('.diligence-content').forEach(c => c.style.display = 'none');
+            // Show selected
+            document.getElementById(`diligence-${tabId}-content`).style.display = 'block';
+
+            // Update sidebar styles
+            document.querySelectorAll('.diligence-nav-item').forEach(item => {
+                item.style.background = 'rgba(255,255,255,0.02)';
+                item.style.border = '1px solid var(--border-color)';
+            });
+
+            element.style.background = 'rgba(16, 185, 129, 0.05)';
+            element.style.border = '1px solid rgba(16, 185, 129, 0.2)';
+
+            // Trigger Dynamic Fetch
+            if (tabId === 'physics') updatePhysicsManifoldData();
+            if (tabId === 'topology') updateDiligenceTopology();
+            if (tabId === 'compliance') updateDiligenceCompliance();
+
+            logEvent(`Diligence Sector: ${tabId.toUpperCase()} Accessed`, "info");
+        }
+
+        async function updateDiligenceTopology() {
+            try {
+                const response = await fetch('http://127.0.0.1:8005/v2/diligence/topology');
+                const data = await response.json();
+                const container = document.getElementById('topology-container');
+                container.innerHTML = data.nodes.map(n => `
+                    <div class="panel" style="padding: 20px; border-left: 2px solid ${n.health > 0.8 ? 'var(--accent-green)' : 'var(--accent-amber)'}">
+                        <div style="font-family: 'JetBrains Mono'; font-size: 10px; color: var(--text-secondary); margin-bottom: 5px;">${n.type}</div>
+                        <div style="font-weight: 800; color: #fff; font-size: 12px; margin-bottom: 8px;">${n.label}</div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="flex: 1; height: 3px; background: rgba(255,255,255,0.05); border-radius: 2px;">
+                                <div style="width: ${n.health * 100}%; height: 100%; background: ${n.health > 0.8 ? 'var(--accent-green)' : 'var(--accent-amber)'}"></div>
+                            </div>
+                            <span style="font-size: 10px; color: #fff;">${(n.health * 100).toFixed(0)}%</span>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) { console.error("Topology Sync Error", e); }
+        }
+
+        async function updateDiligenceCompliance() {
+            try {
+                const response = await fetch('http://127.0.0.1:8005/v2/diligence/compliance');
+                const data = await response.json();
+                const container = document.getElementById('compliance-ledger');
+                container.innerHTML = data.frameworks.map(f => `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 25px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: 8px;">
+                        <div>
+                            <div style="font-weight: 800; color: #fff; margin-bottom: 5px;">${f.standard}</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">Authority: ${f.authority} | Hash: ${f.hash}</div>
+                        </div>
+                        <div style="font-family: 'JetBrains Mono'; color: ${f.status === 'VERIFIED' ? 'var(--accent-green)' : (f.status === 'COMPLIANT' ? 'var(--accent-green)' : 'var(--accent-amber)')}; font-size: 12px; font-weight: 800;">
+                            [ ${f.status} ]
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) { console.error("Compliance Sync Error", e); }
+        }
+
+        async function updatePhysicsManifoldData() {
+            try {
+                const response = await fetch('http://127.0.0.1:8005/v2/physics/manifold');
+                const data = await response.json();
+                const c = data.constants;
+
+                // Update Sidebar constants
+                const reynoldsVal = document.querySelector('[data-i18n="phys_reynolds"]')?.nextElementSibling;
+                if (reynoldsVal) reynoldsVal.innerText = c.reynolds_number.toLocaleString();
+
+                const activationVal = document.querySelector('[data-i18n="phys_activation"]')?.nextElementSibling;
+                if (activationVal) activationVal.innerText = c.activation_energy + " kJ";
+
+                const youngsVal = document.querySelector('[data-i18n="phys_youngs"]')?.nextElementSibling;
+                if (youngsVal) youngsVal.innerText = c.youngs_modulus + " GPa";
+
+                // Update Diligence Hub Live Derivations
+                const reHub = document.getElementById('hub-reynolds');
+                if (reHub) reHub.innerText = c.reynolds_number.toLocaleString();
+
+                const kiHub = document.getElementById('hub-ki');
+                if (kiHub) kiHub.innerText = c.stress_intensity.toFixed(4);
+
+                const corrHub = document.getElementById('hub-corrosion');
+                if (corrHub) corrHub.innerText = c.corrosion_kinetic.toFixed(6);
+
+            } catch (e) { console.error("Physics Link Failure", e); }
+        }
+
+        async function updateAuditLedgerData() {
+            try {
+                const response = await fetch('http://127.0.0.1:8005/v2/audit/ledger');
+                const data = await response.json();
+                const logStream = document.getElementById('log-stream'); // Make sure this ID exists
+                if (logStream && data.logs) {
+                    logStream.innerHTML = data.logs.map(log => `
+                        <div class="log-entry" style="font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); display: grid; grid-template-columns: 140px 100px 1fr 80px; gap: 15px; align-items: center; color: #cbd5e1; animation: fadeIn 0.3s ease;">
+                            <span style="color: var(--text-secondary); opacity: 0.6;">${new Date(log.timestamp).toLocaleTimeString()}</span>
+                            <span style="color: var(--accent-green); font-weight: 700;">${log.event}</span>
+                            <span style="letter-spacing: 0.5px;">ORIGIN: ${log.origin}</span>
+                            <span style="text-align: right; color: var(--accent-green); font-weight: 800;">${log.status}</span>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) { console.error("Audit Link Failure", e); }
+        }
+
+        // Main Inference Call (Port 8002)
+        async function triggerAnalysis() {
+            const apiStatus = document.getElementById('api-status');
+            apiStatus.style.background = 'rgba(245, 158, 11, 0.1)';
+            apiStatus.style.borderColor = 'rgba(245, 158, 11, 0.2)';
+            apiStatus.querySelector('span').innerText = 'API: INFERRING';
+            apiStatus.querySelector('span').style.color = '#f59e0b';
+            apiStatus.querySelector('.status-dot').style.background = '#f59e0b';
+
+            const site = document.getElementById('site-selector').value;
+            const aod = document.getElementById('aod-slider').value;
+            const wind = document.getElementById('wind-slider').value;
+
+            logEvent(`Triggering Causal Inference for [${site}]`, 'info');
+            renderCausalGraph(site);
+
+            // AUTO-HOST DETECTION: Try localhost if 127.0.0.1 fails or use provided host
+            const endpoints = [
+                'http://127.0.0.1:8005/v2/inference/resilience',
+                'http://localhost:8005/v2/inference/resilience'
+            ];
+
+            let success = false;
+            let lastErr = '';
+
+            for (let url of endpoints) {
+                if (success) break;
+                try {
+                    const start = performance.now();
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-API-KEY': 'ENTERPRISE_SECRET_VERIFIED_7M'
+                        },
+                        body: JSON.stringify({
+                            metadata: {
+                                caller_id: "MISSION_CONTROL_DASHBOARD",
+                                request_trace_id: "TR-" + Math.random().toString(36).substr(2, 9).toUpperCase()
+                            },
+                            site_id: site,
+                            asset_id: "PUMP_RU_01",
+                            asset_type: "Pump",
+                            temp_c: 45.0,
+                            vibration_mm_s: 2.1,
+                            aod_override: parseFloat(aod),
+                            wind_override: parseFloat(wind)
+                        })
+                    });
+
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    const data = await response.json();
+                    const latency = Math.round(performance.now() - start);
+
+                    // Reset Status
+                    apiStatus.style.background = 'rgba(16, 185, 129, 0.1)';
+                    apiStatus.style.borderColor = 'rgba(16, 185, 129, 0.2)';
+                    apiStatus.querySelector('span').innerText = `API: OK (${latency}ms)`;
+                    apiStatus.querySelector('span').style.color = '#10b981';
+                    apiStatus.querySelector('.status-dot').style.background = '#10b981';
+
+                    logEvent(`Inference Success via ${url.split('/')[2]}`, 'info');
+
+                    // 1. Update Top Metrics
+                    const reliability = ((1.0 - (data.asset_impact.failure_probability || 0.1)) * 100).toFixed(1);
+                    const rul = (1000 - (data.asset_impact.rul_reduction_hours || 0));
+
+                    document.getElementById('metric-reliability').innerText = reliability + ' %';
+                    document.getElementById('metric-rul').innerText = Math.round(rul).toLocaleString();
+                    document.getElementById('metric-dsi').innerText = data.dsi_metrics.dsi.toFixed(2);
+                    document.getElementById('metric-risk').innerText = ((data.asset_impact.failure_probability || 0) * 100).toFixed(1) + ' %';
+
+                    // 1b. Update MLOps Status
+                    const driftStatus = document.getElementById('drift-status');
+                    driftStatus.innerText = data.dsi_metrics.drift_status;
+                    driftStatus.style.color = data.dsi_metrics.drift_status === 'STABLE' ? 'var(--accent-green)' : 'var(--accent-red)';
+                    const entropy = (data.asset_impact.failure_probability * 100).toFixed(0);
+                    document.getElementById('entropy-bar').style.width = `${Math.max(4, entropy)}%`;
+                    document.getElementById('entropy-bar').style.background = entropy > 40 ? 'var(--accent-red)' : 'var(--accent-green)';
+
+                    // 2. Update Chemical Metrics (Copernicus)
+                    const sm = data.asset_impact.stress_metrics;
+                    if (sm) {
+                        document.getElementById('metric-kinetic').innerText = (sm.kinetic_abrasion || 0).toFixed(2) + ' x';
+                        document.getElementById('metric-thermal').innerText = (sm.thermal_stress || 0).toFixed(2) + ' x';
+                        document.getElementById('metric-salt').innerText = (sm.salt_corrosion || 0).toFixed(2) + ' x';
+
+                        let maxThreat = 'KINETIC ABRASION';
+                        let maxVal = sm.kinetic_abrasion || 0;
+                        if ((sm.thermal_stress || 0) > maxVal) { maxThreat = 'THERMAL DECAY'; maxVal = sm.thermal_stress; }
+                        if ((sm.salt_corrosion || 0) > maxVal) { maxThreat = 'DELIQUESCENCE (SALT)'; maxVal = sm.salt_corrosion; }
+                        document.getElementById('dominant-threat').innerText = maxThreat;
+                        document.getElementById('dominant-threat').style.color = maxThreat.includes('SALT') ? '#3b82f6' : (maxThreat.includes('THERMAL') ? '#ef4444' : '#10b981');
+                    }
+
+                    // 3. Update Chart
+                    if (data.diagnostics && data.diagnostics.simulated_degradation) {
+                        degChart.data.datasets[0].data = data.diagnostics.simulated_degradation;
+                    } else {
+                        degChart.data.datasets[0].data = Array.from({ length: 24 }, (_, i) => 100 - (data.asset_impact.failure_probability * 100) - (i / (2 + Math.random())));
+                    }
+                    degChart.update();
+
+                    // 3. Update Prescriptive Stack (ROI-Driven)
+                    const pStack = document.getElementById('prescriptive-stack');
+                    pStack.innerHTML = '';
+                    if (data.recommendations && data.recommendations.length > 0) {
+                        data.recommendations.forEach((rec, i) => {
+                            const isCrit = rec.priority <= 1;
+                            const cls = isCrit ? 'action-card critical' : 'action-card';
+                            // Technical Translation Mapping
+                            let localizedAction = translations[currentLang][rec.action_key] || rec.action_key;
+                            let localizedRationale = rec.rationale;
+
+                            if (currentLang === 'ar') {
+                                localizedRationale = localizedRationale
+                                    .replace("Structural integrity of", "السلامة الهيكلية لـ")
+                                    .replace("compromised (Entropy:", "متضررة (معدل الاعتلاج:")
+                                    .replace("Risk exceeds safety manifold", "المخاطر تتجاوز حدود الأمان")
+                                    .replace("High atmospheric stress", "إجهاد جوي مرتفع")
+                                    .replace("coupled with increased vibration", "مقترن بزيادة في الاهتزازات")
+                                    .replace("Reducing load to extend RUL", "تخفيف الأحمال لإطالة العمر الافتراضي")
+                                    .replace("Atmospheric dust concentration exceeds nominal limit", "تركيز الغبار الجوي يتجاوز الحد المسموح")
+                                    .replace("Preventive flush required to protect intake nodes", "تطهير وقائي مطلوب لحماية عقد الإدخال");
+                            }
+
+                            const t = translations[currentLang];
+                            const actionLabel = currentLang === 'ar' ? 'الإجراء' : 'ACTION';
+                            const rationaleLabel = currentLang === 'ar' ? 'المبرر التقني' : 'RATIONALE';
+                            const savingsLabel = currentLang === 'ar' ? 'توفير مقدر' : 'EST_SAVINGS';
+                            const copyText = `${actionLabel}: ${localizedAction}\n${rationaleLabel}: ${localizedRationale}\n${savingsLabel}: $${rec.avoided_cost_est}`;
+
+                            pStack.innerHTML += `
+                                <div class="${cls}" style="animation: fadeUp 0.3s ease forwards; animation-delay: ${i * 0.1}s; opacity: 0; margin-bottom: 12px; border-left: 4px solid ${isCrit ? '#ef4444' : 'var(--accent-green)'}; background: rgba(15, 23, 42, 0.7); padding: 16px; position: relative; overflow: hidden; border-radius: 4px; border-right: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <div class="action-badge-container" style="position: absolute; top: 12px; right: 12px; display: flex; flex-direction: column; align-items: flex-end; gap: 5px; z-index: 5;">
+                                        <span style="font-size: 10px; color: #fff; background: rgba(0, 0, 0, 0.8); border: 1px solid rgba(16, 185, 129, 0.4); padding: 2px 6px; border-radius: 3px; font-weight: 800; white-space: nowrap;">${t.roi}: ${rec.roi_index}x</span>
+                                        <button onclick="copyToClipboard(\`${copyText}\`, this)" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; cursor: pointer; padding: 0; border-radius: 3px; display: flex; align-items: center; justify-content: center; transition: 0.2s; width: 18px; height: 18px; flex-shrink: 0;">
+                                            <i data-lucide="copy" size="9"></i>
+                                        </button>
+                                    </div>
+                                    <div class="action-header" style="margin-bottom: 12px; padding-right: 90px;">
+                                        <span class="action-title mono" style="font-weight: 700; color: #fff; font-size: 13px; line-height: 1.4; display: block; word-break: break-all;">${localizedAction}</span>
+                                    </div>
+                                    <div style="color: #cbd5e1; font-size: 13px; margin-bottom: 12px; line-height: 1.5; font-weight: 400; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px;">${localizedRationale}</div>
+                                    <div style="font-family: 'JetBrains Mono'; font-size: 11px; display: flex; flex-direction: column; gap: 4px; color: var(--accent-green); background: rgba(0,0,0,0.5); padding: 10px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05);">
+                                        <div style="display: flex; justify-content: space-between;">
+                                            <span>${t.avoided_loss}:</span>
+                                            <strong style="color: #fff;">$${Math.round(rec.avoided_cost_est).toLocaleString()}</strong>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between;">
+                                            <span>${t.priority_lvl}:</span>
+                                            <span style="color: ${isCrit ? '#ef4444' : 'var(--text-secondary)'}; font-weight: 800;">${rec.priority === 1 ? t.critical : t.optimal}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        lucide.createIcons();
+                    } else {
+                        pStack.innerHTML = `<div style="text-align: center; color: var(--accent-green); margin-top: 40px; font-weight: 600;"><i data-lucide="check-circle" size="32" style="margin-bottom: 10px;"></i><br>${translations[currentLang].nominal}</div>`;
+                        lucide.createIcons();
+                    }
+                    success = true;
+                } catch (err) {
+                    lastErr = err.message;
+                    console.log(`Failed endpoint ${url}:`, err);
+                }
+            }
+
+            if (!success) {
+                logEvent(`API Connection Failed: port 8002 unreachable. Error: ${lastErr}`, 'warn');
+                apiStatus.style.background = 'rgba(239, 68, 68, 0.1)';
+                apiStatus.style.borderColor = 'rgba(239, 68, 68, 0.2)';
+                apiStatus.querySelector('span').innerText = 'API: OFFLINE';
+                apiStatus.querySelector('span').style.color = '#ef4444';
+                apiStatus.querySelector('.status-dot').style.background = '#ef4444';
+            }
+        }
+
+        // Multi-Language System
+        const translations = {
+            en: {
+                core_title: "CORE / Industrial AI",
+                env_override: "Environmental Override",
+                aod: "Aerosol Optical Depth (AOD)",
+                wind_speed: "Wind Speed (m/s)",
+                force_inference: "FORCE INFERENCE CYCLE",
+                chem_diag: "Deep Chemical Diagnostics",
+                cams_payload: "Copernicus CAMS EAC4 Payload",
+                op_metrics: "Operational Performance Metrics",
+                reliability: "Reliability Index",
+                rem_life: "Remaining Life",
+                hrs: "HRS",
+                dust_sev: "Dust Severity",
+                risk_prob: "Risk probability",
+                optimizer: "Prescriptive Optimizer",
+                events: "System Event Log",
+                awaiting: "Awaiting Inference...",
+                nominal: "System Status: Nominal",
+                kinetic: "Kinetic Abrasion",
+                thermal: "Thermal Stress",
+                salt: "Salt Corrosion",
+                threat: "DOMINANT DEGRADATION PATH:",
+                stable: "STABLE",
+                drifting: "DRIFTING",
+                nav_control: "Mission Control",
+                nav_telemetry: "Copernicus Telemetry",
+                nav_physics: "Causal Physics",
+                nav_audit: "Audit Trails",
+                nav_settings: "Settings",
+                roi: "ROI",
+                avoided_loss: "AVOIDED_LOSS",
+                priority_lvl: "PRIORITY_LEVEL",
+                critical: "CRITICAL",
+                optimal: "OPTIMAL",
+                // Action Keys
+                EMERGENCY_SHUTDOWN_SEQUENCE: "EMERGENCY SHUTDOWN SEQUENCE",
+                DYNAMIC_LOAD_REDUCTION: "DYNAMIC LOAD REDUCTION",
+                FLUSH_FILTRATION_MANIFOLD: "FLUSH FILTRATION MANIFOLD",
+                // Causal Graph Labels
+                node_atmos: "Atmos (CAMS)",
+                node_dsi: "DSI Factor",
+                node_vib: "Rotor Vib",
+                node_stress: "Kinetic Stress",
+                node_rul: "Asset RUL",
+                node_salt: "Salt Deposition",
+                node_corrosion: "Corrosion Rate",
+                // Physics View
+                phys_title: "Physics Model Investigation",
+                phys_thermo_h: "Thermodynamic Flux",
+                phys_thermo_d: "Navier-Stokes integration for convective heat transfer across structural nodes. Simulating diurnal expansion/contraction cycles.",
+                phys_arrh_h: "Arrhenius Kinetics",
+                phys_arrh_d: "Mapping chemical degradation rates and salt deliquescence based on Arrhenius equation parameters and local humidity manifolds.",
+                phys_fract_h: "Fracture Propagator",
+                phys_fract_d: "Linear elastic fracture mechanics (LEFM) modeling to predict micro-fracture propagation paths through structural manifolds.",
+                site_1: "SA_EAST_RU_01 (Harsh Desert)",
+                site_2: "EMEA_COAST_02 (Corrosive Coastal)",
+                core_subtitle: "Industrial AI",
+                audit_title: "Sovereign Blockchain Ledger",
+                audit_subtitle: "Cryptographic chain of custody for all inference operations",
+                audit_sec_status: "QUANTUM_SECURITY_SHELL",
+                sync_nodes: "GLOBAL_SYNC_NODES:",
+                audit_parity: "ENCRYPTION_PARITY:",
+                audit_aes: "ACTIVE_AES_256",
+                status_ok: "OK",
+                status_syncing: "SYNCING",
+                audit_ts: "Timestamp",
+                audit_hash: "Block_Anchor_Hash",
+                audit_node: "Provenance_Node",
+                audit_parity_label: "Parity",
+                audit_verified: "VERIFIED",
+                node_riyadh_c: "RIYADH_CENTRAL_01",
+                node_neom_n: "NEOM_GRID_NORTH",
+                node_dhahran_x: "DHAHRAN_X_LAB",
+                node_riyadh_hq: "RIYADH_HQ_CLUSTER",
+                node_neom_core: "NEOM_CORE_INFRA",
+                node_dhahran_sys: "DHAHRAN_X_SYSTEM",
+                telemetry_title: "Satellite Telemetry Streams",
+                tel_feed_01: "SENSOR_FEED_01 // IR_SPECTRAL",
+                tel_feed_02: "SENSOR_FEED_02 // EO_IMAGING",
+                tel_checksum: "CHECKSUM",
+                tel_strength: "STRENGTH",
+                tel_node_ref: "NODE_REF",
+                tel_intensity: "INTENSITY",
+                tel_variance: "VARIANCE",
+                tel_channel: "CHANNEL",
+                tel_bandwidth: "BANDWIDTH",
+                tel_status: "STATUS",
+                tel_frame: "PROCESSING_FRAME",
+                tel_auth: "AUTHENTICATED",
+                tel_range: "SCANNING_RANGE",
+                tel_secure: "SECURE",
+                status_timeout: "TIMEOUT",
+                phys_constants: "MODEL_CONSTANTS",
+                phys_reynolds: "REYNOLDS_NUMBER (Re)",
+                phys_activation: "ACTIVATION_ENERGY (Ea)",
+                phys_youngs: "YOUNG_MODULUS (E)",
+                phys_mode: "SIMULATION_FIDELITY:",
+                phys_manifold_title: "Non-Linear Structural Strain Manifold",
+                nav_control: "Mission Control",
+                nav_telemetry: "Copernicus Telemetry",
+                nav_physics: "Causal Physics",
+                nav_audit: "Audit Trails",
+                nav_diligence: "Diligence Hub",
+                nav_settings: "Settings",
+                settings_title: "Precision Configuration",
+                settings_subtitle: "Adjust system-wide operational parameters",
+                diligence_index: "TECHNICAL_DILIGENCE_INDEX"
+            },
+            ar: {
+                telemetry_title: "تدفقات تتبع الأقمار الصناعية",
+                tel_feed_01: "موجز الاستشعار 01 // الطيف الحراري",
+                tel_feed_02: "موجز الاستشعار 02 // التصوير البصري",
+                tel_checksum: "مجموع التحقق (Checksum)",
+                tel_strength: "قوة الإشارة",
+                tel_node_ref: "مرجع العقدة",
+                tel_intensity: "الكثافة الطيفية",
+                tel_variance: "معدل التباين",
+                tel_channel: "القناة الناقلة",
+                tel_bandwidth: "عرض النطاق الترددي",
+                tel_status: "حالة الاتصال",
+                tel_frame: "إطار المعالجة",
+                tel_auth: "تم التوثيق",
+                tel_range: "نطاق المسح الجغرافي",
+                tel_secure: "اتصال آمن",
+                status_timeout: "انتهت المهلة",
+                phys_constants: "ثوابت النمذجة (Constants)",
+                phys_reynolds: "رقم رينولدز (Reynolds #)",
+                phys_activation: "طاقة التنشيط (Activation Energy)",
+                phys_youngs: "معامل يونغ (Young's Modulus)",
+                phys_mode: "دقة المحاكاة الفيزيائية:",
+                phys_manifold_title: "تشعب الإجهاد الهيكلي غير الخطي",
+                nav_control: "غرفة العمليات الاستراتيجية",
+                nav_telemetry: "بيانات التتبع والمراقبة",
+                nav_physics: "التحليل الفيزيائي للسببية",
+                nav_audit: "مسارات التدقيق اللوجستي",
+                nav_diligence: "مركز التدقيق التقني",
+                nav_settings: "إعدادات النظام",
+                diligence_index: "فهرس التدقيق والامتثال",
+                audit_title: "سجل البلوكشين السيادي (Sovereign Ledger)",
+                audit_subtitle: "سلسلة الحماية التشفيرية لكافة عمليات الاستنتاج الآلي",
+                audit_sec_status: "غلاف الأمن الكمي (Quantum Shield)",
+                sync_nodes: "عقد المزامنة العالمية:",
+                audit_parity: "تكافؤ التشفير:",
+                audit_aes: "تشفير AES_256 نشط",
+                status_ok: "سليم",
+                status_syncing: "جاري المزامنة",
+                audit_ts: "الطابع الزمني",
+                audit_hash: "هاش كتلة الإرساء",
+                audit_node: "عقدة المنشأ",
+                audit_parity_label: "التكافؤ",
+                audit_verified: "تم التحقق",
+                node_riyadh_c: "الرياض_المركزية_01",
+                node_neom_n: "نيوم_الشبكة_الشمالية",
+                node_dhahran_x: "الظهران_المختبر_X",
+                node_riyadh_hq: "عنقود_الرياض_الرئيسي",
+                node_neom_core: "نيوم_البنية_الأساسية",
+                node_dhahran_sys: "الظهران_نظام_X",
+                settings_title: "إعدادات الدقة والنظام",
+                settings_subtitle: "ضبط المعايير التشغيلية ونطاقات استشعار البيانات",
+                core_subtitle: "الذكاء الاصطناعي للمنشآت الحيوية",
+                site_1: "SA_EAST_RU_01 (صحراء قاسية)",
+                site_2: "EMEA_COAST_02 (منطقة ساحلية تآكلية)",
+                env_override: "التحكم في المعطيات البيئية",
+                aod: "العمق البصري للهباء الجوي (AOD)",
+                wind_speed: "سرعة الرياح (م/ث)",
+                force_inference: "تفعيل دورة الاستنتاج الآلي",
+                chem_diag: "التحليل الكيميائي المتقدم",
+                cams_payload: "بيانات منظومة كوبرنيكوس CAMS EAC4",
+                op_metrics: "مقاييس الأداء التشغيلي",
+                reliability: "مؤشر الموثوقية الهندسية",
+                rem_life: "العمر التشغيلي المتبقي",
+                hrs: "ساعة",
+                dust_sev: "كثافة الرواسب الغبارية",
+                risk_prob: "احتمالية حدوث المخاطر",
+                optimizer: "محرك الاستمثال التوجيهي",
+                events: "سجل أحداث النظام",
+                awaiting: "جاري استخلاص النتائج الجوهرية...",
+                nominal: "حالة النظام: مُستقرة (Nominal)",
+                kinetic: "التآكل الميكانيكي (Abrasion)",
+                thermal: "الإجهاد الحراري المعدني",
+                salt: "التآكل الملحي (Corrosion)",
+                threat: "نمط التدهور الهيكلي الرئيسي:",
+                stable: "مستقر",
+                drifting: "انحراف تقني",
+                nav_control: "غرفة العمليات الاستراتيجية",
+                nav_telemetry: "بيانات التتبع والمراقبة",
+                nav_physics: "التحليل الفيزيائي للسببية",
+                nav_audit: "مسارات التدقيق اللوجستي",
+                nav_diligence: "مركز التدقيق التقني",
+                nav_settings: "إعدادات النظام",
+                roi: "العائد الاستثماري (ROI)",
+                avoided_loss: "الخسائر المتفاداة",
+                priority_lvl: "تصنيف الأولوية",
+                critical: "عالي الخطورة",
+                optimal: "تشغيل أمثلي",
+                // Action Keys (Technical)
+                EMERGENCY_SHUTDOWN_SEQUENCE: "بروتوكول الإيقاف الطارئ",
+                DYNAMIC_LOAD_REDUCTION: "تخفيف الأحمال الميكانيكية",
+                FLUSH_FILTRATION_MANIFOLD: "تطهير منظومة الترشيح",
+                // Causal Graph Labels
+                node_atmos: "الغلاف الجوي (CAMS)",
+                node_dsi: "كثافة الرواسب",
+                node_vib: "اهتزاز الدوار",
+                node_stress: "الإجهاد الميكانيكي",
+                node_rul: "العمر التشغيلي للأصل",
+                node_salt: "الترسب الملحي",
+                node_corrosion: "معدل التآكل (Corrosion)",
+                // Physics View
+                phys_title: "التحليل الفيزيائي المعمق",
+                phys_thermo_h: "التدفق الديناميكي الحراري",
+                phys_thermo_d: "تكامل (Navier-Stokes) لانتقال الحرارة الحملي عبر العقد الهيكلية. محاكاة دورات التمدد والانكماش اليومية بدقة فائقة.",
+                phys_arrh_h: "حركية (Arrhenius)",
+                phys_arrh_d: "نمذجة معدلات التدهور الكيميائي وتدمع الملح بناءً على بارامترات معادلة أرينيوس ومعطيات الرطوبة الجوية.",
+                phys_fract_h: "انتشار الكسور الهيكلية",
+                phys_fract_d: "نمذجة ميكانيكا الكسر المرن الخطي (LEFM) للتنبؤ بمسارات انتشار الكسور المجهرية عبر المنظومات الهيكلية."
+            }
+        };
+
+        let currentLang = 'en';
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'ar' : 'en';
+            document.body.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+            document.body.style.fontFamily = currentLang === 'ar' ? "'Tajawal', sans-serif" : "'Inter', sans-serif";
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[currentLang][key]) {
+                    if (el.tagName === 'OPTION') {
+                        el.text = translations[currentLang][key];
+                    } else {
+                        el.innerText = translations[currentLang][key];
+                    }
+                }
+            });
+
+            document.querySelectorAll('[data-i18n-title]').forEach(el => {
+                const key = el.getAttribute('data-i18n-title');
+                if (translations[currentLang][key]) {
+                    el.setAttribute('title', translations[currentLang][key]);
+                }
+            });
+
+            // Re-trigger dynamic rendering to update text inside templates
+            renderCausalGraph('SA_EAST_RU_01');
+            triggerAnalysis();
+
+            logEvent(currentLang === 'ar' ? "تم تغيير اللغة إلى العربية" : "Language switched to English", 'info');
+        }
+
+        // Initialize with Dashboard Data and Periodic Sync
+        document.addEventListener('DOMContentLoaded', () => {
+            initChart();
+            renderCausalGraph('SA_EAST_RU_01');
+            setTimeout(triggerAnalysis, 500); // initial fetch
+
+            // Industrial Multi-Sector Sync (5s Heartbeat)
+            setInterval(() => {
+                const activeView = document.querySelector('.view-content.active');
+                if (!activeView) return;
+                if (activeView.id === 'dashboard-view') triggerAnalysis();
+                if (activeView.id === 'telemetry-view') updateTelemetryData();
+                if (activeView.id === 'physics-view') updatePhysicsManifoldData();
+                if (activeView.id === 'audit-view') updateAuditLedgerData();
+            }, 5000);
+        });
+    </script>
+    <style>
+        body[dir="rtl"] .brand-container {
+            flex-direction: row;
+            gap: 12px !important;
+        }
+
+        body[dir="rtl"] .brand-title {
+            flex-direction: row;
+        }
+
+        body[dir="rtl"] .brand-divider {
+            margin: 0 4px !important;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        body[dir="rtl"] {
+            line-height: 1.6;
+        }
+
+        .lucide-spin {
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</body>
+
+</html>

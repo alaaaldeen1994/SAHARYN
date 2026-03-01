@@ -1,0 +1,59 @@
+version: '3.8'
+
+# SAHARYN AI v2.0 - PRODUCTION STACK
+# Local Instance for Testing and Pilot Site Rollout
+
+services:
+  # 1. Database Layer (PostgreSQL + TimescaleDB)
+  db:
+    image: timescale/timescaledb:latest-pg15
+    environment:
+      POSTGRES_USER: saharyn_admin
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-ENTERPRISE_SECRET_7M}
+      POSTGRES_DB: saharyn_prod
+    volumes:
+      - ./infrastructure/database/schema_v2.sql:/docker-entrypoint-initdb.d/schema_v2.sql
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U saharyn_admin -d saharyn_prod" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 2. API & AI Core Service
+  api:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_NAME: saharyn_prod
+      DB_USER: saharyn_admin
+      DB_PASS: ${DB_PASSWORD:-ENTERPRISE_SECRET_7M}
+    ports:
+      - "8002:8002"
+    restart: always
+
+  # 3. Satellite ETL Service
+  satellite_etl:
+    build: .
+    command: [ "python", "services/ingestion/satellite_etl.py" ]
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      CAMS_API_KEY: ${CAMS_API_KEY}
+
+  # 4. SCADA Bridge Service
+  scada_bridge:
+    build: .
+    command: [ "python", "services/ingestion/scada_bridge.py" ]
+    depends_on:
+      - db
+    network_mode: "host" # Needed for direct OT device communication in some PLC networks
+
+volumes:
+  db_data:

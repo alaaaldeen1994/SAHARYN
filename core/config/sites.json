@@ -1,0 +1,58 @@
+[
+    {
+        "site_id": "SA_EAST_RU_01",
+        "name": "Empty Quarter Hub (Rub' Al Khali)",
+        "coordinates": [
+            22.0,
+            50.0
+        ],
+        "geology": "Hyper-Arid / High Silica Dust",
+        "assets": [
+            {
+                "id": "PUMP_RU_01",
+                "type": "Pump",
+                "criticality": 0.8
+            },
+            {
+                "id": "COMP_RU_01",
+                "type": "Compressor",
+                "criticality": 1.0
+            }
+        ],
+        "dependencies": [
+            [
+                "PUMP_RU_01",
+                "COMP_RU_01",
+                0.85
+            ]
+        ]
+    },
+    {
+        "site_id": "SA_WEST_CO_02",
+        "name": "Red Sea Coastal Facility",
+        "coordinates": [
+            21.5,
+            39.2
+        ],
+        "geology": "Coastal Arid / Salt-Aerosol Influenced",
+        "assets": [
+            {
+                "id": "PUMP_CO_02",
+                "type": "Pump",
+                "criticality": 0.9
+            },
+            {
+                "id": "HEX_CO_02",
+                "type": "HeatExchanger",
+                "criticality": 0.75
+            }
+        ],
+        "dependencies": [
+            [
+                "PUMP_CO_02",
+                "HEX_CO_02",
+                0.6
+            ]
+        ]
+    }
+]
