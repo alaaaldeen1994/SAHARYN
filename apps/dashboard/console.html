@@ -1526,7 +1526,7 @@
 
         async function updateTelemetryData() {
             try {
-                const response = await fetch('http://127.0.0.1:8005/v2/telemetry/stream');
+                const response = await fetch('/v2/telemetry/stream');
                 const data = await response.json();
                 if (data.status === 'LIVE') {
                     const feedContainer = document.querySelector('#telemetry-view .panel-body');
@@ -1568,7 +1568,7 @@
 
         async function updateDiligenceTopology() {
             try {
-                const response = await fetch('http://127.0.0.1:8005/v2/diligence/topology');
+                const response = await fetch('/v2/diligence/topology');
                 const data = await response.json();
                 const container = document.getElementById('topology-container');
                 container.innerHTML = data.nodes.map(n => `
@@ -1588,7 +1588,7 @@
 
         async function updateDiligenceCompliance() {
             try {
-                const response = await fetch('http://127.0.0.1:8005/v2/diligence/compliance');
+                const response = await fetch('/v2/diligence/compliance');
                 const data = await response.json();
                 const container = document.getElementById('compliance-ledger');
                 container.innerHTML = data.frameworks.map(f => `
@@ -1607,7 +1607,7 @@
 
         async function updatePhysicsManifoldData() {
             try {
-                const response = await fetch('http://127.0.0.1:8005/v2/physics/manifold');
+                const response = await fetch('/v2/physics/manifold');
                 const data = await response.json();
                 const c = data.constants;
 
@@ -1636,7 +1636,7 @@
 
         async function updateAuditLedgerData() {
             try {
-                const response = await fetch('http://127.0.0.1:8005/v2/audit/ledger');
+                const response = await fetch('/v2/audit/ledger');
                 const data = await response.json();
                 const logStream = document.getElementById('log-stream'); // Make sure this ID exists
                 if (logStream && data.logs) {
@@ -1668,10 +1668,9 @@
             logEvent(`Triggering Causal Inference for [${site}]`, 'info');
             renderCausalGraph(site);
 
-            // AUTO-HOST DETECTION: Try localhost if 127.0.0.1 fails or use provided host
+            // AUTO-HOST DETECTION: Relative path for Cloud/Railway
             const endpoints = [
-                'http://127.0.0.1:8005/v2/inference/resilience',
-                'http://localhost:8005/v2/inference/resilience'
+                '/v2/inference/resilience'
             ];
 
             let success = false;
