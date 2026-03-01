@@ -17,6 +17,7 @@ from typing import Dict, List, Optional, Any
 from fastapi import FastAPI, HTTPException, Header, Depends, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, validator
 from starlette.middleware.base import BaseHTTPMiddleware
 
@@ -103,6 +104,11 @@ app = FastAPI(
     docs_url="/v2/docs",
     redoc_url="/v2/redoc"
 )
+
+# --- 4. INTEGRATED MISSION CONTROL (Dashboard Mount) ---
+# Allows institutional stakeholders to access the UI via the same production gateway.
+app.mount("/dashboard", StaticFiles(directory="apps/dashboard"), name="dashboard")
+
 
 # --- 5. MIDDLEWARE (Security & Observation) ---
 
@@ -331,10 +337,12 @@ async def get_diligence_compliance():
 if __name__ == "__main__":
     import uvicorn
     # High-Performance Production Server Settings
+    # Supports dynamic port binding for Railway/Cloud deployments
+    gateway_port = int(os.environ.get("PORT", 8005))
     uvicorn.run(
         app, 
         host="0.0.0.0", 
-        port=8003, 
+        port=gateway_port, 
         reload=False, 
         workers=1, 
         log_level="info",
