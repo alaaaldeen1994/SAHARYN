@@ -16,7 +16,7 @@ from typing import Dict, List, Optional, Any
 
 from fastapi import FastAPI, HTTPException, Header, Depends, Request, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, validator
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -108,6 +108,10 @@ app = FastAPI(
 # --- 4. INTEGRATED MISSION CONTROL (Dashboard Mount) ---
 # Allows institutional stakeholders to access the UI via the same production gateway.
 app.mount("/dashboard", StaticFiles(directory="apps/dashboard"), name="dashboard")
+
+@app.get("/", include_in_schema=False)
+async def root_redirect():
+    return RedirectResponse(url="/dashboard/console.html")
 
 
 # --- 5. MIDDLEWARE (Security & Observation) ---
