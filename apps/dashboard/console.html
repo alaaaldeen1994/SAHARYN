@@ -547,98 +547,46 @@
             position: relative;
         }
 
-        /* INNOVATIVE EXIT HUB */
-        .innovative-exit-hub {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
+        /* Chart container */
+        .chart-wrapper {
+            height: 280px;
+            width: 100%;
+            position: relative;
+        }
+
+        /* PREMIUM HEADER NAV */
+        .premium-nav-btn {
             display: flex;
             align-items: center;
             gap: 12px;
+            background: rgba(16, 185, 129, 0.15);
+            border: 2px solid var(--accent-green);
+            color: #fff;
+            padding: 12px 28px;
+            border-radius: 8px;
             text-decoration: none;
-            z-index: 1000;
-            background: rgba(10, 15, 26, 0.8);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            padding: 8px 16px 8px 8px;
-            border-radius: 50px;
-            backdrop-filter: blur(20px);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1);
-            overflow: hidden;
-            width: 44px;
-            white-space: nowrap;
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-transform: uppercase;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.1);
         }
 
-        .innovative-exit-hub:hover {
-            width: 220px;
-            border-color: var(--accent-green);
-            background: rgba(16, 185, 129, 0.05);
-            box-shadow: 0 0 30px rgba(16, 185, 129, 0.2);
-        }
-
-        .exit-orb {
-            width: 28px;
-            height: 28px;
+        .premium-nav-btn:hover {
             background: var(--accent-green);
             color: #000;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            transition: 0.4s;
-            box-shadow: 0 0 15px var(--accent-green);
+            box-shadow: 0 0 40px rgba(16, 185, 129, 0.6);
+            transform: scale(1.02);
         }
 
-        .innovative-exit-hub:hover .exit-orb {
-            transform: rotate(-90deg) scale(1.1);
+        .premium-nav-btn i {
+            transition: 0.3s;
         }
 
-        .exit-label-stack {
-            display: flex;
-            flex-direction: column;
-            opacity: 0;
-            transform: translateX(10px);
-            transition: 0.4s 0.1s;
-        }
-
-        .innovative-exit-hub:hover .exit-label-stack {
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        .exit-label-main {
-            font-family: 'Outfit', sans-serif;
-            font-size: 11px;
-            font-weight: 800;
-            color: #fff;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        .exit-label-sub {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 8px;
-            color: var(--accent-green);
-            opacity: 0.7;
-        }
-
-        @keyframes orb-pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
-            }
-
-            70% {
-                box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
-            }
-
-            100% {
-                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
-            }
-        }
-
-        .exit-orb-active {
-            animation: orb-pulse 2s infinite;
+        .premium-nav-btn:hover i {
+            transform: translateX(-3px);
         }
     </style>
 </head>
@@ -697,9 +645,13 @@
                 </select>
             </div>
             <div class="header-right">
+                <a href="index.html" class="premium-nav-btn">
+                    <i data-lucide="arrow-left" size="16"></i>
+                    <span data-i18n="nav_home">RETURN TO PORTAL</span>
+                </a>
                 <button onclick="toggleLanguage()" id="lang-toggle"
-                    style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--accent-green); color: var(--accent-green); padding: 4px 12px; border-radius: 4px; font-family: 'JetBrains Mono'; font-size: 11px; cursor: pointer; font-weight: 700;">EN
-                    / عربي</button>
+                    style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--accent-green); color: var(--accent-green); padding: 8px 16px; border-radius: 6px; font-family: 'JetBrains Mono'; font-size: 11px; cursor: pointer; font-weight: 800; transition: 0.3s; margin-left: 10px;">EN
+                    / AR</button>
                 <div class="mono" style="font-size: 12px; color: var(--text-secondary);" id="clock">00:00:00 UTC</div>
                 <div id="api-status"
                     style="background: rgba(16, 185, 129, 0.05); border: 1px solid var(--border-color); padding: 4px 10px; border-radius: 4px; display: flex; align-items: center; gap: 8px;">
@@ -2040,7 +1992,7 @@
                 diligence_index: "TECHNICAL_DILIGENCE_INDEX"
             },
             ar: {
-                nav_home: "بوابة الرئيسية",
+                nav_home: "العودة للرئيسية",
                 telemetry_title: "تدفقات تتبع الأقمار الصناعية",
                 tel_feed_01: "موجز الاستشعار 01 // الطيف الحراري",
                 tel_feed_02: "موجز الاستشعار 02 // التصوير البصري",
@@ -2239,18 +2191,6 @@
             }
         }
     </style>
-    <a href="index.html" class="innovative-exit-hub"
-        style="bottom: 40px; right: 40px; width: 60px; height: 60px; padding: 0; justify-content: center; position: fixed; border-radius: 12px; background: rgba(16, 185, 129, 0.15); border: 2px solid var(--accent-green); box-shadow: 0 0 30px rgba(16, 185, 129, 0.3); transition: 0.6s cubic-bezier(0.19, 1, 0.22, 1); cursor: pointer;">
-        <div class="exit-orb exit-orb-active"
-            style="width: 40px; height: 40px; background: var(--accent-green); box-shadow: 0 0 20px var(--accent-green); transition: 0.4s;">
-            <i data-lucide="arrow-left" size="24" color="#000" stroke-width="3"></i>
-        </div>
-        <div class="exit-label-stack" style="margin-left: 20px;">
-            <span class="exit-label-main" style="font-size: 14px; color: #fff; letter-spacing: 2px;">RETURN TO
-                BASE</span>
-            <span class="exit-label-sub" style="font-size: 9px; opacity: 0.8;">SECURE_DISCONNECT // 0x42_SAHARYN</span>
-        </div>
-    </a>
 </body>
 
 </html>
