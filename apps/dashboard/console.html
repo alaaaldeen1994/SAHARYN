@@ -603,6 +603,11 @@
                 </select>
             </div>
             <div class="header-right">
+                <a href="index.html"
+                    style="text-decoration: none; display: flex; align-items: center; gap: 8px; background: rgba(16, 185, 129, 0.1); border: 1px solid var(--accent-green); color: var(--accent-green); padding: 4px 12px; border-radius: 4px; font-family: 'JetBrains Mono'; font-size: 11px; cursor: pointer; font-weight: 700; margin-right: 12px;">
+                    <i data-lucide="arrow-left" size="14"></i>
+                    <span data-i18n="nav_home">PORTAL</span>
+                </a>
                 <button onclick="toggleLanguage()" id="lang-toggle"
                     style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--accent-green); color: var(--accent-green); padding: 4px 12px; border-radius: 4px; font-family: 'JetBrains Mono'; font-size: 11px; cursor: pointer; font-weight: 700;">EN
                     / عربي</button>
@@ -1837,7 +1842,7 @@
         // Multi-Language System
         const translations = {
             en: {
-                nav_home: "Back to Home",
+                nav_home: "PORTAL",
                 core_title: "CORE / Industrial AI",
                 env_override: "Environmental Override",
                 aod: "Aerosol Optical Depth (AOD)",
@@ -1946,7 +1951,7 @@
                 diligence_index: "TECHNICAL_DILIGENCE_INDEX"
             },
             ar: {
-                nav_home: "العودة للرئيسية",
+                nav_home: "بوابة الرئيسية",
                 telemetry_title: "تدفقات تتبع الأقمار الصناعية",
                 tel_feed_01: "موجز الاستشعار 01 // الطيف الحراري",
                 tel_feed_02: "موجز الاستشعار 02 // التصوير البصري",
