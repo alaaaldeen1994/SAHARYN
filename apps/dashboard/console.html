@@ -288,6 +288,11 @@
             display: grid;
         }
 
+        #esg-view.active {
+            display: block;
+            /* Overrides the 3-column grid for ESG specifically */
+        }
+
         /* Dashboard Grid */
         .dashboard-content {
             flex: 1;
@@ -814,7 +819,8 @@
 
 
         <!-- ESG VIEW -->
-        <div id="esg-view" class="view-content">
+        <div id="esg-view" class="view-content"
+            style="display: none; width: 100%; max-width: 100vw; grid-template-columns: 1fr;">
             <div style="display: flex; flex-direction: column; gap: 30px; padding: 30px;">
                 <!-- TOP ESG STATS -->
                 <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
@@ -1635,6 +1641,9 @@
                 updateESGLedgerData();
             }
             if (tabId === 'diligence') logEvent("Diligence Whitepaper Accessed", "info");
+
+            // Re-initialize Lucide for newly rendered/visible dynamic content
+            if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
         async function updateTelemetryData() {

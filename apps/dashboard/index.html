@@ -553,6 +553,7 @@
             <a href="#" data-i18n="nav_home">HOME</a>
             <a href="#mission" data-i18n="nav_mission">MISSION</a>
             <a href="#sectors" data-i18n="nav_sectors">SECTORS</a>
+            <a href="#esg" data-i18n="nav_impact">IMPACT</a>
             <a href="#about" data-i18n="nav_about">ABOUT</a>
             <button onclick="toggleLanguage()" id="lang-toggle"
                 style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--accent); color: var(--accent); padding: 8px 16px; border-radius: 4px; font-family: var(--font-tech); font-size: 10px; cursor: pointer; letter-spacing: 1px; font-weight: 700;">EN
@@ -680,6 +681,39 @@
         </div>
     </section>
 
+    <section id="esg" class="content"
+        style="background: rgba(16, 185, 129, 0.05); border-top: 1px solid var(--border);">
+        <div class="mission-grid">
+            <div style="padding: 40px; border-right: 1px solid var(--border);">
+                <div class="stat-module">
+                    <div class="stat-label" data-i18n="carbon_header">SOVEREIGN_CARBON_LEDGER</div>
+                    <div class="stat-value" style="color: var(--accent);">+4.2t <span
+                            style="font-size: 14px; opacity: 0.6;">CO2e SAVED</span></div>
+                </div>
+                <div
+                    style="margin-top: 40px; font-family: var(--font-tech); font-size: 11px; line-height: 1.8; color: var(--text-dim);">
+                    [ CLAIM_ID: SHRN-DXB-0082 ]<br>
+                    [ STATUS: CRYPTOGRAPHICALLY_ANCHORED ]<br>
+                    [ PROTOCOL: GHG_SCOPE_3_VALIDATED ]
+                </div>
+            </div>
+            <div class="tech-border">
+                <div class="os-tag" style="margin-bottom: 20px;">SUSTAINABILITY_ALPHA_04</div>
+                <h2 class="tech-heading" style="font-size: 42px;" data-i18n="esg_title">Validated Impact.</h2>
+                <p style="color: var(--text-dim); line-height: 1.6; margin-bottom: 40px; font-size: 19px;"
+                    data-i18n="esg_desc">
+                    Every operational optimization in SAHARYN creates a <strong>Sovereign ESG Claim</strong>. By
+                    extending asset lifespans and reducing logistics overhead, we generate immutable, audit-ready carbon
+                    credits anchored to our blockchain ledger.
+                </p>
+                <div class="cta-stack">
+                    <a href="console.html" class="launch-btn" style="padding: 15px 30px; font-size: 12px;"
+                        data-i18n="esg_cta">VIEW LIVE LEDGER</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section id="about" class="content">
         <div class="tech-border hex-pattern">
             <div class="mission-grid">
@@ -791,6 +825,7 @@
                 nav_home: "HOME",
                 nav_mission: "MISSION",
                 nav_sectors: "SECTORS",
+                nav_impact: "IMPACT",
                 nav_about: "ABOUT",
                 nav_console: "ACCESS CONSOLE",
                 hero_tag: "CORE INFRASTRUCTURE // INDUSTRIAL INTELLIGENCE",
@@ -823,6 +858,10 @@
                 about_desc: "Saharyn AI was engineered to solve the 'Black Swan' problem in industrial infrastructure. Our system predicts trajectories using raw NetCDF/GRIB satellite manifests to achieve true predictive stabilization.",
                 up_stab: "UPTIME_STABILITY",
                 mesh_lat: "MESH_LATENCY",
+                carbon_header: "SOVEREIGN_CARBON_LEDGER",
+                esg_title: "Validated Impact.",
+                esg_desc: "Every operational optimization in SAHARYN creates a Sovereign ESG Claim. By extending asset lifespans and reducing logistics overhead, we generate immutable, audit-ready carbon credits anchored to our blockchain ledger.",
+                esg_cta: "VIEW LIVE LEDGER",
                 footer_desc: "Securing the industrial edge through autonomous atmospheric intelligence and causal mapping infrastructure. Validated for high-consequence desert operations globally.",
                 rights: "ALL RIGHTS RESERVED // SECURE_ACCESS_GRANTED"
             },
@@ -830,6 +869,7 @@
                 nav_home: "الرئيسية",
                 nav_mission: "المهمة الاستراتيجية",
                 nav_sectors: "القطاعات الحيوية",
+                nav_impact: "الأثر البيئي",
                 nav_about: "نبذة تقنية",
                 nav_console: "الوصول إلى وحدة التحكم",
                 hero_tag: "البنية التحتية الجوهرية // الذكاء الاصطناعي الصناعي المتقدم",
@@ -862,6 +902,10 @@
                 about_desc: "صُممت 'صحارين' لحل معضلة 'البجعة السوداء' في المنشآت الصناعية. يتنبأ نظامنا بالمسارات الحرجة باستخدام بيانات الأقمار الاصطناعية الخام لتحقيق استقرار تنبؤي حقيقي.",
                 up_stab: "استقرار الأنظمة (Uptime)",
                 mesh_lat: "زمن استجابة الشبكة السببية",
+                carbon_header: "سجل الكربون السيادي",
+                esg_title: "تأثير موثق ومستدام.",
+                esg_desc: "كل عملية تحسين تشغيلية في 'صحارين' تولد مطالبة بيئية سيادية (ESG Claim). من خلال إطالة عمر الأصول وتقليل الأعباء اللوجستية، نصدر أرصدة كربونية غير قابلة للتغيير وجاهزة للتدقيق عبر سجلنا المرتبط بالبلوكشين.",
+                esg_cta: "عرض السجل المباشر",
                 footer_desc: "تأمين الحافة الصناعية من خلال الذكاء الجوي المباشر والبنية التحتية للخرائط السببية. تم التحقق من الكفاءة للعمليات الصعبة في البيئات الصحراوية عالمياً.",
                 rights: "جميع الحقوق محفوظة // تم التصريح بالوصول الآمن"
             }
