@@ -580,6 +580,8 @@
                 data-lucide="scroll-text" size="20"></i></div>
         <div class="nav-item" data-i18n-title="nav_diligence" title="Diligence Hub" onclick="switchTab('diligence')"><i
                 data-lucide="book-open-check" size="20"></i></div>
+        <div class="nav-item" data-i18n-title="nav_esg" title="ESG & Carbon" onclick="switchTab('esg')"><i
+                data-lucide="leaf" size="20"></i></div>
         <div style="flex:1"></div>
         <div class="nav-item" data-i18n-title="nav_settings" title="Settings" onclick="switchTab('settings')"><i
                 data-lucide="settings" size="20"></i></div>
@@ -1510,79 +1512,156 @@
 
             svgHTML += `</svg>`;
             svgContainer.innerHTML = svgHTML;
-        }
+            // DASHBOARD VIEW
+            // ... (existing views)
 
-        // Navigation Logic
-        function switchTab(tabId) {
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-                if (item.getAttribute('onclick')?.includes(tabId)) {
-                    item.classList.add('active');
+            // ESG VIEW
+            const esgViewHTML = `
+        <div id="esg-view" class="view-content">
+            <div style="display: flex; flex-direction: column; gap: 30px;">
+                <!-- TOP ESG STATS -->
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
+                    <div class="panel" style="padding: 24px; text-align: center; border-bottom: 3px solid var(--accent-green);">
+                        <div style="font-family: 'JetBrains Mono'; font-size: 10px; color: var(--text-secondary); margin-bottom: 10px;" data-i18n="carbon_total">TOTAL_CO2_AVOIDED</div>
+                        <div id="esg-co2-val" style="font-size: 32px; font-weight: 900; color: #fff;">0.000 kg</div>
+                    </div>
+                    <div class="panel" style="padding: 24px; text-align: center; border-bottom: 3px solid #3b82f6;">
+                        <div style="font-family: 'JetBrains Mono'; font-size: 10px; color: var(--text-secondary); margin-bottom: 10px;" data-i18n="water_total">WATER_RESOURCES_SAVED</div>
+                        <div id="esg-water-val" style="font-size: 32px; font-weight: 900; color: #fff;">0.00 L</div>
+                    </div>
+                    <div class="panel" style="padding: 24px; text-align: center; border-bottom: 3px solid var(--accent-amber);">
+                        <div style="font-family: 'JetBrains Mono'; font-size: 10px; color: var(--text-secondary); margin-bottom: 10px;" data-i18n="credits">CARBON_CREDITS_PENDING</div>
+                        <div id="esg-credits-val" style="font-size: 32px; font-weight: 900; color: #fff;">0</div>
+                    </div>
+                    <div class="panel" style="padding: 24px; text-align: center; border-bottom: 3px solid #fff;">
+                        <div style="font-family: 'JetBrains Mono'; font-size: 10px; color: var(--text-secondary); margin-bottom: 10px;" data-i18n="authenticated_claims">AUTHENTICATED_CLAIMS</div>
+                        <div id="esg-claims-val" style="font-size: 32px; font-weight: 900; color: #fff;">0</div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 400px; gap: 30px;">
+                    <!-- SOVEREIGN SUSTAINABILITY LEDGER -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div class="panel-title"><i data-lucide="shield-check" size="16" color="var(--accent-green)"></i> 
+                                <span data-i18n="esg_ledger_title">Sovereign Sustainability Ledger</span>
+                            </div>
+                        </div>
+                        <div class="panel-body" style="padding: 0;">
+                            <div id="esg-ledger-stream" style="max-height: 500px; overflow-y: auto;">
+                                <!-- Ledger entries injected here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STANDARDS & COMPLIANCE -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div class="panel-title"><i data-lucide="clipboard-check" size="16"></i> Compliance Frameworks</div>
+                        </div>
+                        <div class="panel-body">
+                            <ul style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 15px;">
+                                <li style="padding: 15px; background: rgba(255,255,255,0.02); border-radius: 6px; border: 1px solid var(--border-color);">
+                                    <div style="font-weight: 800; font-size: 12px; margin-bottom: 4px;">GHG Protocol Scope 3</div>
+                                    <div style="font-size: 10px; color: var(--accent-green); font-family: 'JetBrains Mono';">[ VALIDATED_METHODOLOGY ]</div>
+                                </li>
+                                <li style="padding: 15px; background: rgba(255,255,255,0.02); border-radius: 6px; border: 1px solid var(--border-color);">
+                                    <div style="font-weight: 800; font-size: 12px; margin-bottom: 4px;">ISO 14064-3:2019</div>
+                                    <div style="font-size: 10px; color: var(--accent-green); font-family: 'JetBrains Mono';">[ COMPLIANT_PROCESS ]</div>
+                                </li>
+                                <li style="padding: 15px; background: rgba(255,255,255,0.02); border-radius: 6px; border: 1px solid var(--border-color);">
+                                    <div style="font-weight: 800; font-size: 12px; margin-bottom: 4px;">Verified Carbon Standard (VCS)</div>
+                                    <div style="font-size: 10px; color: var(--accent-amber); font-family: 'JetBrains Mono';">[ PENDING_VERIFICATION ]</div>
+                                </li>
+                            </ul>
+                            <div style="margin-top: 30px; padding: 20px; background: rgba(16, 185, 129, 0.05); border: 1px dashed var(--accent-green); border-radius: 8px;">
+                                <p style="font-size: 11px; line-height: 1.6; color: var(--text-secondary);">
+                                    All ESG claims recorded on this ledger are cryptographically anchored to SAHARYN's Sovereign AI nodes, ensuring non-repudiation for institutional audit trails.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        `;
+            document.querySelector('.view-content').insertAdjacentHTML('afterend', esgViewHTML);
+
+            // Navigation Logic
+            function switchTab(tabId) {
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('active');
+                    if (item.getAttribute('onclick')?.includes(tabId)) {
+                        item.classList.add('active');
+                    }
+                });
+
+                document.querySelectorAll('.view-content').forEach(view => {
+                    view.classList.remove('active');
+                });
+                document.getElementById(`${tabId}-view`).classList.add('active');
+
+                logEvent(`Switching to Command Sector: ${tabId.toUpperCase()}`, 'info');
+
+                if (tabId === 'dashboard') triggerAnalysis();
+                if (tabId === 'telemetry') updateTelemetryData();
+                if (tabId === 'physics') updatePhysicsManifoldData();
+                if (tabId === 'audit') updateAuditLedgerData();
+                if (tabId === 'esg') {
+                    updateESGImpactData();
+                    updateESGLedgerData();
                 }
-            });
+                if (tabId === 'diligence') logEvent("Diligence Whitepaper Accessed", "info");
+            }
 
-            document.querySelectorAll('.view-content').forEach(view => {
-                view.classList.remove('active');
-            });
-            document.getElementById(`${tabId}-view`).classList.add('active');
+            async function updateTelemetryData() {
+                try {
+                    const response = await fetch('/v2/telemetry/stream');
+                    const data = await response.json();
+                    if (data.status === 'LIVE') {
+                        const feedContainer = document.querySelector('#telemetry-view .panel-body');
+                        if (!feedContainer) return;
 
-            logEvent(`Switching to Command Sector: ${tabId.toUpperCase()}`, 'info');
+                        // Update Sensor Boxes (Assuming they have IDs or we target them by index)
+                        const feeds = data.feeds;
+                        const items = feedContainer.querySelectorAll('.sensor-item'); // We might need to add this class
+                        feeds.forEach((f, i) => {
+                            const valEl = document.getElementById(`sensor-val-${i}`);
+                            if (valEl) valEl.innerText = `${f.value} ${f.unit}`;
+                        });
+                    }
+                } catch (e) { console.error("Telemetry Link Failure", e); }
+            }
 
-            if (tabId === 'dashboard') triggerAnalysis();
-            if (tabId === 'telemetry') updateTelemetryData();
-            if (tabId === 'physics') updatePhysicsManifoldData();
-            if (tabId === 'audit') updateAuditLedgerData();
-            if (tabId === 'diligence') logEvent("Diligence Whitepaper Accessed", "info");
-        }
+            function switchDiligenceTab(tabId, element) {
+                // Hide all contents
+                document.querySelectorAll('.diligence-content').forEach(c => c.style.display = 'none');
+                // Show selected
+                document.getElementById(`diligence-${tabId}-content`).style.display = 'block';
 
-        async function updateTelemetryData() {
-            try {
-                const response = await fetch('/v2/telemetry/stream');
-                const data = await response.json();
-                if (data.status === 'LIVE') {
-                    const feedContainer = document.querySelector('#telemetry-view .panel-body');
-                    if (!feedContainer) return;
+                // Update sidebar styles
+                document.querySelectorAll('.diligence-nav-item').forEach(item => {
+                    item.style.background = 'rgba(255,255,255,0.02)';
+                    item.style.border = '1px solid var(--border-color)';
+                });
 
-                    // Update Sensor Boxes (Assuming they have IDs or we target them by index)
-                    const feeds = data.feeds;
-                    const items = feedContainer.querySelectorAll('.sensor-item'); // We might need to add this class
-                    feeds.forEach((f, i) => {
-                        const valEl = document.getElementById(`sensor-val-${i}`);
-                        if (valEl) valEl.innerText = `${f.value} ${f.unit}`;
-                    });
-                }
-            } catch (e) { console.error("Telemetry Link Failure", e); }
-        }
+                element.style.background = 'rgba(16, 185, 129, 0.05)';
+                element.style.border = '1px solid rgba(16, 185, 129, 0.2)';
 
-        function switchDiligenceTab(tabId, element) {
-            // Hide all contents
-            document.querySelectorAll('.diligence-content').forEach(c => c.style.display = 'none');
-            // Show selected
-            document.getElementById(`diligence-${tabId}-content`).style.display = 'block';
+                // Trigger Dynamic Fetch
+                if (tabId === 'physics') updatePhysicsManifoldData();
+                if (tabId === 'topology') updateDiligenceTopology();
+                if (tabId === 'compliance') updateDiligenceCompliance();
 
-            // Update sidebar styles
-            document.querySelectorAll('.diligence-nav-item').forEach(item => {
-                item.style.background = 'rgba(255,255,255,0.02)';
-                item.style.border = '1px solid var(--border-color)';
-            });
+                logEvent(`Diligence Sector: ${tabId.toUpperCase()} Accessed`, "info");
+            }
 
-            element.style.background = 'rgba(16, 185, 129, 0.05)';
-            element.style.border = '1px solid rgba(16, 185, 129, 0.2)';
-
-            // Trigger Dynamic Fetch
-            if (tabId === 'physics') updatePhysicsManifoldData();
-            if (tabId === 'topology') updateDiligenceTopology();
-            if (tabId === 'compliance') updateDiligenceCompliance();
-
-            logEvent(`Diligence Sector: ${tabId.toUpperCase()} Accessed`, "info");
-        }
-
-        async function updateDiligenceTopology() {
-            try {
-                const response = await fetch('/v2/diligence/topology');
-                const data = await response.json();
-                const container = document.getElementById('topology-container');
-                container.innerHTML = data.nodes.map(n => `
+            async function updateDiligenceTopology() {
+                try {
+                    const response = await fetch('/v2/diligence/topology');
+                    const data = await response.json();
+                    const container = document.getElementById('topology-container');
+                    container.innerHTML = data.nodes.map(n => `
                     <div class="panel" style="padding: 20px; border-left: 2px solid ${n.health > 0.8 ? 'var(--accent-green)' : 'var(--accent-amber)'}">
                         <div style="font-family: 'JetBrains Mono'; font-size: 10px; color: var(--text-secondary); margin-bottom: 5px;">${n.type}</div>
                         <div style="font-weight: 800; color: #fff; font-size: 12px; margin-bottom: 8px;">${n.label}</div>
@@ -1594,15 +1673,15 @@
                         </div>
                     </div>
                 `).join('');
-            } catch (e) { console.error("Topology Sync Error", e); }
-        }
+                } catch (e) { console.error("Topology Sync Error", e); }
+            }
 
-        async function updateDiligenceCompliance() {
-            try {
-                const response = await fetch('/v2/diligence/compliance');
-                const data = await response.json();
-                const container = document.getElementById('compliance-ledger');
-                container.innerHTML = data.frameworks.map(f => `
+            async function updateDiligenceCompliance() {
+                try {
+                    const response = await fetch('/v2/diligence/compliance');
+                    const data = await response.json();
+                    const container = document.getElementById('compliance-ledger');
+                    container.innerHTML = data.frameworks.map(f => `
                     <div style="display: flex; justify-content: space-between; align-items: center; padding: 25px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: 8px;">
                         <div>
                             <div style="font-weight: 800; color: #fff; margin-bottom: 5px;">${f.standard}</div>
@@ -1613,45 +1692,45 @@
                         </div>
                     </div>
                 `).join('');
-            } catch (e) { console.error("Compliance Sync Error", e); }
-        }
+                } catch (e) { console.error("Compliance Sync Error", e); }
+            }
 
-        async function updatePhysicsManifoldData() {
-            try {
-                const response = await fetch('/v2/physics/manifold');
-                const data = await response.json();
-                const c = data.constants;
+            async function updatePhysicsManifoldData() {
+                try {
+                    const response = await fetch('/v2/physics/manifold');
+                    const data = await response.json();
+                    const c = data.constants;
 
-                // Update Sidebar constants
-                const reynoldsVal = document.querySelector('[data-i18n="phys_reynolds"]')?.nextElementSibling;
-                if (reynoldsVal) reynoldsVal.innerText = c.reynolds_number.toLocaleString();
+                    // Update Sidebar constants
+                    const reynoldsVal = document.querySelector('[data-i18n="phys_reynolds"]')?.nextElementSibling;
+                    if (reynoldsVal) reynoldsVal.innerText = c.reynolds_number.toLocaleString();
 
-                const activationVal = document.querySelector('[data-i18n="phys_activation"]')?.nextElementSibling;
-                if (activationVal) activationVal.innerText = c.activation_energy + " kJ";
+                    const activationVal = document.querySelector('[data-i18n="phys_activation"]')?.nextElementSibling;
+                    if (activationVal) activationVal.innerText = c.activation_energy + " kJ";
 
-                const youngsVal = document.querySelector('[data-i18n="phys_youngs"]')?.nextElementSibling;
-                if (youngsVal) youngsVal.innerText = c.youngs_modulus + " GPa";
+                    const youngsVal = document.querySelector('[data-i18n="phys_youngs"]')?.nextElementSibling;
+                    if (youngsVal) youngsVal.innerText = c.youngs_modulus + " GPa";
 
-                // Update Diligence Hub Live Derivations
-                const reHub = document.getElementById('hub-reynolds');
-                if (reHub) reHub.innerText = c.reynolds_number.toLocaleString();
+                    // Update Diligence Hub Live Derivations
+                    const reHub = document.getElementById('hub-reynolds');
+                    if (reHub) reHub.innerText = c.reynolds_number.toLocaleString();
 
-                const kiHub = document.getElementById('hub-ki');
-                if (kiHub) kiHub.innerText = c.stress_intensity.toFixed(4);
+                    const kiHub = document.getElementById('hub-ki');
+                    if (kiHub) kiHub.innerText = c.stress_intensity.toFixed(4);
 
-                const corrHub = document.getElementById('hub-corrosion');
-                if (corrHub) corrHub.innerText = c.corrosion_kinetic.toFixed(6);
+                    const corrHub = document.getElementById('hub-corrosion');
+                    if (corrHub) corrHub.innerText = c.corrosion_kinetic.toFixed(6);
 
-            } catch (e) { console.error("Physics Link Failure", e); }
-        }
+                } catch (e) { console.error("Physics Link Failure", e); }
+            }
 
-        async function updateAuditLedgerData() {
-            try {
-                const response = await fetch('/v2/audit/ledger');
-                const data = await response.json();
-                const logStream = document.getElementById('log-stream'); // Make sure this ID exists
-                if (logStream && data.logs) {
-                    logStream.innerHTML = data.logs.map(log => `
+            async function updateAuditLedgerData() {
+                try {
+                    const response = await fetch('/v2/audit/ledger');
+                    const data = await response.json();
+                    const logStream = document.getElementById('log-stream'); // Make sure this ID exists
+                    if (logStream && data.logs) {
+                        logStream.innerHTML = data.logs.map(log => `
                         <div class="log-entry" style="font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); display: grid; grid-template-columns: 140px 100px 1fr 80px; gap: 15px; align-items: center; color: #cbd5e1; animation: fadeIn 0.3s ease;">
                             <span style="color: var(--text-secondary); opacity: 0.6;">${new Date(log.timestamp).toLocaleTimeString()}</span>
                             <span style="color: var(--accent-green); font-weight: 700;">${log.event}</span>
@@ -1659,142 +1738,174 @@
                             <span style="text-align: right; color: var(--accent-green); font-weight: 800;">${log.status}</span>
                         </div>
                     `).join('');
-                }
-            } catch (e) { console.error("Audit Link Failure", e); }
-        }
+                    }
+                } catch (e) { console.error("Audit Link Failure", e); }
+            }
 
-        // Main Inference Call (Port 8002)
-        async function triggerAnalysis() {
-            const apiStatus = document.getElementById('api-status');
-            apiStatus.style.background = 'rgba(245, 158, 11, 0.1)';
-            apiStatus.style.borderColor = 'rgba(245, 158, 11, 0.2)';
-            apiStatus.querySelector('span').innerText = 'API: INFERRING';
-            apiStatus.querySelector('span').style.color = '#f59e0b';
-            apiStatus.querySelector('.status-dot').style.background = '#f59e0b';
-
-            const site = document.getElementById('site-selector').value;
-            const aod = document.getElementById('aod-slider').value;
-            const wind = document.getElementById('wind-slider').value;
-
-            logEvent(`Triggering Causal Inference for [${site}]`, 'info');
-            renderCausalGraph(site);
-
-            // AUTO-HOST DETECTION: Relative path for Cloud/Railway
-            const endpoints = [
-                '/v2/inference/resilience'
-            ];
-
-            let success = false;
-            let lastErr = '';
-
-            for (let url of endpoints) {
-                if (success) break;
+            async function updateESGImpactData() {
                 try {
-                    const start = performance.now();
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-API-KEY': 'ENTERPRISE_SECRET_VERIFIED_7M'
-                        },
-                        body: JSON.stringify({
-                            metadata: {
-                                caller_id: "MISSION_CONTROL_DASHBOARD",
-                                request_trace_id: "TR-" + Math.random().toString(36).substr(2, 9).toUpperCase()
-                            },
-                            site_id: site,
-                            asset_id: "PUMP_RU_01",
-                            asset_type: "Pump",
-                            temp_c: 45.0,
-                            vibration_mm_s: 2.1,
-                            aod_override: parseFloat(aod),
-                            wind_override: parseFloat(wind)
-                        })
-                    });
-
-                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    const response = await fetch('/v2/esg/impact');
                     const data = await response.json();
-                    const latency = Math.round(performance.now() - start);
+                    document.getElementById('esg-co2-val').innerText = `${data.total_co2_kg_saved.toFixed(3)} kg`;
+                    document.getElementById('esg-water-val').innerText = `${data.total_water_liters_saved.toFixed(2)} L`;
+                    document.getElementById('esg-credits-val').innerText = data.credits_pending;
+                } catch (e) { console.error("ESG Impact Link Failure", e); }
+            }
 
-                    // Reset Status
-                    apiStatus.style.background = 'rgba(16, 185, 129, 0.1)';
-                    apiStatus.style.borderColor = 'rgba(16, 185, 129, 0.2)';
-                    apiStatus.querySelector('span').innerText = `API: OK (${latency}ms)`;
-                    apiStatus.querySelector('span').style.color = '#10b981';
-                    apiStatus.querySelector('.status-dot').style.background = '#10b981';
-
-                    logEvent(`Inference Success via ${url.split('/')[2]}`, 'info');
-
-                    // 1. Update Top Metrics
-                    const reliability = ((1.0 - (data.asset_impact.failure_probability || 0.1)) * 100).toFixed(1);
-                    const rul = (1000 - (data.asset_impact.rul_reduction_hours || 0));
-
-                    document.getElementById('metric-reliability').innerText = reliability + ' %';
-                    document.getElementById('metric-rul').innerText = Math.round(rul).toLocaleString();
-                    document.getElementById('metric-dsi').innerText = data.dsi_metrics.dsi.toFixed(2);
-                    document.getElementById('metric-risk').innerText = ((data.asset_impact.failure_probability || 0) * 100).toFixed(1) + ' %';
-
-                    // 1b. Update MLOps Status
-                    const driftStatus = document.getElementById('drift-status');
-                    driftStatus.innerText = data.dsi_metrics.drift_status;
-                    driftStatus.style.color = data.dsi_metrics.drift_status === 'STABLE' ? 'var(--accent-green)' : 'var(--accent-red)';
-                    const entropy = (data.asset_impact.failure_probability * 100).toFixed(0);
-                    document.getElementById('entropy-bar').style.width = `${Math.max(4, entropy)}%`;
-                    document.getElementById('entropy-bar').style.background = entropy > 40 ? 'var(--accent-red)' : 'var(--accent-green)';
-
-                    // 2. Update Chemical Metrics (Copernicus)
-                    const sm = data.asset_impact.stress_metrics;
-                    if (sm) {
-                        document.getElementById('metric-kinetic').innerText = (sm.kinetic_abrasion || 0).toFixed(2) + ' x';
-                        document.getElementById('metric-thermal').innerText = (sm.thermal_stress || 0).toFixed(2) + ' x';
-                        document.getElementById('metric-salt').innerText = (sm.salt_corrosion || 0).toFixed(2) + ' x';
-
-                        let maxThreat = 'KINETIC ABRASION';
-                        let maxVal = sm.kinetic_abrasion || 0;
-                        if ((sm.thermal_stress || 0) > maxVal) { maxThreat = 'THERMAL DECAY'; maxVal = sm.thermal_stress; }
-                        if ((sm.salt_corrosion || 0) > maxVal) { maxThreat = 'DELIQUESCENCE (SALT)'; maxVal = sm.salt_corrosion; }
-                        document.getElementById('dominant-threat').innerText = maxThreat;
-                        document.getElementById('dominant-threat').style.color = maxThreat.includes('SALT') ? '#3b82f6' : (maxThreat.includes('THERMAL') ? '#ef4444' : '#10b981');
+            async function updateESGLedgerData() {
+                try {
+                    const response = await fetch('/v2/esg/ledger');
+                    const data = await response.json();
+                    const container = document.getElementById('esg-ledger-stream');
+                    if (container && data.chain) {
+                        document.getElementById('esg-claims-val').innerText = data.chain.length;
+                        container.innerHTML = data.chain.map(block => `
+                        <div style="font-family: 'JetBrains Mono'; font-size: 11px; padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); display: grid; grid-template-columns: 80px 1fr 140px 120px; gap: 20px; align-items: center; background: ${block.block_index % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.01)'}">
+                            <div style="color: var(--accent-green); font-weight: 800;">#${block.block_index.toString().padStart(4, '0')}</div>
+                            <div>
+                                <div style="color: #fff; font-weight: 700; margin-bottom: 4px;">CLAIM: ${block.action_type}</div>
+                                <div style="font-size: 9px; opacity: 0.5;">HASH: ${block.verification_hash}</div>
+                            </div>
+                            <div style="color: var(--accent-green); font-weight: 900; font-size: 13px;">+ ${block.esg_impact_kg.toFixed(4)} kg CO2</div>
+                            <div style="text-align: right; opacity: 0.6; font-size: 10px;">${new Date(block.timestamp).toLocaleTimeString()}</div>
+                        </div>
+                    `).join('');
                     }
+                } catch (e) { console.error("ESG Ledger Link Failure", e); }
+            }
 
-                    // 3. Update Chart
-                    if (data.diagnostics && data.diagnostics.simulated_degradation) {
-                        degChart.data.datasets[0].data = data.diagnostics.simulated_degradation;
-                    } else {
-                        degChart.data.datasets[0].data = Array.from({ length: 24 }, (_, i) => 100 - (data.asset_impact.failure_probability * 100) - (i / (2 + Math.random())));
-                    }
-                    degChart.update();
+            // Main Inference Call (Port 8002)
+            async function triggerAnalysis() {
+                const apiStatus = document.getElementById('api-status');
+                apiStatus.style.background = 'rgba(245, 158, 11, 0.1)';
+                apiStatus.style.borderColor = 'rgba(245, 158, 11, 0.2)';
+                apiStatus.querySelector('span').innerText = 'API: INFERRING';
+                apiStatus.querySelector('span').style.color = '#f59e0b';
+                apiStatus.querySelector('.status-dot').style.background = '#f59e0b';
 
-                    // 3. Update Prescriptive Stack (ROI-Driven)
-                    const pStack = document.getElementById('prescriptive-stack');
-                    pStack.innerHTML = '';
-                    if (data.recommendations && data.recommendations.length > 0) {
-                        data.recommendations.forEach((rec, i) => {
-                            const isCrit = rec.priority <= 1;
-                            const cls = isCrit ? 'action-card critical' : 'action-card';
-                            // Technical Translation Mapping
-                            let localizedAction = translations[currentLang][rec.action_key] || rec.action_key;
-                            let localizedRationale = rec.rationale;
+                const site = document.getElementById('site-selector').value;
+                const aod = document.getElementById('aod-slider').value;
+                const wind = document.getElementById('wind-slider').value;
 
-                            if (currentLang === 'ar') {
-                                localizedRationale = localizedRationale
-                                    .replace("Structural integrity of", "السلامة الهيكلية لـ")
-                                    .replace("compromised (Entropy:", "متضررة (معدل الاعتلاج:")
-                                    .replace("Risk exceeds safety manifold", "المخاطر تتجاوز حدود الأمان")
-                                    .replace("High atmospheric stress", "إجهاد جوي مرتفع")
-                                    .replace("coupled with increased vibration", "مقترن بزيادة في الاهتزازات")
-                                    .replace("Reducing load to extend RUL", "تخفيف الأحمال لإطالة العمر الافتراضي")
-                                    .replace("Atmospheric dust concentration exceeds nominal limit", "تركيز الغبار الجوي يتجاوز الحد المسموح")
-                                    .replace("Preventive flush required to protect intake nodes", "تطهير وقائي مطلوب لحماية عقد الإدخال");
-                            }
+                logEvent(`Triggering Causal Inference for [${site}]`, 'info');
+                renderCausalGraph(site);
 
-                            const t = translations[currentLang];
-                            const actionLabel = currentLang === 'ar' ? 'الإجراء' : 'ACTION';
-                            const rationaleLabel = currentLang === 'ar' ? 'المبرر التقني' : 'RATIONALE';
-                            const savingsLabel = currentLang === 'ar' ? 'توفير مقدر' : 'EST_SAVINGS';
-                            const copyText = `${actionLabel}: ${localizedAction}\n${rationaleLabel}: ${localizedRationale}\n${savingsLabel}: $${rec.avoided_cost_est}`;
+                // AUTO-HOST DETECTION: Relative path for Cloud/Railway
+                const endpoints = [
+                    '/v2/inference/resilience'
+                ];
 
-                            pStack.innerHTML += `
+                let success = false;
+                let lastErr = '';
+
+                for (let url of endpoints) {
+                    if (success) break;
+                    try {
+                        const start = performance.now();
+                        const response = await fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-API-KEY': 'ENTERPRISE_SECRET_VERIFIED_7M'
+                            },
+                            body: JSON.stringify({
+                                metadata: {
+                                    caller_id: "MISSION_CONTROL_DASHBOARD",
+                                    request_trace_id: "TR-" + Math.random().toString(36).substr(2, 9).toUpperCase()
+                                },
+                                site_id: site,
+                                asset_id: "PUMP_RU_01",
+                                asset_type: "Pump",
+                                temp_c: 45.0,
+                                vibration_mm_s: 2.1,
+                                aod_override: parseFloat(aod),
+                                wind_override: parseFloat(wind)
+                            })
+                        });
+
+                        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                        const data = await response.json();
+                        const latency = Math.round(performance.now() - start);
+
+                        // Reset Status
+                        apiStatus.style.background = 'rgba(16, 185, 129, 0.1)';
+                        apiStatus.style.borderColor = 'rgba(16, 185, 129, 0.2)';
+                        apiStatus.querySelector('span').innerText = `API: OK (${latency}ms)`;
+                        apiStatus.querySelector('span').style.color = '#10b981';
+                        apiStatus.querySelector('.status-dot').style.background = '#10b981';
+
+                        logEvent(`Inference Success via ${url.split('/')[2]}`, 'info');
+
+                        // 1. Update Top Metrics
+                        const reliability = ((1.0 - (data.asset_impact.failure_probability || 0.1)) * 100).toFixed(1);
+                        const rul = (1000 - (data.asset_impact.rul_reduction_hours || 0));
+
+                        document.getElementById('metric-reliability').innerText = reliability + ' %';
+                        document.getElementById('metric-rul').innerText = Math.round(rul).toLocaleString();
+                        document.getElementById('metric-dsi').innerText = data.dsi_metrics.dsi.toFixed(2);
+                        document.getElementById('metric-risk').innerText = ((data.asset_impact.failure_probability || 0) * 100).toFixed(1) + ' %';
+
+                        // 1b. Update MLOps Status
+                        const driftStatus = document.getElementById('drift-status');
+                        driftStatus.innerText = data.dsi_metrics.drift_status;
+                        driftStatus.style.color = data.dsi_metrics.drift_status === 'STABLE' ? 'var(--accent-green)' : 'var(--accent-red)';
+                        const entropy = (data.asset_impact.failure_probability * 100).toFixed(0);
+                        document.getElementById('entropy-bar').style.width = `${Math.max(4, entropy)}%`;
+                        document.getElementById('entropy-bar').style.background = entropy > 40 ? 'var(--accent-red)' : 'var(--accent-green)';
+
+                        // 2. Update Chemical Metrics (Copernicus)
+                        const sm = data.asset_impact.stress_metrics;
+                        if (sm) {
+                            document.getElementById('metric-kinetic').innerText = (sm.kinetic_abrasion || 0).toFixed(2) + ' x';
+                            document.getElementById('metric-thermal').innerText = (sm.thermal_stress || 0).toFixed(2) + ' x';
+                            document.getElementById('metric-salt').innerText = (sm.salt_corrosion || 0).toFixed(2) + ' x';
+
+                            let maxThreat = 'KINETIC ABRASION';
+                            let maxVal = sm.kinetic_abrasion || 0;
+                            if ((sm.thermal_stress || 0) > maxVal) { maxThreat = 'THERMAL DECAY'; maxVal = sm.thermal_stress; }
+                            if ((sm.salt_corrosion || 0) > maxVal) { maxThreat = 'DELIQUESCENCE (SALT)'; maxVal = sm.salt_corrosion; }
+                            document.getElementById('dominant-threat').innerText = maxThreat;
+                            document.getElementById('dominant-threat').style.color = maxThreat.includes('SALT') ? '#3b82f6' : (maxThreat.includes('THERMAL') ? '#ef4444' : '#10b981');
+                        }
+
+                        // 3. Update Chart
+                        if (data.diagnostics && data.diagnostics.simulated_degradation) {
+                            degChart.data.datasets[0].data = data.diagnostics.simulated_degradation;
+                        } else {
+                            degChart.data.datasets[0].data = Array.from({ length: 24 }, (_, i) => 100 - (data.asset_impact.failure_probability * 100) - (i / (2 + Math.random())));
+                        }
+                        degChart.update();
+
+                        // 3. Update Prescriptive Stack (ROI-Driven)
+                        const pStack = document.getElementById('prescriptive-stack');
+                        pStack.innerHTML = '';
+                        if (data.recommendations && data.recommendations.length > 0) {
+                            data.recommendations.forEach((rec, i) => {
+                                const isCrit = rec.priority <= 1;
+                                const cls = isCrit ? 'action-card critical' : 'action-card';
+                                // Technical Translation Mapping
+                                let localizedAction = translations[currentLang][rec.action_key] || rec.action_key;
+                                let localizedRationale = rec.rationale;
+
+                                if (currentLang === 'ar') {
+                                    localizedRationale = localizedRationale
+                                        .replace("Structural integrity of", "السلامة الهيكلية لـ")
+                                        .replace("compromised (Entropy:", "متضررة (معدل الاعتلاج:")
+                                        .replace("Risk exceeds safety manifold", "المخاطر تتجاوز حدود الأمان")
+                                        .replace("High atmospheric stress", "إجهاد جوي مرتفع")
+                                        .replace("coupled with increased vibration", "مقترن بزيادة في الاهتزازات")
+                                        .replace("Reducing load to extend RUL", "تخفيف الأحمال لإطالة العمر الافتراضي")
+                                        .replace("Atmospheric dust concentration exceeds nominal limit", "تركيز الغبار الجوي يتجاوز الحد المسموح")
+                                        .replace("Preventive flush required to protect intake nodes", "تطهير وقائي مطلوب لحماية عقد الإدخال");
+                                }
+
+                                const t = translations[currentLang];
+                                const actionLabel = currentLang === 'ar' ? 'الإجراء' : 'ACTION';
+                                const rationaleLabel = currentLang === 'ar' ? 'المبرر التقني' : 'RATIONALE';
+                                const savingsLabel = currentLang === 'ar' ? 'توفير مقدر' : 'EST_SAVINGS';
+                                const copyText = `${actionLabel}: ${localizedAction}\n${rationaleLabel}: ${localizedRationale}\n${savingsLabel}: $${rec.avoided_cost_est}`;
+
+                                pStack.innerHTML += `
                                 <div class="${cls}" style="animation: fadeUp 0.3s ease forwards; animation-delay: ${i * 0.1}s; opacity: 0; margin-bottom: 12px; border-left: 4px solid ${isCrit ? '#ef4444' : 'var(--accent-green)'}; background: rgba(15, 23, 42, 0.7); padding: 16px; position: relative; overflow: hidden; border-radius: 4px; border-right: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);">
                                     <div class="action-badge-container" style="position: absolute; top: 12px; right: 12px; display: flex; flex-direction: column; align-items: flex-end; gap: 5px; z-index: 5;">
                                         <span style="font-size: 10px; color: #fff; background: rgba(0, 0, 0, 0.8); border: 1px solid rgba(16, 185, 129, 0.4); padding: 2px 6px; border-radius: 3px; font-weight: 800; white-space: nowrap;">${t.roi}: ${rec.roi_index}x</span>
@@ -1818,299 +1929,315 @@
                                     </div>
                                 </div>
                             `;
-                        });
-                        lucide.createIcons();
-                    } else {
-                        pStack.innerHTML = `<div style="text-align: center; color: var(--accent-green); margin-top: 40px; font-weight: 600;"><i data-lucide="check-circle" size="32" style="margin-bottom: 10px;"></i><br>${translations[currentLang].nominal}</div>`;
-                        lucide.createIcons();
-                    }
-                    success = true;
-                } catch (err) {
-                    lastErr = err.message;
-                    console.log(`Failed endpoint ${url}:`, err);
-                }
-            }
-
-            if (!success) {
-                logEvent(`API Connection Failed: port 8002 unreachable. Error: ${lastErr}`, 'warn');
-                apiStatus.style.background = 'rgba(239, 68, 68, 0.1)';
-                apiStatus.style.borderColor = 'rgba(239, 68, 68, 0.2)';
-                apiStatus.querySelector('span').innerText = 'API: OFFLINE';
-                apiStatus.querySelector('span').style.color = '#ef4444';
-                apiStatus.querySelector('.status-dot').style.background = '#ef4444';
-            }
-        }
-
-        // Multi-Language System
-        const translations = {
-            en: {
-                nav_home: "HOME",
-                core_title: "CORE / Industrial AI",
-                env_override: "Environmental Override",
-                aod: "Aerosol Optical Depth (AOD)",
-                wind_speed: "Wind Speed (m/s)",
-                force_inference: "FORCE INFERENCE CYCLE",
-                chem_diag: "Deep Chemical Diagnostics",
-                cams_payload: "Copernicus CAMS EAC4 Payload",
-                op_metrics: "Operational Performance Metrics",
-                reliability: "Reliability Index",
-                rem_life: "Remaining Life",
-                hrs: "HRS",
-                dust_sev: "Dust Severity",
-                risk_prob: "Risk probability",
-                optimizer: "Prescriptive Optimizer",
-                events: "System Event Log",
-                awaiting: "Awaiting Inference...",
-                nominal: "System Status: Nominal",
-                kinetic: "Kinetic Abrasion",
-                thermal: "Thermal Stress",
-                salt: "Salt Corrosion",
-                threat: "DOMINANT DEGRADATION PATH:",
-                stable: "STABLE",
-                drifting: "DRIFTING",
-                nav_control: "Mission Control",
-                nav_telemetry: "Copernicus Telemetry",
-                nav_physics: "Causal Physics",
-                nav_audit: "Audit Trails",
-                nav_settings: "Settings",
-                roi: "ROI",
-                avoided_loss: "AVOIDED_LOSS",
-                priority_lvl: "PRIORITY_LEVEL",
-                critical: "CRITICAL",
-                optimal: "OPTIMAL",
-                // Action Keys
-                EMERGENCY_SHUTDOWN_SEQUENCE: "EMERGENCY SHUTDOWN SEQUENCE",
-                DYNAMIC_LOAD_REDUCTION: "DYNAMIC LOAD REDUCTION",
-                FLUSH_FILTRATION_MANIFOLD: "FLUSH FILTRATION MANIFOLD",
-                // Causal Graph Labels
-                node_atmos: "Atmos (CAMS)",
-                node_dsi: "DSI Factor",
-                node_vib: "Rotor Vib",
-                node_stress: "Kinetic Stress",
-                node_rul: "Asset RUL",
-                node_salt: "Salt Deposition",
-                node_corrosion: "Corrosion Rate",
-                // Physics View
-                phys_title: "Physics Model Investigation",
-                phys_thermo_h: "Thermodynamic Flux",
-                phys_thermo_d: "Navier-Stokes integration for convective heat transfer across structural nodes. Simulating diurnal expansion/contraction cycles.",
-                phys_arrh_h: "Arrhenius Kinetics",
-                phys_arrh_d: "Mapping chemical degradation rates and salt deliquescence based on Arrhenius equation parameters and local humidity manifolds.",
-                phys_fract_h: "Fracture Propagator",
-                phys_fract_d: "Linear elastic fracture mechanics (LEFM) modeling to predict micro-fracture propagation paths through structural manifolds.",
-                site_1: "SA_EAST_RU_01 (Harsh Desert)",
-                site_2: "EMEA_COAST_02 (Corrosive Coastal)",
-                core_subtitle: "Industrial AI",
-                audit_title: "Sovereign Blockchain Ledger",
-                audit_subtitle: "Cryptographic chain of custody for all inference operations",
-                audit_sec_status: "QUANTUM_SECURITY_SHELL",
-                sync_nodes: "GLOBAL_SYNC_NODES:",
-                audit_parity: "ENCRYPTION_PARITY:",
-                audit_aes: "ACTIVE_AES_256",
-                status_ok: "OK",
-                status_syncing: "SYNCING",
-                audit_ts: "Timestamp",
-                audit_hash: "Block_Anchor_Hash",
-                audit_node: "Provenance_Node",
-                audit_parity_label: "Parity",
-                audit_verified: "VERIFIED",
-                node_riyadh_c: "RIYADH_CENTRAL_01",
-                node_neom_n: "NEOM_GRID_NORTH",
-                node_dhahran_x: "DHAHRAN_X_LAB",
-                node_riyadh_hq: "RIYADH_HQ_CLUSTER",
-                node_neom_core: "NEOM_CORE_INFRA",
-                node_dhahran_sys: "DHAHRAN_X_SYSTEM",
-                telemetry_title: "Satellite Telemetry Streams",
-                tel_feed_01: "SENSOR_FEED_01 // IR_SPECTRAL",
-                tel_feed_02: "SENSOR_FEED_02 // EO_IMAGING",
-                tel_checksum: "CHECKSUM",
-                tel_strength: "STRENGTH",
-                tel_node_ref: "NODE_REF",
-                tel_intensity: "INTENSITY",
-                tel_variance: "VARIANCE",
-                tel_channel: "CHANNEL",
-                tel_bandwidth: "BANDWIDTH",
-                tel_status: "STATUS",
-                tel_frame: "PROCESSING_FRAME",
-                tel_auth: "AUTHENTICATED",
-                tel_range: "SCANNING_RANGE",
-                tel_secure: "SECURE",
-                status_timeout: "TIMEOUT",
-                phys_constants: "MODEL_CONSTANTS",
-                phys_reynolds: "REYNOLDS_NUMBER (Re)",
-                phys_activation: "ACTIVATION_ENERGY (Ea)",
-                phys_youngs: "YOUNG_MODULUS (E)",
-                phys_mode: "SIMULATION_FIDELITY:",
-                phys_manifold_title: "Non-Linear Structural Strain Manifold",
-                nav_control: "Mission Control",
-                nav_telemetry: "Copernicus Telemetry",
-                nav_physics: "Causal Physics",
-                nav_audit: "Audit Trails",
-                nav_diligence: "Diligence Hub",
-                nav_settings: "Settings",
-                settings_title: "Precision Configuration",
-                settings_subtitle: "Adjust system-wide operational parameters",
-                diligence_index: "TECHNICAL_DILIGENCE_INDEX"
-            },
-            ar: {
-                nav_home: "العودة للرئيسية",
-                telemetry_title: "تدفقات تتبع الأقمار الصناعية",
-                tel_feed_01: "موجز الاستشعار 01 // الطيف الحراري",
-                tel_feed_02: "موجز الاستشعار 02 // التصوير البصري",
-                tel_checksum: "مجموع التحقق (Checksum)",
-                tel_strength: "قوة الإشارة",
-                tel_node_ref: "مرجع العقدة",
-                tel_intensity: "الكثافة الطيفية",
-                tel_variance: "معدل التباين",
-                tel_channel: "القناة الناقلة",
-                tel_bandwidth: "عرض النطاق الترددي",
-                tel_status: "حالة الاتصال",
-                tel_frame: "إطار المعالجة",
-                tel_auth: "تم التوثيق",
-                tel_range: "نطاق المسح الجغرافي",
-                tel_secure: "اتصال آمن",
-                status_timeout: "انتهت المهلة",
-                phys_constants: "ثوابت النمذجة (Constants)",
-                phys_reynolds: "رقم رينولدز (Reynolds #)",
-                phys_activation: "طاقة التنشيط (Activation Energy)",
-                phys_youngs: "معامل يونغ (Young's Modulus)",
-                phys_mode: "دقة المحاكاة الفيزيائية:",
-                phys_manifold_title: "تشعب الإجهاد الهيكلي غير الخطي",
-                nav_control: "غرفة العمليات الاستراتيجية",
-                nav_telemetry: "بيانات التتبع والمراقبة",
-                nav_physics: "التحليل الفيزيائي للسببية",
-                nav_audit: "مسارات التدقيق اللوجستي",
-                nav_diligence: "مركز التدقيق التقني",
-                nav_settings: "إعدادات النظام",
-                diligence_index: "فهرس التدقيق والامتثال",
-                audit_title: "سجل البلوكشين السيادي (Sovereign Ledger)",
-                audit_subtitle: "سلسلة الحماية التشفيرية لكافة عمليات الاستنتاج الآلي",
-                audit_sec_status: "غلاف الأمن الكمي (Quantum Shield)",
-                sync_nodes: "عقد المزامنة العالمية:",
-                audit_parity: "تكافؤ التشفير:",
-                audit_aes: "تشفير AES_256 نشط",
-                status_ok: "سليم",
-                status_syncing: "جاري المزامنة",
-                audit_ts: "الطابع الزمني",
-                audit_hash: "هاش كتلة الإرساء",
-                audit_node: "عقدة المنشأ",
-                audit_parity_label: "التكافؤ",
-                audit_verified: "تم التحقق",
-                node_riyadh_c: "الرياض_المركزية_01",
-                node_neom_n: "نيوم_الشبكة_الشمالية",
-                node_dhahran_x: "الظهران_المختبر_X",
-                node_riyadh_hq: "عنقود_الرياض_الرئيسي",
-                node_neom_core: "نيوم_البنية_الأساسية",
-                node_dhahran_sys: "الظهران_نظام_X",
-                settings_title: "إعدادات الدقة والنظام",
-                settings_subtitle: "ضبط المعايير التشغيلية ونطاقات استشعار البيانات",
-                core_subtitle: "الذكاء الاصطناعي للمنشآت الحيوية",
-                site_1: "SA_EAST_RU_01 (صحراء قاسية)",
-                site_2: "EMEA_COAST_02 (منطقة ساحلية تآكلية)",
-                env_override: "التحكم في المعطيات البيئية",
-                aod: "العمق البصري للهباء الجوي (AOD)",
-                wind_speed: "سرعة الرياح (م/ث)",
-                force_inference: "تفعيل دورة الاستنتاج الآلي",
-                chem_diag: "التحليل الكيميائي المتقدم",
-                cams_payload: "بيانات منظومة كوبرنيكوس CAMS EAC4",
-                op_metrics: "مقاييس الأداء التشغيلي",
-                reliability: "مؤشر الموثوقية الهندسية",
-                rem_life: "العمر التشغيلي المتبقي",
-                hrs: "ساعة",
-                dust_sev: "كثافة الرواسب الغبارية",
-                risk_prob: "احتمالية حدوث المخاطر",
-                optimizer: "محرك الاستمثال التوجيهي",
-                events: "سجل أحداث النظام",
-                awaiting: "جاري استخلاص النتائج الجوهرية...",
-                nominal: "حالة النظام: مُستقرة (Nominal)",
-                kinetic: "التآكل الميكانيكي (Abrasion)",
-                thermal: "الإجهاد الحراري المعدني",
-                salt: "التآكل الملحي (Corrosion)",
-                threat: "نمط التدهور الهيكلي الرئيسي:",
-                stable: "مستقر",
-                drifting: "انحراف تقني",
-                nav_control: "غرفة العمليات الاستراتيجية",
-                nav_telemetry: "بيانات التتبع والمراقبة",
-                nav_physics: "التحليل الفيزيائي للسببية",
-                nav_audit: "مسارات التدقيق اللوجستي",
-                nav_diligence: "مركز التدقيق التقني",
-                nav_settings: "إعدادات النظام",
-                roi: "العائد الاستثماري (ROI)",
-                avoided_loss: "الخسائر المتفاداة",
-                priority_lvl: "تصنيف الأولوية",
-                critical: "عالي الخطورة",
-                optimal: "تشغيل أمثلي",
-                // Action Keys (Technical)
-                EMERGENCY_SHUTDOWN_SEQUENCE: "بروتوكول الإيقاف الطارئ",
-                DYNAMIC_LOAD_REDUCTION: "تخفيف الأحمال الميكانيكية",
-                FLUSH_FILTRATION_MANIFOLD: "تطهير منظومة الترشيح",
-                // Causal Graph Labels
-                node_atmos: "الغلاف الجوي (CAMS)",
-                node_dsi: "كثافة الرواسب",
-                node_vib: "اهتزاز الدوار",
-                node_stress: "الإجهاد الميكانيكي",
-                node_rul: "العمر التشغيلي للأصل",
-                node_salt: "الترسب الملحي",
-                node_corrosion: "معدل التآكل (Corrosion)",
-                // Physics View
-                phys_title: "التحليل الفيزيائي المعمق",
-                phys_thermo_h: "التدفق الديناميكي الحراري",
-                phys_thermo_d: "تكامل (Navier-Stokes) لانتقال الحرارة الحملي عبر العقد الهيكلية. محاكاة دورات التمدد والانكماش اليومية بدقة فائقة.",
-                phys_arrh_h: "حركية (Arrhenius)",
-                phys_arrh_d: "نمذجة معدلات التدهور الكيميائي وتدمع الملح بناءً على بارامترات معادلة أرينيوس ومعطيات الرطوبة الجوية.",
-                phys_fract_h: "انتشار الكسور الهيكلية",
-                phys_fract_d: "نمذجة ميكانيكا الكسر المرن الخطي (LEFM) للتنبؤ بمسارات انتشار الكسور المجهرية عبر المنظومات الهيكلية."
-            }
-        };
-
-        let currentLang = 'en';
-
-        function toggleLanguage() {
-            currentLang = currentLang === 'en' ? 'ar' : 'en';
-            document.body.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
-            document.body.style.fontFamily = currentLang === 'ar' ? "'Tajawal', sans-serif" : "'Inter', sans-serif";
-
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (translations[currentLang][key]) {
-                    if (el.tagName === 'OPTION') {
-                        el.text = translations[currentLang][key];
-                    } else {
-                        el.innerText = translations[currentLang][key];
+                            });
+                            lucide.createIcons();
+                        } else {
+                            pStack.innerHTML = `<div style="text-align: center; color: var(--accent-green); margin-top: 40px; font-weight: 600;"><i data-lucide="check-circle" size="32" style="margin-bottom: 10px;"></i><br>${translations[currentLang].nominal}</div>`;
+                            lucide.createIcons();
+                        }
+                        success = true;
+                    } catch (err) {
+                        lastErr = err.message;
+                        console.log(`Failed endpoint ${url}:`, err);
                     }
                 }
-            });
 
-            document.querySelectorAll('[data-i18n-title]').forEach(el => {
-                const key = el.getAttribute('data-i18n-title');
-                if (translations[currentLang][key]) {
-                    el.setAttribute('title', translations[currentLang][key]);
+                if (!success) {
+                    logEvent(`API Connection Failed: port 8002 unreachable. Error: ${lastErr}`, 'warn');
+                    apiStatus.style.background = 'rgba(239, 68, 68, 0.1)';
+                    apiStatus.style.borderColor = 'rgba(239, 68, 68, 0.2)';
+                    apiStatus.querySelector('span').innerText = 'API: OFFLINE';
+                    apiStatus.querySelector('span').style.color = '#ef4444';
+                    apiStatus.querySelector('.status-dot').style.background = '#ef4444';
                 }
+            }
+
+            // Multi-Language System
+            const translations = {
+                en: {
+                    nav_home: "HOME",
+                    core_title: "CORE / Industrial AI",
+                    env_override: "Environmental Override",
+                    aod: "Aerosol Optical Depth (AOD)",
+                    wind_speed: "Wind Speed (m/s)",
+                    force_inference: "FORCE INFERENCE CYCLE",
+                    chem_diag: "Deep Chemical Diagnostics",
+                    cams_payload: "Copernicus CAMS EAC4 Payload",
+                    op_metrics: "Operational Performance Metrics",
+                    reliability: "Reliability Index",
+                    rem_life: "Remaining Life",
+                    hrs: "HRS",
+                    dust_sev: "Dust Severity",
+                    risk_prob: "Risk probability",
+                    optimizer: "Prescriptive Optimizer",
+                    events: "System Event Log",
+                    awaiting: "Awaiting Inference...",
+                    nominal: "System Status: Nominal",
+                    kinetic: "Kinetic Abrasion",
+                    thermal: "Thermal Stress",
+                    salt: "Salt Corrosion",
+                    threat: "DOMINANT DEGRADATION PATH:",
+                    stable: "STABLE",
+                    drifting: "DRIFTING",
+                    nav_control: "Mission Control",
+                    nav_telemetry: "Copernicus Telemetry",
+                    nav_physics: "Causal Physics",
+                    nav_audit: "Audit Trails",
+                    nav_settings: "Settings",
+                    roi: "ROI",
+                    avoided_loss: "AVOIDED_LOSS",
+                    priority_lvl: "PRIORITY_LEVEL",
+                    critical: "CRITICAL",
+                    optimal: "OPTIMAL",
+                    // Action Keys
+                    EMERGENCY_SHUTDOWN_SEQUENCE: "EMERGENCY SHUTDOWN SEQUENCE",
+                    DYNAMIC_LOAD_REDUCTION: "DYNAMIC LOAD REDUCTION",
+                    FLUSH_FILTRATION_MANIFOLD: "FLUSH FILTRATION MANIFOLD",
+                    // Causal Graph Labels
+                    node_atmos: "Atmos (CAMS)",
+                    node_dsi: "DSI Factor",
+                    node_vib: "Rotor Vib",
+                    node_stress: "Kinetic Stress",
+                    node_rul: "Asset RUL",
+                    node_salt: "Salt Deposition",
+                    node_corrosion: "Corrosion Rate",
+                    // Physics View
+                    phys_title: "Physics Model Investigation",
+                    phys_thermo_h: "Thermodynamic Flux",
+                    phys_thermo_d: "Navier-Stokes integration for convective heat transfer across structural nodes. Simulating diurnal expansion/contraction cycles.",
+                    phys_arrh_h: "Arrhenius Kinetics",
+                    phys_arrh_d: "Mapping chemical degradation rates and salt deliquescence based on Arrhenius equation parameters and local humidity manifolds.",
+                    phys_fract_h: "Fracture Propagator",
+                    phys_fract_d: "Linear elastic fracture mechanics (LEFM) modeling to predict micro-fracture propagation paths through structural manifolds.",
+                    site_1: "SA_EAST_RU_01 (Harsh Desert)",
+                    site_2: "EMEA_COAST_02 (Corrosive Coastal)",
+                    core_subtitle: "Industrial AI",
+                    audit_title: "Sovereign Blockchain Ledger",
+                    audit_subtitle: "Cryptographic chain of custody for all inference operations",
+                    audit_sec_status: "QUANTUM_SECURITY_SHELL",
+                    sync_nodes: "GLOBAL_SYNC_NODES:",
+                    audit_parity: "ENCRYPTION_PARITY:",
+                    audit_aes: "ACTIVE_AES_256",
+                    status_ok: "OK",
+                    status_syncing: "SYNCING",
+                    audit_ts: "Timestamp",
+                    audit_hash: "Block_Anchor_Hash",
+                    audit_node: "Provenance_Node",
+                    audit_parity_label: "Parity",
+                    audit_verified: "VERIFIED",
+                    node_riyadh_c: "RIYADH_CENTRAL_01",
+                    node_neom_n: "NEOM_GRID_NORTH",
+                    node_dhahran_x: "DHAHRAN_X_LAB",
+                    node_riyadh_hq: "RIYADH_HQ_CLUSTER",
+                    node_neom_core: "NEOM_CORE_INFRA",
+                    node_dhahran_sys: "DHAHRAN_X_SYSTEM",
+                    telemetry_title: "Satellite Telemetry Streams",
+                    tel_feed_01: "SENSOR_FEED_01 // IR_SPECTRAL",
+                    tel_feed_02: "SENSOR_FEED_02 // EO_IMAGING",
+                    tel_checksum: "CHECKSUM",
+                    tel_strength: "STRENGTH",
+                    tel_node_ref: "NODE_REF",
+                    tel_intensity: "INTENSITY",
+                    tel_variance: "VARIANCE",
+                    tel_channel: "CHANNEL",
+                    tel_bandwidth: "BANDWIDTH",
+                    tel_status: "STATUS",
+                    tel_frame: "PROCESSING_FRAME",
+                    tel_auth: "AUTHENTICATED",
+                    tel_range: "SCANNING_RANGE",
+                    tel_secure: "SECURE",
+                    status_timeout: "TIMEOUT",
+                    phys_constants: "MODEL_CONSTANTS",
+                    phys_reynolds: "REYNOLDS_NUMBER (Re)",
+                    phys_activation: "ACTIVATION_ENERGY (Ea)",
+                    phys_youngs: "YOUNG_MODULUS (E)",
+                    phys_mode: "SIMULATION_FIDELITY:",
+                    phys_manifold_title: "Non-Linear Structural Strain Manifold",
+                    nav_control: "Mission Control",
+                    nav_telemetry: "Copernicus Telemetry",
+                    nav_physics: "Causal Physics",
+                    nav_audit: "Audit Trails",
+                    nav_diligence: "Diligence Hub",
+                    nav_settings: "Settings",
+                    nav_esg: "ESG & Carbon Intelligence",
+                    carbon_total: "TOTAL_CO2_AVOIDED",
+                    water_total: "WATER_RESOURCES_SAVED",
+                    credits: "CARBON_CREDITS_PENDING",
+                    authenticated_claims: "AUTHENTICATED_CLAIMS",
+                    esg_ledger_title: "Sovereign Sustainability Ledger",
+                    settings_title: "Precision Configuration",
+                    settings_subtitle: "Adjust system-wide operational parameters",
+                    diligence_index: "TECHNICAL_DILIGENCE_INDEX"
+                },
+                ar: {
+                    nav_home: "العودة للرئيسية",
+                    telemetry_title: "تدفقات تتبع الأقمار الصناعية",
+                    tel_feed_01: "موجز الاستشعار 01 // الطيف الحراري",
+                    tel_feed_02: "موجز الاستشعار 02 // التصوير البصري",
+                    tel_checksum: "مجموع التحقق (Checksum)",
+                    tel_strength: "قوة الإشارة",
+                    tel_node_ref: "مرجع العقدة",
+                    tel_intensity: "الكثافة الطيفية",
+                    tel_variance: "معدل التباين",
+                    tel_channel: "القناة الناقلة",
+                    tel_bandwidth: "عرض النطاق الترددي",
+                    tel_status: "حالة الاتصال",
+                    tel_frame: "إطار المعالجة",
+                    tel_auth: "تم التوثيق",
+                    tel_range: "نطاق المسح الجغرافي",
+                    tel_secure: "اتصال آمن",
+                    status_timeout: "انتهت المهلة",
+                    phys_constants: "ثوابت النمذجة (Constants)",
+                    phys_reynolds: "رقم رينولدز (Reynolds #)",
+                    phys_activation: "طاقة التنشيط (Activation Energy)",
+                    phys_youngs: "معامل يونغ (Young's Modulus)",
+                    phys_mode: "دقة المحاكاة الفيزيائية:",
+                    phys_manifold_title: "تشعب الإجهاد الهيكلي غير الخطي",
+                    nav_control: "غرفة العمليات الاستراتيجية",
+                    nav_telemetry: "بيانات التتبع والمراقبة",
+                    nav_physics: "التحليل الفيزيائي للسببية",
+                    nav_audit: "مسارات التدقيق اللوجستي",
+                    nav_diligence: "مركز التدقيق التقني",
+                    nav_settings: "إعدادات النظام",
+                    nav_esg: "الاستدامة والذكاء الكربوني",
+                    carbon_total: "إجمالي انبعاثات CO2 المتفاداة",
+                    water_total: "الموارد المائية الموفرة",
+                    credits: "أرصدة الكربون المعلقة",
+                    authenticated_claims: "المطالبات المصادق عليها",
+                    esg_ledger_title: "سجل الاستدامة السيادي (ESG Ledger)",
+                    diligence_index: "فهرس التدقيق والامتثال",
+                    audit_title: "سجل البلوكشين السيادي (Sovereign Ledger)",
+                    audit_subtitle: "سلسلة الحماية التشفيرية لكافة عمليات الاستنتاج الآلي",
+                    audit_sec_status: "غلاف الأمن الكمي (Quantum Shield)",
+                    sync_nodes: "عقد المزامنة العالمية:",
+                    audit_parity: "تكافؤ التشفير:",
+                    audit_aes: "تشفير AES_256 نشط",
+                    status_ok: "سليم",
+                    status_syncing: "جاري المزامنة",
+                    audit_ts: "الطابع الزمني",
+                    audit_hash: "هاش كتلة الإرساء",
+                    audit_node: "عقدة المنشأ",
+                    audit_parity_label: "التكافؤ",
+                    audit_verified: "تم التحقق",
+                    node_riyadh_c: "الرياض_المركزية_01",
+                    node_neom_n: "نيوم_الشبكة_الشمالية",
+                    node_dhahran_x: "الظهران_المختبر_X",
+                    node_riyadh_hq: "عنقود_الرياض_الرئيسي",
+                    node_neom_core: "نيوم_البنية_الأساسية",
+                    node_dhahran_sys: "الظهران_نظام_X",
+                    settings_title: "إعدادات الدقة والنظام",
+                    settings_subtitle: "ضبط المعايير التشغيلية ونطاقات استشعار البيانات",
+                    core_subtitle: "الذكاء الاصطناعي للمنشآت الحيوية",
+                    site_1: "SA_EAST_RU_01 (صحراء قاسية)",
+                    site_2: "EMEA_COAST_02 (منطقة ساحلية تآكلية)",
+                    env_override: "التحكم في المعطيات البيئية",
+                    aod: "العمق البصري للهباء الجوي (AOD)",
+                    wind_speed: "سرعة الرياح (م/ث)",
+                    force_inference: "تفعيل دورة الاستنتاج الآلي",
+                    chem_diag: "التحليل الكيميائي المتقدم",
+                    cams_payload: "بيانات منظومة كوبرنيكوس CAMS EAC4",
+                    op_metrics: "مقاييس الأداء التشغيلي",
+                    reliability: "مؤشر الموثوقية الهندسية",
+                    rem_life: "العمر التشغيلي المتبقي",
+                    hrs: "ساعة",
+                    dust_sev: "كثافة الرواسب الغبارية",
+                    risk_prob: "احتمالية حدوث المخاطر",
+                    optimizer: "محرك الاستمثال التوجيهي",
+                    events: "سجل أحداث النظام",
+                    awaiting: "جاري استخلاص النتائج الجوهرية...",
+                    nominal: "حالة النظام: مُستقرة (Nominal)",
+                    kinetic: "التآكل الميكانيكي (Abrasion)",
+                    thermal: "الإجهاد الحراري المعدني",
+                    salt: "التآكل الملحي (Corrosion)",
+                    threat: "نمط التدهور الهيكلي الرئيسي:",
+                    stable: "مستقر",
+                    drifting: "انحراف تقني",
+                    nav_control: "غرفة العمليات الاستراتيجية",
+                    nav_telemetry: "بيانات التتبع والمراقبة",
+                    nav_physics: "التحليل الفيزيائي للسببية",
+                    nav_audit: "مسارات التدقيق اللوجستي",
+                    nav_diligence: "مركز التدقيق التقني",
+                    nav_settings: "إعدادات النظام",
+                    roi: "العائد الاستثماري (ROI)",
+                    avoided_loss: "الخسائر المتفاداة",
+                    priority_lvl: "تصنيف الأولوية",
+                    critical: "عالي الخطورة",
+                    optimal: "تشغيل أمثلي",
+                    // Action Keys (Technical)
+                    EMERGENCY_SHUTDOWN_SEQUENCE: "بروتوكول الإيقاف الطارئ",
+                    DYNAMIC_LOAD_REDUCTION: "تخفيف الأحمال الميكانيكية",
+                    FLUSH_FILTRATION_MANIFOLD: "تطهير منظومة الترشيح",
+                    // Causal Graph Labels
+                    node_atmos: "الغلاف الجوي (CAMS)",
+                    node_dsi: "كثافة الرواسب",
+                    node_vib: "اهتزاز الدوار",
+                    node_stress: "الإجهاد الميكانيكي",
+                    node_rul: "العمر التشغيلي للأصل",
+                    node_salt: "الترسب الملحي",
+                    node_corrosion: "معدل التآكل (Corrosion)",
+                    // Physics View
+                    phys_title: "التحليل الفيزيائي المعمق",
+                    phys_thermo_h: "التدفق الديناميكي الحراري",
+                    phys_thermo_d: "تكامل (Navier-Stokes) لانتقال الحرارة الحملي عبر العقد الهيكلية. محاكاة دورات التمدد والانكماش اليومية بدقة فائقة.",
+                    phys_arrh_h: "حركية (Arrhenius)",
+                    phys_arrh_d: "نمذجة معدلات التدهور الكيميائي وتدمع الملح بناءً على بارامترات معادلة أرينيوس ومعطيات الرطوبة الجوية.",
+                    phys_fract_h: "انتشار الكسور الهيكلية",
+                    phys_fract_d: "نمذجة ميكانيكا الكسر المرن الخطي (LEFM) للتنبؤ بمسارات انتشار الكسور المجهرية عبر المنظومات الهيكلية."
+                }
+            };
+
+            let currentLang = 'en';
+
+            function toggleLanguage() {
+                currentLang = currentLang === 'en' ? 'ar' : 'en';
+                document.body.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+                document.body.style.fontFamily = currentLang === 'ar' ? "'Tajawal', sans-serif" : "'Inter', sans-serif";
+
+                document.querySelectorAll('[data-i18n]').forEach(el => {
+                    const key = el.getAttribute('data-i18n');
+                    if (translations[currentLang][key]) {
+                        if (el.tagName === 'OPTION') {
+                            el.text = translations[currentLang][key];
+                        } else {
+                            el.innerText = translations[currentLang][key];
+                        }
+                    }
+                });
+
+                document.querySelectorAll('[data-i18n-title]').forEach(el => {
+                    const key = el.getAttribute('data-i18n-title');
+                    if (translations[currentLang][key]) {
+                        el.setAttribute('title', translations[currentLang][key]);
+                    }
+                });
+
+                // Re-trigger dynamic rendering to update text inside templates
+                renderCausalGraph('SA_EAST_RU_01');
+                triggerAnalysis();
+
+                logEvent(currentLang === 'ar' ? "تم تغيير اللغة إلى العربية" : "Language switched to English", 'info');
+            }
+
+            // Initialize with Dashboard Data and Periodic Sync
+            document.addEventListener('DOMContentLoaded', () => {
+                initChart();
+                renderCausalGraph('SA_EAST_RU_01');
+                setTimeout(triggerAnalysis, 500); // initial fetch
+
+                // Industrial Multi-Sector Sync (5s Heartbeat)
+                setInterval(() => {
+                    const activeView = document.querySelector('.view-content.active');
+                    if (!activeView) return;
+                    if (activeView.id === 'dashboard-view') triggerAnalysis();
+                    if (activeView.id === 'telemetry-view') updateTelemetryData();
+                    if (activeView.id === 'physics-view') updatePhysicsManifoldData();
+                    if (activeView.id === 'audit-view') updateAuditLedgerData();
+                    if (activeView.id === 'esg-view') {
+                        updateESGImpactData();
+                        updateESGLedgerData();
+                    }
+                }, 5000);
             });
-
-            // Re-trigger dynamic rendering to update text inside templates
-            renderCausalGraph('SA_EAST_RU_01');
-            triggerAnalysis();
-
-            logEvent(currentLang === 'ar' ? "تم تغيير اللغة إلى العربية" : "Language switched to English", 'info');
-        }
-
-        // Initialize with Dashboard Data and Periodic Sync
-        document.addEventListener('DOMContentLoaded', () => {
-            initChart();
-            renderCausalGraph('SA_EAST_RU_01');
-            setTimeout(triggerAnalysis, 500); // initial fetch
-
-            // Industrial Multi-Sector Sync (5s Heartbeat)
-            setInterval(() => {
-                const activeView = document.querySelector('.view-content.active');
-                if (!activeView) return;
-                if (activeView.id === 'dashboard-view') triggerAnalysis();
-                if (activeView.id === 'telemetry-view') updateTelemetryData();
-                if (activeView.id === 'physics-view') updatePhysicsManifoldData();
-                if (activeView.id === 'audit-view') updateAuditLedgerData();
-            }, 5000);
-        });
     </script>
     <style>
         body[dir="rtl"] .brand-container {

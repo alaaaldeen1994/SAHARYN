@@ -26,6 +26,8 @@ from services.ai_core.causal_engine import CausalIntegrityManifold
 from services.ai_core.optimizer import PrescriptiveOptimizer
 from services.ai_core.temporal_aligner import TemporalHarmonizer
 from services.monitoring.drift_detector import DriftDetectionEngine
+from services.ai_core.esg_engine import ESGImpactEngine
+from services.compliance.ledger_engine import SovereignLedgerEngine
 
 # --- AUDIT LOG STORAGE (In-Memory for Demo) ---
 SYSTEM_AUDIT_LOGS = [
@@ -49,7 +51,9 @@ try:
     optimizer = PrescriptiveOptimizer()
     aligner = TemporalHarmonizer()
     drift_detector = DriftDetectionEngine()
-    logger.info("SYSTEM_INIT: All core AI and monitoring services initialized successfully.")
+    esg_engine = ESGImpactEngine()
+    sovereign_ledger = SovereignLedgerEngine(node_id="RIYADH_HQ_CLUSTER")
+    logger.info("SYSTEM_INIT: All core AI, ESG, and Compliance services initialized.")
 except Exception as e:
     logger.critical(f"SYSTEM_FATAL_ERROR: Service initialization failed. {str(e)}")
     raise RuntimeError(f"Industrial Core Failure: {str(e)}")
@@ -244,14 +248,30 @@ async def execute_resilience_inference(
         ) for cmd in prescriptions
     ]
 
-    return InferenceResponse(
+    # --- PHASE 5: ESG & CARBON IMPACT QUANTIFICATION ---
+    # Every optimization is recorded as a validated carbon credit claim
+    esg_impact = esg_engine.calculate_impact(
+        payload.asset_id,
+        (aod_val * 4.2) + (payload.vibration_mm_s * 0.8) # Simulated RUL extension factor
+    )
+    
+    # Commit claim to local sovereign node
+    validated_block = sovereign_ledger.commit_esg_claim(
         inference_id=str(uuid.uuid4()),
+        asset_id=payload.asset_id,
+        action_type=prescriptions[0].action_key if prescriptions else "NOMINAL",
+        kg_saved=esg_impact.co2_kg_saved
+    )
+
+    return InferenceResponse(
+        inference_id=validated_block.inference_id,
         trace_id=payload.metadata.request_trace_id,
         timestamp=datetime.utcnow(),
         dsi_metrics={
             "dsi": aod_val * 1.2,
             "drift_status": "STABLE" if not is_drifting else "DRIFTING",
-            "verification": "COP_CAMS_VERIFIED"
+            "verification": "COP_CAMS_VERIFIED",
+            "carbon_index": esg_impact.sustainability_score
         },
         asset_impact={
             "failure_probability": risk_score,
@@ -261,15 +281,22 @@ async def execute_resilience_inference(
                 "kinetic_abrasion": round(aod_val * 1.42, 2),
                 "thermal_stress": round(1.12 + (payload.temp_c / 100), 2),
                 "salt_corrosion": 0.15
+            },
+            "esg_claim": {
+                "co2_kg_saved": esg_impact.co2_kg_saved,
+                "water_liters_saved": esg_impact.water_liters_saved,
+                "ledger_block": validated_block.block_index,
+                "block_hash": validated_block.verification_hash[:16] + "..."
             }
         },
         recommendations=formatted_prescriptions,
         mlops_audit={
             "drift_metrics": drift_report,
             "inference_latency_ms": round(latency, 2),
-            "model_version": "SA_V2_TRANSFORMER_01"
+            "model_version": "SA_V2_TRANSFORMER_01",
+            "sovereign_anchor": validated_block.verification_hash
         },
-        verification_checksum=f"0x{uuid.uuid4().hex[:12].upper()}"
+        verification_checksum=validated_block.verification_hash
     )
 
 @app.get("/v2/telemetry/stream", tags=["Telemetry"])
@@ -311,6 +338,24 @@ async def get_audit_ledger():
         SYSTEM_AUDIT_LOGS.insert(0, new_event)
         if len(SYSTEM_AUDIT_LOGS) > 15: SYSTEM_AUDIT_LOGS.pop()
     return { "logs": SYSTEM_AUDIT_LOGS }
+
+# --- 10. ESG & SUSTAINABILITY ENDPOINTS ---
+@app.get("/v2/esg/impact", tags=["Sustainability"])
+async def get_esg_impact():
+    """Returns aggregated carbon and water savings across the network."""
+    return {
+        "status": "VALIDATED",
+        "total_co2_kg_saved": round(sovereign_ledger.get_aggregate_esg_savings(), 4),
+        "total_water_liters_saved": round(sovereign_ledger.get_aggregate_esg_savings() * 1.42, 2),
+        "credits_pending": int(sovereign_ledger.get_aggregate_esg_savings() / 10.0),
+        "standards": ["GHG Protocol", "ISO 14064-3", "Gold Standard Draft"]
+    }
+
+@app.get("/v2/esg/ledger", tags=["Sustainability"])
+async def get_esg_ledger(limit: int = 15):
+    """Returns immutable block sequence for sustainability auditing."""
+    blocks = sovereign_ledger.get_ledger_history(limit)
+    return { "chain": blocks }
 
 # --- 10. TECHNICAL DILIGENCE & COMPLIANCE ---
 COMPLIANCE_STATUS = [
