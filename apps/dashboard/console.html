@@ -285,7 +285,7 @@
         }
 
         .view-content.active {
-            display: grid;
+            display: grid !important;
         }
 
         #esg-view.active {
@@ -819,8 +819,7 @@
 
 
         <!-- ESG VIEW -->
-        <div id="esg-view" class="view-content"
-            style="display: none; width: 100%; max-width: 100vw; grid-template-columns: 1fr;">
+        <div id="esg-view" class="view-content" style="width: 100%; max-width: 100vw; grid-template-columns: 1fr;">
             <div style="display: flex; flex-direction: column; gap: 30px; padding: 30px;">
                 <!-- TOP ESG STATS -->
                 <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
@@ -1618,6 +1617,7 @@
 
         // Navigation Logic
         function switchTab(tabId) {
+            console.log("Switching to tab:", tabId);
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.classList.remove('active');
                 if (item.getAttribute('onclick')?.includes(tabId)) {
@@ -1628,7 +1628,13 @@
             document.querySelectorAll('.view-content').forEach(view => {
                 view.classList.remove('active');
             });
-            document.getElementById(`${tabId}-view`).classList.add('active');
+
+            const targetView = document.getElementById(`${tabId}-view`);
+            if (targetView) {
+                targetView.classList.add('active');
+            } else {
+                console.error("View not found:", `${tabId}-view`);
+            }
 
             logEvent(`Switching to Command Sector: ${tabId.toUpperCase()}`, 'info');
 
@@ -1642,7 +1648,6 @@
             }
             if (tabId === 'diligence') logEvent("Diligence Whitepaper Accessed", "info");
 
-            // Re-initialize Lucide for newly rendered/visible dynamic content
             if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
