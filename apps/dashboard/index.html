@@ -380,6 +380,69 @@
             color: var(--accent);
         }
 
+        /* --- CARBON STRIP --- */
+        .carbon-strip {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(16, 185, 129, 0.04);
+            border-top: 1px solid rgba(16, 185, 129, 0.2);
+            padding: 18px 10%;
+            display: flex;
+            align-items: center;
+            gap: 50px;
+            z-index: 20;
+            backdrop-filter: blur(10px);
+        }
+
+        .carbon-strip-label {
+            font-family: var(--font-tech);
+            font-size: 9px;
+            color: var(--accent);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.7;
+            white-space: nowrap;
+        }
+
+        .carbon-strip-val {
+            font-family: var(--font-heading);
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--accent);
+            letter-spacing: -1px;
+            white-space: nowrap;
+        }
+
+        .carbon-strip-meta {
+            font-family: var(--font-tech);
+            font-size: 9px;
+            color: var(--text-dim);
+            line-height: 2.2;
+            letter-spacing: 1px;
+            border-left: 1px solid rgba(16, 185, 129, 0.15);
+            padding-left: 30px;
+        }
+
+        .carbon-strip-divider {
+            width: 1px;
+            height: 40px;
+            background: rgba(16, 185, 129, 0.15);
+        }
+
+        body[dir="rtl"] .carbon-strip {
+            flex-direction: row-reverse;
+        }
+
+        body[dir="rtl"] .carbon-strip-meta {
+            border-left: none;
+            border-right: 1px solid rgba(16, 185, 129, 0.15);
+            padding-left: 0;
+            padding-right: 30px;
+            text-align: right;
+        }
+
         /* --- SIDE HUD --- */
         .side-hud {
             position: absolute;
@@ -630,6 +693,28 @@
             <div class="hud-card">
                 <div class="hud-label" data-i18n="hud_stability">CAUSAL_STABILITY</div>
                 <div class="hud-val" id="val-stability">96.4%</div>
+            </div>
+        </div>
+
+        <!-- CARBON LEDGER STRIP -->
+        <div class="carbon-strip">
+            <div>
+                <div class="carbon-strip-label">SOVEREIGN_CARBON_LEDGER</div>
+                <div class="carbon-strip-val">+4.2t <span style="font-size: 14px; opacity: 0.6; font-weight: 400;">CO₂e
+                        SAVED</span></div>
+            </div>
+            <div class="carbon-strip-divider"></div>
+            <div class="carbon-strip-meta">
+                [ CLAIM_ID: SHRN-DXB-0082 ]<br>
+                [ STATUS: CRYPTOGRAPHICALLY_ANCHORED ]<br>
+                [ PROTOCOL: GHG_SCOPE_3_VALIDATED ]
+            </div>
+            <div style="margin-left: auto; display: flex; align-items: center; gap: 8px;">
+                <div
+                    style="width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse 2s infinite;">
+                </div>
+                <span
+                    style="font-family: var(--font-tech); font-size: 9px; color: var(--accent); letter-spacing: 2px; opacity: 0.8;">LIVE_CHAIN_SYNC</span>
             </div>
         </div>
     </header>
