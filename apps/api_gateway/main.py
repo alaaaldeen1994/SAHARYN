@@ -106,12 +106,12 @@ app = FastAPI(
 )
 
 # --- 4. INTEGRATED MISSION CONTROL (Dashboard Mount) ---
-# Allows institutional stakeholders to access the UI via the same production gateway.
-app.mount("/dashboard", StaticFiles(directory="apps/dashboard"), name="dashboard")
-
 @app.get("/", include_in_schema=False)
 async def root_redirect():
+    """Enterprise Redirect to Operational Dashboard."""
     return RedirectResponse(url="/dashboard/console.html")
+
+app.mount("/dashboard", StaticFiles(directory="apps/dashboard"), name="dashboard")
 
 
 # --- 5. MIDDLEWARE (Security & Observation) ---

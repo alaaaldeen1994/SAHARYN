@@ -10,6 +10,8 @@ def run_test():
     env = os.environ.copy()
     env["PYTHONPATH"] = "."
     
+    env["PORT"] = "8005"
+    
     # Start the gateway
     process = subprocess.Popen(
         ["python", "apps/api_gateway/main.py"],
@@ -22,7 +24,7 @@ def run_test():
     # Wait for it to boot
     time.sleep(5)
     
-    url = "http://localhost:8003/v2/inference/resilience"
+    url = "http://localhost:8005/v2/inference/resilience"
     headers = {
         "X-API-KEY": "ENTERPRISE_SECRET_VERIFIED_7M",
         "Content-Type": "application/json"
