@@ -109,7 +109,7 @@ app = FastAPI(
 @app.get("/", include_in_schema=False)
 async def root_redirect():
     """Enterprise Redirect to Operational Dashboard."""
-    return RedirectResponse(url="/dashboard/console.html")
+    return RedirectResponse(url="/dashboard/index.html")
 
 app.mount("/dashboard", StaticFiles(directory="apps/dashboard"), name="dashboard")
 

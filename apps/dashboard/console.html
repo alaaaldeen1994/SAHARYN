@@ -558,6 +558,10 @@
                 style="width: 30px; height: 30px; background: var(--accent-green); clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); box-shadow: 0 0 10px var(--accent-green-dim);">
             </div>
         </div>
+        <a href="index.html" class="nav-item" data-i18n-title="nav_home" title="Home"
+            style="color: inherit; text-decoration: none;">
+            <i data-lucide="home" size="20"></i>
+        </a>
         <div class="nav-item active" data-i18n-title="nav_control" title="Mission Control"
             onclick="switchTab('dashboard')"><i data-lucide="gauge" size="20"></i></div>
         <div class="nav-item" data-i18n-title="nav_telemetry" title="Copernicus Telemetry"
@@ -1833,6 +1837,7 @@
         // Multi-Language System
         const translations = {
             en: {
+                nav_home: "Back to Home",
                 core_title: "CORE / Industrial AI",
                 env_override: "Environmental Override",
                 aod: "Aerosol Optical Depth (AOD)",
@@ -1941,6 +1946,7 @@
                 diligence_index: "TECHNICAL_DILIGENCE_INDEX"
             },
             ar: {
+                nav_home: "العودة للرئيسية",
                 telemetry_title: "تدفقات تتبع الأقمار الصناعية",
                 tel_feed_01: "موجز الاستشعار 01 // الطيف الحراري",
                 tel_feed_02: "موجز الاستشعار 02 // التصوير البصري",
