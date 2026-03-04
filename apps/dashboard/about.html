@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAHARYN | Technical Diligence & Whitepaper</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Outfit:wght@300;600;800&family=JetBrains+Mono:wght@400;700&family=Tajawal:wght@400;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg: #030712;
+            --panel-bg: #0a0f1a;
+            --accent-green: #10b981;
+            --accent-green-dim: rgba(16, 185, 129, 0.1);
+            --border-color: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --font-main: 'Inter', sans-serif;
+            --font-tech: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        body[dir="rtl"] {
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 80px 24px;
+        }
+
+        /* Header Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: rgba(3, 7, 18, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: #fff;
+        }
+
+        .logo-hex {
+            width: 24px;
+            height: 24px;
+            background: var(--accent-green);
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+
+        .btn-simple {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .btn-simple:hover {
+            color: var(--accent-green);
+        }
+
+        .lang-switch {
+            background: var(--accent-green-dim);
+            border: 1px solid var(--accent-green);
+            color: var(--accent-green);
+            padding: 6px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: var(--font-tech);
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        /* Section Styling */
+        section {
+            margin-bottom: 100px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: 0.8s ease-out forwards;
+        }
+
+        section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        h1 {
+            font-size: 64px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            letter-spacing: -2px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--accent-green);
+            font-family: var(--font-tech);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 14px;
+            margin-bottom: 40px;
+            display: block;
+        }
+
+        .bilingual-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+        }
+
+        .content-en {
+            text-align: left;
+        }
+
+        .content-ar {
+            text-align: right;
+            direction: rtl;
+        }
+
+        p {
+            font-size: 17px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        strong {
+            color: #fff;
+        }
+
+        /* Tech Box */
+        .tech-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 40px;
+            margin-top: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tech-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--accent-green);
+        }
+
+        .equation-box {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 24px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-family: var(--font-tech);
+            color: var(--accent-green);
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .label-tech {
+            font-size: 12px;
+            color: var(--accent-green);
+            opacity: 0.6;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        /* Features list */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .feature-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            padding: 24px;
+            border-radius: 8px;
+        }
+
+        .feature-item i {
+            color: var(--accent-green);
+            margin-bottom: 15px;
+        }
+
+        footer {
+            border-top: 1px solid var(--border-color);
+            padding: 60px 0;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        @media (max-width: 850px) {
+            .bilingual-grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            h1 {
+                font-size: 40px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <a href="index.html" class="brand">
+            <div class="logo-hex"></div>
+            <span style="font-weight: 800; font-family: 'Outfit';">SAHARYN</span>
+        </a>
+        <div class="nav-links">
+            <a href="console.html" class="btn-simple">MISSION CONTROL</a>
+            <button class="lang-switch" onclick="toggleLanguage()">EN / عربي</button>
+        </div>
+    </nav>
+
+    <main class="container">
+
+        <!-- INTRO -->
+        <section id="intro">
+            <span class="subtitle">System Architecture & Core Intelligence</span>
+            <h1 id="main-title">Behind the Machine</h1>
+            <div class="bilingual-grid">
+                <div class="content-en">
+                    <p>SAHARYN is an <strong>Industrial Resilience Engine</strong> designed to solve the challenge of
+                        infrastructure decay in harsh desert environments. By combining aerospace-grade physics with
+                        real-time satellite telemetry, we move beyond simple "AI monitoring" into <strong>Autonomous
+                            Causal Inference</strong>.</p>
+                </div>
+                <div class="content-ar">
+                    <p>"صحارين" هو <strong>محرك للمرونة الصناعية</strong> مصمم لحل تحديات تآكل البنية التحتية في البيئات
+                        الصحراوية القاسية. من خلال دمج فيزياء الفضاء مع بيانات الأقمار الصناعية الفورية، ننتقل من
+                        "مراقبة الذكاء الاصطناعي" البسيطة إلى <strong>الاستدلال السببي الذاتي</strong>.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- PHYSICS ENGINE -->
+        <section id="physics">
+            <span class="subtitle">1. Physics-Informed Causal Mesh</span>
+            <div class="bilingual-grid">
+                <div class="content-en">
+                    <p>Most AI systems use "pattern matching," which fails when conditions change. SAHARYN uses
+                        <strong>Physics-Informed Neural Networks (PINNs)</strong>. We model the actual stress tensors
+                        and fluid dynamics acting on an asset.
+                    </p>
+                </div>
+                <div class="content-ar">
+                    <p>تستخدم معظم أنظمة الذكاء الاصطناعي "مطابقة الأنماط"، والتي تفشل عند تغير الظروف. تستخدم "صحارين"
+                        <strong>الشبكات العصبية القائمة على الفيزياء (PINNs)</strong>. نحن نمذجة مجهودات الإجهاد الفعلية
+                        وديناميكيات السوائل المؤثرة على الأصول.
+                    </p>
+                </div>
+            </div>
+
+            <div class="tech-card">
+                <span class="label-tech">// THE STRESS-PROPAGATION EQUATION</span>
+                <div class="equation-box">
+                    S_{total} = \int_{0}^{t} (\kappa \cdot AOD(\tau) + \nu \cdot V(\tau)) d\tau + \Omega_{static}
+                </div>
+                <div class="bilingual-grid" style="gap: 20px;">
+                    <div class="content-en" style="font-size: 13px;">
+                        <p>Total accumulated stress (S) is the integral of <strong>Dust Load (AOD)</strong> and
+                            <strong>Vibration (V)</strong> over time, multiplied by material constants (κ, ν).
+                        </p>
+                    </div>
+                    <div class="content-ar" style="font-size: 13px;">
+                        <p>إجمالي الإجهاد المتراكم (S) هو تكامل <strong>حمولة الغبار (AOD)</strong> و <strong>الاهتزاز
+                                (V)</strong> بمرور الوقت، مضروباً في ثوابت المواد (κ, ν).</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SOVEREIGN EDGE -->
+        <section id="security">
+            <span class="subtitle">2. Sovereign Edge Inference</span>
+            <div class="bilingual-grid">
+                <div class="content-en">
+                    <p>National security infrastructure cannot depend on global cloud processing. SAHARYN implements
+                        <strong>Sovereign Edge Computing</strong>. When "Sovereign Mode" is engaged, 100% of data
+                        processing remains within local facility servers in Saudi Arabia.
+                    </p>
+                </div>
+                <div class="content-ar">
+                    <p>لا يمكن للبنية التحتية للأمن القومي الاعتماد على المعالجة السحابية العالمية. تطبق "صحارين"
+                        <strong>الحوسبة السيادية على الحافة</strong>. عند تفعيل "الوضع السيادي"، تظل 100٪ من معالجة
+                        البيانات داخل خوادم المنشأة المحلية في المملكة العربية السعودية.
+                    </p>
+                </div>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <i data-lucide="shield-check" size="32"></i>
+                    <h4 style="margin-bottom: 10px;">Zero-Trust Architecture</h4>
+                    <p style="font-size: 13px;">No raw telemetry leaves the Kingdom's perimeter during peak operations.
+                    </p>
+                </div>
+                <div class="feature-item">
+                    <i data-lucide="database" size="32"></i>
+                    <h4 style="margin-bottom: 10px;">Immutable Ledger</h4>
+                    <p style="font-size: 13px;">Every carbon credit and safety alarm is cryptographically signed and
+                        anchored.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ESG MECHANISM -->
+        <section id="esg">
+            <span class="subtitle">3. Sustainability Quantification</span>
+            <div class="bilingual-grid">
+                <div class="content-en">
+                    <p>How do we calculate Carbon Savings? We measure the <strong>Manufacturing Overhead
+                            Offset</strong>. By extending the Remaining Useful Life (RUL) of an asset, we postpone the
+                        carbon-intensive process of replacement and logistics.</p>
+                </div>
+                <div class="content-ar">
+                    <p>كيف نحسب توفير الكربون؟ نقوم بقياس <strong>تعويض أعباء التصنيع الإضافية</strong>. من خلال إطالة
+                        العمر النافع المتبقي (RUL) للأصل، نؤجل العملية كثيفة الكربون للاستبدال والخدمات اللوجستية.</p>
+                </div>
+            </div>
+
+            <div class="tech-card" style="border-left-color: var(--accent-green);">
+                <span class="label-tech">// ESG YIELD MECHANISM</span>
+                <div class="equation-box" style="color: #fff;">
+                    CO2_{saved} = \frac{C_{mfg}}{T_{design}} \cdot \Delta RUL_{extension}
+                </div>
+                <div class="bilingual-grid" style="gap: 20px;">
+                    <div class="content-en" style="font-size: 13px;">
+                        <p>Avoidance is calculated as the ratio of <strong>Manufacturing Carbon (C_mfg)</strong> over
+                            <strong>Design Life (T)</strong>, multiplied by the <strong>Life Extension gained via
+                                AI</strong>.
+                        </p>
+                    </div>
+                    <div class="content-ar" style="font-size: 13px;">
+                        <p>يتم حساب التجنب كنسبة <strong>كربون التصنيع (C_mfg)</strong> على <strong>عمر التصميم
+                                (T)</strong>، مضروبة في <strong>تمديد العمر المكتسب عبر الذكاء الاصطناعي</strong>.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2024 SAHARYN INDUSTRIAL AI CORE. Riyadh, Kingdom of Saudi Arabia.</p>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        // Reveal sections on scroll
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('section').forEach(section => {
+            observer.observe(section);
+        });
+
+        function toggleLanguage() {
+            const body = document.body;
+            const currentDir = body.getAttribute('dir');
+            const newDir = currentDir === 'rtl' ? 'ltr' : 'rtl';
+            body.setAttribute('dir', newDir);
+
+            const btn = document.querySelector('.lang-switch');
+            btn.innerText = newDir === 'rtl' ? 'AR / EN' : 'EN / عربي';
+        }
+    </script>
+</body>
+
+</html>
