@@ -598,46 +598,46 @@
         .module-teaser-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 1px;
-            background: var(--border);
-            border: 1px solid var(--border);
+            gap: 20px;
             margin-top: 60px;
         }
 
         .module-teaser-item {
-            background: var(--bg);
-            padding: 25px;
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid var(--border);
+            padding: 30px;
             transition: 0.3s;
             position: relative;
             overflow: hidden;
+            backdrop-filter: blur(10px);
         }
 
         .module-teaser-item:hover {
             background: rgba(16, 185, 129, 0.08);
-            border-top: 2px solid var(--accent);
-            padding-top: 23px;
-            /* visual stability */
+            border-color: var(--accent);
+            transform: translateY(-5px);
         }
 
         .module-teaser-item i {
             color: var(--accent);
-            margin-bottom: 20px;
-            opacity: 0.8;
+            margin-bottom: 25px;
+            opacity: 1;
         }
 
         .module-teaser-item h4 {
             font-family: var(--font-tech);
-            font-size: 10px;
+            font-size: 12px;
             color: var(--accent);
             letter-spacing: 2px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             text-transform: uppercase;
         }
 
         .module-teaser-item .action-aim {
-            font-size: 13px;
-            color: var(--text-dim);
-            line-height: 1.5;
+            font-size: 15px;
+            color: #fff;
+            line-height: 1.6;
+            font-weight: 400;
         }
 
         .module-teaser-item strong {
@@ -1086,15 +1086,15 @@
                 footer_desc: "Securing the industrial edge through autonomous atmospheric intelligence and causal mapping infrastructure. Validated for high-consequence desert operations globally.",
                 rights: "ALL RIGHTS RESERVED // SECURE_ACCESS_GRANTED",
                 f1_title: "1. SATELLITE FUSION",
-                f1_desc: "AOD Ingestion | Threat Detection",
+                f1_desc: "Watch Dust Storms | Predict Weather Threats",
                 f2_title: "2. STRESS MAPPING",
-                f2_desc: "Live Physics Mesh | Precise Maintenance",
+                f2_desc: "Virtual 3D Map | Spot Wear and Tear",
                 f3_title: "3. CAUSAL LOGIC",
-                f3_desc: "Trigger Correlation | Root-Cause Proof",
+                f3_desc: "Find Hidden Links | Real Problem Solving",
                 f4_title: "4. OPTIMIZER",
-                f4_desc: "Load Adjustment | Life Extension",
+                f4_desc: "Balance the Load | Make Asset last longer",
                 f5_title: "5. CARBON LEDGER",
-                f5_desc: "Offset Tracking | ESG Validation"
+                f5_desc: "Count Saved Carbon | Certified Green Data"
             },
             ar: {
                 nav_home: "الرئيسية",
@@ -1140,15 +1140,15 @@
                 footer_desc: "تأمين الحافة الصناعية عبر الذكاء الجوي الذاتي والبنية التحتية لرسم الخرائط السببية. تم الاعتماد للعمليات الحرجة في البيئات الصحراوية عالمياً.",
                 rights: "جميع الحقوق محفوظة // تم التصريح بالوصول الآمن",
                 f1_title: "1. الدمج الفضائي",
-                f1_desc: "سحب بيانات الغبار | رصد التهديدات",
+                f1_desc: "تتبع العواصف الترابية | توقع التهديدات الجوية",
                 f2_title: "2. خرائط الإجهاد",
-                f2_desc: "محاكاة فيزيائية حية | صيانة دقيقة",
+                f2_desc: "خرائط ثلاثية الأبعاد | رصد التهالك والأعطال",
                 f3_title: "3. المنطق السببي",
-                f3_desc: "ربط المحفزات | إثبات السبب الجذري",
+                f3_desc: "كشف الروابط المخفية | حلول حقيقية للمشاكل",
                 f4_title: "4. المحسن الإرشادي",
-                f4_desc: "موازنة الأحمال | إطالة عمر الأصل",
+                f4_desc: "موازنة الأحمال | إطالة عمر الأصول",
                 f5_title: "5. سجل الكربون",
-                f5_desc: "تتبع توفير دورة الحياة | توثيق الاستدامة"
+                f5_desc: "حساب توفير الكربون | توثيق الاستدامة المعتمد"
             }
         };
 
