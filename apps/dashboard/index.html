@@ -114,11 +114,6 @@
             text-align: right;
         }
 
-        body[dir="rtl"] .hero {
-            padding-top: 200px;
-            align-items: flex-start;
-        }
-
         body[dir="rtl"] .hero-content {
             margin-right: 0;
             margin-left: auto;
@@ -297,10 +292,10 @@
 
         /* --- HERO --- */
         .hero {
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
-            align-items: center;
-            padding: 0 10%;
+            align-items: flex-start;
+            padding: 220px 10% 100px 10%;
             position: relative;
         }
 
