@@ -2129,11 +2129,12 @@
             const apiStatusText = document.getElementById('api-status-text');
             const apiStatusDot = document.getElementById('api-status-dot');
 
-            apiStatus.style.background = 'rgba(245, 158, 11, 0.1)';
-            apiStatus.style.borderColor = 'rgba(245, 158, 11, 0.2)';
+            apiStatus.style.background = 'rgba(0, 255, 149, 0.05)';
+            apiStatus.style.borderColor = 'rgba(0, 255, 149, 0.2)';
             apiStatusText.innerText = 'AI_CORE: INFERRING';
-            apiStatusText.style.color = '#f59e0b';
-            apiStatusDot.style.background = '#f59e0b';
+            apiStatusText.style.color = 'var(--accent-green)';
+            apiStatusDot.style.background = 'var(--accent-green)';
+            apiStatusDot.classList.add('critical-pulse'); // Add pulsing to show activity
 
             const site = document.getElementById('site-selector').value;
             const aod = document.getElementById('aod-slider').value;
