@@ -305,7 +305,8 @@
         }
 
         .hero-content {
-            max-width: 800px;
+            width: 100%;
+            max-width: 1200px;
             z-index: 10;
         }
 
@@ -598,13 +599,72 @@
             height: 100%;
         }
 
-        h2.tech-heading {
-            font-size: clamp(32px, 5vw, 64px);
-            font-weight: 800;
+        /* --- DASHBOARD MODULES GRID --- */
+        .module-teaser-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            margin-top: 60px;
+        }
+
+        .module-teaser-item {
+            background: var(--bg);
+            padding: 25px;
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .module-teaser-item:hover {
+            background: rgba(16, 185, 129, 0.08);
+            border-top: 2px solid var(--accent);
+            padding-top: 23px;
+            /* visual stability */
+        }
+
+        .module-teaser-item i {
+            color: var(--accent);
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+
+        .module-teaser-item h4 {
+            font-family: var(--font-tech);
+            font-size: 10px;
+            color: var(--accent);
+            letter-spacing: 2px;
+            margin-bottom: 15px;
             text-transform: uppercase;
-            letter-spacing: -2px;
-            line-height: 0.9;
-            margin-bottom: 30px;
+        }
+
+        .module-teaser-item .action-aim {
+            font-size: 13px;
+            color: var(--text-dim);
+            line-height: 1.5;
+        }
+
+        .module-teaser-item strong {
+            color: var(--text-main);
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        body[dir="rtl"] .module-teaser-item {
+            text-align: right;
+        }
+
+        @media (max-width: 1024px) {
+            .module-teaser-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .module-teaser-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         /* --- THREE CANVAS --- */
@@ -664,7 +724,7 @@
             <a href="#mission" data-i18n="nav_mission">MISSION</a>
             <a href="#sectors" data-i18n="nav_sectors">SECTORS</a>
             <a href="#esg" data-i18n="nav_impact">IMPACT</a>
-            <a href="about.html" data-i18n="nav_about">ABOUT</a>
+            <a href="about.html" data-i118n="nav_about">ABOUT</a>
             <button onclick="toggleLanguage()" id="lang-toggle"
                 style="background: none; border: none; color: var(--text-dim); font-family: var(--font-tech); font-size: 11px; cursor: pointer; letter-spacing: 1px; font-weight: 600; opacity: 0.7; transition: opacity 0.2s;"
                 onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">EN / عربي</button>
@@ -683,45 +743,49 @@
             <div class="cta-stack">
                 <a href="console.html" class="launch-btn" data-i18n="hero_cta">ACCESS MISSION CONTROL</a>
             </div>
-        </div>
 
-        <!-- QUICK FUNCTIONS GRID (ACTION/AIM) -->
-        <div style="position: absolute; bottom: 80px; left: 10%; right: 10%; display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; z-index: 20;"
-            class="index-functions">
-            <div
-                style="background: rgba(16, 185, 129, 0.05); border: 1px solid var(--accent); padding: 15px; backdrop-filter: blur(10px);">
-                <div style="font-family: var(--font-tech); font-size: 10px; color: var(--accent); margin-bottom: 5px;"
-                    data-i18n="f1_title">1. SATELLITE FUSION</div>
-                <div style="font-size: 11px; color: #fff; line-height: 1.3;" data-i18n="f1_desc">
-                    <strong>Action:</strong> AOD Ingestion<br><strong>Aim:</strong> Threat Detection</div>
-            </div>
-            <div
-                style="background: rgba(16, 185, 129, 0.05); border: 1px solid var(--accent); padding: 15px; backdrop-filter: blur(10px);">
-                <div style="font-family: var(--font-tech); font-size: 10px; color: var(--accent); margin-bottom: 5px;"
-                    data-i18n="f2_title">2. STRESS MAPPING</div>
-                <div style="font-size: 11px; color: #fff; line-height: 1.3;" data-i18n="f2_desc">
-                    <strong>Action:</strong> Live Physics Mesh<br><strong>Aim:</strong> Precise Maintenance</div>
-            </div>
-            <div
-                style="background: rgba(16, 185, 129, 0.05); border: 1px solid var(--accent); padding: 15px; backdrop-filter: blur(10px);">
-                <div style="font-family: var(--font-tech); font-size: 10px; color: var(--accent); margin-bottom: 5px;"
-                    data-i18n="f3_title">3. CAUSAL LOGIC</div>
-                <div style="font-size: 11px; color: #fff; line-height: 1.3;" data-i18n="f3_desc">
-                    <strong>Action:</strong> Trigger Correlation<br><strong>Aim:</strong> Root-Cause Proof</div>
-            </div>
-            <div
-                style="background: rgba(16, 185, 129, 0.05); border: 1px solid var(--accent); padding: 15px; backdrop-filter: blur(10px);">
-                <div style="font-family: var(--font-tech); font-size: 10px; color: var(--accent); margin-bottom: 5px;"
-                    data-i18n="f4_title">4. OPTIMIZER</div>
-                <div style="font-size: 11px; color: #fff; line-height: 1.3;" data-i18n="f4_desc">
-                    <strong>Action:</strong> Load Adjustment<br><strong>Aim:</strong> Life Extension</div>
-            </div>
-            <div
-                style="background: rgba(16, 185, 129, 0.05); border: 1px solid var(--accent); padding: 15px; backdrop-filter: blur(10px);">
-                <div style="font-family: var(--font-tech); font-size: 10px; color: var(--accent); margin-bottom: 5px;"
-                    data-i18n="f5_title">5. CARBON LEDGER</div>
-                <div style="font-size: 11px; color: #fff; line-height: 1.3;" data-i18n="f5_desc">
-                    <strong>Action:</strong> Offset Tracking<br><strong>Aim:</strong> ESG Validation</div>
+            <!-- SYSTEM MODULES TEASER -->
+            <div class="module-teaser-grid">
+                <div class="module-teaser-item">
+                    <i data-lucide="satellite" size="20"></i>
+                    <h4 data-i18n="f1_title">1. SATELLITE FUSION</h4>
+                    <div class="action-aim" data-i18n="f1_desc">
+                        <strong>Action: AOD Ingestion</strong>
+                        Aim: Threat Detection
+                    </div>
+                </div>
+                <div class="module-teaser-item">
+                    <i data-lucide="activity" size="20"></i>
+                    <h4 data-i18n="f2_title">2. STRESS MAPPING</h4>
+                    <div class="action-aim" data-i18n="f2_desc">
+                        <strong>Action: Live Physics Mesh</strong>
+                        Aim: Precise Maintenance
+                    </div>
+                </div>
+                <div class="module-teaser-item">
+                    <i data-lucide="git-branch" size="20"></i>
+                    <h4 data-i18n="f3_title">3. CAUSAL LOGIC</h4>
+                    <div class="action-aim" data-i18n="f3_desc">
+                        <strong>Action: Trigger Correlation</strong>
+                        Aim: Root-Cause Proof
+                    </div>
+                </div>
+                <div class="module-teaser-item">
+                    <i data-lucide="zap" size="20"></i>
+                    <h4 data-i18n="f4_title">4. OPTIMIZER</h4>
+                    <div class="action-aim" data-i18n="f4_desc">
+                        <strong>Action: Load Adjustment</strong>
+                        Aim: Life Extension
+                    </div>
+                </div>
+                <div class="module-teaser-item">
+                    <i data-lucide="database" size="20"></i>
+                    <h4 data-i18n="f5_title">5. CARBON LEDGER</h4>
+                    <div class="action-aim" data-i18n="f5_desc">
+                        <strong>Action: Offset Tracking</strong>
+                        Aim: ESG Validation
+                    </div>
+                </div>
             </div>
         </div>
 

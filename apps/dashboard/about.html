@@ -246,9 +246,61 @@
         }
 
         .feature-item h4 {
-            color: #fff;
+            color: var(--accent-green);
             margin-bottom: 15px;
-            font-size: 18px;
+            font-size: 14px;
+            font-family: var(--font-tech);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .summary-box {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1px;
+            background: var(--border-color);
+            border: 1px solid var(--border-color);
+            margin-top: 40px;
+            margin-bottom: 80px;
+        }
+
+        .summary-item {
+            background: var(--panel-bg);
+            padding: 30px;
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .summary-item:hover {
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .summary-item i {
+            color: var(--accent-green);
+            margin-bottom: 20px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .summary-item h5 {
+            font-size: 11px;
+            color: var(--accent-green);
+            font-family: var(--font-tech);
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .summary-item p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .summary-item strong {
+            color: var(--text-primary);
+            display: block;
+            margin-bottom: 4px;
         }
 
         footer {
@@ -294,71 +346,65 @@
             </div>
         </section>
 
-        <!-- CORE FUNCTIONS SUMMARY (START) -->
-        <section id="core-summary" style="margin-bottom: 120px;">
-            <div class="feature-grid">
-                <div class="feature-item" style="border-top: 3px solid var(--accent-green);">
+        <!-- EXECUTIVE SUMMARY GRID -->
+        <section id="core-summary">
+            <div class="summary-box">
+                <div class="summary-item">
+                    <i data-lucide="satellite" size="24"></i>
                     <div class="lang-content lang-en">
-                        <h4 style="color: var(--accent-green);">1. Satellite Fusion</h4>
-                        <p><strong>Action:</strong> Real-time AOD ingestion.</p>
-                        <p><strong>Aim:</strong> Early threat detection.</p>
+                        <h5>1. SATELLITE FUSION</h5>
+                        <p><strong>Action:</strong> Real-time Ingestion<br><strong>Aim:</strong> Threat Detection</p>
                     </div>
                     <div class="lang-content lang-ar ar-text">
-                        <h4 style="color: var(--accent-green);">1. الدمج الفضائي</h4>
-                        <p><strong>الإجراء:</strong> سحب بيانات الغبار لحظياً.</p>
-                        <p><strong>الهدف:</strong> رصد التهديدات المبكرة.</p>
+                        <h5>1. الدمج الفضائي</h5>
+                        <p><strong>الإجراء:</strong> سحب لحظي<br><strong>الهدف:</strong> رصد التهديدات</p>
                     </div>
                 </div>
-                <div class="feature-item" style="border-top: 3px solid var(--accent-green);">
+                <div class="summary-item">
+                    <i data-lucide="activity" size="24"></i>
                     <div class="lang-content lang-en">
-                        <h4 style="color: var(--accent-green);">2. Stress Mapping</h4>
-                        <p><strong>Action:</strong> Live Physics Mesh.</p>
-                        <p><strong>Aim:</strong> Precise maintenance focus.</p>
+                        <h5>2. STRESS MAPPING</h5>
+                        <p><strong>Action:</strong> Physics Mesh<br><strong>Aim:</strong> Maintenance Focus</p>
                     </div>
                     <div class="lang-content lang-ar ar-text">
-                        <h4 style="color: var(--accent-green);">2. خرائط الإجهاد</h4>
-                        <p><strong>الإجراء:</strong> محاكاة فيزيائية حية.</p>
-                        <p><strong>الهدف:</strong> تركيز دقيق للصيانة.</p>
+                        <h5>2. خرائط الإجهاد</h5>
+                        <p><strong>الإجراء:</strong> محاكاة فيزيائية<br><strong>الهدف:</strong> تركيز الصيانة</p>
                     </div>
                 </div>
-                <div class="feature-item" style="border-top: 3px solid var(--accent-green);">
+                <div class="summary-item">
+                    <i data-lucide="git-branch" size="24"></i>
                     <div class="lang-content lang-en">
-                        <h4 style="color: var(--accent-green);">3. Causal Logic</h4>
-                        <p><strong>Action:</strong> Trigger-to-Sensor correlation.</p>
-                        <p><strong>Aim:</strong> Root-cause verification.</p>
+                        <h5>3. CAUSAL LOGIC</h5>
+                        <p><strong>Action:</strong> Trigger Correlation<br><strong>Aim:</strong> Root-Cause Proof</p>
                     </div>
                     <div class="lang-content lang-ar ar-text">
-                        <h4 style="color: var(--accent-green);">3. المنطق السببي</h4>
-                        <p><strong>الإجراء:</strong> ربط المحفزات بالحساسات.</p>
-                        <p><strong>الهدف:</strong> توثيق السبب الجذري.</p>
+                        <h5>3. المنطق السببي</h5>
+                        <p><strong>الإجراء:</strong> ربط المحفزات<br><strong>الهدف:</strong> إثبات الأسباب</p>
                     </div>
                 </div>
-                <div class="feature-item" style="border-top: 3px solid var(--accent-green);">
+                <div class="summary-item">
+                    <i data-lucide="zap" size="24"></i>
                     <div class="lang-content lang-en">
-                        <h4 style="color: var(--accent-green);">4. Prescriptive Opt.</h4>
-                        <p><strong>Action:</strong> Real-time Load balancing.</p>
-                        <p><strong>Aim:</strong> Asset life extension (RUL).</p>
+                        <h5>4. OPTIMIZER</h5>
+                        <p><strong>Action:</strong> Load Balance<br><strong>Aim:</strong> Asset Life Extension</p>
                     </div>
                     <div class="lang-content lang-ar ar-text">
-                        <h4 style="color: var(--accent-green);">4. المحسن الإرشادي</h4>
-                        <p><strong>الإجراء:</strong> موازنة الأحمال فورياً.</p>
-                        <p><strong>الهدف:</strong> إطالة عمر الأصول.</p>
+                        <h5>4. المحسن الإرشادي</h5>
+                        <p><strong>الإجراء:</strong> موازنة الأحمال<br><strong>الهدف:</strong> إطالة عمر الأصول</p>
                     </div>
                 </div>
-                <div class="feature-item" style="border-top: 3px solid var(--accent-green);">
+                <div class="summary-item">
+                    <i data-lucide="database" size="24"></i>
                     <div class="lang-content lang-en">
-                        <h4 style="color: var(--accent-green);">5. Carbon Ledger</h4>
-                        <p><strong>Action:</strong> Lifecycle offset tracking.</p>
-                        <p><strong>Aim:</strong> Audit-ready ESG data.</p>
+                        <h5>5. CARBON LEDGER</h5>
+                        <p><strong>Action:</strong> Offset Tracking<br><strong>Aim:</strong> ESG Validation</p>
                     </div>
                     <div class="lang-content lang-ar ar-text">
-                        <h4 style="color: var(--accent-green);">5. سجل الكربون</h4>
-                        <p><strong>الإجراء:</strong> تتبع توفير دورة الحياة.</p>
-                        <p><strong>الهدف:</strong> بيانات استدامة موثقة.</p>
+                        <h5>5. سجل الكربون</h5>
+                        <p><strong>الإجراء:</strong> تتبع الوفر<br><strong>الهدف:</strong> توثيق الاستدامة</p>
                     </div>
                 </div>
             </div>
-        </section>
         </section>
 
         <!-- SATELLITE & TELEMETRY -->
