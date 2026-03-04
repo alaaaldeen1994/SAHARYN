@@ -573,6 +573,16 @@
         .critical-pulse {
             animation: stressPulse 2s infinite ease-in-out;
         }
+
+        @keyframes pulseGlow {
+            0% {
+                box-shadow: 0 0 5px rgba(16, 185, 129, 0.1);
+            }
+
+            100% {
+                box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+            }
+        }
     </style>
 </head>
 
@@ -2267,7 +2277,33 @@
                         });
                         lucide.createIcons();
                     } else {
-                        pStack.innerHTML = `<div style="text-align: center; color: var(--accent-green); margin-top: 40px; font-weight: 600;"><i data-lucide="check-circle" size="32" style="margin-bottom: 10px;"></i><br>${translations[currentLang].nominal}</div>`;
+                        const t = translations[currentLang];
+                        const ledgerTitle = currentLang === 'ar' ? 'سجل الكربون السيادي' : 'SOVEREIGN_CARBON_LEDGER';
+                        const copyText = `SOVEREIGN_CARBON_LEDGER\n+4.2t CO2e SAVED\nCLAIM_ID: SHRN-DXB-0082`;
+
+                        pStack.innerHTML = `
+                            <div class="action-card" style="background: rgba(16, 185, 129, 0.05); border: 2px solid var(--accent-green); padding: 25px; border-radius: 8px; margin-bottom: 25px; position: relative; animation: pulseGlow 4s infinite alternate;">
+                                <div style="position: absolute; top: 15px; right: 15px;">
+                                    <button onclick="copyToClipboard(\`${copyText}\`, this)" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; cursor: pointer; padding: 6px; border-radius: 4px; display: flex; align-items: center; justify-content: center; transition: 0.2s;">
+                                        <i data-lucide="copy" size="14"></i>
+                                    </button>
+                                </div>
+                                <div style="font-family: 'JetBrains Mono'; font-size: 10px; color: var(--accent-green); margin-bottom: 12px; font-weight: 800; letter-spacing: 1.5px;">${ledgerTitle}</div>
+                                <div style="font-size: 42px; font-weight: 900; color: #fff; line-height: 1; margin-bottom: 4px;">+4.2t</div>
+                                <div style="font-size: 18px; font-weight: 800; color: #fff; margin-bottom: 20px; letter-spacing: 1px;">CO₂e SAVED</div>
+                                
+                                <div style="font-family: 'JetBrains Mono'; font-size: 11px; color: #cbd5e1; line-height: 1.8; opacity: 0.8; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+                                    <div style="margin-bottom: 4px;">[ CLAIM_ID: <span style="color: var(--accent-green)">SHRN-DXB-0082</span> ]</div>
+                                    <div style="margin-bottom: 4px;">[ STATUS: <span style="color: var(--accent-green)">CRYPTOGRAPHICALLY_ANCHORED</span> ]</div>
+                                    <div>[ PROTOCOL: <span style="color: var(--accent-green)">GHG_SCOPE_3_VALIDATED</span> ]</div>
+                                </div>
+                            </div>
+                            
+                            <div style="text-align: center; color: var(--accent-green); margin-top: 20px; font-weight: 600; opacity: 0.7;">
+                                <i data-lucide="check-circle" size="24" style="margin-bottom: 8px;"></i><br>
+                                ${t.nominal}
+                            </div>
+                        `;
                         lucide.createIcons();
                     }
                     success = true;
