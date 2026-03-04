@@ -635,14 +635,19 @@
                     <option value="EMEA_COAST_02" data-i18n="site_2">EMEA_COAST_02 (Corrosive Coastal)</option>
                 </select>
             </div>
-            <div class="header-right">
+            <div class="header-right" style="display: flex; align-items: center; gap: 15px;">
                 <button onclick="toggleLanguage()" id="lang-toggle"
-                    style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--accent-green); color: var(--accent-green); padding: 8px 16px; border-radius: 6px; font-family: 'JetBrains Mono'; font-size: 11px; cursor: pointer; font-weight: 800; transition: 0.3s; margin-left: 10px;">EN
+                    style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--accent-green); color: var(--accent-green); padding: 8px 16px; border-radius: 6px; font-family: 'JetBrains Mono'; font-size: 11px; cursor: pointer; font-weight: 800; transition: 0.3s;">EN
                     / AR</button>
                 <div class="mono" style="font-size: 12px; color: var(--text-secondary);" id="clock">00:00:00 UTC</div>
-                <span
-                    style="font-family: 'JetBrains Mono'; font-size: 10px; color: var(--accent-green); letter-spacing: 1px;">ENCRYPTED_HANDSHAKE:
-                    OK</span>
+                <div id="api-status"
+                    style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 4px 12px; border-radius: 4px; display: flex; align-items: center; gap: 8px;">
+                    <div class="status-dot"
+                        style="width: 6px; height: 6px; background: var(--accent-green); border-radius: 50%;"></div>
+                    <span
+                        style="font-family: 'JetBrains Mono'; font-size: 10px; color: var(--accent-green); letter-spacing: 1px;">ENCRYPTED_HANDSHAKE:
+                        OK</span>
+                </div>
             </div>
             <div id="sovereign-control" title="Sovereign Edge Mode" onclick="toggleSovereignMode()"
                 style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); padding: 4px 12px; border-radius: 4px; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: 0.3s;">
