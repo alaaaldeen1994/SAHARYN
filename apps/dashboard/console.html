@@ -2283,34 +2283,41 @@
                         const t = translations[currentLang];
                         const ledgerTitle = currentLang === 'ar' ? 'سجل الكربون السيادي' : 'SOVEREIGN_CARBON_LEDGER';
 
-                        // Extract real ESG data from the response
                         const esgPayload = data.asset_impact.esg_claim;
                         const kgSaved = esgPayload ? esgPayload.co2_kg_saved.toFixed(4) : "0.0000";
                         const claimId = `SHRN-${site.split('_')[1]}-${Math.floor(Math.random() * 9000) + 1000}`;
-
-                        const copyText = `SOVEREIGN_CARBON_LEDGER\n+${kgSaved} kg CO2e SAVED\nCLAIM_ID: ${claimId}\nSTATUS: CRYPTOGRAPHICALLY_ANCHORED`;
+                        const copyText = `SOVEREIGN_CARBON_LEDGER\n+${kgSaved} kg CO2e SAVED\nCLAIM_ID: ${claimId}`;
 
                         pStack.innerHTML = `
-                            <div class="action-card" style="background: rgba(16, 185, 129, 0.05); border: 2px solid var(--accent-green); padding: 25px; border-radius: 8px; margin-bottom: 25px; position: relative; animation: pulseGlow 4s infinite alternate;">
-                                <div style="position: absolute; top: 15px; right: 15px;">
-                                    <button onclick="copyToClipboard(\`${copyText}\`, this)" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; cursor: pointer; padding: 6px; border-radius: 4px; display: flex; align-items: center; justify-content: center; transition: 0.2s;">
+                            <div class="action-card" style="animation: fadeUp 0.3s ease forwards; background: rgba(15, 23, 42, 0.7); border-left: 4px solid var(--accent-green); padding: 20px; border-radius: 4px; border-right: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); position: relative; overflow: hidden; margin-bottom: 15px;">
+                                <div class="action-badge-container" style="position: absolute; top: 12px; right: 12px; display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+                                    <span style="font-size: 10px; color: #fff; background: var(--accent-green); padding: 2px 8px; border-radius: 3px; font-weight: 800; opacity: 0.9;">CERTIFIED</span>
+                                    <button onclick="copyToClipboard(\`${copyText}\`, this)" style="background: none; border: none; color: #fff; cursor: pointer; padding: 0; opacity: 0.5;">
                                         <i data-lucide="copy" size="14"></i>
                                     </button>
                                 </div>
-                                <div style="font-family: 'JetBrains Mono'; font-size: 10px; color: var(--accent-green); margin-bottom: 12px; font-weight: 800; letter-spacing: 1.5px;">${ledgerTitle}</div>
-                                <div style="font-size: 42px; font-weight: 900; color: #fff; line-height: 1; margin-bottom: 4px;">+${kgSaved} kg</div>
-                                <div style="font-size: 18px; font-weight: 800; color: #fff; margin-bottom: 20px; letter-spacing: 1px;">CO₂e SAVED</div>
-                                
-                                <div style="font-family: 'JetBrains Mono'; font-size: 11px; color: #cbd5e1; line-height: 1.8; opacity: 0.8; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-                                    <div style="margin-bottom: 4px;">[ CLAIM_ID: <span style="color: var(--accent-green)">${claimId}</span> ]</div>
-                                    <div style="margin-bottom: 4px;">[ STATUS: <span style="color: var(--accent-green)">CRYPTOGRAPHICALLY_ANCHORED</span> ]</div>
-                                    <div>[ PROTOCOL: <span style="color: var(--accent-green)">GHG_SCOPE_3_VALIDATED</span> ]</div>
+                                <div class="action-header" style="margin-bottom: 15px; padding-right: 90px;">
+                                    <span class="action-title mono" style="font-weight: 700; color: #fff; font-size: 14px; line-height: 1.4; display: block;">${ledgerTitle}</span>
+                                </div>
+                                <div style="color: #fff; margin-bottom: 20px;">
+                                    <div style="font-size: 32px; font-weight: 900;">+${kgSaved} kg</div>
+                                    <div style="font-size: 14px; font-weight: 800; opacity: 0.9;">CO₂e SAVED</div>
+                                </div>
+                                <div style="font-family: 'JetBrains Mono'; font-size: 11px; display: flex; flex-direction: column; gap: 6px; color: var(--accent-green); background: rgba(0,0,0,0.5); padding: 12px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05);">
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span>CLAIM_ID:</span>
+                                        <strong style="color: #fff;">${claimId}</strong>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; opacity: 0.7;">
+                                        <span>STATUS:</span>
+                                        <span style="color: #fff; font-weight: 800;">ANCHORED</span>
+                                    </div>
                                 </div>
                             </div>
                             
-                            <div style="text-align: center; color: var(--accent-green); margin-top: 20px; font-weight: 600; opacity: 0.7; font-family: 'JetBrains Mono'; font-size: 11px;">
+                            <div style="text-align: center; color: var(--accent-green); margin-top: 20px; font-weight: 600; opacity: 0.6; font-family: 'JetBrains Mono'; font-size: 11px;">
                                 <i data-lucide="shield-check" size="20" style="margin-bottom: 8px;"></i><br>
-                                ${currentLang === 'ar' ? 'الاستقرار الفيزيائي: اسمي (NOMINAL)' : 'PHYSICS-INFORMED STABILITY: NOMINAL'}
+                                ${currentLang === 'ar' ? 'الاستقرار الفيزيائي: اسمي (NOMINAL)' : 'STABILITY: PHYSICS-INFORMED NOMINAL'}
                             </div>
                         `;
                         lucide.createIcons();
