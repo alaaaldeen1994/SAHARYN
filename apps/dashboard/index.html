@@ -326,6 +326,17 @@
             min-width: 100px;
         }
 
+        .tech-heading {
+            font-family: var(--font-heading);
+            font-size: clamp(40px, 6vw, 84px);
+            line-height: 1;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 30px;
+            letter-spacing: -2px;
+            text-transform: none;
+        }
+
         h1 {
             font-family: var(--font-heading);
             font-size: clamp(60px, 10vw, 150px);
@@ -920,7 +931,7 @@
             </div>
             <div class="tech-border">
                 <div class="os-tag" style="margin-bottom: 20px;">SUSTAINABILITY_ALPHA_04</div>
-                <h2 class="tech-heading" style="font-size: 42px;" data-i18n="esg_title">Validated Impact.</h2>
+                <h2 class="tech-heading" data-i18n="esg_title">Validated Impact.</h2>
                 <p style="color: var(--text-dim); line-height: 1.6; margin-bottom: 40px; font-size: 19px;"
                     data-i18n="esg_desc">
                     Every operational optimization in SAHARYN creates a <strong>Sovereign ESG Claim</strong>. By
@@ -940,8 +951,7 @@
             <div class="mission-grid">
                 <div>
                     <div class="os-tag" style="margin-bottom: 20px;">TECHNICAL_PEDIGREE_03</div>
-                    <h2 class="tech-heading" style="font-size: 42px;" data-i18n="about_title">Founded on<br>Physics.
-                    </h2>
+                    <h2 class="tech-heading" data-i18n="about_title">Founded on<br>Physics.</h2>
                     <p style="color: var(--text-dim); line-height: 1.6; margin-bottom: 40px; font-size: 19px;"
                         data-i18n="about_desc">
                         Saharyn AI was engineered to solve the 'Black Swan' problem in industrial infrastructure.
@@ -1056,7 +1066,7 @@
                 system_stance: "SYSTEM_STANCE: ACTIVE",
                 hud_stream: "COPERNICUS_STREAM",
                 hud_stability: "CAUSAL_STABILITY",
-                mission_title: "Hardening The Horizon.",
+                mission_title: "Hardening<br>The Horizon.",
                 mission_desc: "Saharyn AI provides the technological foundation for high-consequence operations. By fusing real-world atmospheric physics from Copernicus CAMS datasets with autonomous causal monitoring, we prevent infrastructure failure across extended asset lifecycles.",
                 stat_stance: "OPERATIONAL_STANCE",
                 val_preemptive: "PRE-EMPTIVE",
@@ -1110,7 +1120,7 @@
                 system_stance: "الحالة التشغيلية: نـشط",
                 hud_stream: "البث_المباشر: كوبرنيكوس",
                 hud_stability: "الاستقرار_السببي: مُعتمَد",
-                mission_title: "تحصين آفاق البنية التحتية.",
+                mission_title: "تحصين آفاق<br>البنية التحتية.",
                 mission_desc: "تُمثّل صحارين الركيزة التقنية للعمليات الصناعية في البيئات القاسية. ندمج الفيزياء الجوية المستمدة من منظومة 'كوبرنيكوس CAMS' مع رسم الخرائط السببية الذاتية لمنع انهيار البنية التحتية وحماية الأصول الاستراتيجية على امتداد دورة حياتها الكاملة.",
                 stat_stance: "الوضعية التشغيلية",
                 val_preemptive: "وقائي / استباقي",
@@ -1162,7 +1172,7 @@
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 if (translations[currentLang][key]) {
-                    el.innerText = translations[currentLang][key];
+                    el.innerHTML = translations[currentLang][key];
                 }
             });
 
