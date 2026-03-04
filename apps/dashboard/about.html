@@ -266,130 +266,210 @@
 
     <main class="container">
 
-        <!-- INTRO -->
-        <section id="intro">
-            <span class="subtitle">System Architecture & Core Intelligence</span>
-            <h1 id="main-title">Behind the Machine</h1>
+        <!-- SATELLITE FUSION SECTION -->
+        <section id="satellites">
+            <span class="subtitle">1. The Eye in the Sky: Satellite Data Fusion</span>
             <div class="bilingual-grid">
                 <div class="content-en">
-                    <p>SAHARYN is an <strong>Industrial Resilience Engine</strong> designed to solve the challenge of
-                        infrastructure decay in harsh desert environments. By combining aerospace-grade physics with
-                        real-time satellite telemetry, we move beyond simple "AI monitoring" into <strong>Autonomous
-                            Causal Inference</strong>.</p>
+                    <p>SAHARYN does not guess; it observes. We ingest raw telemetry from the <strong>European Space
+                            Agency (ESA)</strong> and <strong>NASA</strong> constellations. This provides the boundary
+                        conditions for our physics simulations.</p>
+                    <ul style="margin-left: 20px; color: var(--text-secondary); font-size: 15px;">
+                        <li><strong>Copernicus Sentinel-3 (CAMS):</strong> Provides real-time Atmosphere Monitoring
+                            (Aerosol Optical Depth - AOD) at 550nm to quantify dust density.</li>
+                        <li><strong>NASA MODIS (Terra/Aqua):</strong> Cross-validated dust severity indices for
+                            historical calibration.</li>
+                        <li><strong>Sentinel-2 (L2A):</strong> High-resolution thermal mapping for asset
+                            point-of-interest stress analysis.</li>
+                    </ul>
                 </div>
                 <div class="content-ar">
-                    <p>"صحارين" هو <strong>محرك للمرونة الصناعية</strong> مصمم لحل تحديات تآكل البنية التحتية في البيئات
-                        الصحراوية القاسية. من خلال دمج فيزياء الفضاء مع بيانات الأقمار الصناعية الفورية، ننتقل من
-                        "مراقبة الذكاء الاصطناعي" البسيطة إلى <strong>الاستدلال السببي الذاتي</strong>.</p>
+                    <p>"صحارين" لا تخمن، بل تراقب. نحن نستقبل البيانات الفورية من كوكبات <strong>وكالة الفضاء الأوروبية
+                            (ESA)</strong> و <strong>وكالة ناسا</strong>. هذا يوفر الظروف الحدودية لمحاكاتنا الفيزيائية.
+                    </p>
+                    <ul style="margin-right: 20px; color: var(--text-secondary); font-size: 15px;">
+                        <li><strong>كوبرنيكوس سينتينيل-3 (CAMS):</strong> يوفر مراقبة الغلاف الجوي في الوقت الفعلي
+                            (العمق البصري للهباء الجوي - AOD) لقياس كثافة الغبار.</li>
+                        <li><strong>موديس ناسا (ترا/أكوا):</strong> مؤشرات شدة الغبار المتقاطعة للمعايرة التاريخية.</li>
+                        <li><strong>سينتينيل-2 (L2A):</strong> خرائط حرارية عالية الدقة لتحليل الإجهاد في نقاط الاهتمام
+                            للأصول.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="tech-card" style="border-left-color: var(--accent-green);">
+                <span class="label-tech">// SPECTRAL INTEGRITY FLOW</span>
+                <div
+                    style="display: flex; justify-content: space-around; align-items: center; padding: 20px 0; border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px;">
+                    <div style="text-align: center;">
+                        <i data-lucide="satellite" size="24" style="color: var(--accent-green);"></i>
+                        <div style="font-size: 10px; margin-top: 5px;">SPACE (CAMS)</div>
+                    </div>
+                    <i data-lucide="arrow-right" size="16" style="opacity: 0.3;"></i>
+                    <div style="text-align: center;">
+                        <i data-lucide="shield" size="24" style="color: #fff;"></i>
+                        <div style="font-size: 10px; margin-top: 5px;">EDGE (KSA)</div>
+                    </div>
+                    <i data-lucide="arrow-right" size="16" style="opacity: 0.3;"></i>
+                    <div style="text-align: center;">
+                        <i data-lucide="cpu" size="24" style="color: var(--accent-green);"></i>
+                        <div style="font-size: 10px; margin-top: 5px;">AI (PINN)</div>
+                    </div>
+                </div>
+                <div class="bilingual-grid">
+                    <div class="content-en" style="font-size: 13px;">
+                        <p>Raw GRIB/NetCDF data is pulled every 3 hours, normalized, and injected into the
+                            <strong>Causal Mesh</strong>. This removes the 'blind spot' of traditional ground-only
+                            sensors.
+                        </p>
+                    </div>
+                    <div class="content-ar" style="font-size: 13px;">
+                        <p>يتم سحب بيانات GRIB/NetCDF الخام كل 3 ساعات، ومعالجتها، وحقنها في <strong>الشبكة
+                                السببية</strong>. هذا يزيل "النقاط العمياء" التي تعاني منها الحساسات الأرضية التقليدية.
+                        </p>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- PHYSICS ENGINE -->
+        <!-- PHYSICS DEEP DIVE -->
         <section id="physics">
-            <span class="subtitle">1. Physics-Informed Causal Mesh</span>
+            <span class="subtitle">2. Physics-Informed Causal Mesh (PINNs)</span>
             <div class="bilingual-grid">
                 <div class="content-en">
-                    <p>Most AI systems use "pattern matching," which fails when conditions change. SAHARYN uses
-                        <strong>Physics-Informed Neural Networks (PINNs)</strong>. We model the actual stress tensors
-                        and fluid dynamics acting on an asset.
+                    <p>Conventional AI looks for correlation; SAHARYN proves <strong>Causality</strong>. Using
+                        <strong>Physics-Informed Neural Networks (PINNs)</strong>, the engine respects the laws of
+                        thermodynamics. If the satellite reports an AOD surge, the AI calculates the exact kinetic
+                        energy transfer to your turbine blades.
                     </p>
                 </div>
                 <div class="content-ar">
-                    <p>تستخدم معظم أنظمة الذكاء الاصطناعي "مطابقة الأنماط"، والتي تفشل عند تغير الظروف. تستخدم "صحارين"
-                        <strong>الشبكات العصبية القائمة على الفيزياء (PINNs)</strong>. نحن نمذجة مجهودات الإجهاد الفعلية
-                        وديناميكيات السوائل المؤثرة على الأصول.
-                    </p>
+                    <p>الذكاء الاصطناعي التقليدي يبحث عن "ارتباط"؛ أما "صحارين" فتثبت <strong>"السببية"</strong>.
+                        باستخدام <strong>الشبكات العصبية القائمة على الفيزياء (PINNs)</strong>، يحترم المحرك قوانين
+                        الديناميكا الحرارية. إذا أبلغ القمر الصناعي عن زيادة في الغبار، يحسب الذكاء الاصطناعي بدقة
+                        انتقال الطاقة الحركية إلى شفرات التوربين الخاصة بك.</p>
                 </div>
             </div>
 
             <div class="tech-card">
-                <span class="label-tech">// THE STRESS-PROPAGATION EQUATION</span>
+                <span class="label-tech">// THE NAVIER-STOKES DUST DECAY MODEL</span>
                 <div class="equation-box">
-                    S_{total} = \int_{0}^{t} (\kappa \cdot AOD(\tau) + \nu \cdot V(\tau)) d\tau + \Omega_{static}
+                    \frac{\partial \mathbf{u}}{\partial t} + (\mathbf{u} \cdot \nabla) \mathbf{u} =
+                    -\frac{1}{\rho}\nabla p + \nu \nabla^2 \mathbf{u} + \mathbf{g}_{dust}
                 </div>
                 <div class="bilingual-grid" style="gap: 20px;">
                     <div class="content-en" style="font-size: 13px;">
-                        <p>Total accumulated stress (S) is the integral of <strong>Dust Load (AOD)</strong> and
-                            <strong>Vibration (V)</strong> over time, multiplied by material constants (κ, ν).
-                        </p>
+                        <p>Our model integrates spectral satellite data directly into the Navier-Stokes equations to
+                            predict <strong>Abrasion and Degradation</strong> rates on sub-millimeter scales.</p>
                     </div>
                     <div class="content-ar" style="font-size: 13px;">
-                        <p>إجمالي الإجهاد المتراكم (S) هو تكامل <strong>حمولة الغبار (AOD)</strong> و <strong>الاهتزاز
-                                (V)</strong> بمرور الوقت، مضروباً في ثوابت المواد (κ, ν).</p>
+                        <p>يُدمج نموذجنا بيانات الأقمار الصناعية الطيفية مباشرة في معادلات نافيير-ستوكس للتنبؤ بمعدلات
+                            <strong>التآكل والتحلل</strong> على مستويات دقيقة جداً (أقل من المليمتر).
+                        </p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- SOVEREIGN EDGE -->
+        <!-- SOVEREIGN ARCHITECTURE -->
         <section id="security">
-            <span class="subtitle">2. Sovereign Edge Inference</span>
+            <span class="subtitle">3. Sovereign Edge: Data Nationality</span>
             <div class="bilingual-grid">
                 <div class="content-en">
-                    <p>National security infrastructure cannot depend on global cloud processing. SAHARYN implements
-                        <strong>Sovereign Edge Computing</strong>. When "Sovereign Mode" is engaged, 100% of data
-                        processing remains within local facility servers in Saudi Arabia.
-                    </p>
+                    <p>In Mission-Critical infrastructure, <strong>Data Residency is Security</strong>. SAHARYN's
+                        Sovereign Mode is a hardware-enforced protocol. It severs the link to global cloud clusters and
+                        shifts all inference to localized clusters in the <strong>Kingdom of Saudi Arabia</strong>.</p>
                 </div>
                 <div class="content-ar">
-                    <p>لا يمكن للبنية التحتية للأمن القومي الاعتماد على المعالجة السحابية العالمية. تطبق "صحارين"
-                        <strong>الحوسبة السيادية على الحافة</strong>. عند تفعيل "الوضع السيادي"، تظل 100٪ من معالجة
-                        البيانات داخل خوادم المنشأة المحلية في المملكة العربية السعودية.
-                    </p>
+                    <p>في البنية التحتية الحساسة، <strong>موقع البيانات هو الأمن</strong>. "الوضع السيادي" في صحارين هو
+                        بروتوكول مفروض برمجياً. يقوم بقطع الاتصال بالعنقود السحابي العالمي ونقل كل الاستدلال إلى عناقيد
+                        محلية داخل <strong>المملكة العربية السعودية</strong>.</p>
                 </div>
             </div>
 
             <div class="feature-grid">
                 <div class="feature-item">
-                    <i data-lucide="shield-check" size="32"></i>
-                    <h4 style="margin-bottom: 10px;">Zero-Trust Architecture</h4>
-                    <p style="font-size: 13px;">No raw telemetry leaves the Kingdom's perimeter during peak operations.
-                    </p>
+                    <i data-lucide="shield-alert" size="32"></i>
+                    <h4 style="margin-bottom: 10px;">Air-Gap Logic</h4>
+                    <p style="font-size: 13px;">Encryption keys are stored on physical HSMs within the client's
+                        perimeter.</p>
                 </div>
                 <div class="feature-item">
-                    <i data-lucide="database" size="32"></i>
-                    <h4 style="margin-bottom: 10px;">Immutable Ledger</h4>
-                    <p style="font-size: 13px;">Every carbon credit and safety alarm is cryptographically signed and
-                        anchored.</p>
+                    <i data-lucide="lock" size="32"></i>
+                    <h4 style="margin-bottom: 10px;">Privacy Isolation</h4>
+                    <p style="font-size: 13px;">No raw vibration or sensor data is stored on external servers during
+                        Sovereign Mode.</p>
                 </div>
             </div>
         </section>
 
-        <!-- ESG MECHANISM -->
+        <!-- ESG & CARBON -->
         <section id="esg">
-            <span class="subtitle">3. Sustainability Quantification</span>
+            <span class="subtitle">4. Validated Carbon Ledger</span>
             <div class="bilingual-grid">
                 <div class="content-en">
-                    <p>How do we calculate Carbon Savings? We measure the <strong>Manufacturing Overhead
-                            Offset</strong>. By extending the Remaining Useful Life (RUL) of an asset, we postpone the
-                        carbon-intensive process of replacement and logistics.</p>
+                    <p>Typical carbon reports are estimates; SAHARYN's are <strong>Proofs of Avoidance</strong>. Each
+                        credit is anchored to a specific AI inference cycle, cross-referenced with satellite
+                        confirmation of avoided downtime.</p>
                 </div>
                 <div class="content-ar">
-                    <p>كيف نحسب توفير الكربون؟ نقوم بقياس <strong>تعويض أعباء التصنيع الإضافية</strong>. من خلال إطالة
-                        العمر النافع المتبقي (RUL) للأصل، نؤجل العملية كثيفة الكربون للاستبدال والخدمات اللوجستية.</p>
+                    <p>تقارير الكربون التقليدية هي مجرد تقديرات؛ أما تقارير "صحارين" فهي <strong>براهين على
+                            التجنب</strong>. كل رصيد مرتبط بدورة استدلال محددة للذكاء الاصطناعي، ومرتبط ببيانات قمر
+                        صناعي تؤكد تجنب فترات التوقف.</p>
                 </div>
             </div>
 
             <div class="tech-card" style="border-left-color: var(--accent-green);">
-                <span class="label-tech">// ESG YIELD MECHANISM</span>
+                <span class="label-tech">// ESG YIELD DYNAMICS</span>
                 <div class="equation-box" style="color: #fff;">
-                    CO2_{saved} = \frac{C_{mfg}}{T_{design}} \cdot \Delta RUL_{extension}
+                    Yield_{credits} = \sum_{sites} \left( \text{Life\_Ext}_{days} \times \phi_{carbon} \right)
                 </div>
                 <div class="bilingual-grid" style="gap: 20px;">
                     <div class="content-en" style="font-size: 13px;">
-                        <p>Avoidance is calculated as the ratio of <strong>Manufacturing Carbon (C_mfg)</strong> over
-                            <strong>Design Life (T)</strong>, multiplied by the <strong>Life Extension gained via
-                                AI</strong>.
+                        <p>Total yield is the sum of <strong>Life Extension (days)</strong> multiplied by the
+                            <strong>Carbon Intensity Factor (φ)</strong> of the asset's manufacturing overhead.
                         </p>
                     </div>
                     <div class="content-ar" style="font-size: 13px;">
-                        <p>يتم حساب التجنب كنسبة <strong>كربون التصنيع (C_mfg)</strong> على <strong>عمر التصميم
-                                (T)</strong>، مضروبة في <strong>تمديد العمر المكتسب عبر الذكاء الاصطناعي</strong>.</p>
+                        <p>إجمالي العائد هو مجموع <strong>تمديد العمر (بالأيام)</strong> مضروباً في <strong>معامل كثافة
+                                الكربون (φ)</strong> لأعباء تصنيع الأصل.</p>
                     </div>
                 </div>
             </div>
-        </section>
+            <!-- SYSTEM CAPABILITIES -->
+            <section id="capabilities">
+                <span class="subtitle">5. Mission Control: Operational Modules</span>
+                <div class="bilingual-grid">
+                    <div class="content-en">
+                        <p>The SAHARYN Dashboard is not a static display; it is a <strong>Command & Control
+                                Interface</strong>. It allows operators to move from passive monitoring to active asset
+                            preservation via three core modules:</p>
+                    </div>
+                    <div class="content-ar">
+                        <p>لوحة تحكم "صحارين" ليست مجرد شاشة عرض جامدة؛ بل هي <strong>واجهة للقيادة والسيطرة</strong>.
+                            تسمح للمشغلين بالانتقال من المراقبة السلبية إلى الحفاظ النشط على الأصول عبر ثلاث وحدات
+                            أساسية:</p>
+                    </div>
+                </div>
+
+                <div class="feature-grid">
+                    <div class="feature-item" style="border-top: 2px solid var(--accent-green);">
+                        <h4 style="margin-bottom: 10px;">Deep Stress Mapping</h4>
+                        <p style="font-size: 13px;">Visualization of <strong>AOD (Dust Intensity)</strong> and
+                            <strong>Thermal Gradients</strong> layered onto physical asset CAD models.</p>
+                    </div>
+                    <div class="feature-item" style="border-top: 2px solid #fff;">
+                        <h4 style="margin-bottom: 10px;">Causal Fault Propagation</h4>
+                        <p style="font-size: 13px;">A real-time graph showing how a satellite-detected dust storm might
+                            trigger a mechanical bearing failure in 48 hours.</p>
+                    </div>
+                    <div class="feature-item" style="border-top: 2px solid var(--accent-green);">
+                        <h4 style="margin-bottom: 10px;">Prescriptive Optimizer</h4>
+                        <p style="font-size: 13px;">The AI doesn't just alert; it suggests. "Reduce RPM by 12% for 4
+                            hours to avoid 75% abrasion damage."</p>
+                    </div>
+                </div>
+            </section>
 
     </main>
 
