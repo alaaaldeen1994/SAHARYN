@@ -314,15 +314,64 @@ async def get_telemetry_stream(site_id: str = "SA_EAST_RU_01"):
 
 @app.get("/v2/physics/manifold", tags=["Physics"])
 async def get_physics_manifold():
+    """Returns the live state of the Causal Physics Manifold."""
     return {
+        "status": "STABLE",
         "constants": {
-            "reynolds_number": int(causal_engine.last_physics_results["reynolds"]),
-            "activation_energy": causal_engine.last_physics_results["activation_energy"],
-            "youngs_modulus": causal_engine.last_physics_results["youngs_modulus"],
-            "corrosion_kinetic": round(causal_engine.last_physics_results["corrosion_kinetic"], 6),
-            "stress_intensity": round(causal_engine.last_physics_results["stress_intensity"], 4)
+            "reynolds_number": round(causal_engine.last_physics_results["reynolds"], 1),
+            "stress_intensity": round(causal_engine.last_physics_results["stress_intensity"], 4),
+            "solar_dsi_constant": round(causal_engine.last_physics_results.get("solar_dsi_load", 0.0), 4),
+            "flare_risk_vector": round(causal_engine.last_physics_results.get("flare_risk", 0.0), 4)
         },
-        "topology": "NON_LINEAR_STRAIN_MANIFOLD"
+        "topology": "NON_LINEAR_STRAIN_MANIFOLD",
+        "sovereign_edge": causal_engine.sovereign_mode
+    }
+
+@app.get("/v2/physics/stress-map", tags=["Physics"])
+async def get_physics_stress_map():
+    """Returns a high-fidelity stress gradient map for all industrial assets."""
+    return {
+        "timestamp": datetime.utcnow().isoformat(),
+        "site_id": "SA_EAST_RU_01",
+        "map": causal_engine.get_asset_stress_map()
+    }
+
+@app.post("/v2/system/sovereign", tags=["System"])
+async def toggle_sovereign_mode(enable: bool):
+    """Activates air-gapped Sovereign Edge Inference mode."""
+    causal_engine.sovereign_mode = enable
+    logger.warning(f"SOVEREIGN_MODE: {'ACTIVATED' if enable else 'DEACTIVATED'} - Edge Computing Protocol Engaged.")
+    return {"status": "SUCCESS", "sovereign_mode": causal_engine.sovereign_mode}
+
+@app.get("/v2/energy/missions", tags=["Energy"])
+async def get_energy_missions():
+    """Returns status of specialized Renewable and Emission reduction missions."""
+    # Derive from live state
+    results = {
+        "solar_dsi_load": causal_engine.last_physics_results.get("solar_dsi_load", 0.0),
+        "flare_risk": causal_engine.last_physics_results.get("flare_risk", 0.0)
+    }
+    impact = esg_engine.calculate_mission_impact(results)
+    
+    return {
+        "missions": [
+            {
+                "id": "MSN_SOLAR_RECOVERY",
+                "label": "Renewable Efficiency (Solar DSI)",
+                "status": "MONITORING" if results["solar_dsi_load"] < 0.8 else "INTERVENTION_REQUIRED",
+                "metric": f"{results['solar_dsi_load']:.2f} kg/m² Dust Load",
+                "impact_saved": f"{impact['solar_co2']:.2f} kg CO2"
+            },
+            {
+                "id": "MSN_FLARE_REDUCTION",
+                "label": "Emission Prevention (Gas Flare)",
+                "status": "STABLE" if results["flare_risk"] < 0.4 else "SURGE_DETECTED",
+                "metric": f"{results['flare_risk']*100:.1f}% Flare Prob",
+                "impact_saved": f"{impact['flare_co2']:.2f} kg CO2"
+            }
+        ],
+        "total_esg_yield": impact["total_mission_saved"],
+        "sovereign_credits": impact["credits_estimate"]
     }
 
 @app.get("/v2/audit/ledger", tags=["Compliance"])
@@ -343,11 +392,29 @@ async def get_audit_ledger():
 @app.get("/v2/esg/impact", tags=["Sustainability"])
 async def get_esg_impact():
     """Returns aggregated carbon and water savings across the network."""
+    # Base savings from ledger
+    ledger_co2 = sovereign_ledger.get_aggregate_esg_savings()
+    
+    # Mission-specific savings (Solar/Flare)
+    results = {
+        "solar_dsi_load": causal_engine.last_physics_results.get("solar_dsi_load", 0.0),
+        "flare_risk": causal_engine.last_physics_results.get("flare_risk", 0.0)
+    }
+    mission_impact = esg_engine.calculate_mission_impact(results)
+    
+    total_co2 = ledger_co2 + mission_impact["total_mission_saved"]
+    
     return {
         "status": "VALIDATED",
-        "total_co2_kg_saved": round(sovereign_ledger.get_aggregate_esg_savings(), 4),
-        "total_water_liters_saved": round(sovereign_ledger.get_aggregate_esg_savings() * 1.42, 2),
-        "credits_pending": int(sovereign_ledger.get_aggregate_esg_savings() / 10.0),
+        "total_co2_kg_saved": round(total_co2, 4),
+        "breakdown": {
+            "operational_optimization": round(ledger_co2, 2),
+            "renewable_recovery": round(mission_impact["solar_co2"], 2),
+            "flare_reduction": round(mission_impact["flare_co2"], 2)
+        },
+        "total_water_liters_saved": round(total_co2 * 1.42, 2),
+        "credits_pending": int(total_co2 / 10.0),
+        "realtime_yield_kg_hr": round(0.42 + mission_impact["total_mission_saved"] / 24, 4),
         "standards": ["GHG Protocol", "ISO 14064-3", "Gold Standard Draft"]
     }
 

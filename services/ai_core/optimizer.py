@@ -86,6 +86,8 @@ class PrescriptiveOptimizer:
         
         # 1. ANALYZE PRIMARY NODES
         for node_id, data in causal_out.items():
+            if not isinstance(data, dict):
+                continue
             health = data['health']
             risk = 1.0 - health
             

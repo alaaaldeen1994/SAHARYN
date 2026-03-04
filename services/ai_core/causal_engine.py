@@ -25,7 +25,7 @@ class ManifoldNode:
     def __init__(self, node_id: str, label: str, node_type: str, mttf_hrs: int = 15000):
         self.node_id = node_id
         self.label = label
-        self.node_type = node_type # [ATMOS, SENSOR, MECHANICAL, LOGICAL]
+        self.node_type = node_type # [ATMOS, SENSOR, MECHANICAL, LOGICAL, ENERGY_SOLAR, ENERGY_FLARE]
         self.mttf_hrs = mttf_hrs
         
         # Internal State
@@ -72,6 +72,7 @@ class CausalIntegrityManifold:
     def __init__(self):
         self.nodes: Dict[str, ManifoldNode] = {}
         self.global_stability_index = 1.0
+        self.sovereign_mode = False
         self.last_physics_results = {
             "reynolds": 1424000.0,
             "activation_energy": 45.0,
@@ -102,7 +103,11 @@ class CausalIntegrityManifold:
         compressor = ManifoldNode("ME_COMP_01", "Main Compressor", "MECHANICAL", 25000)
         rotor = ManifoldNode("ME_ROTOR_HUB", "Active Rotor", "MECHANICAL", 18000)
         
-        # 4. Logical Constraints
+        # 4. Renewable & Emission Nodes (The New Mission Units)
+        solar_panel = ManifoldNode("EN_SOLAR_01", "PV Manifold", "ENERGY_SOLAR", 40000)
+        gas_flare = ManifoldNode("EN_FLARE_01", "Secondary Flare", "ENERGY_FLARE", 50000)
+        
+        # 5. Logical Constraints
         output = ManifoldNode("LG_TPUT", "Total Throughput", "LOGICAL")
 
         # --- ESTABLISH CAUSAL EDGES (Dependency Chain) ---
@@ -112,15 +117,25 @@ class CausalIntegrityManifold:
         intake.add_dependency(atmos)
         intake.add_dependency(wind)
         
+        solar_panel.add_dependency(atmos)
+        solar_panel.add_dependency(wind)
+        
         filter_st.add_dependency(intake)
         compressor.add_dependency(filter_st)
         rotor.add_dependency(compressor)
         
+        gas_flare.add_dependency(rotor) # Flare correlates to mechanical stress/surge
+        
         output.add_dependency(rotor)
+        output.add_dependency(solar_panel)
         output.add_dependency(opc_gateway)
 
         # Store in registry
-        for n in [atmos, wind, opc_gateway, ls_sensor, intake, filter_st, compressor, rotor, output]:
+        all_nodes = [
+            atmos, wind, opc_gateway, ls_sensor, intake, 
+            filter_st, compressor, rotor, solar_panel, gas_flare, output
+        ]
+        for n in all_nodes:
             self.nodes[n.node_id] = n
 
     def calculate_propagation_matrix(self, env_stress: float, telemetry: Dict) -> Dict:
@@ -137,36 +152,41 @@ class CausalIntegrityManifold:
         impact_report = {}
         
         # 2. Sequential Propagation (Topological Sort Simulated)
-        traversal_order = ["SN_LASER", "SN_OPC", "ME_INTAKE", "ME_FILTER_A", "ME_COMP_01", "ME_ROTOR_HUB", "LG_TPUT"]
+        traversal_order = ["SN_LASER", "SN_OPC", "ME_INTAKE", "ME_FILTER_A", "ME_COMP_01", "ME_ROTOR_HUB", "EN_SOLAR_01", "EN_FLARE_01", "LG_TPUT"]
         
         cumulative_entropy = 0.0
-        gas_constant = 8.314e-3 # kJ/(mol·K)
-        temp_k = telemetry.get("temperature", 310.0) # Standard Desert T (37°C)
+        velocity = telemetry.get("wind_speed", 10.0)
+        vibration = telemetry.get("vibration", 1.2)
+        
+        # Physics Constants for derivation
+        reynolds_num = (1.225 * velocity * 0.5) / 1.846e-5 
+        corrosion_kinetic = 1.2e-4 * np.exp(-45 / (8.314e-3 * 310)) 
+        stress_intensity = vibration * 0.04
         
         for node_id in traversal_order:
-            node = self.nodes[node_id]
+            node = self.nodes.get(node_id)
+            if not node: continue
             
-            # Weighted Health Ingestion from Upstream (Probability of Continuity)
-            upstream_healths = [u.health_score for u in node.upstream_dependencies]
-            parent_health = np.mean(upstream_healths) if upstream_healths else 1.0
+            # --- PHYSICS DERIVATION ---
+            parent_health = np.mean([u.health_score for u in node.upstream_dependencies]) if node.upstream_dependencies else 1.0
+            env_impact_factor = 0.15 if node.node_type != "ATMOS" else 0.0
+
+            # 4. Solar Dust Deposition (DSI) Physics
+            if node.node_type == "ENERGY_SOLAR":
+                surface_tilt = 30.0 # Standard fixed tilt
+                aod_value = env_stress # Using AOD as proxy for concentration
+                # DSI Efficiency Loss Model: L = 1 - exp(-k * Dust_Load)
+                dust_load = aod_value * (velocity / 10.0) * np.sin(np.radians(surface_tilt))
+                dsi_loss = 1.0 - np.exp(-0.05 * dust_load)
+                node.health_score = max(0, min(1.0, node.health_score - dsi_loss))
+                impact_report["dsi_soiling_rate"] = round(dust_load, 4)
+
+            # 5. Flare Correlation Logic
+            if node.node_type == "ENERGY_FLARE":
+                flare_event_probability = (1.0 - parent_health) * (1.0 + (stress_intensity / 5.0))
+                node.health_score = max(0, min(1.0, 1.0 - flare_event_probability))
+                impact_report["flare_prob"] = round(flare_event_probability, 4)
             
-            # --- HIGH-FIDELITY PHYSICS DERIVATION ---
-            # 1. Navier-Stokes Particulate Flux (Re = rho * v * L / mu)
-            velocity = telemetry.get("wind_speed", 10.0)
-            rho_air = 1.18 # kg/m³ @ 25°C
-            l_char = 0.5   # Characteristic length
-            reynolds_num = (rho_air * velocity * l_char) / node.air_viscosity
-            
-            # 2. Arrhenius Chemical Decay for Surface Degradation
-            # C = A * exp(-Ea / RT)
-            corrosion_kinetic = np.exp(-node.activation_energy / (gas_constant * temp_k))
-            
-            # 3. LEFM Stress Intensity Mapping
-            vibration_mm_s = telemetry.get("vibration", 0.05)
-            stress_intensity = vibration_mm_s * (node.youngs_modulus / 200.0) * 0.12 # Empirical LEFM map
-            
-            # Local Physical Stressor Weighting
-            env_impact_factor = (1.2 if node.node_type == "MECHANICAL" else 0.5)
             # Combine Reynolds-Turbulence, Arrhenius-Corrosion, and LEFM-Stress
             physical_divergence = (env_stress * env_impact_factor) * (1.0 + (reynolds_num / 500000.0)) 
             physical_divergence += (corrosion_kinetic * 2.0) + (stress_intensity * 0.8)
@@ -187,12 +207,36 @@ class CausalIntegrityManifold:
         self.last_physics_results.update({
             "reynolds": reynolds_num,
             "corrosion_kinetic": corrosion_kinetic,
-            "stress_intensity": stress_intensity
+            "stress_intensity": stress_intensity,
+            "solar_dsi_load": impact_report.get("dsi_soiling_rate", 0.0),
+            "flare_risk": impact_report.get("flare_prob", 0.0)
         })
         
         logger.info(f"PHYSICS_MAP_COMPLETE: Re={reynolds_num:.1f}, Ea_Impact={corrosion_kinetic:.4f}, Stability={self.global_stability_index:.4f}")
         
         return impact_report
+
+    def get_asset_stress_map(self) -> List[Dict]:
+        """
+        Generates a spatio-temporal stress gradient for all assets.
+        Correlates atmospheric impact with mechanical structural integrity.
+        """
+        stress_map = []
+        for node_id, node in self.nodes.items():
+            if node.node_type in ["MECHANICAL", "ENERGY_SOLAR", "ENERGY_FLARE"]:
+                # Calculating failure probability within 48h (Simulated)
+                failure_risk = (1.0 - node.health_score) * 1.2
+                is_critical = failure_risk > 0.7
+                
+                stress_map.append({
+                    "id": node_id,
+                    "label": node.label,
+                    "stress_index": round(node.structural_entropy * 10, 2),
+                    "failure_prob_48h": f"{min(99.9, failure_risk * 100):.1f}%",
+                    "status": "CRITICAL" if is_critical else "STABLE",
+                    "color": "#ef4444" if is_critical else ("#f59e0b" if failure_risk > 0.3 else "#10b981")
+                })
+        return stress_map
 
     def perform_sensitivity_analysis(self, base_stress: float) -> List[Dict]:
         """

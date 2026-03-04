@@ -552,11 +552,26 @@
             position: relative;
         }
 
-        /* Chart container */
-        .chart-wrapper {
-            height: 280px;
-            width: 100%;
-            position: relative;
+        /* Stress Scan Animation */
+        @keyframes stressPulse {
+            0% {
+                box-shadow: 0 0 5px rgba(239, 68, 68, 0.2);
+                border-color: rgba(239, 68, 68, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+                border-color: rgba(239, 68, 68, 0.8);
+            }
+
+            100% {
+                box-shadow: 0 0 5px rgba(239, 68, 68, 0.2);
+                border-color: rgba(239, 68, 68, 0.4);
+            }
+        }
+
+        .critical-pulse {
+            animation: stressPulse 2s infinite ease-in-out;
         }
     </style>
 </head>
@@ -583,10 +598,14 @@
         </div>
         <div class="nav-item" data-i18n-title="nav_audit" title="Audit Trails" onclick="switchTab('audit')"><i
                 data-lucide="scroll-text" size="20"></i></div>
-        <div class="nav-item" data-i18n-title="nav_diligence" title="Diligence Hub" onclick="switchTab('diligence')"><i
-                data-lucide="book-open-check" size="20"></i></div>
+        <div class="nav-item" data-i18n-title="nav_energy" title="Energy Intelligence" onclick="switchTab('energy')"><i
+                data-lucide="zap" size="20"></i></div>
+        <div class="nav-item" data-i18n-title="nav_stress" title="Asset Stress Map" onclick="switchTab('stress')"><i
+                data-lucide="activity" size="20"></i></div>
         <div class="nav-item" data-i18n-title="nav_esg" title="ESG & Carbon" onclick="switchTab('esg')"><i
                 data-lucide="leaf" size="20"></i></div>
+        <div class="nav-item" data-i18n-title="nav_diligence" title="Diligence Hub" onclick="switchTab('diligence')"><i
+                data-lucide="book-open-check" size="20"></i></div>
         <div style="flex:1"></div>
         <div class="nav-item" data-i18n-title="nav_settings" title="Settings" onclick="switchTab('settings')"><i
                 data-lucide="settings" size="20"></i></div>
@@ -621,18 +640,21 @@
                     style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--accent-green); color: var(--accent-green); padding: 8px 16px; border-radius: 6px; font-family: 'JetBrains Mono'; font-size: 11px; cursor: pointer; font-weight: 800; transition: 0.3s; margin-left: 10px;">EN
                     / AR</button>
                 <div class="mono" style="font-size: 12px; color: var(--text-secondary);" id="clock">00:00:00 UTC</div>
-                <div id="api-status"
-                    style="background: rgba(16, 185, 129, 0.05); border: 1px solid var(--border-color); padding: 4px 10px; border-radius: 4px; display: flex; align-items: center; gap: 8px;">
-                    <div class="status-dot"
-                        style="width: 6px; height: 6px; background: var(--accent-green); border-radius: 50%;"></div>
-                    <span
-                        style="font-family: 'JetBrains Mono'; font-size: 10px; color: var(--accent-green); letter-spacing: 1px;">ENCRYPTED_HANDSHAKE:
-                        OK</span>
-                </div>
-                <div
-                    style="width: 32px; height: 32px; border-radius: 50%; background: #1e293b; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border-color);">
-                    <i data-lucide="user" size="16"></i>
-                </div>
+                <span
+                    style="font-family: 'JetBrains Mono'; font-size: 10px; color: var(--accent-green); letter-spacing: 1px;">ENCRYPTED_HANDSHAKE:
+                    OK</span>
+            </div>
+            <div id="sovereign-control" title="Sovereign Edge Mode" onclick="toggleSovereignMode()"
+                style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); padding: 4px 12px; border-radius: 4px; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: 0.3s;">
+                <i data-lucide="shiel-alert" id="sov-icon" size="14" color="var(--text-secondary)"></i>
+                <span id="sov-label"
+                    style="font-family: 'JetBrains Mono'; font-size: 10px; color: var(--text-secondary); letter-spacing: 1px;">SOVEREIGN_MODE:
+                    OFF</span>
+            </div>
+            <div
+                style="width: 32px; height: 32px; border-radius: 50%; background: #1e293b; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border-color);">
+                <i data-lucide="user" size="16"></i>
+            </div>
             </div>
         </header>
 
@@ -828,6 +850,7 @@
                         <div style="font-family: 'JetBrains Mono'; font-size: 10px; color: var(--text-secondary); margin-bottom: 10px;"
                             data-i18n="carbon_total">TOTAL_CO2_AVOIDED</div>
                         <div id="esg-co2-val" style="font-size: 32px; font-weight: 900; color: #fff;">0.000 kg</div>
+                        <div id="esg-breakdown-stats"></div>
                     </div>
                     <div class="panel" style="padding: 24px; text-align: center; border-bottom: 3px solid #3b82f6;">
                         <div style="font-family: 'JetBrains Mono'; font-size: 10px; color: var(--text-secondary); margin-bottom: 10px;"
@@ -844,6 +867,26 @@
                         <div style="font-family: 'JetBrains Mono'; font-size: 10px; color: var(--text-secondary); margin-bottom: 10px;"
                             data-i18n="authenticated_claims">AUTHENTICATED_CLAIMS</div>
                         <div id="esg-claims-val" style="font-size: 32px; font-weight: 900; color: #fff;">0</div>
+                    </div>
+                </div>
+
+                <!-- REAL-TIME CARBON OFFSET STRIP -->
+                <div class="panel"
+                    style="padding: 15px 30px; background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2); display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 20px;">
+                        <div class="status-pill"
+                            style="background: rgba(16, 185, 129, 0.1); color: var(--accent-green);">
+                            <div class="status-dot"></div>
+                            <span style="font-size: 10px; font-weight: 800;">REAL_TIME_YIELD</span>
+                        </div>
+                        <div id="carbon-offset-ticker"
+                            style="font-family: 'JetBrains Mono'; font-size: 18px; font-weight: 800; color: #fff;">
+                            0.0000 kg/hr
+                        </div>
+                    </div>
+                    <div
+                        style="font-family: 'JetBrains Mono'; font-size: 10px; color: var(--text-secondary); opacity: 0.6;">
+                        EQUATION: [ Δ_CO2 = (Σ_E_saved * Grid_Intensity) + Mission_Recovery ]
                     </div>
                 </div>
 
@@ -1264,13 +1307,20 @@
                             </div>
                             <!-- Entry 2 -->
                             <div
-                                style="display: grid; grid-template-columns: 100px 1fr 150px 100px; gap: 20px; align-items: center; background: rgba(255,255,255,0.02); padding: 10px; border-radius: 4px;">
-                                <span style="color: var(--text-secondary);">05:47:15</span>
+                                style="display: grid; grid-template-columns: 80px 1fr 100px 150px 100px; gap: 20px; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding: 15px 20px;">
                                 <span
-                                    style="color: #fff; opacity: 0.6; letter-spacing: 0.5px;">0xb3c2...f4e0c1a938...92a188c2f4e0</span>
-                                <span style="font-size: 10px; color: var(--text-secondary);">NEOM_CORE_INFRA</span>
+                                    style="font-family: 'JetBrains Mono'; font-size: 10px; opacity: 0.6;">#${b.block_index}</span>
+                                <div style="display: flex; flex-direction: column;">
+                                    <span style="font-weight: 700; font-size: 13px;">${b.action_type}</span>
+                                    <span
+                                        style="font-family: 'JetBrains Mono'; font-size: 9px; color: var(--accent-green);">${b.certificate_id}</span>
+                                </div>
+                                <span style="font-weight: 800; color: #fff;">+${b.esg_impact_kg.toFixed(3)}kg</span>
                                 <span
-                                    style="color: var(--accent-green); font-weight: 800; font-size: 9px; background: rgba(16,185,129,0.1); padding: 3px 8px; border-radius: 4px; text-align: center; border: 1px solid rgba(16,185,129,0.2);">VERIFIED</span>
+                                    style="font-family: 'JetBrains Mono'; font-size: 9px; opacity: 0.4;">${b.verification_hash.substr(0,
+                                    24)}...</span>
+                                <span class="status-pill"
+                                    style="font-size: 9px; justify-content: center; background: rgba(16,185,129,0.1); color: var(--accent-green); border: 1px solid rgba(16,185,129,0.2);">VERIFIED</span>
                             </div>
                             <!-- Entry 3 -->
                             <div
@@ -1281,6 +1331,136 @@
                                 <span style="font-size: 10px; color: var(--text-secondary);">DHAHRAN_X_SYSTEM</span>
                                 <span
                                     style="color: var(--accent-green); font-weight: 800; font-size: 9px; background: rgba(16,185,129,0.1); padding: 3px 8px; border-radius: 4px; text-align: center; border: 1px solid rgba(16,185,129,0.2);">VERIFIED</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ASSET STRESS MAP VIEW (PREDICTIVE INTEGRITY AI) -->
+        <div id="stress-view" class="view-content" style="grid-template-columns: 1fr; gap: 24px;">
+            <div class="panel" style="padding: 0; position: relative; overflow: hidden; background: #05070a;">
+                <div class="panel-header"
+                    style="position: absolute; top: 0; left: 0; right: 0; z-index: 10; background: rgba(5,7,10,0.8); backdrop-filter: blur(10px);">
+                    <div class="panel-title">
+                        <i data-lucide="activity" size="18" color="var(--accent-red)"></i>
+                        <span data-i18n="stress_map_title">Asset Stress Map (Spatio-Temporal Gradient)</span>
+                    </div>
+                    <div style="font-family: 'JetBrains Mono'; font-size: 10px; opacity: 0.5;">
+                        FRACTURE_PROPAGATION_PROBABILITY: ACTIVE</div>
+                </div>
+
+                <!-- SIMULATED 3D TWIN SCHEMATIC -->
+                <div id="digital-twin-canvas"
+                    style="height: 500px; width: 100%; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at center, #1e293b 0%, #05070a 100%);">
+                    <div id="stress-grid-container"
+                        style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 60px; width: 100%;">
+                        <!-- Cards injected here -->
+                    </div>
+                </div>
+
+                <div class="panel-footer"
+                    style="padding: 20px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; gap: 30px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div
+                                style="width: 10px; height: 10px; background: var(--accent-green); border-radius: 2px;">
+                            </div>
+                            <span style="font-size: 10px; opacity: 0.6;">STABLE</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div
+                                style="width: 10px; height: 10px; background: var(--accent-amber); border-radius: 2px;">
+                            </div>
+                            <span style="font-size: 10px; opacity: 0.6;">WARNING</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 10px; height: 10px; background: var(--accent-red); border-radius: 2px;">
+                            </div>
+                            <span style="font-size: 10px; opacity: 0.6;">CRITICAL</span>
+                        </div>
+                    </div>
+                    <div style="font-family: 'JetBrains Mono'; font-size: 11px; color: var(--accent-red); font-weight: 800;"
+                        data-i18n="stress_alert_msg">
+                        [!] MULTI-VARIATE FAILURE DETECTED IN 48H WINDOW
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="energy-view" class="view-content" style="grid-template-columns: 1fr 1fr; gap: 24px;">
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <i data-lucide="sun" size="18" color="var(--accent-amber)"></i>
+                        <span data-i18n="mission_solar">Renewable Asset Intelligence (Solar DSI)</span>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div id="solar-mission-container" style="display: flex; flex-direction: column; gap: 20px;">
+                        <div class="action-card"
+                            style="background: rgba(245, 158, 11, 0.05); border-color: rgba(245, 158, 11, 0.2);">
+                            <div
+                                style="font-family: 'JetBrains Mono'; font-size: 10px; color: var(--accent-amber); margin-bottom: 8px;">
+                                [ MISSION_ID: MSN_SOLAR_RECOVERY ]</div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <h3 id="solar-status-label" style="margin: 0;">MONITORING</h3>
+                                <div id="solar-status-badge" class="status-pill"
+                                    style="background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.2); color: var(--accent-amber);">
+                                    <div class="status-dot"
+                                        style="background: var(--accent-amber); box-shadow: 0 0 8px var(--accent-amber);">
+                                    </div>
+                                    <span id="solar-metric-val">0.00 kg/m²</span>
+                                </div>
+                            </div>
+                            <div style="margin-top: 15px; font-size: 13px; color: var(--text-secondary);"
+                                data-i18n="solar_desc">
+                                Physics-based Dust Deposition (DSI) modeling to predict cleaning cycles and recover lost
+                                generation efficiency.
+                            </div>
+                            <div
+                                style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between;">
+                                <span style="font-size: 11px; font-family: 'JetBrains Mono';">IMPACT_SAVED:</span>
+                                <span id="solar-impact-val" style="color: var(--accent-green); font-weight: 800;">+ 0.00
+                                    kg CO2</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <i data-lucide="flame" size="18" color="var(--accent-red)"></i>
+                        <span data-i18n="mission_flare">Emission Reduction (Flare Prevention)</span>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div id="flare-mission-container" style="display: flex; flex-direction: column; gap: 20px;">
+                        <div class="action-card"
+                            style="background: rgba(239, 68, 68, 0.05); border-color: rgba(239, 68, 68, 0.2);">
+                            <div
+                                style="font-family: 'JetBrains Mono'; font-size: 10px; color: var(--accent-red); margin-bottom: 8px;">
+                                [ MISSION_ID: MSN_FLARE_REDUCTION ]</div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <h3 id="flare-status-label" style="margin: 0;">STABLE</h3>
+                                <div id="flare-status-badge" class="status-pill"
+                                    style="background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.2); color: var(--accent-green);">
+                                    <div class="status-dot"></div>
+                                    <span id="flare-metric-val">0.0% Prob</span>
+                                </div>
+                            </div>
+                            <div style="margin-top: 15px; font-size: 13px; color: var(--text-secondary);"
+                                data-i18n="flare_desc">
+                                Correlating mechanical stress anomalies with upstream gas flaring events to generate
+                                verifiable carbon credits.
+                            </div>
+                            <div
+                                style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between;">
+                                <span style="font-size: 11px; font-family: 'JetBrains Mono';">IMPACT_SAVED:</span>
+                                <span id="flare-impact-val" style="color: var(--accent-green); font-weight: 800;">+ 0.00
+                                    kg CO2</span>
                             </div>
                         </div>
                     </div>
@@ -1646,6 +1826,12 @@
                 updateESGImpactData();
                 updateESGLedgerData();
             }
+            if (tabId === 'energy') {
+                updateEnergyMissionsData();
+            }
+            if (tabId === 'stress') {
+                updateAssetStressMap();
+            }
             if (tabId === 'diligence') logEvent("Diligence Whitepaper Accessed", "info");
 
             if (typeof lucide !== 'undefined') lucide.createIcons();
@@ -1668,6 +1854,63 @@
                     });
                 }
             } catch (e) { console.error("Telemetry Link Failure", e); }
+        }
+
+        async function toggleSovereignMode() {
+            const sovLabel = document.getElementById('sov-label');
+            const sovIcon = document.getElementById('sov-icon');
+            const control = document.getElementById('sovereign-control');
+            const currentlyOn = sovLabel.innerText.includes('ON');
+
+            try {
+                const res = await fetch(`/v2/system/sovereign?enable=${!currentlyOn}`, { method: 'POST' });
+                const data = await res.json();
+
+                if (data.status === 'SUCCESS') {
+                    if (data.sovereign_mode) {
+                        sovLabel.innerText = 'SOVEREIGN_MODE: ON';
+                        sovLabel.style.color = 'var(--accent-green)';
+                        sovIcon.style.color = 'var(--accent-green)';
+                        control.style.borderColor = 'var(--accent-green)';
+                        logEvent("S-EDGE ENGAGED: All AI inference running locally on KSA-based edge nodes.", "warn");
+                    } else {
+                        sovLabel.innerText = 'SOVEREIGN_MODE: OFF';
+                        sovLabel.style.color = 'var(--text-secondary)';
+                        sovIcon.style.color = 'var(--text-secondary)';
+                        control.style.borderColor = 'var(--border-color)';
+                        logEvent("CLOUD_UPLINK_RESTORED: Global telemetry relay active.", "info");
+                    }
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                }
+            } catch (e) { console.error("Sovereign Toggle Failure", e); }
+        }
+
+        async function updateAssetStressMap() {
+            try {
+                const response = await fetch('/v2/physics/stress-map');
+                const data = await response.json();
+                const container = document.getElementById('stress-grid-container');
+                if (!container) return;
+
+                container.innerHTML = data.map.map(asset => `
+                    <div class="panel ${asset.status === 'CRITICAL' ? 'critical-pulse' : ''}" style="padding: 15px; border-left: 3px solid ${asset.color}; background: rgba(255,255,255,0.01); transition: 0.3s; transform: perspective(1000px) rotateX(2deg);">
+                        <div style="font-family: 'JetBrains Mono'; font-size: 8px; opacity: 0.5; margin-bottom: 5px;">${asset.id}</div>
+                        <div style="font-weight: 800; font-size: 13px; margin-bottom: 10px;">${asset.label}</div>
+                        <div style="display: flex; justify-content: space-between; align-items: end;">
+                            <div>
+                                <div style="font-size: 10px; opacity: 0.6;">STRESS_INDEX</div>
+                                <div style="font-size: 20px; font-weight: 900; color: ${asset.color};">${asset.stress_index}</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 8px; opacity: 0.6;">FAILURE_48H</div>
+                                <div style="font-size: 11px; font-weight: 800; color: ${asset.status === 'CRITICAL' ? '#ef4444' : '#fff'};">${asset.failure_prob_48h}</div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            } catch (e) { console.error("Stress Map Link Failure", e); }
         }
 
         function switchDiligenceTab(tabId, element) {
@@ -1786,7 +2029,56 @@
                 document.getElementById('esg-co2-val').innerText = `${data.total_co2_kg_saved.toFixed(3)} kg`;
                 document.getElementById('esg-water-val').innerText = `${data.total_water_liters_saved.toFixed(2)} L`;
                 document.getElementById('esg-credits-val').innerText = data.credits_pending;
+
+                const ticker = document.getElementById('carbon-offset-ticker');
+                if (ticker && data.realtime_yield_kg_hr) {
+                    ticker.innerText = `${data.realtime_yield_kg_hr.toFixed(4)} kg/hr`;
+                }
+
+                // If special breakdown elements exist, update them
+                if (data.breakdown) {
+                    const breakdownContainer = document.getElementById('esg-breakdown-stats');
+                    if (breakdownContainer) {
+                        breakdownContainer.innerHTML = `
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 10px;">
+                                <div style="text-align: center; background: rgba(255,255,255,0.02); padding: 5px; border-radius: 4px;">
+                                    <div style="font-size: 8px; opacity: 0.5;">OPT</div>
+                                    <div style="font-size: 10px; color: var(--accent-green); font-weight: 800;">+${data.breakdown.operational_optimization}</div>
+                                </div>
+                                <div style="text-align: center; background: rgba(255,255,255,0.02); padding: 5px; border-radius: 4px;">
+                                    <div style="font-size: 8px; opacity: 0.5;">SOLAR</div>
+                                    <div style="font-size: 10px; color: var(--accent-green); font-weight: 800;">+${data.breakdown.renewable_recovery}</div>
+                                </div>
+                                <div style="text-align: center; background: rgba(255,255,255,0.02); padding: 5px; border-radius: 4px;">
+                                    <div style="font-size: 8px; opacity: 0.5;">FLARE</div>
+                                    <div style="font-size: 10px; color: var(--accent-green); font-weight: 800;">+${data.breakdown.flare_reduction}</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
             } catch (e) { console.error("ESG Impact Link Failure", e); }
+        }
+
+        async function updateEnergyMissionsData() {
+            try {
+                const response = await fetch('/v2/energy/missions');
+                const data = await response.json();
+
+                data.missions.forEach(m => {
+                    if (m.id === 'MSN_SOLAR_RECOVERY') {
+                        document.getElementById('solar-status-label').innerText = m.status;
+                        document.getElementById('solar-metric-val').innerText = m.metric;
+                        document.getElementById('solar-impact-val').innerText = `+ ${m.impact_saved}`;
+                    } else if (m.id === 'MSN_FLARE_REDUCTION') {
+                        document.getElementById('flare-status-label').innerText = m.status;
+                        document.getElementById('flare-metric-val').innerText = m.metric;
+                        document.getElementById('flare-impact-val').innerText = `+ ${m.impact_saved}`;
+                    }
+                });
+
+                logEvent(`Energy Intelligence Sync: Yield ${data.total_esg_yield.toFixed(2)} kg CO2`, 'info');
+            } catch (e) { console.error("Energy Missions Link Failure", e); }
         }
 
         async function updateESGLedgerData() {
@@ -1801,7 +2093,8 @@
                             <div style="color: var(--accent-green); font-weight: 800;">#${block.block_index.toString().padStart(4, '0')}</div>
                             <div>
                                 <div style="color: #fff; font-weight: 700; margin-bottom: 4px;">CLAIM: ${block.action_type}</div>
-                                <div style="font-size: 9px; opacity: 0.5;">HASH: ${block.verification_hash}</div>
+                                <div style="font-size: 9px; color: var(--accent-green); opacity: 0.8;">CERT_ID: ${block.certificate_id}</div>
+                                <div style="font-size: 8px; opacity: 0.4;">HASH: ${block.verification_hash.substr(0, 32)}...</div>
                             </div>
                             <div style="color: var(--accent-green); font-weight: 900; font-size: 13px;">+ ${block.esg_impact_kg.toFixed(4)} kg CO2</div>
                             <div style="text-align: right; opacity: 0.6; font-size: 10px;">${new Date(block.timestamp).toLocaleTimeString()}</div>
@@ -2097,6 +2390,11 @@
                 nav_diligence: "Diligence Hub",
                 nav_settings: "Settings",
                 nav_esg: "ESG & Carbon Intelligence",
+                nav_energy: "Energy Intelligence",
+                mission_solar: "Renewable Asset Intelligence (Solar DSI)",
+                mission_flare: "Emission Reduction (Flare Prevention)",
+                solar_desc: "Physics-based Dust Deposition (DSI) modeling to predict cleaning cycles and recover lost generation efficiency.",
+                flare_desc: "Correlating mechanical stress anomalies with upstream gas flaring events to generate verifiable carbon credits.",
                 carbon_total: "TOTAL_CO2_AVOIDED",
                 water_total: "WATER_RESOURCES_SAVED",
                 credits: "CARBON_CREDITS_PENDING",
@@ -2104,7 +2402,12 @@
                 esg_ledger_title: "Sovereign Sustainability Ledger",
                 settings_title: "Precision Configuration",
                 settings_subtitle: "Adjust system-wide operational parameters",
-                diligence_index: "TECHNICAL_DILIGENCE_INDEX"
+                diligence_index: "TECHNICAL_DILIGENCE_INDEX",
+                nav_stress: "Asset Stress Map",
+                stress_map_title: "Asset Stress Map (Spatio-Temporal Gradient)",
+                stress_alert_msg: "[!] MULTI-VARIATE FAILURE DETECTED IN 48H WINDOW",
+                sov_edge_on: "SOVEREIGN_MODE: ON",
+                sov_edge_off: "SOVEREIGN_MODE: OFF"
             },
             ar: {
                 nav_home: "العودة للرئيسية",
@@ -2143,6 +2446,11 @@
                 authenticated_claims: "المطالبات المصادق عليها",
                 esg_ledger_title: "سجل الاستدامة السيادي (ESG Ledger)",
                 diligence_index: "فهرس التدقيق والامتثال",
+                nav_stress: "خريطة إجهاد الأصول",
+                stress_map_title: "خريطة إجهاد الأصول (التدرج المكاني والزماني)",
+                stress_alert_msg: "[!] تم اكتشاف فشل ميكانيكي محتمل خلال 48 ساعة",
+                sov_edge_on: "وضع الاستدلال السيادي: نـشط",
+                sov_edge_off: "وضع الاستدلال السيادي: غير نـشط",
                 audit_title: "سجل البلوكشين السيادي (Sovereign Ledger)",
                 audit_subtitle: "سلسلة الحماية التشفيرية لكافة عمليات الاستنتاج الآلي",
                 audit_sec_status: "غلاف الأمن الكمي (Quantum Shield)",
@@ -2219,7 +2527,12 @@
                 phys_arrh_h: "حركية (Arrhenius)",
                 phys_arrh_d: "نمذجة معدلات التدهور الكيميائي وتدمع الملح بناءً على بارامترات معادلة أرينيوس ومعطيات الرطوبة الجوية.",
                 phys_fract_h: "انتشار الكسور الهيكلية",
-                phys_fract_d: "نمذجة ميكانيكا الكسر المرن الخطي (LEFM) للتنبؤ بمسارات انتشار الكسور المجهرية عبر المنظومات الهيكلية."
+                phys_fract_d: "نمذجة ميكانيكا الكسر المرن الخطي (LEFM) للتنبؤ بمسارات انتشار الكسور المجهرية عبر المنظومات الهيكلية.",
+                nav_energy: "ذكاء الطاقة المتجددة",
+                mission_solar: "ذكاء الأصول المتجددة (DSI للطاقة الشمسية)",
+                mission_flare: "تخفيض الانبعاثات (منع حرق الغاز)",
+                solar_desc: "نمذجة ترسيب الغبار (DSI) القائمة على الفيزياء للتنبؤ بدورات التنظيف واستعادة كفاءة التوليد المفقودة.",
+                flare_desc: "ربط حالات شذوذ الإجهاد الميكانيكي بأحداث حرق الغاز التلقائية لتوليد أرصدة كربونية قابلة للتحقق."
             }
         };
 
@@ -2269,6 +2582,7 @@
                 if (activeView.id === 'telemetry-view') updateTelemetryData();
                 if (activeView.id === 'physics-view') updatePhysicsManifoldData();
                 if (activeView.id === 'audit-view') updateAuditLedgerData();
+                if (activeView.id === 'energy-view') updateEnergyMissionsData();
                 if (activeView.id === 'esg-view') {
                     updateESGImpactData();
                     updateESGLedgerData();

@@ -19,6 +19,7 @@ class LedgerBlock(BaseModel):
     esg_impact_kg: float
     verification_hash: str
     node_origin: str
+    certificate_id: str
 
 class SovereignLedgerEngine:
     """
@@ -44,7 +45,8 @@ class SovereignLedgerEngine:
             action_type="GENESIS",
             esg_impact_kg=0.0,
             verification_hash=self._calculate_hash(0, "0" * 64, "0xGENESIS_ANCHOR_SAHARYN"),
-            node_origin=self.node_id
+            node_origin=self.node_id,
+            certificate_id="SHRN-GEN-0000"
         )
         self.chain.append(genesis)
 
@@ -76,7 +78,8 @@ class SovereignLedgerEngine:
             action_type=action_type,
             esg_impact_kg=round(kg_saved, 6),
             verification_hash=self._calculate_hash(next_index, last_block.verification_hash, merkle_root),
-            node_origin=self.node_id
+            node_origin=self.node_id,
+            certificate_id=f"SHRN-{self.node_id[:3]}-{next_index:04d}-{uuid.uuid4().hex[:4].upper()}"
         )
         
         self.chain.append(new_block)
