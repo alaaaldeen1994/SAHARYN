@@ -22,3 +22,5 @@ requests
 aiohttp
 python-dotenv
 tenacity
+xarray
+cfgrib
