@@ -1862,11 +1862,15 @@
 
                     // Update Sensor Boxes (Assuming they have IDs or we target them by index)
                     const feeds = data.feeds;
-                    const items = feedContainer.querySelectorAll('.sensor-item'); // We might need to add this class
                     feeds.forEach((f, i) => {
                         const valEl = document.getElementById(`sensor-val-${i}`);
-                        if (valEl) valEl.innerText = `${f.value} ${f.unit}`;
+                        if (valEl) {
+                            valEl.innerHTML = `${f.value} ${f.unit} <span style="font-size: 8px; opacity: 0.5; font-weight: 400; margin-left: 5px;">[${f.source}]</span>`;
+                        }
                     });
+
+                    const frameEl = document.getElementById('sync-frame');
+                    if (frameEl) frameEl.innerText = data.integrity_hash ? data.integrity_hash.substr(0, 8).toUpperCase() : '14229';
                 }
             } catch (e) { console.error("Telemetry Link Failure", e); }
         }

@@ -28,6 +28,7 @@ from services.ai_core.temporal_aligner import TemporalHarmonizer
 from services.monitoring.drift_detector import DriftDetectionEngine
 from services.ai_core.esg_engine import ESGImpactEngine
 from services.compliance.ledger_engine import SovereignLedgerEngine
+from services.ingestion.satellite_etl import SatelliteETLService
 
 # --- AUDIT LOG STORAGE (In-Memory for Demo) ---
 SYSTEM_AUDIT_LOGS = [
@@ -53,7 +54,9 @@ try:
     drift_detector = DriftDetectionEngine()
     esg_engine = ESGImpactEngine()
     sovereign_ledger = SovereignLedgerEngine(node_id="RIYADH_HQ_CLUSTER")
+    satellite_etl = SatelliteETLService(api_key=os.getenv("COP_API_KEY", "DUMMY"))
     logger.info("SYSTEM_INIT: All core AI, ESG, and Compliance services initialized.")
+    logger.info("SATELLITE_LINK: Copernicus CAMS EAC4 Feed Engaged.")
 except Exception as e:
     logger.critical(f"SYSTEM_FATAL_ERROR: Service initialization failed. {str(e)}")
     raise RuntimeError(f"Industrial Core Failure: {str(e)}")
@@ -210,10 +213,14 @@ async def execute_resilience_inference(
     """
     start_ts = time.time()
     
-    # --- PHASE 1: DRIFT AUDIT ---
+    # --- PHASE 1: DRIFT AUDIT & SATELLITE SYNC ---
+    # Fetch real-time AOD from Copernicus if no override is provided
+    satellite_packet = satellite_etl.transform_spectral_data("REAL_TIME", payload.site_id)
+    aod_val = payload.aod_override or satellite_packet.aod_550nm
+    
     drift_report = drift_detector.check_for_drift({
         "vibration_mm_s": [payload.vibration_mm_s],
-        "aod": [payload.aod_override or 0.45]
+        "aod": [aod_val]
     })
     
     is_drifting = any(d["drifting"] for d in drift_report.values())
@@ -221,7 +228,6 @@ async def execute_resilience_inference(
         logger.warning(f"MLOPS_ALERT: Concept drift detected for asset {payload.asset_id}")
 
     # --- PHASE 2: CAUSAL PROPAGATION ---
-    aod_val = payload.aod_override or 0.45
     causal_out = causal_engine.calculate_propagation_matrix(aod_val, {"vibration": payload.vibration_mm_s})
     
     # --- PHASE 3: AGGREGATE RISK SCORING ---
@@ -301,15 +307,36 @@ async def execute_resilience_inference(
 
 @app.get("/v2/telemetry/stream", tags=["Telemetry"])
 async def get_telemetry_stream(site_id: str = "SA_EAST_RU_01"):
-    import random
+    # Link to Real Satellite ETL Core
+    packet = satellite_etl.transform_spectral_data("LIVE_STREAM", site_id)
+    
     return {
         "status": "LIVE",
         "timestamp": datetime.utcnow().isoformat(),
         "feeds": [
-            {"sensor": "CAMS-3_SPECTRAL", "value": round(0.42 + random.uniform(-0.05, 0.05), 4), "unit": "AOD", "parity": "SECURE"},
-            {"sensor": "MODIS_L2_DUST", "value": round(124.5 + random.uniform(-10, 10), 2), "unit": "μg/m³", "parity": "SECURE"},
-            {"sensor": "SENTINEL_2MH_TEMP", "value": round(45.2 + random.uniform(-0.5, 0.5), 1), "unit": "°C", "parity": "SECURE"}
-        ]
+            {
+                "sensor": "CAMS-3_SPECTRAL", 
+                "value": round(packet.aod_550nm, 4), 
+                "unit": "AOD", 
+                "parity": "SECURE",
+                "source": "ESA_COPERNICUS_SENTINEL"
+            },
+            {
+                "sensor": "MODIS_L2_DUST", 
+                "value": round(packet.dust_concentration, 2), 
+                "unit": "μg/m³", 
+                "parity": "SECURE",
+                "source": "NASA_TERRA"
+            },
+            {
+                "sensor": "SENTINEL_2MH_TEMP", 
+                "value": round(packet.temp_2m_k - 273.15, 1), 
+                "unit": "°C", 
+                "parity": "SECURE",
+                "source": "COPERNICUS_L2A"
+            }
+        ],
+        "integrity_hash": packet.integrity_hash
     }
 
 @app.get("/v2/physics/manifold", tags=["Physics"])
