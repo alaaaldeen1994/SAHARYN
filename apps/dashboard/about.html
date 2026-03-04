@@ -256,10 +256,10 @@
 
         .summary-box {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 20px;
-            margin-top: 40px;
-            margin-bottom: 80px;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+            margin-bottom: 100px;
         }
 
         .summary-item {
@@ -285,36 +285,28 @@
         }
 
         .summary-item h5 {
-            font-size: 18px;
+            font-size: 20px;
             color: #fff;
             font-family: var(--font-tech);
             margin-bottom: 25px;
             letter-spacing: 1.5px;
             font-weight: 800;
             text-transform: uppercase;
+            white-space: nowrap;
         }
 
         .summary-item p {
             font-family: 'Inter', sans-serif;
             font-size: 16px;
             color: #fff;
-            line-height: 1.6;
+            line-height: 1.7;
             font-weight: 400;
             opacity: 0.9;
+            text-align: left;
         }
 
-        .summary-item p span {
-            display: block;
-            margin-bottom: 12px;
-            position: relative;
-            padding-left: 15px;
-        }
-
-        .summary-item p span::before {
-            content: '•';
-            position: absolute;
-            left: 0;
-            color: var(--accent-green);
+        .ar-summary p {
+            text-align: right;
         }
 
         footer {
@@ -367,56 +359,77 @@
                 <div class="summary-item">
                     <i data-lucide="satellite" size="24"></i>
                     <div class="lang-content lang-en">
-                        <h5>1. SATELLITE FUSION</h5>
-                        <p><span>Watch dust from space</span><span>Stop weather damage early</span></p>
+                        <h5>SATELLITE FUSION</h5>
+                        <p>This module uses high-speed data from international space satellites to monitor the air and
+                            ground. It specifically tracks dust and sand movements in real-time, allowing our system to
+                            predict and stop weather-related damage before it hits your vital machines.</p>
                     </div>
-                    <div class="lang-content lang-ar ar-text">
-                        <h5>1. الدمج الفضائي</h5>
-                        <p><span>راقب الغبار من الفضاء</span><span>تجنب أضرار الطقس مبكراً</span></p>
+                    <div class="lang-content lang-ar ar-text ar-summary">
+                        <h5>الدمج الفضائي</h5>
+                        <p>تستخدم هذه الوحدة بيانات البث المباشر من الأقمار الاصطناعية العالمية لمراقبة الغلاف الجوي
+                            والأرض بدقة عالية. تقوم بتتبع حركة الغبار والرمال في الوقت الفعلي، مما يسمح لنظامنا بالتنبؤ
+                            بالأخطار الجوية ومنع وقوع الأضرار قبل وصولها لمعداتك الحيوية.</p>
                     </div>
                 </div>
                 <div class="summary-item">
                     <i data-lucide="activity" size="24"></i>
                     <div class="lang-content lang-en">
-                        <h5>2. STRESS MAPPING</h5>
-                        <p><span>Check machine health in 3D</span><span>Fix issues before they break</span></p>
+                        <h5>STRESS MAPPING</h5>
+                        <p>We build a complete digital twin of your mechanical systems. By analyzing how different parts
+                            handle pressure and heat, the system spots tiny signs of wear and tear early on, ensuring
+                            you can fix or replace parts before they lead to a complete breakdown.</p>
                     </div>
-                    <div class="lang-content lang-ar ar-text">
-                        <h5>2. خرائط الإجهاد</h5>
-                        <p><span>افحص صحة الماكينات بتقنية 3D</span><span>أصلح الأعطال قبل وقوعها</span></p>
+                    <div class="lang-content lang-ar ar-text ar-summary">
+                        <h5>خرائط الإجهاد</h5>
+                        <p>نقوم ببناء نموذج رقمي ثلاثي الأبعاد متكامل لجميع أنظمتك الميكانيكية. عبر تحليل كيفية تحمل
+                            الأجزاء المختلفة للضغط والحرارة، يرصد النظام علامات التهالك الصغيرة والمخفية، مما يضمن لك
+                            إصلاح المعدات قبل أن تتعرض لتعطل مفاجئ.</p>
                     </div>
                 </div>
                 <div class="summary-item">
                     <i data-lucide="git-branch" size="24"></i>
                     <div class="lang-content lang-en">
-                        <h5>3. CAUSAL LOGIC</h5>
-                        <p><span>Find why things go wrong</span><span>Fix the real cause directly</span></p>
+                        <h5>CAUSAL LOGIC</h5>
+                        <p>Most AI systems just guess, but our system understands 'why'. By mapping the direct
+                            relationships between the environment and machine performance, it finds the actual root
+                            cause of any problem, so you can solve the real issue instead of just treating symptoms.</p>
                     </div>
-                    <div class="lang-content lang-ar ar-text">
-                        <h5>3. المنطق السببي</h5>
-                        <p><span>اكتشف السبب الحقيقي للمشاكل</span><span>حل المشكلة من جذورها مباشرة</span></p>
+                    <div class="lang-content lang-ar ar-text ar-summary">
+                        <h5>المنطق السببي</h5>
+                        <p>معظم أنظمة الذكاء الاصطناعي تكتفي بالتخمين، لكن نظامنا يفهم "السبب" الحقيقي. من خلال رسم
+                            العلاقات المباشرة بين البيئة وأداء الآلات، يجد النظام المصدر الأساسي لأي خلل، مما يساعدك على
+                            حل المشكلة الحقيقية بدلاً من مجرد معالجة الأعراض السطحية.</p>
                     </div>
                 </div>
                 <div class="summary-item">
                     <i data-lucide="zap" size="24"></i>
                     <div class="lang-content lang-en">
-                        <h5>4. OPTIMIZER</h5>
-                        <p><span>Balance the workload</span><span>Make your machines last longer</span></p>
+                        <h5>OPTIMIZER</h5>
+                        <p>Managing workloads across multiple machines can be complicated. This tool automatically
+                            balances the tasks between your equipment to prevent any single machine from overheating or
+                            wearing out too fast. It's like having an expert engineer managing your entire fleet 24/7.
+                        </p>
                     </div>
-                    <div class="lang-content lang-ar ar-text">
-                        <h5>4. المحسن الإرشادي</h5>
-                        <p><span>وازن أحمال العمل بذكاء</span><span>اجعل معداتك تعيش عمراً أطول</span></p>
+                    <div class="lang-content lang-ar ar-text ar-summary">
+                        <h5>المحسن الإرشادي</h5>
+                        <p>إدارة أعباء العمل عبر ماكينات متعددة قد تكون صعبة. تقوم هذه الأداة تلقائياً بموازنة المهام
+                            بين معداتك لمنع ارتفاع حرارة أي ماكينة أو تهالكها بسرعة. إنها بمثابة مهندس خبير يشرف على
+                            أداء أسطولك بالكامل على مدار الساعة.</p>
                     </div>
                 </div>
                 <div class="summary-item">
                     <i data-lucide="database" size="24"></i>
                     <div class="lang-content lang-en">
-                        <h5>5. CARBON LEDGER</h5>
-                        <p><span>Track your carbon savings</span><span>Proven green records you can trust</span></p>
+                        <h5>CARBON LEDGER</h5>
+                        <p>Every time our system saves energy or prevents a repair, it calculates your carbon savings.
+                            This data is recorded on a secure blockchain, giving you a certified, audit-ready green
+                            record that proves your environmental positive impact to regulators and global partners.</p>
                     </div>
-                    <div class="lang-content lang-ar ar-text">
-                        <h5>5. سجل الكربون</h5>
-                        <p><span>تتبع كمية الكربون الموفرة</span><span>سجلات خضراء موثوقة ومضمونة</span></p>
+                    <div class="lang-content lang-ar ar-text ar-summary">
+                        <h5>سجل الكربون</h5>
+                        <p>في كل مرة ينجح فيها نظامنا في توفير الطاقة أو منع الإصلاحات، فإنه يحسب كمية الكربون الموفرة.
+                            يتم تسجيل هذه البيانات في "بلوكشين" آمن، مما يمنحك سجلاً أخضر معتمداً وجاهزاً للتدقيق يثبت
+                            أثرك البيئي الإيجابي أمام الجهات التنظيمية والشركاء العالميين.</p>
                     </div>
                 </div>
             </div>
