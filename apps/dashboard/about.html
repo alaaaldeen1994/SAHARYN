@@ -4,11 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAHARYN | Technical Diligence & Whitepaper</title>
+    <title>SAHARYN | Technical Whitepaper & Feature Deep-Dive</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Outfit:wght@300;600;800&family=JetBrains+Mono:wght@400;700&family=Tajawal:wght@400;700;800&display=swap"
         rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- MathJax for beautiful equations -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
         :root {
             --bg: #030712;
@@ -32,7 +35,7 @@
             background: var(--bg);
             color: var(--text-primary);
             font-family: var(--font-main);
-            line-height: 1.6;
+            line-height: 1.8;
             overflow-x: hidden;
         }
 
@@ -43,7 +46,7 @@
         .container {
             max-width: 1000px;
             margin: 0 auto;
-            padding: 80px 24px;
+            padding: 100px 24px;
         }
 
         /* Header Navigation */
@@ -53,8 +56,8 @@
             left: 0;
             right: 0;
             height: 70px;
-            background: rgba(3, 7, 18, 0.8);
-            backdrop-filter: blur(10px);
+            background: rgba(3, 7, 18, 0.85);
+            backdrop-filter: blur(15px);
             border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
@@ -100,48 +103,18 @@
             background: var(--accent-green-dim);
             border: 1px solid var(--accent-green);
             color: var(--accent-green);
-            padding: 6px 14px;
-            border-radius: 4px;
+            padding: 8px 16px;
+            border-radius: 6px;
             cursor: pointer;
             font-family: var(--font-tech);
             font-weight: 700;
             font-size: 12px;
+            transition: 0.3s;
         }
 
-        /* Section Styling */
-        section {
-            margin-bottom: 100px;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: 0.8s ease-out forwards;
-        }
-
-        section.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        h1 {
-            font-size: 64px;
-            font-family: 'Outfit', sans-serif;
-            font-weight: 800;
-            letter-spacing: -2px;
-            margin-bottom: 20px;
-            background: linear-gradient(135deg, #fff, #94a3b8);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .subtitle {
-            color: var(--accent-green);
-            font-family: var(--font-tech);
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-size: 14px;
-            margin-bottom: 40px;
-            display: block;
+        .lang-switch:hover {
+            background: var(--accent-green);
+            color: var(--bg);
         }
 
         /* Language-Aware visibility */
@@ -157,31 +130,58 @@
             display: block;
         }
 
+        section {
+            margin-bottom: 120px;
+            padding-bottom: 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        h1 {
+            font-size: clamp(40px, 8vw, 72px);
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            letter-spacing: -3px;
+            margin-bottom: 30px;
+            line-height: 1;
+            background: linear-gradient(135deg, #fff, #64748b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--accent-green);
+            font-family: var(--font-tech);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        h2 {
+            font-size: 32px;
+            font-family: 'Outfit', sans-serif;
+            margin-bottom: 25px;
+            color: #fff;
+        }
+
         .ar-text {
             direction: rtl;
             text-align: right;
             font-family: 'Tajawal', sans-serif;
         }
 
-        p {
-            font-size: 17px;
-            color: var(--text-secondary);
-            margin-bottom: 24px;
-        }
-
-        strong {
-            color: #fff;
-        }
-
-        /* Tech Box */
+        /* Technical Cards */
         .tech-card {
             background: var(--panel-bg);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
+            border-radius: 16px;
             padding: 40px;
-            margin-top: 40px;
+            margin: 40px 0;
             position: relative;
-            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
         .tech-card::before {
@@ -194,59 +194,69 @@
             background: var(--accent-green);
         }
 
+        body[dir="rtl"] .tech-card::before {
+            left: auto;
+            right: 0;
+        }
+
         .equation-box {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 24px;
-            border-radius: 8px;
-            margin: 20px 0;
-            font-family: var(--font-tech);
-            color: var(--accent-green);
-            font-size: 18px;
-            text-align: center;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 30px;
+            border-radius: 12px;
+            margin: 25px 0;
+            font-size: 20px;
+            overflow-x: auto;
         }
 
         .label-tech {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--accent-green);
-            opacity: 0.6;
-            display: block;
+            font-family: var(--font-tech);
+            opacity: 0.8;
             margin-bottom: 10px;
+            display: block;
         }
 
-        /* Features list */
+        /* Feature Grid System */
         .feature-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
             margin-top: 40px;
         }
 
         .feature-item {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid var(--border-color);
-            padding: 24px;
-            border-radius: 8px;
-            text-align: inherit;
+            padding: 30px;
+            border-radius: 12px;
+            transition: 0.3s;
+        }
+
+        .feature-item:hover {
+            border-color: var(--accent-green);
+            background: rgba(16, 185, 129, 0.03);
+            transform: translateY(-5px);
         }
 
         .feature-item i {
             color: var(--accent-green);
+            margin-bottom: 20px;
+        }
+
+        .feature-item h4 {
+            color: #fff;
             margin-bottom: 15px;
+            font-size: 18px;
         }
 
         footer {
-            border-top: 1px solid var(--border-color);
-            padding: 60px 0;
+            padding: 80px 0;
             text-align: center;
             color: var(--text-secondary);
             font-size: 14px;
-        }
-
-        @media (max-width: 850px) {
-            h1 {
-                font-size: 40px;
-            }
+            border-top: 1px solid var(--border-color);
         }
     </style>
 </head>
@@ -266,281 +276,204 @@
 
     <main class="container">
 
-        <!-- INTRO -->
-        <section id="intro">
-            <span class="subtitle">System Architecture & Core Intelligence</span>
-            <h1 id="main-title">Behind the Machine</h1>
-
+        <!-- HERO SECTION -->
+        <section id="hero">
+            <span class="subtitle">Operational Intelligence</span>
             <div class="lang-content lang-en">
-                <p>SAHARYN is an <strong>Industrial Resilience Engine</strong> designed to solve the challenge of
-                    infrastructure decay in harsh desert environments. By combining aerospace-grade physics with
-                    real-time satellite telemetry, we move beyond simple "AI monitoring" into <strong>Autonomous
-                        Causal Inference</strong>.</p>
+                <h1>Beyond Prediction. Proof.</h1>
+                <p style="font-size: 20px;">Welcome to the deep-dive documentation of the SAHARYN Core. This page
+                    explains the <strong>industrial mechanisms</strong>, the <strong>space-born datasets</strong>, and
+                    the <strong>logic engines</strong> that protect Saudi Arabia's high-consequence infrastructure.</p>
             </div>
             <div class="lang-content lang-ar ar-text">
-                <p>"صحارين" هو <strong>محرك للمرونة الصناعية</strong> مصمم لحل تحديات تآكل البنية التحتية في البيئات
-                    الصحراوية القاسية. من خلال دمج فيزياء الفضاء مع بيانات الأقمار الصناعية الفورية، ننتقل من
-                    "مراقبة الذكاء الاصطناعي" البسيطة إلى <strong>الاستدلال السببي الذاتي</strong>.</p>
+                <h1>ما وراء التوقعات. البرهان.</h1>
+                <p style="font-size: 20px;">مرحباً بك في الوثائق التفصيلية لمحرك "صحارين". تشرح هذه الصفحة
+                    <strong>الآليات الصناعية</strong>، و <strong>مجموعات البيانات الفضائية</strong>، و <strong>محركات
+                        المنطق</strong> التي تحمي البنية التحتية الحساسة في المملكة العربية السعودية.</p>
             </div>
         </section>
 
-        <!-- SATELLITE FUSION SECTION -->
-        <section id="satellites">
-            <span class="subtitle">1. The Eye in the Sky: Satellite Data Fusion</span>
-
+        <!-- SATELLITE & TELEMETRY -->
+        <section id="satellite-telemetry">
+            <span class="subtitle">Module 01: Global Satellite Ingestion</span>
             <div class="lang-content lang-en">
-                <p>SAHARYN does not guess; it observes. We ingest raw telemetry from the <strong>European Space
-                        Agency (ESA)</strong> and <strong>NASA</strong> constellations. This provides the boundary
-                    conditions for our physics simulations.</p>
-                <ul style="margin-left: 20px; color: var(--text-secondary); font-size: 15px;">
-                    <li><strong>Copernicus Sentinel-3 (CAMS):</strong> Provides real-time Atmosphere Monitoring
-                        (Aerosol Optical Depth - AOD) at 550nm to quantify dust density.</li>
-                    <li><strong>NASA MODIS (Terra/Aqua):</strong> Cross-validated dust severity indices for
-                        historical calibration.</li>
-                    <li><strong>Sentinel-2 (L2A):</strong> High-resolution thermal mapping for asset
-                        point-of-interest stress analysis.</li>
-                </ul>
+                <h2>Space-Born Ground Truth</h2>
+                <p>The SAHARYN Console displays real-time <strong>Copernicus Sentinel-3</strong> and <strong>NASA
+                        MODIS</strong> feeds. We ingest "Spectral Radiance" and "Backscatter" data to calculate the
+                    exact atmospheric severity.</p>
             </div>
             <div class="lang-content lang-ar ar-text">
-                <p>"صحارين" لا تخمن، بل تراقب. نحن نستقبل البيانات الفورية من كوكبات <strong>وكالة الفضاء الأوروبية
-                        (ESA)</strong> و <strong>وكالة ناسا</strong>. هذا يوفر الظروف الحدودية لمحاكاتنا الفيزيائية.</p>
-                <ul style="margin-right: 20px; color: var(--text-secondary); font-size: 15px;">
-                    <li><strong>كوبرنيكوس سينتينيل-3 (CAMS):</strong> يوفر مراقبة الغلاف الجوي في الوقت الفعلي
-                        (العمق البصري للهباء الجوي - AOD) لقياس كثافة الغبار.</li>
-                    <li><strong>موديس ناسا (ترا/أكوا):</strong> مؤشرات شدة الغبار المتقاطعة للمعايرة التاريخية.</li>
-                    <li><strong>سينتينيل-2 (L2A):</strong> خرائط حرارية عالية الدقة لتحليل الإجهاد في نقاط الاهتمام
-                        للأصول.</li>
-                </ul>
-            </div>
-
-            <div class="tech-card" style="border-left-color: var(--accent-green);">
-                <span class="label-tech">// SPECTRAL INTEGRITY FLOW</span>
-                <div
-                    style="display: flex; justify-content: space-around; align-items: center; padding: 20px 0; border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px;">
-                    <div style="text-align: center;">
-                        <i data-lucide="satellite" size="24" style="color: var(--accent-green);"></i>
-                        <div style="font-size: 10px; margin-top: 5px;">SPACE (CAMS)</div>
-                    </div>
-                    <i data-lucide="arrow-right" size="16" style="opacity: 0.3;"></i>
-                    <div style="text-align: center;">
-                        <i data-lucide="shield" size="24" style="color: #fff;"></i>
-                        <div style="font-size: 10px; margin-top: 5px;">EDGE (KSA)</div>
-                    </div>
-                    <i data-lucide="arrow-right" size="16" style="opacity: 0.3;"></i>
-                    <div style="text-align: center;">
-                        <i data-lucide="cpu" size="24" style="color: var(--accent-green);"></i>
-                        <div style="font-size: 10px; margin-top: 5px;">AI (PINN)</div>
-                    </div>
-                </div>
-
-                <div class="lang-content lang-en">
-                    <p style="font-size: 13px;">Raw GRIB/NetCDF data is pulled every 3 hours, normalized, and injected
-                        into the
-                        <strong>Causal Mesh</strong>. This removes the 'blind spot' of traditional ground-only sensors.
-                    </p>
-                </div>
-                <div class="lang-content lang-ar ar-text">
-                    <p style="font-size: 13px;">يتم سحب بيانات GRIB/NetCDF الخام كل 3 ساعات، ومعالجتها، وحقنها في
-                        <strong>الشبكة السببية</strong>. هذا يزيل "النقاط العمياء" التي تعاني منها الحساسات الأرضية
-                        التقليدية.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- PHYSICS DEEP DIVE -->
-        <section id="physics">
-            <span class="subtitle">2. Physics-Informed Causal Mesh (PINNs)</span>
-
-            <div class="lang-content lang-en">
-                <p>Conventional AI looks for correlation; SAHARYN proves <strong>Causality</strong>. Using
-                    <strong>Physics-Informed Neural Networks (PINNs)</strong>, the engine respects the laws of
-                    thermodynamics. If the satellite reports an AOD surge, the AI calculates the exact kinetic
-                    energy transfer to your turbine blades.
-                </p>
-            </div>
-            <div class="lang-content lang-ar ar-text">
-                <p>الذكاء الاصطناعي التقليدي يبحث عن "ارتباط"؛ أما "صحارين" فتثبت <strong>"السببية"</strong>.
-                    باستخدام <strong>الشبكات العصبية القائمة على الفيزياء (PINNs)</strong>، يحترم المحرك قوانين
-                    الديناميكا الحرارية. إذا أبلغ القمر الصناعي عن زيادة في الغبار، يحسب الذكاء الاصطناعي بدقة
-                    انتقال الطاقة الحركية إلى شفرات التوربين الخاصة بك.</p>
-            </div>
-
-            <div class="tech-card">
-                <span class="label-tech">// THE NAVIER-STOKES DUST DECAY MODEL</span>
-                <div class="equation-box">
-                    \frac{\partial \mathbf{u}}{\partial t} + (\mathbf{u} \cdot \nabla) \mathbf{u} =
-                    -\frac{1}{\rho}\nabla p + \nu \nabla^2 \mathbf{u} + \mathbf{g}_{dust}
-                </div>
-                <div class="lang-content lang-en">
-                    <p style="font-size: 13px;">Our model integrates spectral satellite data directly into the
-                        Navier-Stokes equations to
-                        predict <strong>Abrasion and Degradation</strong> rates on sub-millimeter scales.</p>
-                </div>
-                <div class="lang-content lang-ar ar-text">
-                    <p style="font-size: 13px;">يُدمج نموذجنا بيانات الأقمار الصناعية الطيفية مباشرة في معادلات
-                        نافيير-ستوكس للتنبؤ بمعدلات <strong>التآكل والتحلل</strong> على مستويات دقيقة جداً (أقل من
-                        المليمتر).</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- SOVEREIGN ARCHITECTURE -->
-        <section id="security">
-            <span class="subtitle">3. Sovereign Edge: Data Nationality</span>
-
-            <div class="lang-content lang-en">
-                <p>In Mission-Critical infrastructure, <strong>Data Residency is Security</strong>. SAHARYN's
-                    Sovereign Mode is a hardware-enforced protocol. It severs the link to global cloud clusters and
-                    shifts all inference to localized clusters in the <strong>Kingdom of Saudi Arabia</strong>.</p>
-            </div>
-            <div class="lang-content lang-ar ar-text">
-                <p>في البنية التحتية الحساسة، <strong>موقع البيانات هو الأمن</strong>. "الوضع السيادي" في صحارين هو
-                    بروتوكول مفروض برمجياً. يقوم بقطع الاتصال بالعنقود السحابي العالمي ونقل كل الاستدلال إلى عناقيد
-                    محلية داخل <strong>المملكة العربية السعودية</strong>.</p>
+                <h2>الحقيقة القادمة من الفضاء</h2>
+                <p>تعرض لوحة تحكم "صحارين" بيانات فورية من أقمار <strong>كوبرنيكوس سينتينيل-3</strong> و <strong>ناسا
+                        موديس</strong>. نحن نستقبل بيانات "الإشعاع الطيفي" و "الارتداد" لحساب الشدة الجوية الدقيقة.</p>
             </div>
 
             <div class="feature-grid">
                 <div class="feature-item">
-                    <i data-lucide="shield-alert" size="32"></i>
+                    <i data-lucide="satellite" size="32"></i>
                     <div class="lang-content lang-en">
-                        <h4 style="margin-bottom: 10px;">Air-Gap Logic</h4>
-                        <p style="font-size: 13px;">Encryption keys are stored on physical HSMs within the client's
-                            perimeter.</p>
+                        <h4>AOD (Aerosol Optical Depth)</h4>
+                        <p>Measures how much sunlight is prevented from reaching the ground by dust particles. Higher
+                            AOD = Higher Abrasion risk.</p>
                     </div>
                     <div class="lang-content lang-ar ar-text">
-                        <h4 style="margin-bottom: 10px;">منطق الفجوة الهوائية</h4>
-                        <p style="font-size: 13px;">يتم تخزين مفاتيح التشفير على أجهزة HSM فيزيائية داخل محيط العميل.
+                        <h4>AOD (العمق البصري للهباء الجوي)</h4>
+                        <p>يقيس كمية ضوء الشمس التي يمنعها الغبار من الوصول للأرض. زيادة AOD تعني زيادة مخاطر التآكل.
                         </p>
                     </div>
                 </div>
                 <div class="feature-item">
-                    <i data-lucide="lock" size="32"></i>
+                    <i data-lucide="waves" size="32"></i>
                     <div class="lang-content lang-en">
-                        <h4 style="margin-bottom: 10px;">Privacy Isolation</h4>
-                        <p style="font-size: 13px;">No raw vibration or sensor data is stored on external servers during
-                            Sovereign Mode.</p>
+                        <h4>Kinetic Impact Logic</h4>
+                        <p>Using satellite wind speed, we calculate the momentum of sand particles hitting the asset
+                            surfaces.</p>
                     </div>
                     <div class="lang-content lang-ar ar-text">
-                        <h4 style="margin-bottom: 10px;">عزل الخصوصية</h4>
-                        <p style="font-size: 13px;">لا يتم تخزين بيانات الاهتزاز أو الحساسات الخام على خوادم خارجية
-                            أثناء الوضع السيادي.</p>
+                        <h4>منطق التأثير الحركي</h4>
+                        <p>باستخدام سرعة الرياح من القمر الصناعي، نحسب زخم جزيئات الرمل التي تصطدم بأسطح الأصول.</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- ESG & CARBON -->
-        <section id="esg">
-            <span class="subtitle">4. Validated Carbon Ledger</span>
-
+        <!-- PHYSICS & THE STRESS MAP -->
+        <section id="physics-engine">
+            <span class="subtitle">Module 02: Physics-Informed Causal Mesh (PINNs)</span>
             <div class="lang-content lang-en">
-                <p>Typical carbon reports are estimates; SAHARYN's are <strong>Proofs of Avoidance</strong>. Each
-                    credit is anchored to a specific AI inference cycle, cross-referenced with satellite
-                    confirmation of avoided downtime.</p>
+                <h2>How the "Stress Map" is Calculated</h2>
+                <p>When you see red zones on the asset in the Console, the AI is solving the <strong>Stress Propagation
+                        Equation</strong> in real-time. It doesn't just "guess" heat; it calculates energy transfer.</p>
             </div>
             <div class="lang-content lang-ar ar-text">
-                <p>تقارير الكربون التقليدية هي مجرد تقديرات؛ أما تقارير "صحارين" فهي <strong>براهين على التجنب</strong>.
-                    كل رصيد مرتبط بدورة استدلال محددة للذكاء الاصطناعي، ومرتبط ببيانات قمر صناعي تؤكد تجنب فترات التوقف.
-                </p>
+                <h2>كيف يتم حساب "خريطة الإجهاد"</h2>
+                <p>عندما تلمح مناطق حمراء على الأصل في لوحة التحكم، فإن الذكاء الاصطناعي يقوم بحل <strong>معادلة انتشار
+                        الإجهاد</strong> في الوقت الفعلي. هو لا "يخمن" الحرارة، بل يحسب انتقال الطاقة.</p>
             </div>
 
-            <div class="tech-card" style="border-left-color: var(--accent-green);">
-                <span class="label-tech">// ESG YIELD DYNAMICS</span>
-                <div class="equation-box" style="color: #fff;">
-                    Yield_{credits} = \sum_{sites} \left( \text{Life\_Ext}_{days} \times \phi_{carbon} \right)
+            <div class="tech-card">
+                <span class="label-tech">// THE INDUSTRIAL STRESS EQUATION (RE-SCALED)</span>
+                <div class="equation-box">
+                    \[ \sigma_{asset} = \underbrace{\Phi_{ext}}_{\text{Satellite Load}} \times \exp\left(
+                    -\frac{E_{a}}{RT} \right) + \sum \Delta \text{Vibration} \]
                 </div>
                 <div class="lang-content lang-en">
-                    <p style="font-size: 13px;">Total yield is the sum of <strong>Life Extension (days)</strong>
-                        multiplied by the
-                        <strong>Carbon Intensity Factor (φ)</strong> of the asset's manufacturing overhead.
-                    </p>
+                    <p><strong>The Breakdown:</strong> The Stress (\(\sigma\)) is calculated by taking the
+                        <strong>Satellite Load</strong> (\(\Phi\)) and multiplying it by the <strong>Thermal Decay
+                            Factor</strong> (Arrhenius equation). We then add the internal vibration sensors to get the
+                        total risk.</p>
                 </div>
                 <div class="lang-content lang-ar ar-text">
-                    <p style="font-size: 13px;">إجمالي العائد هو مجموع <strong>تمديد العمر (بالأيام)</strong> مضروباً في
-                        <strong>معامل كثافة الكربون (φ)</strong> لأعباء تصنيع الأصل.</p>
+                    <p><strong>شرح المعادلة:</strong> يتم حساب الإجهاد (\(\sigma\)) عن طريق أخذ <strong>الحمل القادم من
+                            القمر الصناعي</strong> (\(\Phi\)) وضربه في <strong>معامل التحلل الحراري</strong> (معادلة
+                        أرينيوس). ثم نضيف بيانات اهتزاز الحساسات الداخلية لنحصل على الخطر الإجمالي.</p>
                 </div>
             </div>
         </section>
 
-        <!-- SYSTEM CAPABILITIES -->
-        <section id="capabilities">
-            <span class="subtitle">5. Mission Control: Operational Modules</span>
-
+        <!-- CAUSAL FAULT PROPAGATION -->
+        <section id="causal-logic">
+            <span class="subtitle">Module 03: Causal Fault Mesh</span>
             <div class="lang-content lang-en">
-                <p>The SAHARYN Dashboard is not a static display; it is a <strong>Command & Control Interface</strong>.
-                    It allows operators to move from passive monitoring to active asset preservation via three core
-                    modules:</p>
+                <h2>Why Causal? (Anti-Hallucination)</h2>
+                <p>Standard AI can hallucinate. SAHARYN uses a <strong>Causal Mesh</strong>. If the system predicts a
+                    failure, it must show the "Causal Chain":</p>
             </div>
             <div class="lang-content lang-ar ar-text">
-                <p>لوحة تحكم "صحارين" ليست مجرد شاشة عرض جامدة؛ بل هي <strong>واجهة للقيادة والسيطرة</strong>. تسمح
-                    للمشغلين بالانتقال من المراقبة السلبية إلى الحفاظ النشط على الأصول عبر ثلاث وحدات أساسية:</p>
+                <h2>لماذا المنطق السببي؟ (منع الهلوسة)</h2>
+                <p>الذكاء الاصطناعي العادي قد "يهلوس". صحارين تستخدم <strong>الشبكة السببية</strong>. إذا توقع النظام
+                    عطلاً، يجب أن يظهر "السلسلة السببية":</p>
             </div>
 
             <div class="feature-grid">
-                <div class="feature-item" style="border-top: 2px solid var(--accent-green);">
+                <div class="feature-item" style="border-left: 4px solid var(--accent-green);">
                     <div class="lang-content lang-en">
-                        <h4 style="margin-bottom: 10px;">Deep Stress Mapping</h4>
-                        <p style="font-size: 13px;">Visualization of <strong>AOD (Dust Intensity)</strong> and
-                            <strong>Thermal Gradients</strong> layered onto physical asset CAD models.</p>
+                        <h4>1. Environmental Trigger</h4>
+                        <p>Satellite detects Dust Storm (AOD > 0.8).</p>
                     </div>
                     <div class="lang-content lang-ar ar-text">
-                        <h4 style="margin-bottom: 10px;">خرائط التوتر العميقة</h4>
-                        <p style="font-size: 13px;">تصوير <strong>شدة الغبار (AOD)</strong> والتدرجات الحرارية المطبقة
-                            على نماذج CAD للأصول الفيزيائية.</p>
+                        <h4>1. المحفز البيئي</h4>
+                        <p>القمر الصناعي يرصد عاصفة غبار (AOD > 0.8).</p>
                     </div>
                 </div>
-                <div class="feature-item" style="border-top: 2px solid #fff;">
+                <div class="feature-item" style="border-left: 4px solid #fff;">
                     <div class="lang-content lang-en">
-                        <h4 style="margin-bottom: 10px;">Causal Fault Propagation</h4>
-                        <p style="font-size: 13px;">A real-time graph showing how a satellite-detected dust storm might
-                            trigger a mechanical bearing failure in 48 hours.</p>
+                        <h4>2. Physics Interaction</h4>
+                        <p>Navier-Stokes proves abrasion on air filters.</p>
                     </div>
                     <div class="lang-content lang-ar ar-text">
-                        <h4 style="margin-bottom: 10px;">الانتشار السببي للأعطال</h4>
-                        <p style="font-size: 13px;">رسم بياني وقتي يوضح كيف يمكن لعاصفة غبار رصدها القمر الصناعي أن تسبب
-                            عطلاً ميكانيكياً خلال 48 ساعة.</p>
+                        <h4>2. التفاعل الفيزيائي</h4>
+                        <p>معادلات نافيير-ستوكس تثبت حدوث انسداد في الفلاتر.</p>
                     </div>
                 </div>
-                <div class="feature-item" style="border-top: 2px solid var(--accent-green);">
+                <div class="feature-item" style="border-left: 4px solid var(--accent-green);">
                     <div class="lang-content lang-en">
-                        <h4 style="margin-bottom: 10px;">Prescriptive Optimizer</h4>
-                        <p style="font-size: 13px;">The AI doesn't just alert; it suggests. "Reduce RPM by 12% for 4
-                            hours to avoid 75% abrasion damage."</p>
+                        <h4>3. Asset Outcome</h4>
+                        <p>Bearing temperature rises → Failure in 48h.</p>
                     </div>
                     <div class="lang-content lang-ar ar-text">
-                        <h4 style="margin-bottom: 10px;">المحسن التوجيهي</h4>
-                        <p style="font-size: 13px;">الذكاء الاصطناعي لا ينبه فحسب، بل يقترح. "قلل سرعة الدوران بنسبة 12٪
-                            لمدة 4 ساعات لتجنب 75٪ من ضرر التآكل".</p>
+                        <h4>3. نتيجة الأصل</h4>
+                        <p>ارتفاع حرارة المحامل ← تعطل خلال 48 ساعة.</p>
                     </div>
                 </div>
+            </div>
+        </section>
+
+        <!-- ESG & SAVINGS LOGIC -->
+        <section id="esg-logic">
+            <span class="subtitle">Module 04: The Sovereign Carbon Ledger</span>
+            <div class="lang-content lang-en">
+                <h2>Calculating The "CO2 Saved" (+4.2t)</h2>
+                <p>How does the Console get that number? We use the <strong>Manufacturing Lifecycle Offset</strong>
+                    model. Replacing an industrial asset costs tons of carbon. Extending its life saves it.</p>
+            </div>
+            <div class="lang-content lang-ar ar-text">
+                <h2>كيف نحسب "الكربون الموفر" (+4.2t)</h2>
+                <p>كيف تحصل لوحة التحكم على هذا الرقم؟ نستخدم نموذج <strong>تعويض دورة حياة التصنيع</strong>. استبدال
+                    أصل صناعي يكلف أطنان من الكربون. إطالة عمره يوفر هذا الكربون.</p>
+            </div>
+
+            <div class="tech-card" style="border-left-color: #fff;">
+                <span class="label-tech">// THE CARBON AVOIDANCE MODEL</span>
+                <div class="equation-box">
+                    \[ \text{Carbon Saved} = \left( \frac{\text{Mfg Carbon Footprint}}{\text{Standard Operational Life}}
+                    \right) \times \Delta \text{Useful Life Extended} \]
+                </div>
+                <div class="lang-content lang-en">
+                    <p>Every hour the AI extends the asset's life, we bank a portion of the carbon that <em>would</em>
+                        have been emitted to manufacture and ship a replacement. This is real, verifiable ESG impact.
+                    </p>
+                </div>
+                <div class="lang-content lang-ar ar-text">
+                    <p>كل ساعة يطيل فيها الذكاء الاصطناعي عمر الأصل، نقوم بتسجيل جزء من الكربون الذي <em>كان سيصدر</em>
+                        لتصنيع وشحن أصل بديل. هذا هو التأثير الحقيقي القابل للتحقق.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SOVEREIGN MODE -->
+        <section id="sovereign-logic">
+            <span class="subtitle">Module 05: Sovereign Edge Infrastructure</span>
+            <div class="lang-content lang-en">
+                <h2>Local Security vs. Global Cloud</h2>
+                <p>In "Sovereign Mode", SAHARYN severs its cloud connection. The AI logic shifts to internal
+                    <strong>NVIDIA-Powered Edge Clusters</strong> located physically in Riyadh or NEOM.</p>
+            </div>
+            <div class="lang-content lang-ar ar-text">
+                <h2>الأمن المحلي مقابل السحابة العالمية</h2>
+                <p>في "الوضع السيادي"، تقطع "صحارين" اتصالها السحابي. يتحول منطق الذكاء الاصطناعي إلى <strong>عناقيد
+                        حوسبة محلية</strong> مدعومة بمعالجات NVIDIA موجودة فعلياً في الرياض أو نيوم.</p>
             </div>
         </section>
 
     </main>
 
     <footer>
-        <p>&copy; 2024 SAHARYN INDUSTRIAL AI CORE. Riyadh, Kingdom of Saudi Arabia.</p>
+        <p>&copy; 2024 SAHARYN INDUSTRIAL AI CORE. Technical Diligence & Verification Hub.</p>
     </footer>
 
     <script>
         lucide.createIcons();
-
-        // Reveal sections on scroll
-        const observerOptions = {
-            threshold: 0.1
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('section').forEach(section => {
-            observer.observe(section);
-        });
 
         function toggleLanguage() {
             const body = document.body;
