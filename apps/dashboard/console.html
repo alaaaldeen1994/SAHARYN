@@ -2161,7 +2161,7 @@
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-API-KEY': 'ENTERPRISE_SECRET_VERIFIED_7M'
+                            'X-API-KEY': 'SAHARYN_PROD_2026_SECURE_KEY'
                         },
                         body: JSON.stringify({
                             metadata: {
@@ -2338,7 +2338,7 @@
             }
 
             if (!success) {
-                logEvent(`AI Core Connection Failed: port 8005 unreachable. Error: ${lastErr}`, 'warn');
+                logEvent(`AI Core Connection Failed: [${url}] unreachable. Check API visibility or tokens. Error: ${lastErr}`, 'warn');
                 apiStatus.style.background = 'rgba(239, 68, 68, 0.1)';
                 apiStatus.style.borderColor = 'rgba(239, 68, 68, 0.2)';
                 apiStatusText.innerText = 'AI_CORE: OFFLINE';
