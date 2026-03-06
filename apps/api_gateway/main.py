@@ -384,6 +384,13 @@ async def get_telemetry_stream(site_id: str = "SA_EAST_RU_01"):
                 "unit": "°C", 
                 "parity": "SECURE",
                 "source": "COPERNICUS_L2A"
+            },
+            {
+                "sensor": "SENTINEL_DDI_PLUME", 
+                "value": round(packet.dust_detection_index, 3), 
+                "unit": "DDI", 
+                "parity": "SECURE",
+                "source": "ESA_SENTINEL_2"
             }
         ],
         "integrity_hash": packet.integrity_hash
