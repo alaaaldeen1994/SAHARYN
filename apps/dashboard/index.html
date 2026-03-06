@@ -114,20 +114,146 @@
         .nav-cta {
             font-family: var(--mono);
             font-size: 11px;
-            font-weight: 600;
+            font-weight: 800;
             letter-spacing: 1.5px;
             text-decoration: none;
             text-transform: uppercase;
-            color: var(--bg) !important;
-            background: var(--accent);
-            padding: 11px 24px;
-            transition: background 0.2s, box-shadow 0.2s;
+            color: var(--accent) !important;
+            background: transparent;
+            padding: 10px 22px;
+            border: 1px solid var(--accent);
+            border-radius: 4px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .nav-cta:hover {
-            background: #0ea572;
-            box-shadow: 0 0 24px var(--accent-glow);
+            color: var(--bg) !important;
+            background: var(--accent);
+            box-shadow: 0 0 20px var(--accent-glow);
+            transform: translateY(-1px);
         }
+
+        /* ── USER DROPDOWN ── */
+        .user-dropdown {
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border);
+            transition: 0.2s;
+            overflow: hidden;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-avatar:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 15px;
+            width: 240px;
+            background: #0c1523;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+            display: none;
+            flex-direction: column;
+            padding: 8px 0;
+            z-index: 300;
+            animation: dropdownFade 0.2s ease-out;
+        }
+
+        @keyframes dropdownFade {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dropdown-menu.active {
+            display: flex;
+        }
+
+        .user-info-header {
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 6px;
+        }
+
+        .user-name-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            display: block;
+        }
+
+        .user-email-label {
+            font-size: 11px;
+            color: var(--text-mid);
+            display: block;
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .dropdown-item {
+            padding: 12px 20px;
+            font-size: 12px;
+            color: var(--text-mid);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: 0.2s;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-family: var(--sans);
+        }
+
+        .dropdown-item:hover {
+            background: rgba(16, 185, 129, 0.05);
+            color: var(--accent);
+        }
+
+        .dropdown-item i {
+            opacity: 0.7;
+        }
+
+        .dropdown-item.sign-out {
+            color: #ef4444;
+            border-top: 1px solid var(--border);
+            margin-top: 4px;
+            padding-top: 14px;
+        }
+
 
 
 
@@ -806,6 +932,28 @@
                 style="background:none;border:none;color:var(--text-dim);font-family:var(--mono);font-size:11px;cursor:pointer;letter-spacing:1px;">EN
                 / عربي</button>
             <div class="nav-cta" id="login-btn" style="cursor:pointer;" data-i18n="nav_cta">Sign In / Sign Up</div>
+
+            <!-- User Profile Dropdown (Hidden initially) -->
+            <div class="user-dropdown" id="user-profile" style="display: none;">
+                <div class="user-avatar" id="landing-avatar">
+                    <i data-lucide="user" size="18" color="var(--accent)"></i>
+                </div>
+                <div class="dropdown-menu" id="landing-menu">
+                    <div class="user-info-header">
+                        <span class="user-name-label" id="landing-user-name">Guest User</span>
+                        <span class="user-email-label" id="landing-user-email">Not Signed In</span>
+                    </div>
+                    <a href="console.html" class="dropdown-item">
+                        <i data-lucide="gauge" size="14"></i>
+                        Open Mission Control
+                    </a>
+                    <div class="dropdown-item sign-out" id="landing-logout-btn">
+                        <i data-lucide="log-out" size="14"></i>
+                        Sign Out
+                    </div>
+                </div>
+            </div>
+
         </div>
     </nav>
 
@@ -1304,26 +1452,66 @@
         setInterval(updateClock, 1000);
 
         // -- Firebase Auth Integration --
-        import { login, auth } from "./firebase-init.js";
+        import { login, logout, auth } from "./firebase-init.js";
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-        document.getElementById('login-btn').addEventListener('click', async () => {
-            const user = await login();
-            if (user) {
-                window.location.href = 'console.html';
-            }
+        const loginBtn = document.getElementById('login-btn');
+        const userProfile = document.getElementById('user-profile');
+        const profileMenu = document.getElementById('landing-menu');
+
+        loginBtn.addEventListener('click', async () => {
+            await login();
+        });
+
+        userProfile.addEventListener('click', (e) => {
+            e.stopPropagation();
+            profileMenu.classList.toggle('active');
+        });
+
+        document.addEventListener('click', () => {
+            profileMenu.classList.remove('active');
+        });
+
+        document.getElementById('landing-logout-btn').addEventListener('click', async () => {
+            await logout();
         });
 
         if (auth) {
             onAuthStateChanged(auth, (user) => {
+                const systemStatus = document.getElementById('system-status');
+                const i18nButtons = document.querySelectorAll('[data-i18n="nav_cta"]');
+                const heroCta = document.querySelector('[data-i18n="hero_cta"]');
+
                 if (user) {
-                    document.getElementById('login-btn').innerText = "Open Dashboard";
-                    document.getElementById('login-btn').addEventListener('click', () => {
-                        window.location.href = 'console.html';
+                    loginBtn.style.display = 'none';
+                    userProfile.style.display = 'flex';
+                    if (systemStatus) systemStatus.innerText = "AUTHENTICATED";
+
+                    // Update all buttons that used to say "Sign In"
+                    i18nButtons.forEach(btn => {
+                        btn.innerText = lang === 'ar' ? "فتح مركز العمليات" : "Open Mission Control";
+                        if (btn.tagName === 'A') btn.href = 'console.html';
+                    });
+
+                    document.getElementById('landing-user-name').innerText = user.displayName || "Mission Control User";
+                    document.getElementById('landing-user-email').innerText = user.email;
+                    if (user.photoURL) {
+                        document.getElementById('landing-avatar').innerHTML = `<img src="${user.photoURL}" alt="${user.displayName}" style="width:100%; height:100%; border-radius:50%;">`;
+                    }
+                    lucide.createIcons();
+                } else {
+                    loginBtn.style.display = 'block';
+                    userProfile.style.display = 'none';
+                    if (systemStatus) systemStatus.innerText = "GUEST_MODE";
+
+                    i18nButtons.forEach(btn => {
+                        btn.innerText = translations[lang]['nav_cta'];
+                        if (btn.tagName === 'A') btn.href = '#';
                     });
                 }
             });
         }
+
     </script>
 </body>
 
