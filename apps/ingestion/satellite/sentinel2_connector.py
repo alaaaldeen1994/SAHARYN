@@ -36,9 +36,9 @@ logger = logging.getLogger("SAHARYN_SENTINEL2")
 # ─────────────────────────────────────────────────────────────
 # Configuration
 # ─────────────────────────────────────────────────────────────
-SH_CLIENT_ID     = os.getenv("SENTINELHUB_CLIENT_ID")
-SH_CLIENT_SECRET = os.getenv("SENTINELHUB_CLIENT_SECRET")
-SH_INSTANCE_ID   = os.getenv("SENTINELHUB_INSTANCE_ID")
+SH_API_KEY       = os.getenv("SENTINELHUB_API_KEY")      # PLAK... key from User Settings
+SH_CLIENT_ID     = os.getenv("SENTINELHUB_CLIENT_ID")    # User ID from User Settings
+SH_INSTANCE_ID   = os.getenv("SENTINELHUB_INSTANCE_ID")  # Account ID from Account Settings
 
 # Area radius around asset for imagery (km)
 DEFAULT_RADIUS_KM = 10.0
@@ -58,31 +58,28 @@ class Sentinel2Connector:
         self._connect()
 
     def _connect(self):
-        """Initialize Sentinel Hub connection."""
-        if not SH_CLIENT_ID or not SH_CLIENT_SECRET:
+        """Initialize Sentinel Hub connection using API Key."""
+        if not SH_API_KEY:
             logger.warning(
-                "Sentinel Hub credentials not set (SENTINELHUB_CLIENT_ID, SENTINELHUB_CLIENT_SECRET). "
-                "Connector will operate in simulation mode."
+                "SENTINELHUB_API_KEY not set. Connector in simulation mode."
             )
             return
 
         try:
             from sentinelhub import SHConfig
             config = SHConfig()
-            config.sh_client_id     = SH_CLIENT_ID
-            config.sh_client_secret = SH_CLIENT_SECRET
+            config.sh_client_id = SH_CLIENT_ID or ""
+            config.sh_base_url  = "https://services.sentinel-hub.com"
             if SH_INSTANCE_ID:
                 config.instance_id = SH_INSTANCE_ID
             self._sh_config = config
+            self._api_key   = SH_API_KEY
             self._available = True
-            logger.info("Sentinel Hub connection initialized")
+            logger.info("Sentinel Hub connected via API Key")
         except ImportError:
-            logger.warning(
-                "sentinelhub package not installed. "
-                "Install with: pip install sentinelhub"
-            )
+            logger.warning("sentinelhub not installed. pip install sentinelhub")
         except Exception as e:
-            logger.error(f"Sentinel Hub initialization failed: {e}")
+            logger.error(f"Sentinel Hub init failed: {e}")
 
     def _bbox_from_point(self, lat: float, lon: float, radius_km: float = DEFAULT_RADIUS_KM) -> Tuple:
         """
