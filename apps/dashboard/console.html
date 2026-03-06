@@ -621,7 +621,7 @@
             top: 100%;
             right: 0;
             margin-top: 12px;
-            width: 220px;
+            width: 200px;
             background: var(--bg-panel);
             border: 1px solid var(--border-color);
             border-radius: 8px;
@@ -1754,52 +1754,120 @@
         </div>
 
         <!-- SETTINGS VIEW -->
-        <div id="settings-view" class="view-content" style="grid-template-columns: 1fr;">
-            <div class="panel" style="height: 100%;">
-                <div class="panel-header">
-                    <div class="panel-title"><i data-lucide="settings" size="16" color="var(--accent-green)"></i>
-                        <span data-i18n="settings_title">Precision Configuration</span>
-                    </div>
+        <div id="settings-view" class="view-content"
+            style="grid-template-columns: 1fr; padding: 40px; overflow-y: auto;">
+            <div style="max-width: 900px; margin: 0 auto; width: 100%;">
+                <div style="margin-bottom: 40px;">
+                    <h1 style="font-size: 28px; font-weight: 900; color: #fff; margin-bottom: 8px;">Precision
+                        Configuration</h1>
+                    <p style="color: var(--text-secondary); font-size: 14px;">Manage your institutional profile and AI
+                        inference heuristics.</p>
                 </div>
-                <div class="panel-body" style="padding: 24px;">
-                    <div style="max-width: 600px;">
-                        <p data-i18n="settings_subtitle"
-                            style="font-size: 12px; color: var(--text-secondary); margin-bottom: 30px;">Adjust
-                            system-wide operational parameters and sensor fusion thresholds.</p>
-                        <div style="display: flex; flex-direction: column; gap: 20px;">
-                            <div class="panel"
-                                style="padding: 16px; display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02);">
-                                <div>
-                                    <div style="font-weight: 600; font-size: 14px;">Adaptive Learning Rate</div>
-                                    <div style="font-size: 11px; color: var(--text-secondary);">Dynamic gradient
-                                        adjustment for RUL modeling.</div>
+
+                <div style="display: grid; grid-template-columns: 300px 1fr; gap: 40px;">
+                    <!-- Settings Sidebar -->
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <button class="panel"
+                            style="padding: 15px 20px; background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2); color: var(--accent-green); text-align: left; font-weight: 800; font-size: 13px; display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                            <i data-lucide="user" size="16"></i> Profile Management
+                        </button>
+                        <button class="panel"
+                            style="padding: 15px 20px; background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); text-align: left; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                            <i data-lucide="shield" size="16"></i> Security & Access
+                        </button>
+                        <button class="panel"
+                            style="padding: 15px 20px; background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); text-align: left; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                            <i data-lucide="cpu" size="16"></i> Inference Heuristics
+                        </button>
+                        <button class="panel"
+                            style="padding: 15px 20px; background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); text-align: left; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                            <i data-lucide="bell" size="16"></i> Alerts & Notify
+                        </button>
+                    </div>
+
+                    <!-- Settings Main Content -->
+                    <div style="display: flex; flex-direction: column; gap: 30px;">
+                        <!-- Profile Section -->
+                        <div class="panel" style="padding: 30px;">
+                            <h3
+                                style="font-size: 16px; margin-bottom: 25px; display: flex; align-items: center; gap: 10px;">
+                                <i data-lucide="user" size="18" color="var(--accent-green)"></i> User Identity
+                            </h3>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                                <div class="control-group">
+                                    <label class="control-label"
+                                        style="font-size: 11px; margin-bottom: 8px;">FULL_NAME</label>
+                                    <input type="text" id="settings-name" class="mono"
+                                        style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: #fff; padding: 12px; border-radius: 4px;"
+                                        value="Loading...">
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-label"
+                                        style="font-size: 11px; margin-bottom: 8px;">EMAIL_ADDRESS</label>
+                                    <input type="text" id="settings-email" class="mono" readonly
+                                        style="width: 100%; background: rgba(0,0,0,0.15); border: 1px solid var(--border-color); color: var(--text-secondary); padding: 12px; border-radius: 4px;"
+                                        value="Loading...">
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label"
+                                    style="font-size: 11px; margin-bottom: 8px;">ORGANIZATION_ID</label>
+                                <input type="text" class="mono" readonly
+                                    style="width: 100%; background: rgba(0,0,0,0.15); border: 1px solid var(--border-color); color: var(--text-secondary); padding: 12px; border-radius: 4px;"
+                                    value="SAHARYN_CORP_INTERNAL_01">
+                            </div>
+                        </div>
+
+                        <!-- System Preferences -->
+                        <div class="panel" style="padding: 30px;">
+                            <h3
+                                style="font-size: 16px; margin-bottom: 25px; display: flex; align-items: center; gap: 10px;">
+                                <i data-lucide="sliders" size="18" color="var(--accent-blue)"></i> System Heuristics
+                            </h3>
+                            <div style="display: flex; flex-direction: column; gap: 20px;">
+                                <div
+                                    style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(255,255,255,0.02); border-radius: 6px;">
+                                    <div>
+                                        <div style="font-weight: 700; font-size: 14px;">Adaptive Learning Rate</div>
+                                        <div style="font-size: 11px; color: var(--text-secondary);">Dynamic gradient
+                                            adjustment for RUL modeling.</div>
+                                    </div>
+                                    <div
+                                        style="width: 44px; height: 22px; background: var(--accent-green); border-radius: 11px; position: relative; cursor: pointer;">
+                                        <div
+                                            style="width: 18px; height: 18px; background: #fff; border-radius: 50%; position: absolute; right: 2px; top: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+                                        </div>
+                                    </div>
                                 </div>
                                 <div
-                                    style="width: 40px; height: 20px; background: var(--accent-green); border-radius: 10px; position: relative;">
+                                    style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(255,255,255,0.02); border-radius: 6px;">
+                                    <div>
+                                        <div style="font-weight: 700; font-size: 14px;">Sovereign Local Drift</div>
+                                        <div style="font-size: 11px; color: var(--text-secondary);">Enable edge-based
+                                            inference when latency exceeds 200ms.</div>
+                                    </div>
                                     <div
-                                        style="width: 16px; height: 16px; background: #fff; border-radius: 50%; position: absolute; right: 2px; top: 2px;">
+                                        style="width: 44px; height: 22px; background: var(--border-color); border-radius: 11px; position: relative; cursor: pointer;">
+                                        <div
+                                            style="width: 18px; height: 18px; background: #64748b; border-radius: 50%; position: absolute; left: 2px; top: 2px;">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="panel"
-                                style="padding: 16px; display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02);">
-                                <div>
-                                    <div style="font-weight: 600; font-size: 14px;">Multimodal Sensor Fusion</div>
-                                    <div style="font-size: 11px; color: var(--text-secondary);">Integrate satellite
-                                        spectral data with ground-level vibration sensors.</div>
-                                </div>
-                                <div
-                                    style="width: 40px; height: 20px; background: #1e293b; border-radius: 10px; position: relative;">
-                                    <div
-                                        style="width: 16px; height: 16px; background: #94a3b8; border-radius: 50%; position: absolute; left: 2px; top: 2px;">
-                                    </div>
-                                </div>
-                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div style="display: flex; justify-content: flex-end; gap: 15px;">
+                            <button
+                                style="background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); padding: 12px 25px; border-radius: 6px; font-weight: 600; cursor: pointer;">RESTORE_DEFAULTS</button>
+                            <button onclick="logEvent('SYSTEM_CONFIG_UPDATED', 'info')"
+                                style="background: var(--accent-green); border: none; color: #000; padding: 12px 35px; border-radius: 6px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 15px var(--accent-green-dim);">APPLY_CHANGES</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
     </main>
 
     <script type="module">
@@ -1980,6 +2048,15 @@
 
             if (typeof lucide !== 'undefined') lucide.createIcons();
         }
+
+        // Handle URL Hash for deep linking (e.g., console.html#settings)
+        window.addEventListener('load', () => {
+            const hash = window.location.hash.replace('#', '');
+            if (hash && ['settings', 'telemetry', 'physics', 'audit', 'esg', 'energy', 'stress', 'diligence'].includes(hash)) {
+                switchTab(hash);
+            }
+        });
+
 
         async function updateTelemetryData() {
             try {
@@ -2808,6 +2885,13 @@
                 if (user) {
                     document.getElementById('user-display-name').innerText = user.displayName || "User Session Active";
                     document.getElementById('user-display-email').innerText = user.email;
+
+                    // Sync settings fields
+                    const settingsName = document.getElementById('settings-name');
+                    const settingsEmail = document.getElementById('settings-email');
+                    if (settingsName) settingsName.value = user.displayName || "";
+                    if (settingsEmail) settingsEmail.value = user.email || "";
+
                     if (user.photoURL) {
                         document.getElementById('user-avatar-container').innerHTML = `<img src="${user.photoURL}" alt="${user.displayName}" style="width: 100%; height: 100%; border-radius: 50%;">`;
                     }
