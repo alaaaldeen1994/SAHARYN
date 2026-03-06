@@ -1767,24 +1767,20 @@
                 <div style="display: grid; grid-template-columns: 300px 1fr; gap: 40px;">
                     <!-- Settings Sidebar -->
                     <div style="display: flex; flex-direction: column; gap: 10px;">
-                        <button class="panel settings-nav-btn active" onclick="switchSettingsTab('profile', this)"
-                            style="padding: 15px 20px; text-align: left; font-weight: 800; font-size: 13px; display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                        <button class="settings-nav-btn active" onclick="switchSettingsTab('profile', this)">
                             <i data-lucide="user" size="16"></i> Profile Management
                         </button>
-                        <button class="panel settings-nav-btn" onclick="switchSettingsTab('security', this)"
-                            style="padding: 15px 20px; text-align: left; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                        <button class="settings-nav-btn" onclick="switchSettingsTab('security', this)">
                             <i data-lucide="shield" size="16"></i> Security & Access
                         </button>
-                        <button class="panel settings-nav-btn" onclick="switchSettingsTab('inference', this)"
-                            style="padding: 15px 20px; text-align: left; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                        <button class="settings-nav-btn" onclick="switchSettingsTab('inference', this)">
                             <i data-lucide="cpu" size="16"></i> Inference Heuristics
                         </button>
-                        <button class="panel settings-nav-btn" onclick="switchSettingsTab('alerts', this)"
-                            style="padding: 15px 20px; text-align: left; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                        <button class="settings-nav-btn" onclick="switchSettingsTab('alerts', this)">
                             <i data-lucide="bell" size="16"></i> Alerts & Notify
                         </button>
-                        <button class="panel settings-nav-btn" onclick="switchSettingsTab('support', this)"
-                            style="padding: 15px 20px; text-align: left; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 12px; cursor: pointer; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 5px; padding-top: 15px;">
+                        <button class="settings-nav-btn" onclick="switchSettingsTab('support', this)"
+                            style="border-top: 1px solid rgba(255,255,255,0.05); margin-top: 5px; padding-top: 15px;">
                             <i data-lucide="help-circle" size="16"></i> Technical Support
                         </button>
                     </div>
@@ -3110,11 +3106,51 @@
     </script>
     <style>
         /* Shared Styles */
+        /* Shared Styles for Settings Portal */
+        .settings-nav-btn {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px 20px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .settings-nav-btn:hover {
+            border-color: rgba(16, 185, 129, 0.3) !important;
+            background: rgba(16, 185, 129, 0.02) !important;
+            color: #fff !important;
+        }
+
         .settings-nav-btn.active {
-            background: rgba(16, 185, 129, 0.05) !important;
-            border-color: rgba(16, 185, 129, 0.2) !important;
+            background: rgba(16, 185, 129, 0.08) !important;
+            border-color: var(--accent-green) !important;
             color: var(--accent-green) !important;
             font-weight: 800 !important;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.1);
+        }
+
+        .settings-section {
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         body[dir="rtl"] .brand-container {
@@ -3153,27 +3189,6 @@
         @keyframes spin {
             100% {
                 transform: rotate(360deg);
-            }
-        }
-
-        .settings-nav-btn:hover {
-            border-color: var(--accent-green) !important;
-            color: #fff !important;
-        }
-
-        .settings-section {
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(5px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
             }
         }
     </style>
