@@ -1832,10 +1832,10 @@
                                         <div style="font-size: 11px; color: var(--text-secondary);">Dynamic gradient
                                             adjustment for RUL modeling.</div>
                                     </div>
-                                    <div onclick="this.querySelector('div').style.left = this.querySelector('div').style.left === '2px' ? 'auto' : '2px'; this.querySelector('div').style.right = this.querySelector('div').style.right === '2px' ? 'auto' : '2px'; this.style.background = this.style.background.includes('accent-green') ? 'var(--border-color)' : 'var(--accent-green)';"
-                                        style="width: 44px; height: 22px; background: var(--accent-green); border-radius: 11px; position: relative; cursor: pointer; transition: 0.3s;">
+                                    <div onclick="toggleSwitch(this)" data-state="on"
+                                        style="width: 44px; height: 22px; background: var(--accent-green); border-radius: 11px; position: relative; cursor: pointer; transition: 0.3s; display: flex; align-items: center; padding: 0 2px;">
                                         <div
-                                            style="width: 18px; height: 18px; background: #fff; border-radius: 50%; position: absolute; right: 2px; top: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); transition: 0.3s;">
+                                            style="width: 18px; height: 18px; background: #fff; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.3); transition: 0.3s; transform: translateX(22px);">
                                         </div>
                                     </div>
                                 </div>
@@ -1846,10 +1846,10 @@
                                         <div style="font-size: 11px; color: var(--text-secondary);">Enable edge-based
                                             inference when latency exceeds 200ms.</div>
                                     </div>
-                                    <div onclick="this.querySelector('div').style.left = this.querySelector('div').style.left === '24px' ? '2px' : '24px'; this.style.background = this.style.background.includes('accent-green') ? 'var(--border-color)' : 'var(--accent-green)';"
-                                        style="width: 44px; height: 22px; background: var(--border-color); border-radius: 11px; position: relative; cursor: pointer; transition: 0.3s;">
+                                    <div onclick="toggleSwitch(this)" data-state="off"
+                                        style="width: 44px; height: 22px; background: var(--border-color); border-radius: 11px; position: relative; cursor: pointer; transition: 0.3s; display: flex; align-items: center; padding: 0 2px;">
                                         <div
-                                            style="width: 18px; height: 18px; background: #fff; border-radius: 50%; position: absolute; left: 2px; top: 2px; transition: 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+                                            style="width: 18px; height: 18px; background: #fff; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.3); transition: 0.3s; transform: translateX(0);">
                                         </div>
                                     </div>
                                 </div>
@@ -2051,12 +2051,30 @@
         }
 
         // Handle URL Hash for deep linking (e.g., console.html#settings)
-        window.addEventListener('load', () => {
+        function handleHash() {
             const hash = window.location.hash.replace('#', '');
             if (hash && ['settings', 'telemetry', 'physics', 'audit', 'esg', 'energy', 'stress', 'diligence'].includes(hash)) {
                 switchTab(hash);
             }
-        });
+        }
+        window.addEventListener('load', handleHash);
+        window.addEventListener('hashchange', handleHash);
+
+        function toggleSwitch(el) {
+            const state = el.getAttribute('data-state');
+            const knob = el.querySelector('div');
+            if (state === 'on') {
+                el.setAttribute('data-state', 'off');
+                el.style.background = 'var(--border-color)';
+                knob.style.transform = 'translateX(0)';
+            } else {
+                el.setAttribute('data-state', 'on');
+                el.style.background = 'var(--accent-green)';
+                knob.style.transform = 'translateX(22px)';
+            }
+            logEvent(`SYSTEM_CONFIG: ${el.previousElementSibling.firstElementChild.innerText} toggled ${state === 'on' ? 'OFF' : 'ON'}`, 'info');
+        }
+        window.toggleSwitch = toggleSwitch;
 
 
         async function updateTelemetryData() {
