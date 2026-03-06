@@ -763,12 +763,15 @@
                         style="font-family: 'JetBrains Mono'; font-size: 10px; color: var(--accent-green); letter-spacing: 1px;">PHYSICS-INFORMED
                         AI STABILITY: NOMINAL</span>
                 </div>
-                <div id="sovereign-control" title="Sovereign Edge Mode" onclick="toggleSovereignMode()"
-                    style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); padding: 4px 12px; border-radius: 4px; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: 0.3s;">
+                <div id="sovereign-control" title="Requires ADMIN role" data-rbac-action="toggle_sovereign"
+                    onclick="toggleSovereignMode()" aria-disabled="true"
+                    style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 4px 12px; border-radius: 4px; display: flex; align-items: center; gap: 8px; cursor: not-allowed; transition: 0.3s; opacity: 0.4; pointer-events: none;">
                     <i data-lucide="shield-alert" id="sov-icon" size="14" color="var(--text-secondary)"></i>
                     <span id="sov-label"
                         style="font-family: 'JetBrains Mono'; font-size: 10px; color: var(--text-secondary); letter-spacing: 1px;">SOVEREIGN_MODE:
                         OFF</span>
+                    <i data-lucide="lock" id="sov-lock-icon" size="11" color="var(--text-secondary)"
+                        style="margin-left: 2px;"></i>
                 </div>
                 <div class="user-dropdown" id="profile-dropdown">
                     <div class="user-avatar" id="user-avatar-container">
@@ -2290,9 +2293,21 @@
         }
 
         async function toggleSovereignMode() {
+            const control = document.getElementById('sovereign-control');
+
+            // RBAC Guard — element is locked by default until ADMIN role confirmed
+            if (control.getAttribute('aria-disabled') === 'true') {
+                logEvent('ACCESS_DENIED: SOVEREIGN_MODE requires ADMIN role. Contact your system administrator.', 'warn');
+                const lockIcon = document.getElementById('sov-lock-icon');
+                if (lockIcon) {
+                    lockIcon.setAttribute('color', 'var(--accent-red)');
+                    setTimeout(() => lockIcon.setAttribute('color', 'var(--text-secondary)'), 2000);
+                }
+                return;
+            }
+
             const sovLabel = document.getElementById('sov-label');
             const sovIcon = document.getElementById('sov-icon');
-            const control = document.getElementById('sovereign-control');
             const currentlyOn = sovLabel.innerText.includes('ON');
 
             try {
@@ -2303,20 +2318,26 @@
                     if (data.sovereign_mode) {
                         sovLabel.innerText = 'SOVEREIGN_MODE: ON';
                         sovLabel.style.color = 'var(--accent-green)';
-                        sovIcon.style.color = 'var(--accent-green)';
+                        sovIcon.setAttribute('color', 'var(--accent-green)');
                         control.style.borderColor = 'var(--accent-green)';
+                        control.style.background = 'rgba(16, 185, 129, 0.05)';
                         logEvent("S-EDGE ENGAGED: All AI inference running locally on KSA-based edge nodes.", "warn");
                     } else {
                         sovLabel.innerText = 'SOVEREIGN_MODE: OFF';
                         sovLabel.style.color = 'var(--text-secondary)';
-                        sovIcon.style.color = 'var(--text-secondary)';
+                        sovIcon.setAttribute('color', 'var(--text-secondary)');
                         control.style.borderColor = 'var(--border-color)';
+                        control.style.background = 'rgba(255,255,255,0.03)';
                         logEvent("CLOUD_UPLINK_RESTORED: Global telemetry relay active.", "info");
                     }
                     if (typeof lucide !== 'undefined') lucide.createIcons();
                 }
-            } catch (e) { console.error("Sovereign Toggle Failure", e); }
+            } catch (e) {
+                logEvent('SOVEREIGN_TOGGLE_FAILED: Could not reach API gateway.', 'warn');
+                console.error("Sovereign Toggle Failure", e);
+            }
         }
+
 
         async function updateAssetStressMap() {
             try {
@@ -3190,11 +3211,26 @@
             }
 
             // Sovereign mode button — ADMIN+ only
-            const sovereignBtn = document.querySelector('[onclick*="toggleSovereignMode"]');
-            if (sovereignBtn && !actions.toggle_sovereign) {
-                sovereignBtn.style.opacity = '0.4';
-                sovereignBtn.style.pointerEvents = 'none';
-                sovereignBtn.title = `Requires ADMIN role (current: ${role})`;
+            const sovereignBtn = document.getElementById('sovereign-control');
+            const sovLockIcon = document.getElementById('sov-lock-icon');
+            if (sovereignBtn) {
+                if (actions.toggle_sovereign) {
+                    // ADMIN/SUPER_ADMIN — UNLOCK the button
+                    sovereignBtn.setAttribute('aria-disabled', 'false');
+                    sovereignBtn.style.opacity = '1';
+                    sovereignBtn.style.pointerEvents = 'auto';
+                    sovereignBtn.style.cursor = 'pointer';
+                    sovereignBtn.title = 'Sovereign Edge Mode — Click to toggle';
+                    if (sovLockIcon) sovLockIcon.style.display = 'none';
+                } else {
+                    // Non-ADMIN — keep locked
+                    sovereignBtn.setAttribute('aria-disabled', 'true');
+                    sovereignBtn.style.opacity = '0.4';
+                    sovereignBtn.style.pointerEvents = 'none';
+                    sovereignBtn.style.cursor = 'not-allowed';
+                    sovereignBtn.title = `SOVEREIGN_MODE: Requires ADMIN role (current: ${role})`;
+                    if (sovLockIcon) sovLockIcon.style.display = 'inline';
+                }
             }
 
             // Settings save button — edit_settings permission required
