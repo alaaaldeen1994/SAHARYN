@@ -18,14 +18,38 @@ class EnvironmentalImpactEngineV2:
     Outputs: Dust Severity Index (DSI) + Uncertainty Bounds.
     """
     
-    def __init__(self, model_path: str = None):
-        self.model_path = model_path
+    def __init__(self, model_key: str = "dust_severity"):
+        self.model_key = model_key
         self.model = None
-        # Load pre-trained model if available
-        if model_path and os.path.exists(model_path):
-            self.model = xgb.Booster()
-            self.model.load_model(model_path)
-            logger.info(f"Environmental Engine Loaded: {model_path}")
+        self.mlflow_mgr = None
+        self._load_production_model()
+
+    def _load_production_model(self):
+        """Attempts to load the current PRODUCTION model (Local first, then MLflow)."""
+        # 1. Try Local Calibrated Model
+        try:
+            local_model_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "models", "registry", "latest_dsi.json")
+            if os.path.exists(local_model_path):
+                 self.model = xgb.Booster()
+                 self.model.load_model(local_model_path)
+                 logger.info(f"Loaded CALIBRATED production model from {local_model_path}")
+                 return
+        except Exception as e:
+            logger.warning(f"Failed to load local model: {e}")
+
+        # 2. Fallback: MLflow
+        try:
+            from apps.mlops.mlflow_manager import SAHARYNMLflow
+            self.mlflow_mgr = SAHARYNMLflow()
+            self.model = self.mlflow_mgr.load_production_model(self.model_key)
+            if self.model:
+                logger.info(f"Loaded production model from MLflow registry")
+                return
+        except Exception as e:
+            logger.error(f"Failed to load model from MLflow: {e}")
+            self.model = None
+
+        logger.warning(f"No high-fidelity model found for {self.model_key}. Operating in PHYSICS_PROXY mode.")
 
     def engineer_features(self, aod: float, wind: float, temp: float, humidity: float) -> pd.DataFrame:
         """
@@ -53,16 +77,26 @@ class EnvironmentalImpactEngineV2:
         Inference with Quantile-based Uncertainty Estimation.
         Outputs: DSI (Mean), Lower bound (p10), Upper bound (p90).
         """
-        features = self.engineer_features(aod, wind, temp, humidity)
-        dmatrix = xgb.DMatrix(features)
+        # 1. Inference using REAL model if available
+        if self.model:
+            try:
+                # Ensure input is DMatrix for Booster
+                dmatrix = xgb.DMatrix(features)
+                # Quantile regression using XGBoost (if trained with Quantile objective)
+                # For baseline, we assume the model predicts the mean
+                preds = self.model.predict(dmatrix)
+                base_dsi = float(preds[0])
+            except Exception as e:
+                logger.error(f"Model inference failed: {e}")
+                # Baseline physics-based proxy for the mean
+                base_dsi = (aod * 0.6) + ( (wind**1.5) * 0.02 * (1/(humidity+1)) )
+        else:
+            # Baseline physics-based proxy for the mean
+            base_dsi = (aod * 0.6) + ( (wind**1.5) * 0.02 * (1/(humidity+1)) )
         
-        # In a real deployed scenario, we would have 3 models or 1 multi-output
-        # Here we simulate the DSI prediction logic with uncertainty injection
-        # Standard physics-based proxy for the mean
-        base_dsi = (aod * 0.6) + ( (wind**1.5) * 0.02 * (1/(humidity+1)) )
         dsi_final = np.clip(base_dsi, 0.0, 1.0)
         
-        # Uncertainty scales with wind turbulence and humidity sensor error
+        # Uncertainty calculation
         uncertainty = 0.05 + (wind * 0.005) + (1.0 / (humidity + 1.0)) * 0.02
         
         # Out-of-Distribution (OOD) Detection
