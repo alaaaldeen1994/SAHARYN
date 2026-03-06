@@ -30,6 +30,11 @@ from services.ai_core.esg_engine import ESGImpactEngine
 from services.compliance.ledger_engine import SovereignLedgerEngine
 from services.ingestion.satellite_etl import SatelliteETLService
 
+# --- 1. LOGGING (must be first — everything below depends on it) ---
+LOG_FORMAT = "%(asctime)s - %(name)s - [%(process)d] - [%(levelname)s] - %(message)s"
+logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
+logger = logging.getLogger("SAHARYN_API_GATEWAY")
+
 # --- AUDIT LOG STORAGE (Persistent structured log — production grade) ---
 import collections
 SYSTEM_AUDIT_LOGS = collections.deque(maxlen=500)  # Thread-safe, capped at 500 entries
@@ -44,15 +49,10 @@ def _write_audit(event: str, origin: str, status: str, detail: str = ""):
         "detail": detail
     }
     SYSTEM_AUDIT_LOGS.appendleft(entry)
-    logger.info(f"AUDIT: {event} | {origin} | {status} | {detail}")
+    logging.getLogger("SAHARYN_API_GATEWAY").info(f"AUDIT: {event} | {origin} | {status} | {detail}")
 
-# Seed with real system startup event
+# Record system startup in audit trail
 _write_audit("SYSTEM_STARTUP", "API_GATEWAY", "SUCCESS", "All core services initialized")
-
-# --- 1. INDUSTRIAL LOGGING CONFIGURATION ---
-LOG_FORMAT = "%(asctime)s - %(name)s - [%(process)d] - [%(levelname)s] - %(message)s"
-logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
-logger = logging.getLogger("SAHARYN_API_GATEWAY")
 
 # --- 2. SECURITY CONFIGURATION ---
 # PRODUCTION: API key MUST be set via environment variable — no hardcoded fallback
