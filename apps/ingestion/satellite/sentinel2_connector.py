@@ -36,9 +36,9 @@ logger = logging.getLogger("SAHARYN_SENTINEL2")
 # ─────────────────────────────────────────────────────────────
 # Configuration
 # ─────────────────────────────────────────────────────────────
-SH_API_KEY       = os.getenv("SENTINELHUB_API_KEY")      # PLAK... key from User Settings
-SH_CLIENT_ID     = os.getenv("SENTINELHUB_CLIENT_ID")    # User ID from User Settings
-SH_INSTANCE_ID   = os.getenv("SENTINELHUB_INSTANCE_ID")  # Account ID from Account Settings
+SH_CLIENT_ID     = os.getenv("SENTINELHUB_CLIENT_ID")     # OAuth2 Client ID
+SH_CLIENT_SECRET = os.getenv("SENTINELHUB_CLIENT_SECRET")  # OAuth2 Client Secret
+SH_INSTANCE_ID   = os.getenv("SENTINELHUB_INSTANCE_ID")    # Account ID
 
 # Area radius around asset for imagery (km)
 DEFAULT_RADIUS_KM = 10.0
@@ -58,24 +58,26 @@ class Sentinel2Connector:
         self._connect()
 
     def _connect(self):
-        """Initialize Sentinel Hub connection using API Key."""
-        if not SH_API_KEY:
+        """Initialize Sentinel Hub connection using OAuth2 Client Credentials."""
+        if not SH_CLIENT_ID or not SH_CLIENT_SECRET:
             logger.warning(
-                "SENTINELHUB_API_KEY not set. Connector in simulation mode."
+                "Sentinel Hub OAuth credentials not set. "
+                "Set SENTINELHUB_CLIENT_ID and SENTINELHUB_CLIENT_SECRET."
             )
             return
 
         try:
             from sentinelhub import SHConfig
             config = SHConfig()
-            config.sh_client_id = SH_CLIENT_ID or ""
-            config.sh_base_url  = "https://services.sentinel-hub.com"
+            config.sh_client_id     = SH_CLIENT_ID
+            config.sh_client_secret = SH_CLIENT_SECRET
+            config.sh_token_url     = "https://services.sentinel-hub.com/oauth/token"
+            config.sh_base_url      = "https://services.sentinel-hub.com"
             if SH_INSTANCE_ID:
                 config.instance_id = SH_INSTANCE_ID
             self._sh_config = config
-            self._api_key   = SH_API_KEY
             self._available = True
-            logger.info("Sentinel Hub connected via API Key")
+            logger.info(f"Sentinel Hub OAuth connected: client_id={SH_CLIENT_ID[:8]}...")
         except ImportError:
             logger.warning("sentinelhub not installed. pip install sentinelhub")
         except Exception as e:
