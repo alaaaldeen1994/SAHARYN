@@ -1,0 +1,348 @@
+name: SAHARYN AI — Production CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, release/* ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options: [ staging, production ]
+
+env:
+  PYTHON_VERSION: "3.11"
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # ─────────────────────────────────────────────────────────────────────────
+  # JOB 1: Code Quality & Security Scan
+  # ─────────────────────────────────────────────────────────────────────────
+  quality-gate:
+    name: Code Quality & Security
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install ruff bandit safety pytest pytest-cov
+
+      - name: Lint with ruff (PEP8 + type hints)
+        run: ruff check . --output-format=github
+
+      - name: Security scan with bandit (OWASP compliance)
+        run: bandit -r services/ apps/ai_core/ core/ -f json -o bandit_report.json || true
+        # Note: Non-zero exit warns but doesn't block — HIGH findings fail below
+
+      - name: Check bandit for HIGH severity findings
+        run: |
+          python -c "
+          import json, sys
+          with open('bandit_report.json') as f:
+              report = json.load(f)
+          high_issues = [r for r in report.get('results', []) if r['issue_severity'] == 'HIGH']
+          if high_issues:
+              print(f'SECURITY GATE FAILED: {len(high_issues)} HIGH severity issues:')
+              for i in high_issues:
+                  print(f'  [{i[\"test_id\"]}] {i[\"issue_text\"]} — {i[\"filename\"]}:{i[\"line_number\"]}')
+              sys.exit(1)
+          print(f'Security scan passed — 0 HIGH severity issues.')
+          "
+
+      - name: Dependency vulnerability scan
+        run: safety check -r requirements.txt --full-report || echo "::warning::Safety check found vulnerabilities — review report"
+
+      - name: Upload security reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-reports
+          path: bandit_report.json
+          retention-days: 30
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # JOB 2: Unit & Integration Tests with Coverage
+  # ─────────────────────────────────────────────────────────────────────────
+  test:
+    name: Test Suite
+    runs-on: ubuntu-latest
+    needs: quality-gate
+    env:
+      SAHARYN_API_KEY: ci-test-key-not-for-production
+      SAHARYN_ENV: TESTING
+      JWT_SECRET: ci-jwt-secret
+      MLFLOW_TRACKING_URI: file:./mlruns
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt pytest pytest-cov pytest-asyncio httpx
+
+      - name: Run unit tests with coverage
+        run: |
+          pytest tests/ \
+            --cov=services \
+            --cov=apps/ai_core \
+            --cov=core \
+            --cov-report=xml:coverage.xml \
+            --cov-report=term-missing \
+            --cov-fail-under=70 \
+            -v \
+            --tb=short \
+            -m "not integration"
+
+      - name: Run scientific rigor validation
+        run: python validate_system.py
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage.xml
+          fail_ci_if_error: false
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # JOB 3: Model Training & Validation (only on main branch)
+  # ─────────────────────────────────────────────────────────────────────────
+  model-validation:
+    name: Model Training & Validation
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    env:
+      SAHARYN_API_KEY: ci-test-key-not-for-production
+      MLFLOW_TRACKING_URI: file:./mlruns
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run model training pipeline
+        run: python training/train_asset_failure.py --n-samples 10000
+        # Note: CI uses 10k samples for speed. Production uses full dataset.
+
+      - name: Validate model artifacts exist
+        run: |
+          test -f models/artifacts/failure_model.ubj || (echo "Model artifact missing!" && exit 1)
+          test -f models/artifacts/rul_model.ubj || (echo "RUL model artifact missing!" && exit 1)
+          test -f models/artifacts/model_metadata.json || (echo "Model metadata missing!" && exit 1)
+          python -c "
+          import json
+          with open('models/artifacts/model_metadata.json') as f:
+              meta = json.load(f)
+          assert meta['production_gate'] == 'PASSED', f'Production gate not passed: {meta}'
+          auc = meta['metrics']['test_auc_roc']
+          recall = meta['metrics']['test_recall']
+          print(f'Model validation: AUC={auc:.4f}, Recall={recall:.4f}')
+          assert auc >= 0.75, f'AUC {auc:.4f} below minimum 0.75'
+          assert recall >= 0.65, f'Recall {recall:.4f} below minimum 0.65'
+          print('Model validation PASSED ✔')
+          "
+
+      - name: Upload model artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: model-artifacts-${{ github.sha }}
+          path: models/artifacts/
+          retention-days: 90
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # JOB 4: Build & Push Docker Image
+  # ─────────────────────────────────────────────────────────────────────────
+  build:
+    name: Build & Push Container
+    runs-on: ubuntu-latest
+    needs: [ test ]
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release/')
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image-digest: ${{ steps.build.outputs.digest }}
+      image-tag: ${{ steps.meta.outputs.tags }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=sha-
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+
+      - name: Build and push Docker image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            BUILD_DATE=${{ github.event.head_commit.timestamp }}
+            GIT_SHA=${{ github.sha }}
+
+      - name: Scan image for vulnerabilities (Trivy)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}
+          format: sarif
+          output: trivy-results.sarif
+          severity: CRITICAL,HIGH
+          exit-code: 0
+
+      - name: Upload Trivy results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: trivy-results.sarif
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # JOB 5: Deploy to Railway (Staging)
+  # ─────────────────────────────────────────────────────────────────────────
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [ build, model-validation ]
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: staging
+      url: https://saharyn-staging.up.railway.app
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Deploy to Railway Staging
+        run: railway up --detach --environment staging
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: Health check staging deployment
+        run: |
+          echo "Waiting for deployment to stabilize..."
+          sleep 45
+          for i in {1..5}; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://saharyn-staging.up.railway.app/v2/system/health)
+            echo "Attempt $i: HTTP $STATUS"
+            if [ "$STATUS" = "200" ]; then
+              echo "Health check PASSED ✔"
+              exit 0
+            fi
+            sleep 15
+          done
+          echo "Health check FAILED after 5 attempts"
+          exit 1
+
+      - name: Run smoke tests against staging
+        run: python test_v2_api.py
+        env:
+          API_BASE_URL: https://saharyn-staging.up.railway.app
+          SAHARYN_API_KEY: ${{ secrets.SAHARYN_API_KEY_STAGING }}
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # JOB 6: Deploy to Production (requires manual approval)
+  # ─────────────────────────────────────────────────────────────────────────
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: production
+      url: https://saharyn.com
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Deploy to Railway Production
+        run: railway up --detach --environment production
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: Health check production deployment
+        run: |
+          echo "Waiting for production deployment..."
+          sleep 60
+          for i in {1..8}; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://saharyn.com/v2/system/health)
+            echo "Attempt $i: HTTP $STATUS"
+            if [ "$STATUS" = "200" ]; then
+              echo "Production health check PASSED ✔"
+              exit 0
+            fi
+            sleep 20
+          done
+          echo "CRITICAL: Production health check FAILED"
+          exit 1
+
+      - name: Notify deployment success
+        if: success()
+        run: |
+          echo "::notice::✅ Production deployment successful — $(date -u)"
+          echo "Commit: ${{ github.sha }}"
+          echo "Branch: ${{ github.ref }}"
+
+      - name: Rollback on failure
+        if: failure()
+        run: |
+          echo "::error::Production deployment failed. Initiating rollback..."
+          railway rollback --environment production
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}

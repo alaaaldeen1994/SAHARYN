@@ -3093,7 +3093,7 @@
         }
 
         if (auth) {
-            onAuthStateChanged(auth, (user) => {
+            onAuthStateChanged(auth, async (user) => {
                 const userDisplayName = document.getElementById('user-display-name');
                 const userDisplayEmail = document.getElementById('user-display-email');
                 const settingsName = document.getElementById('settings-name');
@@ -3103,19 +3103,114 @@
                 if (user) {
                     if (userDisplayName) userDisplayName.innerText = user.displayName || "User Session Active";
                     if (userDisplayEmail) userDisplayEmail.innerText = user.email;
-
-                    // Sync settings fields
                     if (settingsName) settingsName.value = user.displayName || "";
                     if (settingsEmail) settingsEmail.value = user.email || "";
-
                     if (user.photoURL && avatarContainer) {
                         avatarContainer.innerHTML = `<img src="${user.photoURL}" alt="${user.displayName}" style="width: 100%; height: 100%; border-radius: 50%;">`;
+                    }
+
+                    // ── RBAC Bootstrap ────────────────────────────────────────────
+                    // Get the user's role from Firebase custom claims, then fetch
+                    // capabilities from the API to drive UI gating.
+                    try {
+                        const idTokenResult = await user.getIdTokenResult();
+                        const userRole = idTokenResult.claims?.role || "OPERATOR";
+
+                        // Fetch capability map from backend
+                        const capResp = await fetch('/v2/auth/capabilities', {
+                            headers: { 'X-User-Role': userRole }
+                        });
+                        const caps = capResp.ok ? await capResp.json() : { role: userRole, dashboard_sections: {}, actions: {} };
+
+                        applyRBACToUI(caps);
+                        logEvent(`RBAC: Session authorized as ${caps.role}`, 'info');
+                    } catch (e) {
+                        console.warn('RBAC bootstrap failed, applying OPERATOR defaults:', e);
+                        applyRBACToUI({ role: 'OPERATOR', dashboard_sections: { telemetry: true, physics: true, esg: true, energy: true, stress: true }, actions: {} });
                     }
                 } else {
                     console.log("Dashboard: No active user");
                 }
             });
         }
+
+        /**
+         * applyRBACToUI — Hides nav items and disables actions based on role capabilities.
+         * Called once after login. Does NOT require page reload on role change.
+         */
+        function applyRBACToUI(caps) {
+            const sections = caps.dashboard_sections || {};
+            const actions = caps.actions || {};
+            const role = caps.role || 'OPERATOR';
+
+            // ── Role badge in header ──────────────────────────────────────────
+            const existingBadge = document.getElementById('role-badge');
+            if (existingBadge) existingBadge.remove();
+            const roleColors = { OPERATOR: '#64748b', ANALYST: '#3b82f6', MANAGER: '#8b5cf6', ADMIN: '#10b981', SUPER_ADMIN: '#f59e0b' };
+            const badge = document.createElement('div');
+            badge.id = 'role-badge';
+            badge.style.cssText = `background: ${roleColors[role] || '#64748b'}22; border: 1px solid ${roleColors[role] || '#64748b'}44; color: ${roleColors[role] || '#64748b'}; padding: 3px 10px; border-radius: 4px; font-size: 10px; font-weight: 800; letter-spacing: 1px; font-family: 'JetBrains Mono';`;
+            badge.innerText = role;
+            const headerRight = document.querySelector('.header-right');
+            if (headerRight) headerRight.prepend(badge);
+
+            // ── Nav Item Visibility ───────────────────────────────────────────
+            // Map nav item onclick values to capability keys
+            const navMap = {
+                'telemetry': sections.telemetry,
+                'physics': sections.physics,
+                'audit': sections.audit,
+                'esg': sections.esg,
+                'energy': sections.energy,
+                'stress': sections.stress,
+                'diligence': sections.diligence,
+                'settings': sections.settings,
+            };
+
+            document.querySelectorAll('.nav-item[onclick]').forEach(item => {
+                const onclick = item.getAttribute('onclick') || '';
+                const match = onclick.match(/switchTab\('(\w+)'/);
+                if (match) {
+                    const tabKey = match[1];
+                    if (navMap[tabKey] === false) {
+                        item.style.display = 'none';
+                        item.title = `${tabKey.toUpperCase()} — Role '${role}' does not have access`;
+                    }
+                }
+            });
+
+            // ── Action Gating ────────────────────────────────────────────────
+            // Delete account button — ADMIN+ only
+            const deleteBtn = document.querySelector('[onclick*="handleDeleteAccount"]');
+            if (deleteBtn && !actions.delete_account) {
+                deleteBtn.disabled = true;
+                deleteBtn.style.opacity = '0.3';
+                deleteBtn.style.cursor = 'not-allowed';
+                deleteBtn.title = `Requires ADMIN role (current: ${role})`;
+            }
+
+            // Sovereign mode button — ADMIN+ only
+            const sovereignBtn = document.querySelector('[onclick*="toggleSovereignMode"]');
+            if (sovereignBtn && !actions.toggle_sovereign) {
+                sovereignBtn.style.opacity = '0.4';
+                sovereignBtn.style.pointerEvents = 'none';
+                sovereignBtn.title = `Requires ADMIN role (current: ${role})`;
+            }
+
+            // Settings save button — edit_settings permission required
+            const saveProfileBtn = document.querySelector('[onclick*="SAVE_PROFILE"], button[style*="accent-green"]');
+            if (saveProfileBtn && !actions.edit_settings) {
+                saveProfileBtn.disabled = true;
+                saveProfileBtn.style.opacity = '0.4';
+                saveProfileBtn.title = `Read-only: ${role} cannot edit settings`;
+            }
+
+            // ── Operator-mode message if restricted ──────────────────────────
+            if (role === 'OPERATOR') {
+                logEvent('RBAC: Operating in read-only OPERATOR mode. Contact ADMIN for elevated access.', 'info');
+            }
+        }
+        window.applyRBACToUI = applyRBACToUI;
 
         // -- Global Scope Exposure (Required for HTML events in type="module") --
         window.switchTab = switchTab;

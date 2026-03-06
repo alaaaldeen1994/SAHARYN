@@ -31,6 +31,14 @@ from services.ai_core.esg_engine import ESGImpactEngine
 from services.compliance.ledger_engine import SovereignLedgerEngine
 from services.ingestion.satellite_etl import SatelliteETLService
 
+# --- Security Layer ---
+from core.security.siem_forwarder import (
+    get_siem, SIEMEvent, SIEMEventType, SIEMSeverity,
+    emit_auth_failure, emit_auth_success, emit_model_drift,
+    emit_inference_event, emit_sovereign_change, emit_esg_claim,
+)
+from core.security.rbac import get_role_capabilities_json, Role
+
 # --- RBAC Security Layer (with graceful fallback) ---
 try:
     from core.security.rbac import (
@@ -192,20 +200,20 @@ app.add_middleware(
 
 async def verify_enterprise_access(request: Request, x_api_key: str = Header(...)):
     """Validate enterprise API key and write failed attempts to audit log."""
+    client_ip = request.client.host if request.client else "UNKNOWN"
     if x_api_key != API_KEY_SECRET:
-        client_ip = request.client.host if request.client else "UNKNOWN"
         _write_audit(
-            "AUTH_FAILURE",
-            f"IP:{client_ip}",
-            "BLOCKED",
+            "AUTH_FAILURE", f"IP:{client_ip}", "BLOCKED",
             f"Invalid API key for path {request.url.path}"
         )
+        emit_auth_failure(actor="UNKNOWN", ip=client_ip, reason="Invalid API key")
         logger.error(f"SECURITY_ALERT: Unauthorized access attempt from {client_ip}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Valid Enterprise Security Token Required.",
             headers={"WWW-Authenticate": "X-API-KEY"},
         )
+    emit_auth_success(actor="api_client", ip=client_ip, role="API_KEY_HOLDER")
     return x_api_key
 
 # --- 8. ERROR HANDLERS ---
@@ -539,6 +547,30 @@ async def get_diligence_topology():
 @app.get("/v2/diligence/compliance", tags=["Diligence"])
 async def get_diligence_compliance():
     return {"status": "ACTIVE", "frameworks": COMPLIANCE_STATUS}
+
+
+# --- RBAC Capabilities Endpoint (used by frontend on login) ---
+@app.get("/v2/auth/capabilities", tags=["Auth"])
+async def get_user_capabilities(x_user_role: str = Header(default="OPERATOR")):
+    """
+    Returns the capability map for the given user role.
+    The dashboard fetches this after login to configure which sections are visible.
+    Frontend passes the role from the Firebase ID token custom claim.
+    """
+    valid_roles = [r.value for r in Role]
+    role = x_user_role if x_user_role in valid_roles else "OPERATOR"
+    return get_role_capabilities_json(role)
+
+
+# --- Sovereign Mode with SIEM ---
+@app.post("/v2/system/sovereign", tags=["System"])
+async def toggle_sovereign_mode(enable: bool, actor: str = "API_CLIENT"):
+    """Activates air-gapped Sovereign Edge Inference mode."""
+    causal_engine.sovereign_mode = enable
+    emit_sovereign_change(enabled=enable, actor=actor)
+    logger.warning(f"SOVEREIGN_MODE: {'ACTIVATED' if enable else 'DEACTIVATED'} — Edge Computing Protocol Engaged.")
+    return {"status": "SUCCESS", "sovereign_mode": causal_engine.sovereign_mode}
+
 
 if __name__ == "__main__":
     import uvicorn
