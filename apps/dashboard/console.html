@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<script type="module" src="./firebase-init.js"></script>
 <html lang="en">
 
 <head>
@@ -11,6 +10,7 @@
         rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module" src="./firebase-init.js"></script>
     <style>
         :root {
             --bg-base: #05070a;
@@ -1803,7 +1803,7 @@
         </div>
     </main>
 
-    <script>
+    <script type="module">
         // Init Icons
         lucide.createIcons();
 
@@ -2804,18 +2804,19 @@
             await logout();
         });
 
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                document.getElementById('user-display-name').innerText = user.displayName || "User Session Active";
-                document.getElementById('user-display-email').innerText = user.email;
-                if (user.photoURL) {
-                    document.getElementById('user-avatar-container').innerHTML = `<img src="${user.photoURL}" alt="${user.displayName}">`;
+        if (auth) {
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    document.getElementById('user-display-name').innerText = user.displayName || "User Session Active";
+                    document.getElementById('user-display-email').innerText = user.email;
+                    if (user.photoURL) {
+                        document.getElementById('user-avatar-container').innerHTML = `<img src="${user.photoURL}" alt="${user.displayName}">`;
+                    }
+                } else {
+                    console.log("Dashboard: No active user");
                 }
-            } else {
-                // If logged out, you might want to redirect, but let's keep it for demo
-                console.log("Dashboard: No active user");
-            }
-        });
+            });
+        }
     </script>
     <style>
         body[dir="rtl"] .brand-container {

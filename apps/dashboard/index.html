@@ -805,7 +805,7 @@
             <button onclick="toggleLanguage()"
                 style="background:none;border:none;color:var(--text-dim);font-family:var(--mono);font-size:11px;cursor:pointer;letter-spacing:1px;">EN
                 / عربي</button>
-            <a href="console.html" class="nav-cta" data-i18n="nav_cta">Sign In / Sign Up</a>
+            <div class="nav-cta" id="login-btn" style="cursor:pointer;" data-i18n="nav_cta">Sign In / Sign Up</div>
         </div>
     </nav>
 
@@ -1181,7 +1181,7 @@
 
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script>
+    <script type="module">
         // ── Three.js Background ──
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, innerWidth / innerHeight, 0.1, 1000);
@@ -1302,6 +1302,28 @@
         updateClock();
         setInterval(fetchLiveData, 8000);
         setInterval(updateClock, 1000);
+
+        // -- Firebase Auth Integration --
+        import { login, auth } from "./firebase-init.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        document.getElementById('login-btn').addEventListener('click', async () => {
+            const user = await login();
+            if (user) {
+                window.location.href = 'console.html';
+            }
+        });
+
+        if (auth) {
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    document.getElementById('login-btn').innerText = "Open Dashboard";
+                    document.getElementById('login-btn').addEventListener('click', () => {
+                        window.location.href = 'console.html';
+                    });
+                }
+            });
+        }
     </script>
 </body>
 
