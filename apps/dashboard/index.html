@@ -66,7 +66,6 @@
             padding: 22px 60px;
             background: rgba(3, 9, 18, 0.85);
             backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border);
         }
 
         .brand {
@@ -130,56 +129,7 @@
             box-shadow: 0 0 24px var(--accent-glow);
         }
 
-        /* ── LIVE STATUS BAR ── */
-        .live-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            z-index: 200;
-            display: flex;
-            align-items: center;
-            gap: 30px;
-            padding: 10px 60px;
-            background: rgba(3, 9, 18, 0.95);
-            border-top: 1px solid var(--border);
-            font-family: var(--mono);
-            font-size: 10px;
-            color: var(--text-dim);
-            letter-spacing: 1px;
-        }
 
-        .live-dot {
-            width: 7px;
-            height: 7px;
-            background: var(--accent);
-            border-radius: 50%;
-            box-shadow: 0 0 8px var(--accent);
-            animation: pulse 1.8s infinite;
-        }
-
-        @keyframes pulse {
-
-            0%,
-            100% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0.3;
-            }
-        }
-
-        .live-status {
-            color: var(--accent);
-            font-weight: 600;
-        }
-
-        .live-sep {
-            width: 1px;
-            height: 14px;
-            background: var(--border-bright);
-        }
 
         /* ── HERO ── */
         .hero {
@@ -1228,19 +1178,7 @@
         </div>
     </footer>
 
-    <!-- ── LIVE STATUS BAR ── -->
-    <div class="live-bar">
-        <div class="live-dot"></div>
-        <span class="live-status">SYSTEMS OPERATIONAL</span>
-        <div class="live-sep"></div>
-        <span>NASA_BRIDGE: <span style="color:var(--accent);" id="bar-nasa">—</span></span>
-        <div class="live-sep"></div>
-        <span>ESA_SENTINEL: <span style="color:var(--blue);" id="bar-esa">—</span></span>
-        <div class="live-sep"></div>
-        <span>CAMS_TEMP: <span style="color:var(--amber);" id="bar-cams">—</span></span>
-        <div class="live-sep"></div>
-        <span>AUDIT: <span style="color:var(--text-mid);" id="bar-hash">AWAITING...</span></span>
-    </div>
+
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
@@ -1288,17 +1226,13 @@
                 const cams = feeds.find(f => f.source === 'COPERNICUS_L2A');
 
                 if (aod) {
-                    document.getElementById('bar-nasa').innerText = `AOD ${aod.value}`;
                     document.getElementById('aod-live').innerText = aod.value;
                 }
                 if (ddi) {
-                    document.getElementById('bar-esa').innerText = `DDI ${ddi.value}`;
                     document.getElementById('ddi-live').innerText = ddi.value;
                 }
-                if (cams) document.getElementById('bar-cams').innerText = `${cams.value} °C`;
 
                 const hash = d.integrity_hash || '';
-                document.getElementById('bar-hash').innerText = hash.slice(0, 16) + '...';
                 document.getElementById('live-audit-id').innerText = `HASH: ${hash.slice(0, 20)}...`;
             } catch (e) {
                 document.getElementById('live-audit-id').innerText = 'AWAITING LIVE SYNC...';
