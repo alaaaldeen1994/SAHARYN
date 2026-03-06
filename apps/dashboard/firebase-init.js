@@ -50,4 +50,23 @@ export async function logout() {
     window.location.href = 'index.html';
 }
 
+// Helper for Account Deletion
+export async function deleteAccount() {
+    if (!auth || !auth.currentUser) return;
+    const user = auth.currentUser;
+    if (confirm("CRITICAL: This will permanently delete your SAHARYN AI account and all associated institutional data. This action cannot be undone. Proceed?")) {
+        try {
+            await user.delete();
+            window.location.href = 'index.html';
+        } catch (error) {
+            console.error("Account deletion failed:", error);
+            if (error.code === 'auth/requires-recent-login') {
+                alert("For security, please sign out and sign back in before deleting your account.");
+            } else {
+                alert("Deletion failed: " + error.message);
+            }
+        }
+    }
+}
+
 export { auth };
