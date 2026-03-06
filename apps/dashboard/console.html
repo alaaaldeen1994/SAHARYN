@@ -1783,6 +1783,10 @@
                             style="padding: 15px 20px; text-align: left; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 12px; cursor: pointer;">
                             <i data-lucide="bell" size="16"></i> Alerts & Notify
                         </button>
+                        <button class="panel settings-nav-btn" onclick="switchSettingsTab('support', this)"
+                            style="padding: 15px 20px; text-align: left; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 12px; cursor: pointer; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 5px; padding-top: 15px;">
+                            <i data-lucide="help-circle" size="16"></i> Technical Support
+                        </button>
                     </div>
 
                     <!-- Settings Main Content -->
@@ -1965,6 +1969,38 @@
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Support Section -->
+                        <div id="settings-support-section" class="settings-section" style="display: none;">
+                            <div class="panel" style="padding: 30px;">
+                                <h3
+                                    style="font-size: 16px; margin-bottom: 25px; display: flex; align-items: center; gap: 10px;">
+                                    <i data-lucide="help-circle" size="18" color="var(--accent-green)"></i>
+                                    Institutional Support
+                                </h3>
+                                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 25px;">For
+                                    technical inquiries, SLA escalations, or API documentation access, please contact
+                                    our institutional relations team.</p>
+
+                                <div class="panel"
+                                    style="background: rgba(16, 185, 129, 0.03); border: 1px dashed rgba(16, 185, 129, 0.3); padding: 25px; display: flex; flex-direction: column; align-items: center; gap: 15px; text-align: center;">
+                                    <div
+                                        style="width: 50px; height: 50px; background: rgba(16, 185, 129, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                        <i data-lucide="mail" size="24" color="var(--accent-green)"></i>
+                                    </div>
+                                    <div>
+                                        <div
+                                            style="font-family: 'JetBrains Mono'; font-size: 18px; font-weight: 800; color: #fff; margin-bottom: 5px;">
+                                            info@niluslab.com</div>
+                                        <div
+                                            style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;">
+                                            Primary Node Uplink</div>
+                                    </div>
+                                    <a href="mailto:info@niluslab.com"
+                                        style="background: var(--accent-green); color: #000; padding: 10px 25px; border-radius: 6px; text-decoration: none; font-weight: 800; font-size: 12px; transition: 0.2s; display: inline-block;">SEND_SECURE_ENQUIRY</a>
                                 </div>
                             </div>
                         </div>
