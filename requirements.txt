@@ -24,3 +24,5 @@ python-dotenv
 tenacity
 xarray
 cfgrib
+schedule
+shap

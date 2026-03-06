@@ -1,0 +1,57 @@
+# SAHARYN AI — MLflow Tracking Server
+# Deployed as a separate service alongside the main API
+# Data stored in PostgreSQL (same TimescaleDB instance, separate schema)
+# Artifacts stored in local volume (replace with S3 in full production)
+
+version: '3.8'
+
+services:
+  mlflow:
+    image: python:3.11-slim
+    command: >
+      bash -c "
+        pip install mlflow psycopg2-binary boto3 --quiet &&
+        mlflow server
+          --host 0.0.0.0
+          --port 5000
+          --backend-store-uri postgresql://saharyn_admin:${DB_PASSWORD}@db:5432/mlflow_tracking
+          --default-artifact-root /mlflow/artifacts
+          --workers 2
+      "
+    ports:
+      - "5000:5000"
+    environment:
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      DB_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - mlflow_artifacts:/mlflow/artifacts
+    depends_on:
+      - db
+    restart: always
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:5000/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  db:
+    image: timescale/timescaledb:latest-pg15
+    environment:
+      POSTGRES_USER: saharyn_admin
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: saharyn_prod
+    volumes:
+      - ./infrastructure/database/schema_v2.sql:/docker-entrypoint-initdb.d/01_schema.sql
+      - ./infrastructure/database/mlflow_schema.sql:/docker-entrypoint-initdb.d/02_mlflow.sql
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U saharyn_admin -d saharyn_prod" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  db_data:
+  mlflow_artifacts:
