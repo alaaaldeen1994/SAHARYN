@@ -30,6 +30,13 @@ from services.ai_core.esg_engine import ESGImpactEngine
 from services.compliance.ledger_engine import SovereignLedgerEngine
 from services.ingestion.satellite_etl import SatelliteETLService
 
+# --- RBAC Security Layer ---
+from core.security.rbac import (
+    get_current_user, require_permission, require_site_access,
+    create_access_token, UserContext, Role, Permission,
+    TokenRequest, TokenResponse,
+)
+
 # --- 1. LOGGING (must be first — everything below depends on it) ---
 LOG_FORMAT = "%(asctime)s - %(name)s - [%(process)d] - [%(levelname)s] - %(message)s"
 logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)

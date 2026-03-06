@@ -1,0 +1,23 @@
+project: saharyn
+provider: local
+
+offline_store:
+  type: feast.infra.offline_stores.contrib.postgres_offline_store.postgres.PostgreSQLOfflineStore
+  host: ${DB_HOST}
+  port: 5432
+  database: saharyn_prod
+  user: saharyn_admin
+  password: ${DB_PASSWORD}
+
+online_store:
+  type: redis
+  connection_string: ${REDIS_URL:-redis://localhost:6379}
+
+registry:
+  registry_type: sql
+  path: postgresql://saharyn_admin:${DB_PASSWORD}@${DB_HOST}:5432/saharyn_prod
+
+entity_key_serialization_version: 2
+
+flags:
+  limit_online_feature_count_max: 50
