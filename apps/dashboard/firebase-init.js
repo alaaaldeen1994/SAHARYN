@@ -1,4 +1,4 @@
-// Firebase Initialization for Saharyn AI
+// Firebase Initialization for Saharyn AI - Tech Uplink Verified
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import firebaseConfig from "./firebase-config.js";
