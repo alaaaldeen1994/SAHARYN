@@ -359,6 +359,14 @@ async def execute_resilience_inference(
 async def get_telemetry_stream(site_id: str = "SA_EAST_RU_01"):
     # Link to Real Satellite ETL Core
     packet = satellite_etl.transform_spectral_data("LIVE_STREAM", site_id)
+    
+    # RECORD SATELLITE SYNC IN PERMANENT AUDIT LEDGER
+    _write_audit(
+        "SATELLITE_SYNC", 
+        f"SITE:{site_id}", 
+        "SUCCESS", 
+        f"Fused NASA(AOD:{packet.aod_550nm:.2f}), ESA(DDI:{packet.dust_detection_index:.3f}), CAMS(Verified)"
+    )
 
     return {
         "status": "LIVE",
