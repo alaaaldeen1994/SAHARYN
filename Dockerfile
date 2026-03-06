@@ -18,6 +18,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy All Logic & Assets
 COPY services/ ./services/
 COPY apps/ ./apps/
+COPY core/ ./core/
 COPY infrastructure/ ./infrastructure/
 # Copy metadata/configs if needed
 COPY README.md .

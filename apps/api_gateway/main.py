@@ -30,12 +30,17 @@ from services.ai_core.esg_engine import ESGImpactEngine
 from services.compliance.ledger_engine import SovereignLedgerEngine
 from services.ingestion.satellite_etl import SatelliteETLService
 
-# --- RBAC Security Layer ---
-from core.security.rbac import (
-    get_current_user, require_permission, require_site_access,
-    create_access_token, UserContext, Role, Permission,
-    TokenRequest, TokenResponse,
-)
+# --- RBAC Security Layer (with graceful fallback) ---
+try:
+    from core.security.rbac import (
+        get_current_user, require_permission, require_site_access,
+        create_access_token, UserContext, Role, Permission,
+        TokenRequest, TokenResponse,
+    )
+    _RBAC_AVAILABLE = True
+except ImportError as _rbac_err:
+    _RBAC_AVAILABLE = False
+    # API will fall back to API-key-only auth — logged after logger is initialized
 
 # --- 1. LOGGING (must be first — everything below depends on it) ---
 LOG_FORMAT = "%(asctime)s - %(name)s - [%(process)d] - [%(levelname)s] - %(message)s"
