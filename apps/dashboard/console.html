@@ -1832,10 +1832,10 @@
                                         <div style="font-size: 11px; color: var(--text-secondary);">Dynamic gradient
                                             adjustment for RUL modeling.</div>
                                     </div>
-                                    <div
-                                        style="width: 44px; height: 22px; background: var(--accent-green); border-radius: 11px; position: relative; cursor: pointer;">
+                                    <div onclick="this.querySelector('div').style.left = this.querySelector('div').style.left === '2px' ? 'auto' : '2px'; this.querySelector('div').style.right = this.querySelector('div').style.right === '2px' ? 'auto' : '2px'; this.style.background = this.style.background.includes('accent-green') ? 'var(--border-color)' : 'var(--accent-green)';"
+                                        style="width: 44px; height: 22px; background: var(--accent-green); border-radius: 11px; position: relative; cursor: pointer; transition: 0.3s;">
                                         <div
-                                            style="width: 18px; height: 18px; background: #fff; border-radius: 50%; position: absolute; right: 2px; top: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+                                            style="width: 18px; height: 18px; background: #fff; border-radius: 50%; position: absolute; right: 2px; top: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.3); transition: 0.3s;">
                                         </div>
                                     </div>
                                 </div>
@@ -1846,10 +1846,10 @@
                                         <div style="font-size: 11px; color: var(--text-secondary);">Enable edge-based
                                             inference when latency exceeds 200ms.</div>
                                     </div>
-                                    <div
-                                        style="width: 44px; height: 22px; background: var(--border-color); border-radius: 11px; position: relative; cursor: pointer;">
+                                    <div onclick="this.querySelector('div').style.left = this.querySelector('div').style.left === '24px' ? '2px' : '24px'; this.style.background = this.style.background.includes('accent-green') ? 'var(--border-color)' : 'var(--accent-green)';"
+                                        style="width: 44px; height: 22px; background: var(--border-color); border-radius: 11px; position: relative; cursor: pointer; transition: 0.3s;">
                                         <div
-                                            style="width: 18px; height: 18px; background: #64748b; border-radius: 50%; position: absolute; left: 2px; top: 2px;">
+                                            style="width: 18px; height: 18px; background: #fff; border-radius: 50%; position: absolute; left: 2px; top: 2px; transition: 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">
                                         </div>
                                     </div>
                                 </div>
@@ -2012,7 +2012,8 @@
             console.log("Switching to tab:", tabId);
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.classList.remove('active');
-                if (item.getAttribute('onclick')?.includes(tabId)) {
+                const onClickStr = item.getAttribute('onclick') || '';
+                if (onClickStr.includes(`'${tabId}'`) || onClickStr.includes(`"${tabId}"`)) {
                     item.classList.add('active');
                 }
             });
