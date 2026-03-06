@@ -412,6 +412,8 @@ async def get_physics_manifold():
         "constants": {
             "reynolds_number": round(causal_engine.last_physics_results["reynolds"], 1),
             "stress_intensity": round(causal_engine.last_physics_results["stress_intensity"], 4),
+            "activation_energy": round(causal_engine.last_physics_results.get("activation_energy", 45.0), 2),
+            "youngs_modulus": round(causal_engine.last_physics_results.get("youngs_modulus", 200.0), 2),
             "solar_dsi_constant": round(causal_engine.last_physics_results.get("solar_dsi_load", 0.0), 4),
             "flare_risk_vector": round(causal_engine.last_physics_results.get("flare_risk", 0.0), 4)
         },

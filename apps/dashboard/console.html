@@ -1242,10 +1242,10 @@
                         <div style="font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 16px; letter-spacing: 0.5px;"
                             data-i18n="phys_mode">SIMULATION_FIDELITY:</div>
                         <div style="display: flex; gap: 12px;">
-                            <button
-                                style="flex:1; background: var(--accent-green); border: none; padding: 12px; border-radius: 6px; color: #000; font-weight: 800; font-size: 12px; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);">ULTRA_HD</button>
-                            <button
-                                style="flex:1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 12px; border-radius: 6px; color: #fff; font-size: 12px; font-weight: 600; cursor: pointer;">REALTIME</button>
+                            <button id="btn-fidelity-uhd" onclick="setSimulationFidelity('uhd', this)"
+                                style="flex:1; background: var(--accent-green); border: none; padding: 12px; border-radius: 6px; color: #000; font-weight: 800; font-size: 12px; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); transition: 0.3s;">ULTRA_HD</button>
+                            <button id="btn-fidelity-rt" onclick="setSimulationFidelity('rt', this)"
+                                style="flex:1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 12px; border-radius: 6px; color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.3s;">REALTIME</button>
                         </div>
                     </div>
                 </div>
@@ -2215,6 +2215,39 @@
         }
         window.addEventListener('load', handleHash);
         window.addEventListener('hashchange', handleHash);
+
+        function setSimulationFidelity(mode, btn) {
+            const uhdBtn = document.getElementById('btn-fidelity-uhd');
+            const rtBtn = document.getElementById('btn-fidelity-rt');
+
+            // Reset styles
+            [uhdBtn, rtBtn].forEach(b => {
+                if (b) {
+                    b.style.background = 'rgba(255, 255, 255, 0.05)';
+                    b.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+                    b.style.color = '#fff';
+                    b.style.boxShadow = 'none';
+                    b.style.fontWeight = '600';
+                }
+            });
+
+            // Activate current
+            btn.style.background = 'var(--accent-green)';
+            btn.style.border = 'none';
+            btn.style.color = '#000';
+            btn.style.fontWeight = '800';
+            btn.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.2)';
+
+            logEvent(`PHYSICS_ENGINE: Simulation Fidelity set to ${mode.toUpperCase()}`, 'info');
+
+            // Visual feedback on the manifold graph
+            const svg = document.querySelector('#svg-graph svg');
+            if (svg) {
+                svg.style.filter = mode === 'uhd' ? 'drop-shadow(0 0 5px var(--accent-green))' : 'none';
+                svg.style.opacity = mode === 'uhd' ? '1' : '0.8';
+            }
+        }
+        window.setSimulationFidelity = setSimulationFidelity;
 
         function toggleSwitch(el) {
             const state = el.getAttribute('data-state');
