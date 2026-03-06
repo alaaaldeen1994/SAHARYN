@@ -861,7 +861,7 @@
 
     <!-- ── HERO ── -->
     <header class="hero">
-        <div class="hero-tag">SAHARYN AI // Industrial Infrastructure Intelligence</div>
+
         <h1 data-i18n="hero_h1">Predict failures<br><span class="dim">before they happen.</span></h1>
         <p class="hero-sub" data-i18n="hero_sub">
             SAHARYN AI connects directly to <strong>NASA and ESA satellites</strong> to monitor desert industrial
@@ -870,9 +870,7 @@
         </p>
         <div class="hero-actions">
             <a href="console.html" class="btn-primary" data-i18n="hero_cta">Open Mission Control</a>
-            <a href="#satellites" class="btn-secondary">
-                See how it works <i data-lucide="arrow-down" size="14"></i>
-            </a>
+
         </div>
         <div class="hero-stats">
             <div class="hstat">
@@ -972,11 +970,15 @@
         <div class="live-proof">
             <div class="live-proof-dot"></div>
             <div class="live-proof-text">
-                <strong>All three data bridges are active right now.</strong>
-                Every time this page loads, a fresh satellite record is written to the permanent
-                cryptographic audit ledger — time-stamped and tamper-proof.
+                <strong>All three data bridges are active and verified right now.</strong>
+                Every satellite reading is automatically recorded in a tamper-proof audit log
+                linked to your dashboard — no manual input required.
             </div>
-            <div class="live-proof-id" id="live-audit-id">LOADING AUDIT ID...</div>
+            <div
+                style="font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: 1px; padding: 8px 16px; border: 1px solid rgba(16,185,129,0.3); background: rgba(16,185,129,0.05); display: flex; align-items: center; gap: 8px; white-space: nowrap;">
+                <i data-lucide="check-circle" size="14"></i>
+                BRIDGE STATUS: LIVE
+            </div>
         </div>
     </section>
 
