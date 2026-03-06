@@ -51,11 +51,11 @@ class SAHARYNFeatureStore:
         """
         Fetch features from Feast online store.
         Returns None if store is unavailable.
-        
+
         Args:
             entity_rows: e.g., [{"site_id": "SA_EAST_RU_01"}]
             features: e.g., ["satellite_environmental_features:dust_severity_index"]
-        
+
         Returns:
             Dict mapping feature name → list of values (one per entity row)
         """

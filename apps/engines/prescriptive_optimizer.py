@@ -1,4 +1,3 @@
-import logging
 import numpy as np
 from typing import List, Dict, Any
 from pydantic import BaseModel
@@ -19,11 +18,11 @@ class PrescriptiveOptimizationEngine:
     Converts failure probabilities and ROI simulations into actionable industrial directives.
     Goal: Minimize Total Cost (OpCost + Expected Failure Cost).
     """
-    
+
     def __init__(self, energy_cost_per_mwh: float = 120, downtime_cost_per_hr: float = 8500):
         self.energy_cfg = energy_cost_per_mwh
         self.downtime_cfg = downtime_cost_per_hr
-        
+
         # Standard Operating Procedure (SOP) Action Matrix
         self.action_matrix = [
             ActionOption(id="LOAD_SHED_10", label="Reduce Load by 10%", cost=500, reduction_factor=0.15, downtime_hrs=0),
@@ -35,13 +34,13 @@ class PrescriptiveOptimizationEngine:
     def optimize_decision(self, asset_id: str, failure_prob: float, asset_value: float) -> Dict[str, Any]:
         """
         Calculates the optimal action using Expected Value (EV) theory.
-        Loss = P(Failure) * AssetValue 
+        Loss = P(Failure) * AssetValue
         """
         logger.info(f"Optimizing prescriptive policy for {asset_id} (P_Fail: {failure_prob:.4f})")
-        
+
         # Base Case: Do Nothing (Expected Loss)
         baseline_expected_loss = failure_prob * asset_value
-        
+
         best_action = None
         best_roi = 0.0
         lowest_total_cost = baseline_expected_loss
@@ -50,14 +49,14 @@ class PrescriptiveOptimizationEngine:
         for action in self.action_matrix:
             # New failure prob after action
             new_prob = failure_prob * (1 - action.reduction_factor)
-            
+
             # Action Cost = Fixed Cost + Operational Cost + Downtime Cost
             operational_impact = action.downtime_hrs * self.downtime_cfg
             total_action_cost = action.cost + operational_impact
-            
+
             # New Expected Loss = (New Prob * Asset Value) + Action Cost
             new_expected_loss = (new_prob * asset_value) + total_action_cost
-            
+
             # ROI = (Initial Loss - New EL) / Total Action Cost
             if new_expected_loss < lowest_total_cost:
                 lowest_total_cost = new_expected_loss
@@ -75,7 +74,7 @@ class PrescriptiveOptimizationEngine:
                 "risk_reduction_pct": round(best_action.reduction_factor * 100, 1),
                 "rational": f"Action {best_action.id} provides optimal cost mitigation. EV reduced by ${expected_savings:,.2f}."
             }
-        
+
         return {
             "asset_id": asset_id,
             "recommended_action": "CONTINUE_NOMINAL_OPS",

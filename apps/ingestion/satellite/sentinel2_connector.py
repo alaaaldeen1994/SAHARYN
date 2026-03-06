@@ -102,7 +102,7 @@ class Sentinel2Connector:
     ) -> Dict:
         """
         Detect active dust plume over an industrial site using Sentinel-2 imagery.
-        
+
         Returns:
             Dict with:
               - dust_plume_detected: bool

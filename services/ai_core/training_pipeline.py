@@ -47,7 +47,7 @@ class TrainingPipelines:
 
         # Basic Data Cleaning
         data = data.dropna(subset=feature_cols + [target_col])
-        
+
         if len(data) < 50:
             raise ValueError(f"Insufficient data for training: {len(data)} samples. Need at least 50.")
 

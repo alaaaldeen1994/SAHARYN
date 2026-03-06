@@ -9,7 +9,7 @@ class SCADAGateway(BaseConnector):
     Supports OPC UA and PI Web API protocols.
     Designed for Air-Gapped / Data Diode compatibility.
     """
-    
+
     def __init__(self, config: Dict[str, Any]):
         super().__init__(config)
         self.endpoint = config.get("opc_endpoint")
@@ -34,7 +34,7 @@ class SCADAGateway(BaseConnector):
         """
         if not self.is_connected:
             await self.connect()
-            
+
         telemetry_batch = {}
         for asset_id in self.assets_to_track:
             # Simulation of real SCADA tags (Pressure, Flow, Vibration)
@@ -46,7 +46,7 @@ class SCADAGateway(BaseConnector):
                 "temp_c": 58.5,
                 "power_kw": 125.0
             }
-        
+
         return telemetry_batch
 
     async def push_to_broker(self, data: Dict[str, Any]):

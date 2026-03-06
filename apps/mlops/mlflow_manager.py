@@ -6,7 +6,7 @@ registers models, and manages promotion from staging to production.
 
 Usage:
     from apps.mlops.mlflow_manager import SAHARYNMLflow
-    
+
     tracker = SAHARYNMLflow()
     with tracker.start_run("dust_severity_model") as run:
         tracker.log_params({"learning_rate": 0.01, "n_estimators": 300})
@@ -54,7 +54,7 @@ PROMOTION_THRESHOLDS = {
 class SAHARYNMLflow:
     """
     Central MLOps manager for all SAHARYN model lifecycle operations.
-    
+
     Responsibilities:
       - Experiment tracking (params, metrics, artifacts)
       - Model registration and versioning
@@ -94,7 +94,7 @@ class SAHARYNMLflow:
     ):
         """
         Context manager for a training run.
-        
+
         Example:
             with tracker.start_run("dust_severity") as run:
                 tracker.log_params({...})
@@ -180,7 +180,7 @@ class SAHARYNMLflow:
         """
         Promote a model version to Production after passing quality gates.
         Returns True if promoted, False if quality gate failed.
-        
+
         Quality gate: model must beat PROMOTION_THRESHOLDS.
         On success: old Production model is moved to Archived.
         """

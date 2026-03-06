@@ -15,7 +15,7 @@ class IngestionConfig(BaseSettings):
     COP_API_URL: str = os.getenv("COP_API_URL", "https://ads.atmosphere.copernicus.eu/api")
     COP_API_KEY: str = os.getenv("COP_API_KEY", "dummy-key")
     GEE_PROJECT: str = os.getenv("GEE_PROJECT", "gigafield-enterprise")
-    
+
     class Config:
         env_file = ".env"
         extra = "ignore"  # Allow extra vars like API_SECRET in .env
@@ -27,7 +27,7 @@ class SatelliteIngestor:
     Enterprise Satellite Ingestor for AI Desert Resilience.
     Handles Copernicus CAMS (Dust) and NASA MODIS (AOD) via GEE.
     """
-    
+
     def __init__(self):
         self.cams_client = cdsapi.Client(url=config.COP_API_URL, key=config.COP_API_KEY)
         try:
@@ -44,7 +44,7 @@ class SatelliteIngestor:
         logger.info(f"Syncing EAC4 Satellite Reanalysis: {start_date} to {end_date}")
         target_file = f"data/raw/satellite/cams_reanalysis_{start_date}.grib"
         os.makedirs(os.path.dirname(target_file), exist_ok=True)
-        
+
         self.cams_client.retrieve(
             'cams-global-reanalysis-eac4',
             {
@@ -66,11 +66,11 @@ class SatelliteIngestor:
         Pull Global Atmospheric Composition Forecasts (Dust Aerosol Optical Depth).
         """
         logger.info(f"Initiating CAMS fetch for {target_date}...")
-        
+
         # Area: [North, West, South, East]
         target_file = f"data/raw/satellite/cams_{target_date.isoformat()}.grib"
         os.makedirs(os.path.dirname(target_file), exist_ok=True)
-        
+
         try:
             self.cams_client.retrieve(
                 'cams-global-atmospheric-composition-forecasts',
@@ -99,20 +99,20 @@ class SatelliteIngestor:
         Used for historical baseline and validation.
         """
         logger.info(f"Extracting MODIS AOD for region {region.toDictionary().getInfo()}...")
-        
+
         # MODIS/061/MCD19A2_GRN (Aerosol Optical Depth)
         collection = ee.ImageCollection("MODIS/061/MCD19A2_GRN") \
             .filterDate(date_range[0], date_range[1]) \
             .filterBounds(region) \
             .select('Optical_Depth_047')
-            
+
         mean_aod = collection.mean()
         # Quality check: ensure we have data
         count = collection.size().getInfo()
         if count == 0:
             logger.warning("No MODIS assets found for the specified window.")
             return None
-            
+
         logger.info(f"Aggregated {count} MODIS granules for temporal alignment.")
         return mean_aod
 

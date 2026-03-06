@@ -20,7 +20,7 @@ class SAPCMMSConnector:
     Enterprise CMMS Connector for SAP EAM / IBM Maximo APIs.
     Pulls maintenance logs and asset health history.
     """
-    
+
     def __init__(self, api_base_url: str, client_id: str):
         self.api_base_url = api_base_url
         self.client_id = client_id
@@ -30,7 +30,7 @@ class SAPCMMSConnector:
         Retrieves the last 12 months of maintenance activity for correlation.
         """
         logger.info(f"Syncing SAP EAM records for Asset {asset_id}...")
-        
+
         # Mocking API Response from SAP OData Gateway
         history = [
             MaintenanceRecord(
@@ -52,7 +52,7 @@ class SAPCMMSConnector:
                 parts_replaced=["VITON_SEAL_X"]
             )
         ]
-        
+
         logger.info(f"Retrieved {len(history)} maintenance events.")
         return history
 

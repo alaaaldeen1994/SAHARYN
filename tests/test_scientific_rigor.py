@@ -21,7 +21,7 @@ def test_geology_abrasivity():
     profiler = GeotechnicalDustProfiler(region="Rub_Al_Khali")
     multiplier = profiler.get_abrasivity_multiplier()
     assert multiplier > 1.0 # High quartz content should scale wear
-    
+
     deposition = profiler.estimate_deposition_rate(wind_speed=10, dsi=0.8)
     assert deposition > 0
 

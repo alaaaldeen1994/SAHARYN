@@ -9,9 +9,9 @@ def run_test():
     print("Starting Saharyn AI API Gateway on port 8003...")
     env = os.environ.copy()
     env["PYTHONPATH"] = "."
-    
+
     env["PORT"] = "8005"
-    
+
     # Start the gateway
     process = subprocess.Popen(
         ["python", "apps/api_gateway/main.py"],
@@ -20,10 +20,10 @@ def run_test():
         env=env,
         text=True
     )
-    
+
     # Wait for it to boot
     time.sleep(5)
-    
+
     url = "http://localhost:8005/v2/inference/resilience"
     headers = {
         "X-API-KEY": "ENTERPRISE_SECRET_VERIFIED_7M",
@@ -42,7 +42,7 @@ def run_test():
         "aod_override": 0.45,
         "wind_override": 18.0
     }
-    
+
     print(f"Testing endpoint: {url}")
     try:
         response = requests.post(url, headers=headers, json=payload, timeout=10)
@@ -61,7 +61,7 @@ def run_test():
             stdout, stderr = process.communicate()
             print("STDOUT:", stdout)
             print("STDERR:", stderr)
-            
+
     # Cleanup
     print("Terminating API Gateway...")
     process.terminate()

@@ -14,7 +14,7 @@ class MLOpsGovernanceManager:
     Handles artifact versioning, drift detection, and automated retraining triggers.
     Ensures model integrity in production industrial environments.
     """
-    
+
     def __init__(self, experiment_name: str = "Desert_Resilience_Platform"):
         mlflow.set_experiment(experiment_name)
         self.reference_data: Optional[pd.DataFrame] = None
@@ -43,17 +43,17 @@ class MLOpsGovernanceManager:
         if self.reference_data is None:
             logger.warning("Drift detection skipped: No reference baseline.")
             return {"drift_detected": False}
-            
+
         drift_report = {}
         drift_found = False
-        
+
         for col in current_batch.columns:
             if col not in self.reference_data.columns:
                 continue
-                
+
             # Perform KS Test
             stat, p_val = ks_2samp(self.reference_data[col], current_batch[col])
-            
+
             is_drifting = p_val < threshold
             drift_report[col] = {
                 "p_value": float(p_val),
@@ -80,11 +80,11 @@ class MLOpsGovernanceManager:
 
 if __name__ == "__main__":
     manager = MLOpsGovernanceManager()
-    
+
     # Mocking data drift
     ref = pd.DataFrame({'aod': np.random.normal(0.5, 0.1, 100)})
     curr = pd.DataFrame({'aod': np.random.normal(0.8, 0.1, 100)}) # Shifted distribution
-    
+
     manager.set_reference_baseline(ref)
     report = manager.check_for_data_drift(curr)
     print(f"Drift Report: {report}")

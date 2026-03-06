@@ -201,7 +201,7 @@ class RetrainingScheduler:
                 query = "SELECT * FROM asset_telemetry WHERE time > NOW() - INTERVAL '60 days'"
             else:
                 return None
-            
+
             df = pd.read_sql(query, engine)
             return df
         except Exception as e:
@@ -224,12 +224,12 @@ class RetrainingScheduler:
             }
             # Physics-based target generation
             data['dust_severity_index'] = (
-                0.6 * data['aerosol_optical_depth'] + 
-                0.3 * (data['wind_speed_10m'] / 25) - 
+                0.6 * data['aerosol_optical_depth'] +
+                0.3 * (data['wind_speed_10m'] / 25) -
                 0.1 * (data['relative_humidity_pct'] / 100)
             ) + np.random.normal(0, 0.05, n)
             return pd.DataFrame(data)
-        
+
         elif model_key == "asset_performance":
             data = {
                 'dust_severity_index': np.random.uniform(0, 1.0, n),
@@ -240,12 +240,12 @@ class RetrainingScheduler:
                 'differential_pressure_bar': np.random.uniform(0.1, 5.0, n),
             }
             data['efficiency_pct'] = (
-                0.95 - 
-                0.2 * data['dust_severity_index'] - 
+                0.95 -
+                0.2 * data['dust_severity_index'] -
                 0.15 * (data['vibration_mm_s'] / 15.0)
             ) + np.random.normal(0, 0.02, n)
             return pd.DataFrame(data)
-        
+
         return pd.DataFrame()
 
     def get_stats(self) -> Dict[str, Any]:

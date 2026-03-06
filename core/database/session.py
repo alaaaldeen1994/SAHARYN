@@ -9,7 +9,7 @@ load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://admin:secure_pass@localhost:5432/resilience_db")
 
 engine = create_engine(
-    DATABASE_URL, 
+    DATABASE_URL,
     connect_args={'connect_timeout': 5} # Prevent long hangs if DB is down
 )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

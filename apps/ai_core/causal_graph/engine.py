@@ -23,7 +23,7 @@ class IndustrialCausalEngine:
 
     def define_interaction(self, source_id: str, target_id: str, coupling_strength: float):
         """
-        Defines a functional dependency. 
+        Defines a functional dependency.
         Coupling strength (0-1) represents how much a failure in source impacts performance in target.
         """
         self.graph.add_edge(source_id, target_id, weight=coupling_strength)
@@ -43,13 +43,13 @@ class IndustrialCausalEngine:
         """
         n = len(self.asset_mapping)
         if n == 0: return primary_failures
-        
+
         # P vector initialization
         p_initial = np.zeros(n)
         for aid, prob in primary_failures.items():
             if aid in self.asset_mapping:
                 p_initial[self.asset_mapping[aid]] = prob
-        
+
         # Leontief inverse style propagation for dependency chains
         # We cap the spectral radius to ensure convergence if cycles exist
         I = np.eye(n)
@@ -69,7 +69,7 @@ class IndustrialCausalEngine:
         results = {}
         for aid, idx in self.asset_mapping.items():
             results[aid] = float(np.clip(p_total[idx], 0.0, 1.0))
-        
+
         return results
 
     def get_topological_risk_order(self) -> List[str]:

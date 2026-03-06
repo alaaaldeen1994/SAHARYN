@@ -5,15 +5,15 @@ from core.common.base import BaseConnector, get_logger
 
 class SatelliteIngestor(BaseConnector):
     """
-    Ingests Aerosol Optical Depth (AOD) and Dust concentration from 
+    Ingests Aerosol Optical Depth (AOD) and Dust concentration from
     Copernicus CAMS and NASA MODIS via Google Earth Engine.
     """
-    
+
     def __init__(self, config: Dict[str, Any]):
         super().__init__(config)
         self.project = config.get("gee_project")
         self.region = config.get("target_region") # GeoJSON or list of coordinates
-        
+
     async def connect(self):
         try:
             # ee.Authenticate() # Handled via service account in production
@@ -29,16 +29,16 @@ class SatelliteIngestor(BaseConnector):
         """
         now = datetime.datetime.now()
         end_date = now + datetime.timedelta(hours=lead_time_hours)
-        
+
         # CAMS Global Near-Real-Time
         # ECMWF/CAMS/GEMS
         cams = ee.ImageCollection('ECMWF/CAMS/GEMS/reanalysis') \
                  .filterDate(now.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'))
-        
+
         # Select target bands
         bands = ['total_aerosol_optical_depth_at_550nm', 'dust_aerosol_optical_depth_at_550nm']
         target_data = cams.select(bands)
-        
+
         return target_data
 
     async def fetch_modis_aod(self):
@@ -47,7 +47,7 @@ class SatelliteIngestor(BaseConnector):
         """
         modis = ee.ImageCollection('MODIS/061/MCD19A2_GRN') \
                   .filterDate(datetime.datetime.now() - datetime.timedelta(days=1), datetime.datetime.now())
-        
+
         # Optical_Depth_047 (Blue band AOD)
         return modis.select('Optical_Depth_047')
 

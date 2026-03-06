@@ -160,15 +160,15 @@ def create_access_token(
 ) -> str:
     """
     Create a signed JWT access token.
-    
+
     Args:
         user_id:  The user's unique identifier
         role:     Their assigned role
         site_ids: List of site IDs they can access. Empty list = all sites (ADMIN only).
-    
+
     Returns:
         Signed JWT string
-    
+
     Raises:
         RuntimeError: If JWT is not configured
     """
@@ -227,7 +227,7 @@ def get_current_user(
     """
     FastAPI dependency: validates JWT Bearer token or API key fallback.
     Injects UserContext into every protected endpoint.
-    
+
     Priority:
       1. JWT Bearer token (preferred — supports roles/sites)
       2. X-API-Key header (fallback — grants ADMIN role for service-to-service calls)
@@ -267,7 +267,7 @@ def get_current_user(
 def require_permission(permission: Permission):
     """
     Factory for FastAPI dependencies that enforce a specific permission.
-    
+
     Usage in endpoint:
         @app.get("/v2/financial/roi")
         async def get_roi(user: UserContext = Depends(require_permission(Permission.READ_FINANCIAL))):

@@ -11,7 +11,7 @@ logger = logging.getLogger("WeatherIngestor")
 class WeatherConfig(BaseSettings):
     ECMWF_API_URL: str = "https://cds.climate.copernicus.eu/api/v2"
     ECMWF_API_KEY: str = os.getenv("ECMWF_API_KEY", "dummy-key")
-    
+
     class Config:
         env_file = ".env"
 
@@ -22,7 +22,7 @@ class ECMWFWeatherIngestor:
     Enterprise Weather Data Ingestor.
     Pulls high-resolution forecast ensembles for wind, temp, and humidity.
     """
-    
+
     def __init__(self):
         self.client = cdsapi.Client(url=config.ECMWF_API_URL, key=config.ECMWF_API_KEY)
 
@@ -42,7 +42,7 @@ class ECMWFWeatherIngestor:
                     'product_type': 'reanalysis',
                     'format': 'grib',
                     'variable': [
-                        '10m_u_component_of_wind', 
+                        '10m_u_component_of_wind',
                         '10m_v_component_of_wind',
                         '2m_temperature',
                         '2m_dewpoint_temperature', # For humidity calculation
@@ -68,7 +68,7 @@ class ECMWFWeatherIngestor:
         Used at the feature engineering layer.
         """
         import numpy as np
-        rh = 100 * (np.exp((17.625 * dewpoint_c) / (243.04 + dewpoint_c)) / 
+        rh = 100 * (np.exp((17.625 * dewpoint_c) / (243.04 + dewpoint_c)) /
                     np.exp((17.625 * temp_c) / (243.04 + temp_c)))
         return rh
 

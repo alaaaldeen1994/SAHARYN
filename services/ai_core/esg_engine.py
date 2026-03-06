@@ -18,7 +18,7 @@ class ESGImpactEngine:
     Quantifies the environmental impact of predictive maintenance and asset life extension.
     Transforms operational uptime into validated carbon credits and sustainability KPIs.
     """
-    
+
     # Industrial Standard Coefficients (Validated for Desert Operations)
     CO2_KG_PER_KM_MAINTENANCE_LOGISTICS = 0.25  # Avg service truck emissions
     AVG_KM_SAVED_PER_PM_OPTIMIZATION = 120.0   # Distance avoided by grouping/postponing
@@ -26,7 +26,7 @@ class ESGImpactEngine:
     CO2_KG_PER_HOUR_ASSET_LIFESPAN = 0.12     # Manufacturing carbon overhead divided by total life
     CO2_KG_PER_MWH_SOLAR_RECOVERY = 450.0      # Avg carbon displaced by 1MWh of recovered solar
     CO2_KG_PER_CUBIC_METER_GAS_FLARED = 2.8   # Carbon intensive emissions for flared methane
-    
+
     def __init__(self):
         self.cumulative_co2_saved = 0.0
         self.cumulative_water_saved = 0.0
@@ -41,14 +41,14 @@ class ESGImpactEngine:
         if action_id in ["FORCE_INFERENCE", "DYNAMIC_LOAD_REDUCTION"]:
             # If we manage via software instead of a physical trip
             logistics_co2_saving = self.CO2_KG_PER_KM_MAINTENANCE_LOGISTICS * self.AVG_KM_SAVED_PER_PM_OPTIMIZATION
-            
+
         # 2. Manufacturing avoidance (Life extension)
         # Extending life avoids the 'embedded' carbon of manufacturing a replacement too early
         life_extension_co2_saving = rul_extension_hrs * self.CO2_KG_PER_HOUR_ASSET_LIFESPAN
-        
+
         total_co2 = logistics_co2_saving + life_extension_co2_saving
         water_saving = life_extension_co2_saving * 1.5 # 1.5L of industrial water used per manufacturing CO2 kg
-        
+
         score = min(100, (total_co2 / 50.0) * 100) # Norm against 50kg benchmark
 
         return ESGMetric(
@@ -76,7 +76,7 @@ class ESGImpactEngine:
         flare_co2_saved = gas_prevented_m3 * self.CO2_KG_PER_CUBIC_METER_GAS_FLARED
 
         total_saved = solar_co2_saved + flare_co2_saved
-        
+
         return {
             "solar_co2": round(solar_co2_saved, 4),
             "flare_co2": round(flare_co2_saved, 4),

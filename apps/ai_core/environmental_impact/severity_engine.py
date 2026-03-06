@@ -1,5 +1,4 @@
 import os
-import logging
 import numpy as np
 import pandas as pd
 import xgboost as xgb
@@ -17,7 +16,7 @@ class EnvironmentalImpactEngineV2:
     Combines Physics-Informed features with Gradient Boosted Quantile Regression.
     Outputs: Dust Severity Index (DSI) + Uncertainty Bounds.
     """
-    
+
     def __init__(self, model_key: str = "dust_severity"):
         self.model_key = model_key
         self.model = None
@@ -61,7 +60,7 @@ class EnvironmentalImpactEngineV2:
         lofting_potential = aod / (humidity + 0.1)
         # Thermal instability
         thermal_buoyancy = temp * (1 - (humidity / 100))
-        
+
         return pd.DataFrame([{
             'aod': aod,
             'wind_speed': wind,
@@ -93,19 +92,19 @@ class EnvironmentalImpactEngineV2:
         else:
             # Baseline physics-based proxy for the mean
             base_dsi = (aod * 0.6) + ( (wind**1.5) * 0.02 * (1/(humidity+1)) )
-        
+
         dsi_final = np.clip(base_dsi, 0.0, 1.0)
-        
+
         # Uncertainty calculation
         uncertainty = 0.05 + (wind * 0.005) + (1.0 / (humidity + 1.0)) * 0.02
-        
+
         # Out-of-Distribution (OOD) Detection
         # Check if features are within historical 'Trust Region'
         is_ood = False
         if aod > 1.8 or wind > 100:
             is_ood = True
             logger.warning("Environmental Feature Anomaly: OOD Alert Triggered")
-            
+
         return {
             "dsi": float(dsi_final),
             "p10": float(max(0, dsi_final - uncertainty)),
@@ -131,7 +130,7 @@ class EnvironmentalImpactEngineV2:
             }
             dtrain = xgb.DMatrix(data.drop(columns=[target_col]), label=data[target_col])
             self.model = xgb.train(params, dtrain, num_boost_round=100)
-            
+
             # Log metrics to MLflow
             mlflow.log_params(params)
             mlflow.xgboost.log_model(self.model, "environmental_v2")

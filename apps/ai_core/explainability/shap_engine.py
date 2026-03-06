@@ -55,16 +55,16 @@ class SHAPExplainer:
     """
     Computes SHAP values for any trained model and generates
     plain-language explanations suitable for operations and management reports.
-    
+
     Supports:
       - Tree-based models (XGBoost, LightGBM, RandomForest): TreeExplainer
       - Linear models: LinearExplainer
       - Any model via KernelExplainer (slower, universal fallback)
-    
+
     Usage:
         explainer = SHAPExplainer()
         explainer.fit(trained_model, background_data, model_type="xgboost")
-        
+
         result = explainer.explain(input_features, prediction_value)
         print(result["explanation_text"])
         print(result["top_drivers"])
@@ -94,7 +94,7 @@ class SHAPExplainer:
     ) -> None:
         """
         Initialize the SHAP explainer with a trained model and background dataset.
-        
+
         Args:
             model: Trained model object (XGBoost, sklearn, etc.)
             background_data: Representative sample of training data (100-500 rows)
@@ -148,12 +148,12 @@ class SHAPExplainer:
     ) -> Dict:
         """
         Generate SHAP-based explanation for a single prediction.
-        
+
         Args:
             input_features: 1D numpy array of feature values (same order as fit())
             prediction_value: The model's output (e.g., failure probability)
             top_n: Number of top drivers to return
-        
+
         Returns dict with:
             shap_values:      dict mapping feature_name → SHAP value
             top_drivers:      list of top N features with human-readable info

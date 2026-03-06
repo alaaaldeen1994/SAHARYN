@@ -27,7 +27,7 @@ class SovereignLedgerEngine:
     Maintains an immutable chain of custody for all ESG claims and operational directives.
     Implements simulated cryptographic chaining for industrial validation.
     """
-    
+
     def __init__(self, node_id: str = "RIYADH_CENTRAL_01"):
         self.node_id = node_id
         self.chain: List[LedgerBlock] = []
@@ -62,11 +62,11 @@ class SovereignLedgerEngine:
         """
         last_block = self.chain[-1]
         next_index = last_block.block_index + 1
-        
+
         # Merkle Root Formulation (Simplified for Demonstration)
         payload_data = f"{inference_id}{asset_id}{action_type}{kg_saved}"
         merkle_root = hashlib.sha256(payload_data.encode()).hexdigest()
-        
+
         # Block Creation
         new_block = LedgerBlock(
             block_index=next_index,
@@ -81,14 +81,14 @@ class SovereignLedgerEngine:
             node_origin=self.node_id,
             certificate_id=f"SHRN-{self.node_id[:3]}-{next_index:04d}-{uuid.uuid4().hex[:4].upper()}"
         )
-        
+
         self.chain.append(new_block)
         logger.info(f"LEDGER_COMMIT: Block {next_index} verified by {self.node_id} (Claim: {kg_saved}kg CO2)")
-        
+
         # Pruning (Optional for demo, keep last 20 blocks in memory)
         if len(self.chain) > 50:
             self.chain.pop(1) # Keep genesis at 0
-            
+
         return new_block
 
     def get_ledger_history(self, limit: int = 20) -> List[LedgerBlock]:

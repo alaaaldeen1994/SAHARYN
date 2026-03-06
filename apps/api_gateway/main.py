@@ -13,6 +13,7 @@ import logging
 import traceback
 from datetime import datetime
 from typing import Dict, List, Optional, Any
+import collections
 
 from fastapi import FastAPI, HTTPException, Header, Depends, Request, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -48,7 +49,6 @@ logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
 logger = logging.getLogger("SAHARYN_API_GATEWAY")
 
 # --- AUDIT LOG STORAGE (Persistent structured log — production grade) ---
-import collections
 SYSTEM_AUDIT_LOGS = collections.deque(maxlen=500)  # Thread-safe, capped at 500 entries
 
 def _write_audit(event: str, origin: str, status: str, detail: str = ""):
@@ -155,17 +155,17 @@ app.mount("/dashboard", StaticFiles(directory="apps/dashboard"), name="dashboard
 async def audit_middleware(request: Request, call_next):
     if request.method == "OPTIONS":
         return await call_next(request)
-        
+
     start_time = time.time()
     trace_id = request.headers.get("X-Request-ID", str(uuid.uuid4()))
     logger.info(f"INCOMING_REQUEST: {request.method} {request.url.path} | Trace: {trace_id}")
-    
+
     response = await call_next(request)
-    
+
     process_time = time.time() - start_time
     response.headers["X-Process-Time"] = str(process_time)
     response.headers["X-Trace-ID"] = trace_id
-    
+
     logger.info(f"REQUEST_COMPLETED: {request.url.path} | Status: {response.status_code} | Time: {process_time:.4f}s")
     return response
 
@@ -242,7 +242,7 @@ async def get_system_health():
 
 @app.post("/v2/inference/resilience", response_model=InferenceResponse, tags=["Inference"])
 async def execute_resilience_inference(
-    payload: InferenceRequest, 
+    payload: InferenceRequest,
     auth_key: str = Depends(verify_enterprise_access)
 ):
     """
@@ -253,37 +253,37 @@ async def execute_resilience_inference(
     4. Generates data-chain verification checksum
     """
     start_ts = time.time()
-    
+
     # --- PHASE 1: DRIFT AUDIT & SATELLITE SYNC ---
     # Fetch real-time AOD from Copernicus if no override is provided
     satellite_packet = satellite_etl.transform_spectral_data("REAL_TIME", payload.site_id)
     aod_val = payload.aod_override or satellite_packet.aod_550nm
-    
+
     drift_report = drift_detector.check_for_drift({
         "vibration_mm_s": [payload.vibration_mm_s],
         "aod": [aod_val]
     })
-    
+
     is_drifting = any(d["drifting"] for d in drift_report.values())
     if is_drifting:
         logger.warning(f"MLOPS_ALERT: Concept drift detected for asset {payload.asset_id}")
 
     # --- PHASE 2: CAUSAL PROPAGATION ---
     causal_out = causal_engine.calculate_propagation_matrix(aod_val, {"vibration": payload.vibration_mm_s})
-    
+
     # --- PHASE 3: AGGREGATE RISK SCORING ---
     primary_failure_prob = causal_out.get("ME_ROTOR_HUB", {}).get("health", 0.9)
     risk_score = 1.0 - primary_failure_prob
-    
+
     # --- PHASE 4: PRESCRIPTIVE OPTIMIZATION ---
     prescriptions = optimizer.optimize_operational_stance(
         payload.asset_id,
         causal_out,
         aod_val
     )
-    
+
     latency = (time.time() - start_ts) * 1000
-    
+
     formatted_prescriptions = [
         ActionRecommendation(
             id=cmd.command_id,
@@ -301,7 +301,7 @@ async def execute_resilience_inference(
         payload.asset_id,
         (aod_val * 4.2) + (payload.vibration_mm_s * 0.8) # Simulated RUL extension factor
     )
-    
+
     # Commit claim to local sovereign node
     validated_block = sovereign_ledger.commit_esg_claim(
         inference_id=str(uuid.uuid4()),
@@ -359,36 +359,36 @@ async def execute_resilience_inference(
 async def get_telemetry_stream(site_id: str = "SA_EAST_RU_01"):
     # Link to Real Satellite ETL Core
     packet = satellite_etl.transform_spectral_data("LIVE_STREAM", site_id)
-    
+
     return {
         "status": "LIVE",
         "timestamp": datetime.utcnow().isoformat(),
         "feeds": [
             {
-                "sensor": "CAMS-3_SPECTRAL", 
-                "value": round(packet.aod_550nm, 4), 
-                "unit": "AOD", 
+                "sensor": "CAMS-3_SPECTRAL",
+                "value": round(packet.aod_550nm, 4),
+                "unit": "AOD",
                 "parity": "SECURE",
                 "source": "ESA_COPERNICUS_SENTINEL"
             },
             {
-                "sensor": "MODIS_L2_DUST", 
-                "value": round(packet.dust_concentration, 2), 
-                "unit": "μg/m³", 
+                "sensor": "MODIS_L2_DUST",
+                "value": round(packet.dust_concentration, 2),
+                "unit": "μg/m³",
                 "parity": "SECURE",
                 "source": "NASA_TERRA"
             },
             {
-                "sensor": "SENTINEL_2MH_TEMP", 
-                "value": round(packet.temp_2m_k - 273.15, 1), 
-                "unit": "°C", 
+                "sensor": "SENTINEL_2MH_TEMP",
+                "value": round(packet.temp_2m_k - 273.15, 1),
+                "unit": "°C",
                 "parity": "SECURE",
                 "source": "COPERNICUS_L2A"
             },
             {
-                "sensor": "SENTINEL_DDI_PLUME", 
-                "value": round(packet.dust_detection_index, 3), 
-                "unit": "DDI", 
+                "sensor": "SENTINEL_DDI_PLUME",
+                "value": round(packet.dust_detection_index, 3),
+                "unit": "DDI",
                 "parity": "SECURE",
                 "source": "ESA_SENTINEL_2"
             }
@@ -436,7 +436,7 @@ async def get_energy_missions():
         "flare_risk": causal_engine.last_physics_results.get("flare_risk", 0.0)
     }
     impact = esg_engine.calculate_mission_impact(results)
-    
+
     return {
         "missions": [
             {
@@ -474,16 +474,16 @@ async def get_esg_impact():
     """Returns aggregated carbon and water savings across the network."""
     # Base savings from ledger
     ledger_co2 = sovereign_ledger.get_aggregate_esg_savings()
-    
+
     # Mission-specific savings (Solar/Flare)
     results = {
         "solar_dsi_load": causal_engine.last_physics_results.get("solar_dsi_load", 0.0),
         "flare_risk": causal_engine.last_physics_results.get("flare_risk", 0.0)
     }
     mission_impact = esg_engine.calculate_mission_impact(results)
-    
+
     total_co2 = ledger_co2 + mission_impact["total_mission_saved"]
-    
+
     return {
         "status": "VALIDATED",
         "total_co2_kg_saved": round(total_co2, 4),
@@ -536,11 +536,11 @@ if __name__ == "__main__":
     # Supports dynamic port binding for Railway/Cloud deployments
     gateway_port = int(os.environ.get("PORT", 8005))
     uvicorn.run(
-        app, 
-        host="0.0.0.0", 
-        port=gateway_port, 
-        reload=False, 
-        workers=1, 
+        app,
+        host="0.0.0.0",
+        port=gateway_port,
+        reload=False,
+        workers=1,
         log_level="info",
         proxy_headers=True,
         forwarded_allow_ips="*"

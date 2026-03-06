@@ -129,14 +129,14 @@ class MaximoConnector:
     ) -> List[Dict]:
         """
         Fetch work orders from Maximo with optional filters.
-        
+
         Args:
             site_id:  Maximo site ID (e.g., "RIYADH")
-            asset_id: Maximo asset number (e.g., "AX-PRX-00042") 
+            asset_id: Maximo asset number (e.g., "AX-PRX-00042")
             status:   Work order status filter (e.g., "COMP", "WAPPR", "INPRG")
             since:    Fetch orders changed after this date
             limit:    Max results
-        
+
         Returns:
             Normalized list of work orders with SAHARYN asset IDs
         """

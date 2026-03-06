@@ -7,7 +7,7 @@ class DriftDetector:
     """
     Monitors data distributions for Data/Concept drift using Kolmogorov-Smirnov test.
     """
-    
+
     def __init__(self, threshold: float = 0.05):
         self.logger = get_logger("DriftDetector")
         self.threshold = threshold
@@ -19,14 +19,14 @@ class DriftDetector:
     def check_drift(self, feature_name: str, current_values: List[float]) -> bool:
         if feature_name not in self.reference_data:
             return False
-            
+
         statistic, p_value = ks_2samp(self.reference_data[feature_name], current_values)
-        
+
         is_drifting = p_value < self.threshold
         if is_drifting:
             self.logger.warning(f"DRIFT DETECTED in {feature_name}: p-value={p_value:.4f}")
             # Trigger retraining event via Kafka
-        
+
         return is_drifting
 
     def report_status(self) -> Dict[str, Any]:

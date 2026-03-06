@@ -24,12 +24,12 @@ class DustSeverityModel(ScientificModel):
     """
     def __init__(self, region: str = "Middle East"):
         self.logger = get_logger("DustSeverityModel")
-        
+
         # Region-specific geotechnical and atmospheric constants
         # Reference: Mineralogical composition of dust in the Rub' Al Khali
         self.regional_profiles = {
             "Middle East": {
-                "settling_coeff": 1.2e-4, 
+                "settling_coeff": 1.2e-4,
                 "quartz_content": 0.65, # High abrasive silica
                 "turbulence_scaling": 0.05
             },
@@ -44,7 +44,7 @@ class DustSeverityModel(ScientificModel):
                 "turbulence_scaling": 0.06
             }
         }
-        
+
         profile = self.regional_profiles.get(region, self.regional_profiles["Middle East"])
         self.K_SETTLING = profile["settling_coeff"]
         self.QUARTZ_FACTOR = profile["quartz_content"]
@@ -56,23 +56,23 @@ class DustSeverityModel(ScientificModel):
         Reference: Integrated Physics-ML approach for desert infrastructure.
         """
         # 1. Atmospheric Stability Factor
-        # High heat + Low humidity in the desert leads to strong convective instability, 
+        # High heat + Low humidity in the desert leads to strong convective instability,
         # keeping dust lofted longer.
         stability_index = (1.0 / (humidity + 1.0)) * (wind_speed ** 1.5)
-        
+
         # 2. Particle Loading Approximation
         # AOD is a dimensionless measure of extinction. We correlate this to ground-level mass concentration.
         mass_loading = aod * (1 - (altitude / 10000)) # Simple laps-rate scaling
-        
+
         # 3. DSI Calculation (Core Logic)
         # Non-linear combination of static load and dynamic wind-driven abrasion.
         raw_dsi = (mass_loading * 0.7) + (stability_index * self.TURBULENCE_SCALING * 0.3)
-        
+
         # 4. Uncertainty Quantification
         # Higher wind speeds increase model variance due to turbulent eddies.
         uncertainty = 0.05 + (wind_speed * 0.005)
         dsi_final = np.clip(raw_dsi, 0.0, 1.0)
-        
+
         return ModelOutput(
             value=float(dsi_final),
             confidence_interval=(float(dsi_final - uncertainty), float(dsi_final + uncertainty)),
@@ -111,17 +111,17 @@ class MechanicalReliabilityModel(ScientificModel):
         # Kinetic temperature penalty (Non-linear after 45°C - standard desert operational limit)
         # Activation energy style penalty: e^(-Ea/RT)
         temp_stress = np.exp(0.05 * (temp_c - 45.0)) if temp_c > 45 else 1.0
-        
+
         # Abrasion/Fouling Risk
         abrasion_risk = dsi * self.degradation_coeffs.get("abrasion", 0.1) * temp_stress
-        
+
         # Failure Prob: Logarithmic hazard function
         failure_prob = 1 - np.exp(-0.2 * abrasion_risk)
-        
+
         # Efficiency Decay: Fouling on heat exchange surfaces or filter saturation
         base_efficiency = telemetry.get("efficiency_base", 0.95)
         efficiency_decay = (dsi ** 1.8) * self.degradation_coeffs.get("fouling", 0.2)
-        
+
         return {
             "failure_probability": float(np.clip(failure_prob, 0.0, 1.0)),
             "efficiency_loss": float(efficiency_decay),

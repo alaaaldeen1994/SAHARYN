@@ -24,7 +24,7 @@ class SCADAGateway:
     Simulated Enterprise SCADA Gateway for OPC UA / PI System Integration.
     Designed for 1-minute high-frequency ingestion.
     """
-    
+
     def __init__(self, endpoint_url: str):
         self.endpoint_url = endpoint_url
         self.connected = False
@@ -42,7 +42,7 @@ class SCADAGateway:
         """
         if not self.connected:
             raise ConnectionError("Gateway disconnected. Check OT VPN status.")
-            
+
         tags = {
             "pressure": SCADATag(tag_id=f"{asset_id}.PS_01", value=random.uniform(40, 50), unit="bar", timestamp=datetime.now()),
             "flow": SCADATag(tag_id=f"{asset_id}.FT_01", value=random.uniform(1100, 1300), unit="m3/h", timestamp=datetime.now()),
@@ -50,7 +50,7 @@ class SCADAGateway:
             "vibration": SCADATag(tag_id=f"{asset_id}.VT_01", value=random.uniform(0.1, 2.5), unit="mm/s", timestamp=datetime.now()),
             "power": SCADATag(tag_id=f"{asset_id}.PW_01", value=random.uniform(200, 250), unit="kW", timestamp=datetime.now())
         }
-        
+
         return AssetTelemetry(asset_id=asset_id, metrics=tags)
 
     def batch_ingest(self, asset_ids: List[str]) -> List[AssetTelemetry]:

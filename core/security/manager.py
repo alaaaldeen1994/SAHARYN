@@ -29,7 +29,7 @@ class SecurityManager:
     Zero-Trust Security & RBAC Manager for OT-IT Integration.
     Ensures every request to the API is authenticated and logged for ISO27001 compliance.
     """
-    
+
     def __init__(self):
         self.audit_log_path = "data/audit/access_logs.csv"
         os.makedirs(os.path.dirname(self.audit_log_path), exist_ok=True)
@@ -61,7 +61,7 @@ class SecurityManager:
         log_entry = f"{timestamp},{user},{action},{resource},{status}\n"
         with open(self.audit_log_path, "a") as f:
             f.write(log_entry)
-        
+
         logger.info(f"AUDIT: {user} performed {action} on {resource} - STATUS: {status}")
 
     def authorize_role(self, user: User, allowed_roles: List[str]) -> bool:

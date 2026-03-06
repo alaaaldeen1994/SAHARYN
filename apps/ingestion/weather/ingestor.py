@@ -7,7 +7,7 @@ class WeatherIngestor(BaseConnector):
     """
     Ingests ECMWF HRES forecasts via Copernicus Climate Data Store (CDS).
     """
-    
+
     def __init__(self, config: Dict[str, Any]):
         super().__init__(config)
         self.api_url = config.get("cds_url", "https://cds.climate.copernicus.eu/api/v2")
@@ -19,13 +19,13 @@ class WeatherIngestor(BaseConnector):
         Pull 10m wind speed, 2m temperature, and humidity.
         """
         self.logger.info(f"Requesting ECMWF HRES forecast for area: {area}")
-        
+
         # CDS API request
         self.client.retrieve(
             'reanalysis-era5-single-levels',
             {
                 'variable': [
-                    '10m_wind_speed', '10m_wind_direction', 
+                    '10m_wind_speed', '10m_wind_direction',
                     '2m_temperature', 'total_precipitation'
                 ],
                 'product_type': 'reanalysis',
@@ -38,7 +38,7 @@ class WeatherIngestor(BaseConnector):
             },
             'download.nc'
         )
-        
+
         # TODO: Post-process NetCDF to JSON/TimescaleDB
         return "download.nc"
 

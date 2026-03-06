@@ -178,13 +178,13 @@ class PIWebAPIConnector:
     ) -> List[Dict]:
         """
         Fetch interpolated historical data at fixed intervals.
-        
+
         Args:
             tag_path:   PI tag path
             start, end: Time range
             interval:   Sampling interval ('1m', '5m', '1h', etc.)
             max_entries: Maximum number of samples
-        
+
         Returns:
             List of {timestamp, value, quality} dicts
         """

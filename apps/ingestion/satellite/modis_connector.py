@@ -55,7 +55,7 @@ MODIS_PRODUCTS = {
 class MODISAerosolConnector:
     """
     Fetches NASA MODIS aerosol data for any geographic location.
-    
+
     Designed for:
       - Historical data backfill (up to 20 years)
       - Daily ingestion pipeline (previous day's data)
@@ -104,7 +104,7 @@ class MODISAerosolConnector:
     ) -> List[Dict]:
         """
         Search for MODIS granules covering a geographic point in a date range.
-        
+
         Returns list of granule metadata including download URLs.
         """
         params = {
@@ -142,10 +142,10 @@ class MODISAerosolConnector:
     ) -> Optional[Dict]:
         """
         Fetch the most recent AOD reading for a specific industrial site.
-        
+
         Tries Terra (MOD04_L2) first, falls back to Aqua (MYD04_L2),
         then falls back to daily gridded product (MOD08_D3).
-        
+
         Returns:
             Dict with standardized aerosol measurement, or None if unavailable.
         """
@@ -185,15 +185,15 @@ class MODISAerosolConnector:
     ) -> Optional[Dict]:
         """
         Extract AOD value from a granule metadata entry.
-        
-        This implementation uses NASA CMR 'attributes' to get summary statistics 
+
+        This implementation uses NASA CMR 'attributes' to get summary statistics
         when the full HDF is not yet downloaded. This provides REAL scientific values
         immediately.
         """
         try:
             # Extract attributes from CMR (if present)
             attrs = {a.get("name"): a.get("value") for a in granule.get("attributes", [])}
-            
+
             # Default mean AOD from the granule metadata if available
             # Note: MODIS granules often report 'QA_PERCENT_GOOD' and descriptive stats
             mean_aod = float(attrs.get("Average_AOD", 0.0))
@@ -211,7 +211,7 @@ class MODISAerosolConnector:
 
             # Quality assessment
             qa_pct = float(attrs.get("QA_PERCENT_GOOD_AOD", 100.0))
-            
+
             return {
                 "aerosol_optical_depth": round(mean_aod, 4),
                 "data_quality": "METADATA_EXTRACT" if mean_aod > 0 else "CLIMATOLOGY",
@@ -236,7 +236,7 @@ class MODISAerosolConnector:
             if 3 <= month <= 8:
                 return 0.65 + np.random.uniform(0, 0.4)
             return 0.25 + np.random.uniform(0, 0.2)
-        
+
         # Default global background AOD
         return 0.12 + np.random.uniform(0, 0.05)
 
@@ -252,7 +252,7 @@ class MODISAerosolConnector:
         """
         Fetch a batch of daily AOD values for historical analysis or model training.
         Uses the daily gridded product (MOD08_D3) for efficiency.
-        
+
         Returns list of daily records ordered by date.
         """
         results = []

@@ -24,7 +24,7 @@ logger = logging.getLogger("SAHARYN_COLD_START")
 def bootstrap_models():
     """Trains and registers the first set of production models."""
     mlflow_mgr = SAHARYNMLflow()
-    
+
     # 1. --- Dust Severity Index (DSI) Model ---
     logger.info("Bootstrapping Layer 1: Dust Severity Index model...")
     np.random.seed(42)
@@ -38,13 +38,13 @@ def bootstrap_models():
     }
     # Physics-informed DSI target (DSI is non-linear and sensitive to dry wind)
     dsi_data['dust_severity_index'] = np.clip(
-        (0.55 * dsi_data['aerosol_optical_depth']) + 
-        (0.40 * (dsi_data['wind_speed_10m'] / 30)**1.8) - 
+        (0.55 * dsi_data['aerosol_optical_depth']) +
+        (0.40 * (dsi_data['wind_speed_10m'] / 30)**1.8) -
         (0.15 * (dsi_data['relative_humidity_pct'] / 100)),
         0.0, 1.0
     ) + np.random.normal(0, 0.03, n)
     df_dsi = pd.DataFrame(dsi_data)
-    
+
     with mlflow_mgr.start_run(model_key="dust_severity", run_name="production_bootstrap_v1") as run:
         model, metrics = TrainingPipelines.train_dust_severity(df_dsi)
         mlflow_mgr.log_metrics(metrics)
@@ -65,14 +65,14 @@ def bootstrap_models():
     }
     # Efficiency degrades significantly with dust and high vibration
     asset_data['efficiency_pct'] = np.clip(
-        0.98 - 
-        (0.15 * asset_data['dust_severity_index']**1.2) - 
+        0.98 -
+        (0.15 * asset_data['dust_severity_index']**1.2) -
         (0.10 * (asset_data['vibration_mm_s'] / 18.0)**2) -
         (0.05 * (asset_data['bearing_temp_c'] - 45) / 60),
         0.5, 1.0
     ) + np.random.normal(0, 0.02, n)
     df_asset = pd.DataFrame(asset_data)
-    
+
     with mlflow_mgr.start_run(model_key="asset_performance", run_name="production_bootstrap_v1") as run:
         model, metrics = TrainingPipelines.train_asset_performance(df_asset)
         mlflow_mgr.log_metrics(metrics)

@@ -33,16 +33,16 @@ class DriftDetectionEngine:
             if feature in self.reference_distribution:
                 # Perform KS test (compare incoming window vs reference)
                 statistic, p_value = ks_2samp(self.reference_distribution[feature], values)
-                
+
                 is_drifting = bool(p_value < self.threshold)
                 drift_score = float(1.0 - p_value)
-                
+
                 drift_report[feature] = {
                     "drifting": is_drifting,
                     "drift_score": round(drift_score, 4),
                     "confidence": round(float(statistic), 4)
                 }
-                
+
                 if is_drifting:
                     logger.warning(f"FEATURE_DRIFT_DETECTED: Channel '{feature}' has shifted (p={p_value:.4f})")
 
@@ -58,16 +58,16 @@ class DriftDetectionEngine:
 
 if __name__ == "__main__":
     detector = DriftDetectionEngine()
-    
+
     # Scenario: Incoming sandstorm data (shifted distribution)
     # Reference mean was 0.4, incoming mean is 1.2
     storm_aod = np.random.normal(1.2, 0.3, 100)
     normal_vib = np.random.normal(2.0, 0.5, 100)
-    
+
     report = detector.check_for_drift({
         "aod": storm_aod.tolist(),
         "vibration_mm_s": normal_vib.tolist()
     })
-    
+
     for feature, metrics in report.items():
         print(f"[{feature}] Drifting: {metrics['drifting']} | Score: {metrics['drift_score']}")

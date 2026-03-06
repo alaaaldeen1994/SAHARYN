@@ -38,11 +38,11 @@ class GeotechnicalDustProfiler:
         rho_a = 1.225 # Air density
         mu = 1.8e-5 # Air viscosity
         d = profile["median_diameter"] * 1e-6 # Convert to meters
-        
+
         v_settling = (g * d**2 * (rho_p - rho_a)) / (18 * mu)
-        
+
         # Adjust for turbulence: High wind keeps small particles aloft
         turbulent_bypass = np.exp(-0.1 * wind_speed)
-        
+
         deposition_rate = v_settling * dsi * turbulent_bypass * 1000 # Scaling for mg/m^2
         return float(deposition_rate)
