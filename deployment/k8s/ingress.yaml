@@ -1,0 +1,123 @@
+# SAHARYN AI — Ingress (Public HTTPS Entry Point)
+# Routes saharyn.com → saharyn-api-svc
+# Requires nginx-ingress-controller + cert-manager installed in the cluster
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: saharyn-ingress
+  namespace: saharyn
+  annotations:
+    # TLS certificate — automatically issued and renewed via Let's Encrypt
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    # Security headers
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    # Rate limiting — 100 requests per minute per IP
+    nginx.ingress.kubernetes.io/limit-rps: "100"
+    nginx.ingress.kubernetes.io/limit-connections: "20"
+    # Request size limit — prevent large payload attacks
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    # HSTS header
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_headers "Strict-Transport-Security: max-age=31536000; includeSubDomains; preload";
+      more_set_headers "X-Frame-Options: DENY";
+      more_set_headers "X-Content-Type-Options: nosniff";
+      more_set_headers "Referrer-Policy: strict-origin-when-cross-origin";
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - saharyn.com
+        - www.saharyn.com
+      secretName: saharyn-tls-cert
+  rules:
+    - host: saharyn.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: saharyn-api-svc
+                port:
+                  number: 80
+    - host: www.saharyn.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: saharyn-api-svc
+                port:
+                  number: 80
+
+---
+# Network Policy — Zero-trust: only allow traffic that is explicitly permitted
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: saharyn-api-netpol
+  namespace: saharyn
+spec:
+  podSelector:
+    matchLabels:
+      app: saharyn-api
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Only allow traffic from the nginx ingress controller
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 8005
+  egress:
+    # Allow outbound to database
+    - to:
+        - podSelector:
+            matchLabels:
+              app: saharyn-postgres
+      ports:
+        - protocol: TCP
+          port: 5432
+    # Allow DNS resolution
+    - to: []
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # Allow outbound HTTPS for Copernicus, ECMWF, etc.
+    - to: []
+      ports:
+        - protocol: TCP
+          port: 443
+
+---
+# Network Policy — Database only accepts connections from API pods
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: saharyn-db-netpol
+  namespace: saharyn
+spec:
+  podSelector:
+    matchLabels:
+      app: saharyn-postgres
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Only accept connections from saharyn-api pods
+    - from:
+        - podSelector:
+            matchLabels:
+              app: saharyn-api
+      ports:
+        - protocol: TCP
+          port: 5432
+  egress: []                         # Database has no outbound access

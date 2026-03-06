@@ -1,0 +1,201 @@
+# SAHARYN AI — API Gateway Deployment
+# Production-grade: resource limits, health checks, rolling updates, anti-affinity
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: saharyn-api
+  namespace: saharyn
+  labels:
+    app: saharyn-api
+    version: "2.1"
+    component: api-gateway
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+spec:
+  replicas: 2                        # Minimum 2 for HA — HPA will scale up to 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1                    # Add 1 new pod before removing old ones
+      maxUnavailable: 0              # Zero downtime deployments
+  selector:
+    matchLabels:
+      app: saharyn-api
+  template:
+    metadata:
+      labels:
+        app: saharyn-api
+        version: "2.1"
+    spec:
+      # Anti-affinity: never place both replicas on the same node
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values: [saharyn-api]
+                topologyKey: kubernetes.io/hostname
+
+      # Security context — run as non-root user
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        fsGroup: 1001
+
+      containers:
+        - name: saharyn-api
+          image: ghcr.io/alaaaldeen1994/saharyn-api:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8005
+              name: http
+              protocol: TCP
+
+          # All secrets injected from K8s Secret — never in image or code
+          env:
+            - name: SAHARYN_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: saharyn-secrets
+                  key: SAHARYN_API_KEY
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: saharyn-secrets
+                  key: DB_PASSWORD
+            - name: CAMS_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: saharyn-secrets
+                  key: CAMS_API_KEY
+            - name: COP_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: saharyn-secrets
+                  key: COP_API_KEY
+            - name: SAHARYN_ENV
+              value: "PRODUCTION"
+            - name: DB_HOST
+              value: "saharyn-postgres-svc"
+            - name: DB_NAME
+              value: "saharyn_prod"
+            - name: DB_USER
+              value: "saharyn_admin"
+            - name: PYTHONUNBUFFERED
+              value: "1"
+
+          # Resource limits — prevents one pod from killing the node
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+
+          # Liveness probe — restart pod if API is hung
+          livenessProbe:
+            httpGet:
+              path: /v2/system/health
+              port: 8005
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          # Readiness probe — only send traffic when API is ready
+          readinessProbe:
+            httpGet:
+              path: /v2/system/health
+              port: 8005
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 2
+
+          # Startup probe — allow extra time for model initialization
+          startupProbe:
+            httpGet:
+              path: /v2/system/health
+              port: 8005
+            failureThreshold: 12    # 12 * 10s = 2 minutes startup window
+            periodSeconds: 10
+
+          # Container security — read-only root filesystem
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false    # False because uvicorn writes temp files
+            capabilities:
+              drop: [ALL]
+
+      # Image pull secret for GHCR private images
+      imagePullSecrets:
+        - name: ghcr-credentials
+
+      # Graceful shutdown
+      terminationGracePeriodSeconds: 30
+
+---
+# SAHARYN API — Kubernetes Service (internal load balancer)
+apiVersion: v1
+kind: Service
+metadata:
+  name: saharyn-api-svc
+  namespace: saharyn
+  labels:
+    app: saharyn-api
+spec:
+  type: ClusterIP
+  selector:
+    app: saharyn-api
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8005
+      protocol: TCP
+
+---
+# SAHARYN API — Horizontal Pod Autoscaler
+# Scales from 2 to 10 pods based on CPU and memory
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: saharyn-api-hpa
+  namespace: saharyn
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: saharyn-api
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70        # Scale up when CPU > 70%
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80        # Scale up when memory > 80%
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 60   # Wait 60s before scaling up
+      policies:
+        - type: Pods
+          value: 2
+          periodSeconds: 60            # Add max 2 pods per minute
+    scaleDown:
+      stabilizationWindowSeconds: 300  # Wait 5 minutes before scaling down
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 120           # Remove max 1 pod per 2 minutes

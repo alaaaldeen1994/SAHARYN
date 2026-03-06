@@ -1,0 +1,235 @@
+name: SAHARYN Production CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/saharyn-api
+  PYTHON_VERSION: "3.11"
+
+jobs:
+  # ─────────────────────────────────────────────
+  # JOB 1: Code Quality & Security Scan
+  # ─────────────────────────────────────────────
+  lint-and-security:
+    name: Lint & Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: "pip"
+
+      - name: Install lint & security tools
+        run: |
+          pip install --upgrade pip
+          pip install flake8 bandit safety
+
+      - name: Run flake8 linter
+        run: |
+          flake8 apps/ services/ core/ \
+            --max-line-length=120 \
+            --exclude=__pycache__,.git \
+            --count --statistics
+        continue-on-error: false
+
+      - name: Run bandit security scanner
+        run: |
+          bandit -r apps/ services/ core/ \
+            -ll \
+            --exclude "*/tests/*" \
+            -f json -o bandit-report.json || true
+          cat bandit-report.json
+
+      - name: Upload security report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bandit-security-report
+          path: bandit-report.json
+
+      - name: Check dependencies for known vulnerabilities
+        run: |
+          pip install -r requirements.txt --dry-run
+          safety check -r requirements.txt --full-report
+        continue-on-error: true
+
+  # ─────────────────────────────────────────────
+  # JOB 2: Run Test Suite
+  # ─────────────────────────────────────────────
+  test:
+    name: Run Test Suite
+    runs-on: ubuntu-latest
+    needs: lint-and-security
+
+    services:
+      postgres:
+        image: timescale/timescaledb:latest-pg15
+        env:
+          POSTGRES_USER: saharyn_test
+          POSTGRES_PASSWORD: test_secret_ci
+          POSTGRES_DB: saharyn_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_NAME: saharyn_test
+      DB_USER: saharyn_test
+      DB_PASS: test_secret_ci
+      SAHARYN_ENV: TESTING
+      SAHARYN_API_KEY: ci_test_key_not_for_production
+      COP_API_KEY: dummy_ci_key
+      PYTHONPATH: .
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-asyncio pytest-cov httpx
+
+      - name: Run test suite with coverage
+        run: |
+          pytest tests/ \
+            --cov=apps \
+            --cov=services \
+            --cov=core \
+            --cov-report=xml:coverage.xml \
+            --cov-report=term-missing \
+            --cov-fail-under=40 \
+            -v
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: coverage.xml
+
+  # ─────────────────────────────────────────────
+  # JOB 3: Build & Push Docker Image
+  # ─────────────────────────────────────────────
+  build-and-push:
+    name: Build & Push Docker Image
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    permissions:
+      contents: read
+      packages: write
+
+    outputs:
+      image-digest: ${{ steps.build.outputs.digest }}
+      image-tag: ${{ steps.meta.outputs.tags }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Docker metadata (tags, labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=sha-
+            type=ref,event=branch
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=prod-${{ github.run_number }}
+
+      - name: Build and push Docker image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64
+
+  # ─────────────────────────────────────────────
+  # JOB 4: Deploy to Railway (Production)
+  # ─────────────────────────────────────────────
+  deploy-production:
+    name: Deploy to Railway Production
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment:
+      name: production
+      url: https://saharyn.com
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Railway CLI
+        run: |
+          npm install -g @railway/cli
+
+      - name: Deploy to Railway
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          railway up --service saharyn --detach
+
+      - name: Verify deployment health
+        run: |
+          echo "Waiting 30 seconds for deployment to stabilize..."
+          sleep 30
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            https://saharyn.com/v2/system/health \
+            --max-time 30)
+          echo "Health check returned: $HTTP_STATUS"
+          if [ "$HTTP_STATUS" != "200" ]; then
+            echo "DEPLOYMENT HEALTH CHECK FAILED — rolling back"
+            railway rollback --service saharyn
+            exit 1
+          fi
+          echo "Deployment verified successfully."
+
+      - name: Notify deployment success
+        if: success()
+        run: |
+          echo "::notice title=Deployment Success::SAHARYN v$(cat requirements.txt | head -1) deployed to production at $(date -u)"
+
+      - name: Notify deployment failure
+        if: failure()
+        run: |
+          echo "::error title=Deployment Failed::Production deployment failed for commit ${{ github.sha }}"

@@ -1,0 +1,10 @@
+# SAHARYN AI — Kubernetes Namespace
+# All resources are isolated in their own namespace for security and resource management
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: saharyn
+  labels:
+    app.kubernetes.io/name: saharyn
+    environment: production
+    security-tier: enterprise

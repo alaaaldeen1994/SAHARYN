@@ -1,0 +1,126 @@
+# SAHARYN AI — TimescaleDB (PostgreSQL) Deployment
+# Production: persistent volume, resource limits, health checks
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: saharyn-postgres
+  namespace: saharyn
+  labels:
+    app: saharyn-postgres
+    component: database
+spec:
+  replicas: 1                        # Single primary — use managed DB (RDS/CloudSQL) in full prod
+  strategy:
+    type: Recreate                   # DB must be shut down completely before updating
+  selector:
+    matchLabels:
+      app: saharyn-postgres
+  template:
+    metadata:
+      labels:
+        app: saharyn-postgres
+    spec:
+      securityContext:
+        runAsUser: 999
+        fsGroup: 999
+
+      containers:
+        - name: timescaledb
+          image: timescale/timescaledb:latest-pg15
+          ports:
+            - containerPort: 5432
+              name: postgres
+
+          env:
+            - name: POSTGRES_USER
+              value: "saharyn_admin"
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: saharyn-secrets
+                  key: DB_PASSWORD
+            - name: POSTGRES_DB
+              value: "saharyn_prod"
+            - name: PGDATA
+              value: "/var/lib/postgresql/data/pgdata"
+
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "2Gi"
+              cpu: "1000m"
+
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - saharyn_admin
+                - -d
+                - saharyn_prod
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 5
+
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - saharyn_admin
+                - -d
+                - saharyn_prod
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+            - name: init-schema
+              mountPath: /docker-entrypoint-initdb.d
+
+      volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: saharyn-postgres-pvc
+        - name: init-schema
+          configMap:
+            name: saharyn-db-schema
+
+---
+# Persistent Volume Claim — 50GB SSD for time-series data
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: saharyn-postgres-pvc
+  namespace: saharyn
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ssd              # Use 'ssd' or 'fast' storage class on your cluster
+  resources:
+    requests:
+      storage: 50Gi
+
+---
+# Database internal service
+apiVersion: v1
+kind: Service
+metadata:
+  name: saharyn-postgres-svc
+  namespace: saharyn
+  labels:
+    app: saharyn-postgres
+spec:
+  type: ClusterIP                    # Only accessible within the cluster — not exposed externally
+  selector:
+    app: saharyn-postgres
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432
+      protocol: TCP
