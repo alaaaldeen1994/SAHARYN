@@ -1,4 +1,6 @@
 #!/bin/bash
+set -e
+set -x
 echo "SAHARYN AI: Deployment initialization starting..."
 
 # 1. Materialize Database Schema
