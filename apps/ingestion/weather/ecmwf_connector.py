@@ -2,18 +2,21 @@ import os
 import logging
 import datetime
 from typing import List, Dict, Any
-from tenacity import retry, stop_after_attempt, wait_fixed
+import requests
+import numpy as np
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 import cdsapi
 from pydantic_settings import BaseSettings
 
 logger = logging.getLogger("WeatherIngestor")
 
 class WeatherConfig(BaseSettings):
-    ECMWF_API_URL: str = "https://cds.climate.copernicus.eu/api/v2"
+    ECMWF_API_URL: str = "https://cds.climate.copernicus.eu/api"
     ECMWF_API_KEY: str = os.getenv("ECMWF_API_KEY", "dummy-key")
 
     class Config:
         env_file = ".env"
+        extra = "ignore"
 
 config = WeatherConfig()
 
@@ -26,7 +29,7 @@ class ECMWFWeatherIngestor:
     def __init__(self):
         self.client = cdsapi.Client(url=config.ECMWF_API_URL, key=config.ECMWF_API_KEY)
 
-    @retry(stop=stop_after_attempt(3), wait=wait_fixed(10))
+    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=30))
     def ingest_forecast(self, area: List[float]):
         """
         72-hour forecast ingestion (ERA5-Land or Reanalysis-5).
