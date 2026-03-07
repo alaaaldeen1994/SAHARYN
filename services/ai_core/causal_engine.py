@@ -180,8 +180,11 @@ class CausalIntegrityManifold:
             # 3. Filter Pressure Cascade (ME_FILTER_A)
             if node_id == "ME_FILTER_A":
                 # Darcy's Law Proxy: Pressure Drop increases as dust blocks pores
-                # P_drop ~ exp(k * Dust_Load)
-                pressure_delta = telemetry.get("pressure", 4.5)
+                # P_drop = Outlet_P - Inlet_P (absolute value for flow resistance)
+                in_p = telemetry.get("inlet_pressure_bar", 4.5)
+                out_p = telemetry.get("outlet_pressure_bar", 8.5)
+                pressure_delta = abs(out_p - in_p)
+                
                 clogging_factor = env_stress * (velocity / 5.0)
                 # If dust is high, health drops exponentially due to differential pressure spike
                 node.health_score = max(0.1, node.health_score - (clogging_factor * 0.3) - (pressure_delta / 25.0))

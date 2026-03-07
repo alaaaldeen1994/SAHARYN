@@ -79,14 +79,30 @@ class SensorCollectorService:
             logger.error(f"TIMESTAMP_PARSE_FAIL: {e}")
             pi_time = datetime.now(timezone.utc)
 
-        # 4. LOAD & FUSE
+        # 4. LOAD & CACHE
         value = float(result.get("value", 0.0))
         self._write_to_db(mapping, value, "192", pi_time)
+        self.last_poll_times[f"val_{field}"] = value # Cache latest value for fusion
         
-        # 5. DIAGNOSTIC FUSION LOG
+        # 5. SYSTEM FUSION: Trigger manifold when vibration is updated (the 1Hz ticker)
         if field == "vibration_mm_s":
-            self.manifold.calculate_propagation_matrix(0.5, {"vibration": value, "wind_speed": 10.0})
-            logger.info(f"FUSION_DIAGNOSTIC: Asset={self.asset_id} | Vib={value:.2f} | Stability={self.manifold.global_stability_index:.4f}")
+            # Assemble current telemetry snapshot
+            telemetry_snapshot = {
+                "vibration": value,
+                "inlet_pressure_bar": self.last_poll_times.get("val_inlet_pressure_bar", 4.5),
+                "outlet_pressure_bar": self.last_poll_times.get("val_outlet_pressure_bar", 8.5),
+                "bearing_temp_c": self.last_poll_times.get("val_bearing_temp_c", 65.0),
+                "power_kw": self.last_poll_times.get("val_power_kw", 120.0),
+                "wind_speed": 10.0 # Will be fused from Satellite feed in Phase 3
+            }
+            # Execute Causal Inference
+            # We assume a baseline AOD of 0.5 for diagnostic logging
+            self.manifold.calculate_propagation_matrix(0.5, telemetry_snapshot)
+            logger.info(
+                f"FUSION_DIAGNOSTIC: Asset={self.asset_id} | Vib={value:.2f} | "
+                f"dP={abs(telemetry_snapshot['outlet_pressure_bar'] - telemetry_snapshot['inlet_pressure_bar']):.2f} | "
+                f"Stability={self.manifold.global_stability_index:.4f}"
+            )
 
     def _write_to_db(self, mapping: Dict, value: float, quality: str, timestamp: Optional[datetime] = None):
         try:

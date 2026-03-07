@@ -15,8 +15,14 @@
             "unit": "C"
         },
         {
-            "internal_field": "pressure_bar",
-            "pi_tag": "\\\\PISERVER\\PILOT_SITE.COMP_01.PRESS_DELTA_FILTER",
+            "internal_field": "inlet_pressure_bar",
+            "pi_tag": "\\\\PISERVER\\PILOT_SITE.COMP_01.PRESS_INLET",
+            "sampling_rate_hz": 0.1,
+            "unit": "bar"
+        },
+        {
+            "internal_field": "outlet_pressure_bar",
+            "pi_tag": "\\\\PISERVER\\PILOT_SITE.COMP_01.PRESS_OUTLET",
             "sampling_rate_hz": 0.1,
             "unit": "bar"
         },
