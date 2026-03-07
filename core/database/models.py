@@ -68,3 +68,18 @@ class AuditTrail(Base):
     resource = Column(String, nullable=False)
     status = Column(String, nullable=False)
     details = Column(JSON, nullable=True)
+class CarbonLedger(Base):
+    __tablename__ = "carbon_ledger"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    timestamp = Column(DateTime(timezone=True), server_default=func.now(), index=True)
+    block_index = Column(Float, nullable=False) # Supporting historical chaining
+    
+    asset_id = Column(String, nullable=False, index=True)
+    action_type = Column(String, nullable=False) # e.g., PREVENTIVE_MAINTENANCE
+    esg_impact_kg = Column(Float, nullable=False)
+    
+    certificate_id = Column(String, nullable=False, unique=True)
+    merkle_root = Column(String, nullable=True)
+    verification_hash = Column(String, nullable=False)
+    node_origin = Column(String, nullable=False)

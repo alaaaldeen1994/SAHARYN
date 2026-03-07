@@ -13,7 +13,7 @@ load_dotenv()
 
 from apps.ingestion.scada.pi_webapi_connector import PIWebAPIConnector
 from core.database.session import SessionLocal
-from core.database.models import SensorTelemetry
+from core.database.models import SensorTelemetry, SatelliteTelemetry
 from services.ai_core.causal_engine import CausalIntegrityManifold
 
 # --- CONFIGURATION ---
@@ -38,6 +38,21 @@ class SensorCollectorService:
         # Performance & Reliability Metrics
         self.ingestion_count = 0
         self.last_sync_drift = 0.0
+        self.cached_aod = 0.1 # Default clear sky
+
+    def _sync_environmental_force(self):
+        """Fetches latest real AOD from DB to drive simulated mechanical response."""
+        try:
+            db = SessionLocal()
+            latest_sat = db.query(SatelliteTelemetry).order_by(SatelliteTelemetry.timestamp.desc()).first()
+            if latest_sat:
+                self.cached_aod = latest_sat.aod_550nm
+                # Feed to connector to scale synthetic data
+                self.connector.set_simulation_stress(self.cached_aod)
+                logger.debug(f"ENV_SYNC: Scaling simulation with AOD={self.cached_aod:.4f}")
+            db.close()
+        except Exception as e:
+            logger.warning(f"ENV_SYNC_FAILURE: {e}")
 
     def _load_config(self) -> Dict:
         try:
@@ -55,6 +70,10 @@ class SensorCollectorService:
         tag_path = mapping["pi_tag"]
         field = mapping["internal_field"]
         
+        # 0. SYNC WITH REAL WORLD (if simulation mode)
+        if not self.connector._available:
+            self._sync_environmental_force()
+
         # 1. FETCH
         logger.debug(f"POLLING: {tag_path}")
         result = self.connector.get_current_value(tag_path)

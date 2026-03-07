@@ -5,6 +5,8 @@ import uuid
 from datetime import datetime
 from typing import List, Dict, Any, Optional
 from pydantic import BaseModel
+from core.database.session import SessionLocal
+from core.database.models import CarbonLedger
 
 logger = logging.getLogger("SovereignLedger")
 
@@ -84,6 +86,26 @@ class SovereignLedgerEngine:
 
         self.chain.append(new_block)
         logger.info(f"LEDGER_COMMIT: Block {next_index} verified by {self.node_id} (Claim: {kg_saved}kg CO2)")
+
+        # Persist to Database
+        try:
+            db = SessionLocal()
+            db_entry = CarbonLedger(
+                block_index=float(new_block.block_index),
+                timestamp=new_block.timestamp,
+                asset_id=new_block.asset_id,
+                action_type=new_block.action_type,
+                esg_impact_kg=new_block.esg_impact_kg,
+                certificate_id=new_block.certificate_id,
+                merkle_root=new_block.merkle_root,
+                verification_hash=new_block.verification_hash,
+                node_origin=new_block.node_origin
+            )
+            db.add(db_entry)
+            db.commit()
+            db.close()
+        except Exception as e:
+            logger.error(f"LEDGER_DB_FAILURE: {e}")
 
         # Pruning (Optional for demo, keep last 20 blocks in memory)
         if len(self.chain) > 50:

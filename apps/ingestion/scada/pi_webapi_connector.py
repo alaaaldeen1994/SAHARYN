@@ -68,7 +68,13 @@ class PIWebAPIConnector:
         self._available = False
         self._tag_webids: Dict[str, str] = {}   # Cache: tag path → WebID
         self.session = requests.Session()
+        # Demo/Simulation State
+        self.atmospheric_stress = 0.1 # Default clear sky
         self._connect()
+
+    def set_simulation_stress(self, aod: float):
+        """Dynamic multiplier for demo scenarios. Connects AOD to mechanical response."""
+        self.atmospheric_stress = aod
 
     def _connect(self):
         """Initialize PI Web API session."""
@@ -174,16 +180,26 @@ class PIWebAPIConnector:
         import random
         import numpy as np
         
+        # Scaling factor: Stress (AOD) causes increase in deviation
+        stress = self.atmospheric_stress
         val = 0.0
         tag_upper = tag_path.upper()
+        
         if "VIB" in tag_upper:
-            val = 1.2 + np.random.normal(0, 0.2)
+            # Vibration increases by +5.0mm/s per 1.0 AOD unit (clogging surge)
+            val = 1.2 + (stress * 5.0) + np.random.normal(0, 0.2)
         elif "TEMP" in tag_upper:
-            val = 65.0 + np.random.normal(0, 5.0)
-        elif "PRESS" in tag_upper:
-            val = 4.5 + np.random.normal(0, 0.5)
+            # Temperature rises as cooling efficiency drops
+            val = 65.0 + (stress * 20.0) + np.random.normal(0, 5.0)
+        elif "INLET" in tag_upper:
+            # Inlet pressure drops as filter clogs
+            val = max(0.1, 4.5 - (stress * 3.0) + np.random.normal(0, 0.2))
+        elif "OUTLET" in tag_upper:
+            # Outlet pressure might drop or oscillate during surge
+            val = 8.5 - (stress * 1.5) + np.random.normal(0, 0.5)
         elif "POWER" in tag_upper:
-            val = 120.0 + np.random.normal(0, 10.0)
+            # Power consumption spikes as engine works harder against clogging
+            val = 120.0 + (stress * 50.0) + np.random.normal(0, 10.0)
         else:
             val = random.uniform(10, 100)
             
