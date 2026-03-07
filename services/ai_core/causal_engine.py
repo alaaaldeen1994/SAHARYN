@@ -164,7 +164,8 @@ class CausalIntegrityManifold:
         # Physics Constants for derivation
         reynolds_num = (1.225 * velocity * 0.5) / 1.846e-5
         corrosion_kinetic = 1.2e-4 * np.exp(-45 / (8.314e-3 * 310))
-        stress_intensity = vibration * 0.04
+        # ISO-10816 Standard: Vibrations above 3.5mm/s are 'Class C' (Restricted)
+        stress_intensity = vibration * 0.15 
 
         for node_id in traversal_order:
             node = self.nodes.get(node_id)
@@ -174,7 +175,30 @@ class CausalIntegrityManifold:
             parent_health = np.mean([u.health_score for u in node.upstream_dependencies]) if node.upstream_dependencies else 1.0
             env_impact_factor = 0.15 if node.node_type != "ATMOS" else 0.0
 
-            # 4. Solar Dust Deposition (DSI) Physics
+            # --- INDUSTRIAL CAUSAL CHAIN: DUST -> FILTER -> COMPRESSOR ---
+            
+            # 3. Filter Pressure Cascade (ME_FILTER_A)
+            if node_id == "ME_FILTER_A":
+                # Darcy's Law Proxy: Pressure Drop increases as dust blocks pores
+                # P_drop ~ exp(k * Dust_Load)
+                pressure_delta = telemetry.get("pressure", 4.5)
+                clogging_factor = env_stress * (velocity / 5.0)
+                # If dust is high, health drops exponentially due to differential pressure spike
+                node.health_score = max(0.1, node.health_score - (clogging_factor * 0.3) - (pressure_delta / 25.0))
+                impact_report["filter_clogging_index"] = round(clogging_factor, 4)
+
+            # 4. Compressor Vibration Coupling (ME_COMP_01)
+            if node_id == "ME_COMP_01":
+                # Surge Logic: If upstream filter health is poor, compressor vibrates more
+                filter_health = self.nodes["ME_FILTER_A"].health_score
+                surge_potential = (1.0 - filter_health) * 0.4
+                vibration_multiplier = 1.0 + surge_potential + (vibration / 10.0)
+                
+                # Combine physical stress with vibration-induced material fatigue
+                node.health_score = max(0.05, node.health_score * (1.0 - (surge_potential * 0.5)) - (stress_intensity * 0.2))
+                impact_report["compressor_surge_risk"] = round(surge_potential, 4)
+
+            # 5. Solar Dust Deposition (DSI) Physics
             if node.node_type == "ENERGY_SOLAR":
                 surface_tilt = 30.0 # Standard fixed tilt
                 aod_value = env_stress # Using AOD as proxy for concentration
@@ -194,12 +218,18 @@ class CausalIntegrityManifold:
             physical_divergence = (env_stress * env_impact_factor) * (1.0 + (reynolds_num / 500000.0))
             physical_divergence += (corrosion_kinetic * 2.0) + (stress_intensity * 0.8)
 
-            # Health Calculation: (Parent Health * 0.7 + Material Continuity * 0.3) - Physical Divergence
-            new_health = (parent_health * 0.7) + (1.0 * 0.3) - (physical_divergence * 0.25)
+            # Health Calculation: Temporal Continuity * 0.8 + Current State * 0.2 - Physics Stress
+            # ATMOS nodes are 'Source' nodes and do not decay mechanical performance
+            if node.node_type == "ATMOS":
+                new_health = node.health_score 
+            else:
+                new_health = (parent_health * 0.8) + (node.health_score * 0.2) - (physical_divergence * 0.8)
+            
             node.health_score = max(0, min(1.0, new_health))
 
             # Entropy Calculation (Measure of structural instability)
-            node.structural_entropy = (1.0 - node.health_score) * 0.8
+            # Entropy follows a non-linear tipping point: E ~ (1-H)^2
+            node.structural_entropy = ((1.0 - node.health_score) ** 2) * 1.5
             cumulative_entropy += node.structural_entropy
 
             impact_report[node_id] = node.to_dict()
