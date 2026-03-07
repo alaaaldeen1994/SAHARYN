@@ -15,7 +15,8 @@ from datetime import datetime
 from typing import Dict, List, Optional, Any
 import collections
 
-from fastapi import FastAPI, HTTPException, Header, Depends, Request, status
+import asyncio
+from fastapi import FastAPI, HTTPException, Header, Depends, Request, status, Query, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -30,6 +31,10 @@ from services.monitoring.drift_detector import DriftDetectionEngine
 from services.ai_core.esg_engine import ESGImpactEngine
 from services.compliance.ledger_engine import SovereignLedgerEngine
 from services.ingestion.satellite_etl import SatelliteETLService
+
+# --- Database Layer ---
+from core.database.session import SessionLocal
+from core.database.models import SatelliteTelemetry, SensorTelemetry, Prediction, CarbonLedger
 
 # --- Security Layer ---
 from core.security.siem_forwarder import (
@@ -494,8 +499,6 @@ async def export_demo_dataset():
     """
     db = SessionLocal()
     try:
-        from core.database.models import SatelliteTelemetry, SensorTelemetry, Prediction, CarbonLedger
-        
         # Pull last 50 entries of each for technical context
         sat = db.query(SatelliteTelemetry).order_by(SatelliteTelemetry.timestamp.desc()).limit(50).all()
         sen = db.query(SensorTelemetry).order_by(SensorTelemetry.timestamp.desc()).limit(100).all()
@@ -528,6 +531,78 @@ async def export_demo_dataset():
         return dataset
     finally:
         db.close()
+
+# --- 9. DEMO & SIMULATION ORCHESTRATION ---
+@app.post("/v2/demo/scenario", tags=["Demo"])
+async def trigger_demo_scenario(background_tasks: BackgroundTasks, scenario_id: str = Query(..., enum=["sandstorm", "heat", "filter", "replay", "reset"])):
+    """Triggers specific industrial failure scenarios for demonstration purposes."""
+    db_session = SessionLocal()
+    site_id = "RESILIENCE_PILOT_01"
+    
+    async def run_replay():
+        steps = [
+            (0.1, 300.0, 5.0, "TIMELINE_NORMAL"),
+            (0.4, 305.0, 15.0, "TIMELINE_GATHERING"),
+            (0.95, 310.0, 45.0, "TIMELINE_STORM_PEAK"),
+            (0.8, 308.0, 20.0, "TIMELINE_ANOMALY"),
+            (0.3, 302.0, 5.0, "TIMELINE_FAILURE_PREDICTED")
+        ]
+        db = SessionLocal()
+        try:
+            for aod, temp, wind, agency in steps:
+                packet = SatelliteTelemetry(
+                    site_id=site_id,
+                    timestamp=datetime.utcnow(),
+                    source_agency=agency,
+                    aod_550nm=aod,
+                    temp_2m_k=temp,
+                    wind_speed=wind,
+                    integrity_hash=str(uuid.uuid4())
+                )
+                db.add(packet)
+                db.commit()
+                await asyncio.sleep(8) # Space out steps for the replay
+        finally:
+            db.close()
+
+    try:
+        def inject_sat(aod, temp_k=305.0, wind=5.0, agency="SAHARYN_DEMO"):
+            packet = SatelliteTelemetry(
+                site_id=site_id,
+                timestamp=datetime.utcnow(),
+                source_agency=agency,
+                aod_550nm=aod,
+                dust_concentration=aod * 400,
+                temp_2m_k=temp_k,
+                wind_speed=wind,
+                integrity_hash=str(uuid.uuid4())
+            )
+            db_session.add(packet)
+            db_session.commit()
+            return packet
+
+        if scenario_id == "sandstorm":
+            inject_sat(0.95, temp_k=315.0, wind=35.0, agency="NASA_MODIS_SIM")
+            msg = "[DEMO] Sandstorm Event Injected. AOD: 0.95, Wind: 35m/s"
+        elif scenario_id == "heat":
+            inject_sat(0.15, temp_k=325.0, wind=2.0, agency="CAMS_LIVE_SIM")
+            msg = "[DEMO] Extreme Heat Stress Injected. Temp: 52C (325K)"
+        elif scenario_id == "filter":
+            inject_sat(0.4, temp_k=305.0, wind=5.0, agency="FILTER_STRESS_OVERRIDE")
+            msg = "[DEMO] Progressive Filter Degradation Pattern Triggered."
+        elif scenario_id == "reset":
+            inject_sat(0.08, 298.0, 3.0, agency="SYSTEM_RESET")
+            msg = "[DEMO] System Reset. Nominal conditions restored."
+        elif scenario_id == "replay":
+            background_tasks.add_task(run_replay)
+            msg = "[DEMO] Sequential Timeline Replay Initiated in Background."
+        
+        return {"status": "SUCCESS", "message": msg, "scenario": scenario_id}
+    except Exception as e:
+        logger.error(f"Demo scenario failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        db_session.close()
 
 # --- 10. ESG & SUSTAINABILITY ENDPOINTS ---
 @app.get("/v2/esg/impact", tags=["Sustainability"])

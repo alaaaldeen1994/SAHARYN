@@ -585,6 +585,30 @@
             }
         }
 
+        /* Demo Controller Buttons */
+        .demo-btn {
+            border: 1px solid;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono';
+            font-size: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .demo-btn:hover {
+            filter: brightness(1.2);
+            transform: translateY(-1px);
+        }
+
+        .demo-btn i {
+            pointer-events: none;
+        }
+
         /* User Profile Dropdown */
         .user-dropdown {
             position: relative;
@@ -801,6 +825,54 @@
 
         <!-- DASHBOARD VIEW -->
         <div id="dashboard-view" class="view-content active">
+
+            <!-- DEMO MISSION CONTROL STRIP (TOP FULL WIDTH) -->
+            <div id="demo-controller-strip"
+                style="grid-column: span 3; padding: 15px 24px; background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 8px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div
+                        style="width: 38px; height: 38px; background: rgba(16, 185, 129, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(16, 185, 129, 0.3);">
+                        <i data-lucide="play-circle" size="20" color="var(--accent-green)"></i>
+                    </div>
+                    <div>
+                        <div style="font-family: 'JetBrains Mono'; font-size: 11px; font-weight: 800; color: #fff;">
+                            DEMO_ORCHESTRATOR_v2.1</div>
+                        <div style="font-size: 10px; color: var(--text-secondary); opacity: 0.7;">
+                            INDUSTRIAL_SCENARIO_ENGINE
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button onclick="triggerScenario('sandstorm')" class="demo-btn"
+                        style="background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.2); color: var(--accent-amber);">
+                        <i data-lucide="wind" size="14"></i> <span data-i18n="demo_sandstorm">SANDSTORM</span>
+                    </button>
+                    <button onclick="triggerScenario('heat')" class="demo-btn"
+                        style="background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); color: var(--accent-red);">
+                        <i data-lucide="thermometer-sun" size="14"></i> <span data-i18n="demo_heat">HEAT_STRESS</span>
+                    </button>
+                    <button onclick="triggerScenario('filter')" class="demo-btn"
+                        style="background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.2); color: #3b82f6;">
+                        <i data-lucide="filter" size="14"></i> <span data-i18n="demo_filter">FILTER_DEG</span>
+                    </button>
+                    <button id="btn-replay" onclick="triggerTimeline()" class="demo-btn"
+                        style="background: rgba(139, 92, 246, 0.1); border-color: rgba(139, 92, 246, 0.2); color: #8b5cf6;">
+                        <i data-lucide="history" size="14"></i> <span data-i18n="demo_replay">TIMELINE</span>
+                    </button>
+                    <button onclick="triggerScenario('reset')" class="demo-btn"
+                        style="background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.1); color: #fff;">
+                        <i data-lucide="rotate-ccw" size="14"></i> <span data-i18n="demo_reset">RESET</span>
+                    </button>
+                </div>
+
+                <div style="border-left: 1px solid rgba(255,255,255,0.1); padding-left: 20px; margin-left: auto;">
+                    <button onclick="exportDemoData()"
+                        style="background: var(--accent-green); border: none; color: #000; padding: 10px 20px; border-radius: 6px; font-weight: 800; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 15px var(--accent-green-dim);">
+                        <i data-lucide="download" size="16"></i> <span data-i18n="demo_export">EXPORT_DATASET</span>
+                    </button>
+                </div>
+            </div>
 
             <!-- COLUMN 1: Environment & Telemetry (300px) -->
             <div style="display: flex; flex-direction: column; gap: 24px; grid-row: 1 / -1;">
@@ -2780,6 +2852,75 @@
             }
         }
 
+        async function triggerScenario(id) {
+            logEvent(`DEMO_ENGINE: Activating scenario [${id.toUpperCase()}]`, 'info');
+            try {
+                const response = await fetch(`/v2/demo/scenario?scenario_id=${id}`, { method: 'POST' });
+                const data = await response.json();
+                if (data.status === 'SUCCESS') {
+                    logEvent(data.message, 'info');
+                    // Force a refresh of the dashboard to see immediate effects
+                    setTimeout(() => triggerAnalysis(), 500);
+                }
+            } catch (e) {
+                logEvent(`DEMO_ENGINE: Failed to trigger scenario. ${e.message}`, 'warn');
+            }
+        }
+        window.triggerScenario = triggerScenario;
+
+        async function triggerTimeline() {
+            const btn = document.getElementById('btn-replay');
+            if (btn.getAttribute('disabled') === 'true') return;
+
+            btn.setAttribute('disabled', 'true');
+            btn.style.opacity = '0.5';
+
+            logEvent("DEMO_ENGINE: Engaging Multi-Step Timeline Replay System...", 'info');
+
+            await triggerScenario('replay');
+
+            // Provide visual feedback that it's running
+            let dots = 0;
+            const interval = setInterval(() => {
+                dots = (dots + 1) % 4;
+                btn.innerHTML = `<i data-lucide="history" size="14"></i> REPLAYING${'.'.repeat(dots)}`;
+                lucide.createIcons();
+            }, 500);
+
+            // Re-enable after expected duration (approx 40-50s for 5 steps * 8s)
+            setTimeout(() => {
+                clearInterval(interval);
+                btn.removeAttribute('disabled');
+                btn.style.opacity = '1';
+                btn.innerHTML = `<i data-lucide="history" size="14"></i> <span data-i18n="demo_replay">TIMELINE</span>`;
+                lucide.createIcons();
+                logEvent("DEMO_ENGINE: Timeline Replay Session Finished.", 'info');
+            }, 40000);
+        }
+        window.triggerTimeline = triggerTimeline;
+
+        async function exportDemoData() {
+            logEvent("DEMO_ENGINE: Preparing Industrial Evidence Dataset...", 'info');
+            try {
+                const response = await fetch('/v2/demo/export');
+                const data = await response.json();
+
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `SAHARYN_DEMO_EXPORT_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+
+                logEvent("SUCCESS: Composite Dataset Exported for Technical Diligence.", 'info');
+            } catch (e) {
+                logEvent(`EXPORT_FAILED: ${e.message}`, 'warn');
+            }
+        }
+        window.exportDemoData = exportDemoData;
+
         // Multi-Language System
         const translations = {
             en: {
@@ -2867,6 +3008,12 @@
                 tel_node_ref: "NODE_REF",
                 tel_intensity: "INTENSITY",
                 tel_variance: "VARIANCE",
+                demo_sandstorm: "SANDSTORM",
+                demo_heat: "HEAT_STRESS",
+                demo_filter: "FILTER_DEG",
+                demo_replay: "TIMELINE",
+                demo_reset: "RESET",
+                demo_export: "EXPORT_DATASET",
                 tel_channel: "CHANNEL",
                 tel_bandwidth: "BANDWIDTH",
                 tel_status: "STATUS",
@@ -3030,7 +3177,13 @@
                 mission_solar: "ذكاء الأصول المتجددة (DSI للطاقة الشمسية)",
                 mission_flare: "تخفيض الانبعاثات (منع حرق الغاز)",
                 solar_desc: "نمذجة ترسيب الغبار (DSI) القائمة على الفيزياء للتنبؤ بدورات التنظيف واستعادة كفاءة التوليد المفقودة.",
-                flare_desc: "ربط حالات شذوذ الإجهاد الميكانيكي بأحداث حرق الغاز التلقائية لتوليد أرصدة كربونية قابلة للتحقق."
+                flare_desc: "ربط حالات شذوذ الإجهاد الميكانيكي بأحداث حرق الغاز التلقائية لتوليد أرصدة كربونية قابلة للتحقق.",
+                demo_sandstorm: "محاكاة عاصفة رملية",
+                demo_heat: "إجهاد حراري فائق",
+                demo_filter: "تدهور نظام الترشيح",
+                demo_replay: "محاكاة الخط الزمني",
+                demo_reset: "إعادة ضبط النظام",
+                demo_export: "تصدير مجموعة البيانات"
             }
         };
 
