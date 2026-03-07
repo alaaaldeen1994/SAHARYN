@@ -30,7 +30,10 @@ RUN mkdir -p /app/data/raw/satellite && chmod 777 /app/data/raw/satellite
 
 # Healthcheck for Plant Operators
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8000/health || exit 1
+    CMD curl -f http://localhost:8005/v2/system/health || exit 1
 
-# Entrypoint: Start the Sensor Collector by default
-CMD ["python", "services/ingestion/sensor_collector.py"]
+# Ensure start script is executable
+RUN chmod +x /app/start.sh
+
+# Entrypoint: Initialize DB and Launch API Gateway
+CMD ["/bin/bash", "/app/start.sh"]
