@@ -486,6 +486,49 @@ async def get_audit_ledger(limit: int = 50):
         "logs": logs
     }
 
+@app.get("/v2/demo/export", tags=["Demo"])
+async def export_demo_dataset():
+    """
+    Exports a composite technical dataset for investor proof-of-concept.
+    Includes Satellite, Sensor, Prediction, and Ledger data.
+    """
+    db = SessionLocal()
+    try:
+        from core.database.models import SatelliteTelemetry, SensorTelemetry, Prediction, CarbonLedger
+        
+        # Pull last 50 entries of each for technical context
+        sat = db.query(SatelliteTelemetry).order_by(SatelliteTelemetry.timestamp.desc()).limit(50).all()
+        sen = db.query(SensorTelemetry).order_by(SensorTelemetry.timestamp.desc()).limit(100).all()
+        pred = db.query(Prediction).order_by(Prediction.timestamp.desc()).limit(20).all()
+        ledger = db.query(CarbonLedger).order_by(CarbonLedger.timestamp.desc()).limit(50).all()
+
+        dataset = {
+            "export_metadata": {
+                "timestamp": datetime.utcnow().isoformat() + "Z",
+                "node_id": "RIYADH_HQ_CLUSTER",
+                "schema_version": "2.1.0-Demo"
+            },
+            "satellite_telemetry": [
+                {"ts": s.timestamp.isoformat(), "aod": s.aod_550nm, "source": s.source_agency} for s in sat
+            ],
+            "sensor_telemetry": [
+                {"ts": s.timestamp.isoformat(), "tag": s.source_tag, "val": s.value} for s in sen
+            ],
+            "causal_predictions": [
+                {"ts": p.timestamp.isoformat(), "asset": p.asset_id, "fail_prob": p.failure_prob} for p in pred
+            ],
+            "carbon_ledger": [
+                {"ts": l.timestamp.isoformat(), "cert": l.certificate_id, "kg": l.esg_impact_kg} for l in ledger
+            ],
+            "causal_integrity_manifold": {
+                "global_stability": causal_engine.global_stability_index,
+                "structural_entropy": [n.structural_entropy for n in causal_engine.nodes.values()]
+            }
+        }
+        return dataset
+    finally:
+        db.close()
+
 # --- 10. ESG & SUSTAINABILITY ENDPOINTS ---
 @app.get("/v2/esg/impact", tags=["Sustainability"])
 async def get_esg_impact():
@@ -576,7 +619,7 @@ if __name__ == "__main__":
     import uvicorn
     # High-Performance Production Server Settings
     # Supports dynamic port binding for Railway/Cloud deployments
-    gateway_port = int(os.environ.get("PORT", 8005))
+    gateway_port = int(os.environ.get("PORT", 8080))
     uvicorn.run(
         app,
         host="0.0.0.0",
