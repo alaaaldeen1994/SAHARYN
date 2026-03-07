@@ -6,11 +6,27 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://admin:secure_pass@localhost:5432/resilience_db")
+# Build URL from individual components if DATABASE_URL is not set
+DB_USER = os.getenv("DB_USER", "saharyn_admin")
+DB_PASS = os.getenv("DB_PASSWORD", "secure_pass")
+DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_PORT = os.getenv("DB_PORT", "5432")
+DB_NAME = os.getenv("DB_NAME", "saharyn_prod")
+
+DEFAULT_URL = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+DATABASE_URL = os.getenv("DATABASE_URL", DEFAULT_URL)
+
+# Fallback to SQLite if we are in local development and Postgres fails
+if os.getenv("SAHARYN_ENV") == "DEVELOPMENT" and "postgresql" in DATABASE_URL:
+    try:
+        engine = create_engine(DATABASE_URL, connect_args={'connect_timeout': 2})
+        engine.connect()
+    except Exception:
+        DATABASE_URL = "sqlite:///./saharyn_dev.db"
 
 engine = create_engine(
     DATABASE_URL,
-    connect_args={'connect_timeout': 5} # Prevent long hangs if DB is down
+    connect_args={'connect_timeout': 5} if "sqlite" not in DATABASE_URL else {}
 )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

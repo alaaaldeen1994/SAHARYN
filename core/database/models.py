@@ -8,17 +8,51 @@ class Asset(Base):
     __tablename__ = "assets"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    site_id = Column(String, nullable=False, index=True)
     name = Column(String, nullable=False)
     type = Column(String, nullable=False)
     parent_id = Column(UUID(as_uuid=True), ForeignKey("assets.id"), nullable=True)
     critical_thresholds = Column(JSON, nullable=True)
+
+class SatelliteTelemetry(Base):
+    """TimescaleDB Hypertable Ready"""
+    __tablename__ = "satellite_telemetry"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    timestamp = Column(DateTime(timezone=True), primary_key=True, server_default=func.now(), index=True)
+    site_id = Column(String, nullable=False, index=True)
+    source_agency = Column(String, nullable=False) # NASA_MODIS_LIVE, COPERNICUS
+    
+    aod_550nm = Column(Float, nullable=False)
+    dust_concentration = Column(Float, nullable=True)
+    temp_2m_k = Column(Float, nullable=True)
+    wind_speed = Column(Float, nullable=True)
+    
+    integrity_hash = Column(String, nullable=False) # SHA-256
+
+class SensorTelemetry(Base):
+    """TimescaleDB Hypertable Ready"""
+    __tablename__ = "sensor_telemetry"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    timestamp = Column(DateTime(timezone=True), primary_key=True, server_default=func.now(), index=True)
+    asset_id = Column(String, nullable=False, index=True)
+    
+    vibration_mm_s = Column(Float, nullable=True)
+    bearing_temp_c = Column(Float, nullable=True)
+    flow_rate_m3_h = Column(Float, nullable=True)
+    pressure_bar = Column(Float, nullable=True)
+    power_kw = Column(Float, nullable=True)
+    
+    quality_code = Column(String, default="192") # OPC-UA Good
 
 class Prediction(Base):
     __tablename__ = "predictions"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     timestamp = Column(DateTime(timezone=True), server_default=func.now())
-    asset_id = Column(String, nullable=False) # Simplified for current integration
+    asset_id = Column(String, nullable=False, index=True)
+    site_id = Column(String, nullable=True)
     dsi_forecast = Column(Float, nullable=False)
     failure_prob = Column(Float, nullable=False)
     rec_action = Column(String, nullable=True)
