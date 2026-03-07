@@ -1,0 +1,30 @@
+{
+    "site_id": "RESILIENCE_PILOT_01",
+    "asset_id": "ME_COMP_PILOT_01",
+    "mappings": [
+        {
+            "internal_field": "vibration_mm_s",
+            "pi_tag": "\\\\PISERVER\\PILOT_SITE.COMP_01.VIB_TOTAL",
+            "sampling_rate_hz": 1,
+            "unit": "mm/s"
+        },
+        {
+            "internal_field": "bearing_temp_c",
+            "pi_tag": "\\\\PISERVER\\PILOT_SITE.COMP_01.TEMP_BEARING_DE",
+            "sampling_rate_hz": 0.016,
+            "unit": "C"
+        },
+        {
+            "internal_field": "pressure_bar",
+            "pi_tag": "\\\\PISERVER\\PILOT_SITE.COMP_01.PRESS_DELTA_FILTER",
+            "sampling_rate_hz": 0.1,
+            "unit": "bar"
+        },
+        {
+            "internal_field": "power_kw",
+            "pi_tag": "\\\\PISERVER\\PILOT_SITE.COMP_01.POWER_ACTUAL",
+            "sampling_rate_hz": 0.033,
+            "unit": "kW"
+        }
+    ]
+}

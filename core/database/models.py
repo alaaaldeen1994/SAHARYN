@@ -31,20 +31,20 @@ class SatelliteTelemetry(Base):
     integrity_hash = Column(String, nullable=False) # SHA-256
 
 class SensorTelemetry(Base):
-    """TimescaleDB Hypertable Ready"""
+    """TimescaleDB Hypertable Ready - Long Format"""
     __tablename__ = "sensor_telemetry"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     timestamp = Column(DateTime(timezone=True), primary_key=True, server_default=func.now(), index=True)
+    site_id = Column(String, nullable=False, index=True)
     asset_id = Column(String, nullable=False, index=True)
     
-    vibration_mm_s = Column(Float, nullable=True)
-    bearing_temp_c = Column(Float, nullable=True)
-    flow_rate_m3_h = Column(Float, nullable=True)
-    pressure_bar = Column(Float, nullable=True)
-    power_kw = Column(Float, nullable=True)
+    source_tag = Column(String, nullable=False)
+    value = Column(Float, nullable=False)
+    unit = Column(String, nullable=True)
     
-    quality_code = Column(String, default="192") # OPC-UA Good
+    quality_code = Column(String, default="192") # OPC-UA Good (192) or Bad (0)
+    integrity_hash = Column(String, nullable=False) # SHA-256
 
 class Prediction(Base):
     __tablename__ = "predictions"
