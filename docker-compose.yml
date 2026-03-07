@@ -1,59 +1,47 @@
 version: '3.8'
 
-# SAHARYN AI v2.0 - PRODUCTION STACK
-# Local Instance for Testing and Pilot Site Rollout
-
 services:
-  # 1. Database Layer (PostgreSQL + TimescaleDB)
-  db:
-    image: timescale/timescaledb:latest-pg15
-    environment:
-      POSTGRES_USER: saharyn_admin
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-ENTERPRISE_SECRET_7M}
-      POSTGRES_DB: saharyn_prod
-    volumes:
-      - ./infrastructure/database/schema_v2.sql:/docker-entrypoint-initdb.d/schema_v2.sql
-      - db_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U saharyn_admin -d saharyn_prod" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # 2. API & AI Core Service
-  api:
-    build: .
-    depends_on:
-      db:
-        condition: service_healthy
-    environment:
-      DB_HOST: db
-      DB_NAME: saharyn_prod
-      DB_USER: saharyn_admin
-      DB_PASS: ${DB_PASSWORD:-ENTERPRISE_SECRET_7M}
-    ports:
-      - "8002:8002"
-    restart: always
-
-  # 3. Satellite ETL Service
+  # 1. Atmospheric Pipeline (Live NASA/Copernicus Bridge)
   satellite_etl:
     build: .
-    command: [ "python", "services/ingestion/satellite_etl.py" ]
-    depends_on:
-      - db
-    environment:
-      DB_HOST: db
-      CAMS_API_KEY: ${CAMS_API_KEY}
+    restart: always
+    command: python services/ingestion/satellite_etl.py
+    env_file: .env
+    volumes:
+      - satellite_cache:/app/data/raw/satellite
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
 
-  # 4. SCADA Bridge Service
-  scada_bridge:
+  # 2. Industrial Sensor Collector (PI Web API Bridge)
+  sensor_collector:
     build: .
-    command: [ "python", "services/ingestion/scada_bridge.py" ]
+    restart: always
+    command: python services/ingestion/sensor_collector.py
+    env_file: .env
     depends_on:
-      - db
-    network_mode: "host" # Needed for direct OT device communication in some PLC networks
+      - satellite_etl
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
+
+  # 3. API Gateway & Inference Hub
+  api_gateway:
+    build: .
+    restart: always
+    ports:
+      - "8000:8000"
+    command: python apps/api_gateway/main.py
+    env_file: .env
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 volumes:
-  db_data:
+  satellite_cache:

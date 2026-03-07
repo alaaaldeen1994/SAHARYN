@@ -72,8 +72,9 @@ class PIWebAPIConnector:
 
     def _connect(self):
         """Initialize PI Web API session."""
-        if not PI_WEBAPI_URL:
-            logger.warning("PI_WEBAPI_URL not set. PI Web API connector disabled.")
+        if not PI_WEBAPI_URL or "dummy" in PI_WEBAPI_URL.lower():
+            logger.warning("PI_WEBAPI_URL not set or DUMMY. Maintaining SIMULATION_MODE.")
+            self._available = False
             return
 
         # Configure authentication

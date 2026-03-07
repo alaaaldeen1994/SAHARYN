@@ -1,40 +1,36 @@
-# SAHARYN AI v2.1 - INSTITUTIONAL PRODUCTION CONTAINER
-# Target: Railway.app / Enterprise Cloud / High-Availability Clusters
-
-FROM python:3.11-slim
+# SAHARYN AI — Edge Node Dockerfile (Purdue Level 3 Architecture)
+# -------------------------------------------------------------
+FROM python:3.11-slim-bookworm as builder
 
 WORKDIR /app
+COPY requirements.txt .
+RUN pip install --user --no-cache-dir -r requirements.txt
 
-# System Dependencies
+FROM python:3.11-slim-bookworm
+WORKDIR /app
+
+# Install system dependencies (for cfgrib and numerical stability)
 RUN apt-get update && apt-get install -y \
-    build-essential \
-    libpq-dev \
+    libeccodes-dev \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python Requirements
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy installed python packages from builder
+COPY --from=builder /root/.local /root/.local
+COPY . .
 
-# Copy All Logic & Assets
-COPY services/ ./services/
-COPY apps/ ./apps/
-COPY core/ ./core/
-COPY infrastructure/ ./infrastructure/
-# Copy metadata/configs if needed
-COPY README.md .
-
-# Security: Run as non-privileged user
-RUN addgroup --system saharyn && adduser --system --group saharyn
-RUN chown -R saharyn:saharyn /app
-USER saharyn
-
-# Deployment Environment
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+# Environment Defaults
+ENV PATH=/root/.local/bin:$PATH
 ENV PYTHONPATH=/app
-ENV PORT=8005
+ENV SAHARYN_ENV=PRODUCTION
+ENV SAHARYN_SATELLITE_MODE=LIVE
 
-EXPOSE 8005
+# Industrial Compliance: Read-only Root FS support
+RUN mkdir -p /app/data/raw/satellite && chmod 777 /app/data/raw/satellite
 
-# Execute High-Fidelity API Gateway
-CMD ["python", "apps/api_gateway/main.py"]
+# Healthcheck for Plant Operators
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# Entrypoint: Start the Sensor Collector by default
+CMD ["python", "services/ingestion/sensor_collector.py"]
