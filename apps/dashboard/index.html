@@ -1079,10 +1079,11 @@
 
         <h1 data-i18n="hero_h1">Predict Failures<br><span class="dim">before they happen.</span></h1>
         <p class="hero-sub" data-i18n="hero_sub">
-            SAHARYN AI combines satellite environmental intelligence with industrial telemetry and causal AI modeling to
-            predict equipment failures before they occur. By monitoring atmospheric dust, wind, temperature, and
-            mechanical stress signals such as vibration and pressure, the system identifies risk patterns and alerts
-            operators up to 48 hours before a potential failure.
+            <strong>SAHARYN AI</strong> integrates <strong>satellite environmental intelligence</strong> with industrial
+            telemetry and <strong>causal AI modeling</strong> to predict equipment failures before they occur. By
+            monitoring atmospheric dust, wind, temperature, and mechanical stress signals—such as vibration and
+            pressure—the system identifies risk patterns and alerts operators up to <strong>48 hours</strong> before a
+            potential failure.
         </p>
         <div class="hero-actions">
             <a href="console.html" class="btn-primary" data-i18n="hero_cta">Open Mission Control</a>
@@ -1435,129 +1436,31 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script type="module">
-        // ── SAHARYN Satellite Intelligence 3D Engine ──
+        // ── Three.js Background ──
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, innerWidth / innerHeight, 0.1, 2000);
+        const camera = new THREE.PerspectiveCamera(75, innerWidth / innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), antialias: true, alpha: true });
         renderer.setSize(innerWidth, innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-        // 1. Desert Terrain (Meshed Grid)
-        const terrainGeo = new THREE.PlaneGeometry(1600, 1600, 100, 100);
-        const terrainMat = new THREE.MeshPhongMaterial({
-            color: 0x0c1523,
-            wireframe: true,
-            transparent: true,
-            opacity: 0.15,
-            emissive: 0x10b981,
-            emissiveIntensity: 0.05
-        });
-        const terrain = new THREE.Mesh(terrainGeo, terrainMat);
-        terrain.rotation.x = -Math.PI / 2;
-        terrain.position.y = -300;
-
-        // Populate terrain with industrial data points (Holographic markers)
-        const vertices = terrainGeo.attributes.position;
-        for (let i = 0; i < vertices.count; i++) {
-            const x = vertices.getX(i);
-            const y = vertices.getY(i);
-            const z = (Math.sin(x / 100) * Math.cos(y / 100) * 30) + (Math.random() * 5);
-            vertices.setZ(i, z);
+        const geo = new THREE.PlaneGeometry(1200, 1200, 60, 60);
+        const mat = new THREE.MeshBasicMaterial({ color: 0x10b981, wireframe: true, transparent: true, opacity: 0.07 });
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.rotation.x = -Math.PI / 2.5;
+        mesh.position.y = -200;
+        const pos = geo.attributes.position;
+        for (let i = 0; i < pos.count; i++) {
+            pos.setZ(i, (Math.sin(pos.getX(i) / 50) * Math.cos(pos.getY(i) / 50) * 40) + Math.random() * 4);
         }
-        scene.add(terrain);
-
-        // 2. Industrial Infrastructure (Simplified Digital Twin models)
-        const industrialGroup = new THREE.Group();
-        const boxGeo = new THREE.BoxGeometry(40, 40, 40);
-        const buildMat = new THREE.MeshPhongMaterial({ color: 0x1e293b, transparent: true, opacity: 0.4 });
-
-        // Add some "facilities"
-        for (let i = 0; i < 8; i++) {
-            const b = new THREE.Mesh(boxGeo, buildMat);
-            const rX = (Math.random() - 0.5) * 800;
-            const rZ = (Math.random() - 0.5) * 800;
-            b.position.set(rX, -280, rZ);
-            b.scale.y = Math.random() * 3 + 1;
-            industrialGroup.add(b);
-
-            // Add a status light on top
-            const light = new THREE.PointLight(0x10b981, 0.5, 100);
-            light.position.set(rX, -280 + (b.scale.y * 20), rZ);
-            industrialGroup.add(light);
-        }
-        scene.add(industrialGroup);
-
-        // 3. Satellite Scanning Beam (Moving cone/line)
-        const beamGeo = new THREE.CylinderGeometry(0, 150, 600, 32, 1, true);
-        const beamMat = new THREE.MeshBasicMaterial({
-            color: 0x10b981,
-            transparent: true,
-            opacity: 0.1,
-            side: THREE.DoubleSide,
-            blending: THREE.AdditiveBlending
-        });
-        const scanBeam = new THREE.Mesh(beamGeo, beamMat);
-        scanBeam.position.y = 0;
-        scene.add(scanBeam);
-
-        // 4. Atmospheric Particles (Sandstorm/AOD simulation)
-        const partCount = 2000;
-        const partGeo = new THREE.BufferGeometry();
-        const partPos = new Float32Array(partCount * 3);
-        for (let i = 0; i < partCount * 3; i++) {
-            partPos[i] = (Math.random() - 0.5) * 2000;
-        }
-        partGeo.setAttribute('position', new THREE.BufferAttribute(partPos, 3));
-        const partMat = new THREE.PointsMaterial({
-            color: 0x10b981,
-            size: 2,
-            transparent: true,
-            opacity: 0.3,
-            blending: THREE.AdditiveBlending
-        });
-        const particles = new THREE.Points(partGeo, partMat);
-        scene.add(particles);
-
-        // 5. Lighting
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
-        scene.add(ambientLight);
-        const directionalLight = new THREE.DirectionalLight(0x10b981, 0.8);
-        directionalLight.position.set(500, 500, 500);
-        scene.add(directionalLight);
-
-        camera.position.z = 800;
-        camera.position.y = 200;
-
-        let clock = new THREE.Clock();
-        let mouseX = 0, mouseY = 0;
-        document.addEventListener('mousemove', e => {
-            mouseX = (e.clientX - innerWidth / 2) / innerWidth;
-            mouseY = (e.clientY - innerHeight / 2) / innerHeight;
-        });
-
-        function animate() {
-            requestAnimationFrame(animate);
-            const time = clock.getElapsedTime();
-
-            // Rotate components
-            terrain.rotation.z += 0.0005;
-            particles.rotation.y += 0.001;
-            particles.rotation.x += 0.0005;
-
-            // Animate scanning beam
-            scanBeam.position.x = Math.sin(time * 0.5) * 400;
-            scanBeam.position.z = Math.cos(time * 0.3) * 300;
-            scanBeam.rotation.z = Math.sin(time * 0.5) * 0.1;
-
-            // Camera interaction
-            camera.position.x += (mouseX * 150 - camera.position.x) * 0.05;
-            camera.position.y += (-mouseY * 150 + 200 - camera.position.y) * 0.05;
-            camera.lookAt(0, -150, 0);
-
+        scene.add(mesh); camera.position.z = 450;
+        let tx = 0, ty = 0;
+        document.addEventListener('mousemove', e => { tx = (e.clientX - innerWidth / 2) / 1200; ty = (e.clientY - innerHeight / 2) / 1200; });
+        (function anim() {
+            requestAnimationFrame(anim);
+            mesh.rotation.z += 0.0004;
+            camera.position.x += (tx * 80 - camera.position.x) * 0.04;
+            camera.position.y += (-ty * 80 - camera.position.y) * 0.04;
+            camera.lookAt(0, -100, 0);
             renderer.render(scene, camera);
-        }
-        animate();
-
+        })();
         window.addEventListener('resize', () => {
             camera.aspect = innerWidth / innerHeight;
             camera.updateProjectionMatrix();
@@ -1616,7 +1519,7 @@
                 nav_impact: 'IMPACT', nav_sec: 'SECTORS', nav_tech: 'TECHNOLOGY',
                 nav_cta: 'Sign In / Sign Up',
                 hero_h1: 'Predict Failures<br><span class="dim">before they happen.</span>',
-                hero_sub: 'SAHARYN AI combines satellite environmental intelligence with industrial telemetry and causal AI modeling to predict equipment failures before they occur. By monitoring atmospheric dust, wind, temperature, and mechanical stress signals such as vibration and pressure, the system identifies risk patterns and alerts operators up to 48 hours before a potential failure.',
+                hero_sub: '<strong>SAHARYN AI</strong> integrates <strong>satellite environmental intelligence</strong> with industrial telemetry and <strong>causal AI modeling</strong> to predict equipment failures before they occur. By monitoring atmospheric dust, wind, temperature, and mechanical stress signals—such as vibration and pressure—the system identifies risk patterns and alerts operators up to <strong>48 hours</strong> before a potential failure.',
                 hero_cta: 'Open Mission Control',
                 stat_warning: 'Average Early Warning',
                 stat_sat: 'Satellite Data Sources',
@@ -1700,7 +1603,7 @@
                 nav_impact: 'الأثر', nav_sec: 'القطاعات', nav_tech: 'التكنولوجيا',
                 nav_cta: 'تسجيل الدخول / الاشتراك',
                 hero_h1: 'توقع الأعطال<br><span class="dim">قبل حدوثها.</span>',
-                hero_sub: 'تجمع صحارين AI بين الذكاء البيئي للأقمار الصناعية والقياس الصناعي عن بُعد ونمذجة الذكاء الاصطناعي السببي للتنبؤ بأعطال المعدات قبل حدوثها. ومن خلال مراقبة الغبار الجوي والرياح ودرجة الحرارة وإشارات الإجهاد الميكانيكي مثل الاهتزاز والضغط، يحدد النظام أنماط المخاطر وينبه المشغلين قبل 48 ساعة من وقوع عطل محتمل.',
+                hero_sub: 'تدمج <strong>صحارين AI</strong> تقنيات <strong>الذكاء البيئي للأقمار الصناعية</strong> مع القياس الصناعي والنمذجة بواسطة <strong>الذكاء الاصطناعي السببي</strong> للتنبؤ بأعطال المعدات قبل حدوثها. ومن خلال مراقبة الغبار الجوي والرياح ودرجة الحرارة وإشارات الإجهاد الميكانيكي—مثل الاهتزاز والضغط—يحدد النظام أنماط المخاطر وينبه المشغلين قبل <strong>48 ساعة</strong> من وقوع عطل محتمل.',
                 hero_cta: 'فتح مركز العمليات',
                 stat_warning: 'متوسط الإنذار المبكر',
                 stat_sat: 'مصادر بيانات الأقمار الصناعية',
