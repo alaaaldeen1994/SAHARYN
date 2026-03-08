@@ -252,26 +252,60 @@
             color: var(--accent-green);
         }
 
+        /* Standardized Header Controls */
+        .header-control {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            padding: 4px 12px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 32px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .header-control:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        .header-control.active-green {
+            background: rgba(16, 185, 129, 0.05);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: var(--accent-green);
+        }
+
         .status-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--accent-green);
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
+            background: var(--accent-green);
             box-shadow: 0 0 8px var(--accent-green);
             animation: pulse 2s infinite;
         }
 
         @keyframes pulse {
             0% {
-                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+                opacity: 0.6;
+                transform: scale(1);
             }
 
-            70% {
-                box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+            50% {
+                opacity: 1;
+                transform: scale(1.2);
             }
 
             100% {
-                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+                opacity: 0.6;
+                transform: scale(1);
             }
         }
 
@@ -774,38 +808,33 @@
                     <option value="EMEA_COAST_02" data-i18n="site_2">EMEA_COAST_02 (Corrosive Coastal)</option>
                 </select>
             </div>
-            <div class="header-right" style="display: flex; align-items: center; gap: 15px;">
-                <button onclick="toggleLanguage()" id="lang-toggle"
-                    style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--accent-green); color: var(--accent-green); padding: 8px 16px; border-radius: 6px; font-family: 'JetBrains Mono'; font-size: 11px; cursor: pointer; font-weight: 800; transition: 0.3s;">EN
-                    / AR</button>
-                <div class="mono" style="font-size: 12px; color: var(--text-secondary);" id="clock">00:00:00 UTC</div>
-                <div id="api-status"
-                    style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 4px 12px; border-radius: 4px; display: flex; align-items: center; gap: 8px;">
-                    <div class="status-dot" id="api-status-dot"
-                        style="width: 6px; height: 6px; background: var(--accent-green); border-radius: 50%;"></div>
-                    <span id="api-status-text"
-                        style="font-family: 'JetBrains Mono'; font-size: 10px; color: var(--accent-green); letter-spacing: 1px;">PHYSICS-INFORMED
-                        AI STABILITY: NOMINAL</span>
+            <div class="header-right" style="display: flex; align-items: center; gap: 12px;">
+                <div onclick="toggleLanguage()" class="header-control" id="lang-toggle-container">
+                    <i data-lucide="languages" size="14"></i>
+                    <span id="lang-display" style="font-weight: 800;">EN</span>
                 </div>
+
+                <div class="mono" style="font-size: 11px; color: var(--text-secondary); opacity: 0.8;" id="clock">
+                    00:00:00 UTC</div>
+
+                <div id="api-status" class="header-control active-green">
+                    <div class="status-dot" id="api-status-dot"></div>
+                    <span id="api-status-text" data-i18n="api_status_nominal">AI_CORE: ONLINE</span>
+                </div>
+
                 <div id="stability-control" title="Requires ADMIN role" onclick="toggleStabilityMode()"
-                    aria-disabled="true"
-                    style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 4px 12px; border-radius: 4px; display: flex; align-items: center; gap: 8px; cursor: not-allowed; transition: 0.3s; opacity: 0.4; pointer-events: none;">
-                    <i data-lucide="anchor" id="stab-icon" size="14" color="var(--text-secondary)"></i>
-                    <span id="stab-label"
-                        style="font-family: 'JetBrains Mono'; font-size: 10px; color: var(--text-secondary); letter-spacing: 1px;">STABILITY_LOCKED:
-                        OFF</span>
-                    <i data-lucide="lock" id="stab-lock-icon" size="11" color="var(--text-secondary)"
-                        style="margin-left: 2px;"></i>
+                    aria-disabled="true" class="header-control" style="opacity: 0.4; pointer-events: none;">
+                    <i data-lucide="anchor" id="stab-icon" size="14"></i>
+                    <span id="stab-label" data-i18n="stability_off">STABILITY_LOCKED: OFF</span>
+                    <i data-lucide="lock" id="stab-lock-icon" size="11" style="margin-left: 2px;"></i>
                 </div>
+
                 <div id="sovereign-control" title="Requires ADMIN role" data-rbac-action="toggle_sovereign"
-                    onclick="toggleSovereignMode()" aria-disabled="true"
-                    style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 4px 12px; border-radius: 4px; display: flex; align-items: center; gap: 8px; cursor: not-allowed; transition: 0.3s; opacity: 0.4; pointer-events: none;">
-                    <i data-lucide="shield-alert" id="sov-icon" size="14" color="var(--text-secondary)"></i>
-                    <span id="sov-label"
-                        style="font-family: 'JetBrains Mono'; font-size: 10px; color: var(--text-secondary); letter-spacing: 1px;">SOVEREIGN_MODE:
-                        OFF</span>
-                    <i data-lucide="lock" id="sov-lock-icon" size="11" color="var(--text-secondary)"
-                        style="margin-left: 2px;"></i>
+                    onclick="toggleSovereignMode()" aria-disabled="true" class="header-control"
+                    style="opacity: 0.4; pointer-events: none;">
+                    <i data-lucide="shield-alert" id="sov-icon" size="14"></i>
+                    <span id="sov-label" data-i18n="sov_off">SOVEREIGN_MODE: OFF</span>
+                    <i data-lucide="lock" id="sov-lock-icon" size="11" style="margin-left: 2px;"></i>
                 </div>
                 <div class="user-dropdown" id="profile-dropdown">
                     <div class="user-avatar" id="user-avatar-container">
@@ -2397,18 +2426,18 @@
 
                 if (data.status === 'SUCCESS') {
                     if (data.sovereign_mode) {
-                        sovLabel.innerText = 'SOVEREIGN_MODE: ON';
+                        sovLabel.setAttribute('data-i18n', 'sov_on');
+                        sovLabel.innerText = translations[currentLang]['sov_on'];
                         sovLabel.style.color = 'var(--accent-green)';
                         sovIcon.setAttribute('color', 'var(--accent-green)');
-                        control.style.borderColor = 'var(--accent-green)';
-                        control.style.background = 'rgba(16, 185, 129, 0.05)';
+                        control.classList.add('active-green');
                         logEvent("S-EDGE ENGAGED: All AI inference running locally on KSA-based edge nodes.", "warn");
                     } else {
-                        sovLabel.innerText = 'SOVEREIGN_MODE: OFF';
+                        sovLabel.setAttribute('data-i18n', 'sov_off');
+                        sovLabel.innerText = translations[currentLang]['sov_off'];
                         sovLabel.style.color = 'var(--text-secondary)';
                         sovIcon.setAttribute('color', 'var(--text-secondary)');
-                        control.style.borderColor = 'var(--border-color)';
-                        control.style.background = 'rgba(255,255,255,0.03)';
+                        control.classList.remove('active-green');
                         logEvent("CLOUD_UPLINK_RESTORED: Global telemetry relay active.", "info");
                     }
                     if (typeof lucide !== 'undefined') lucide.createIcons();
@@ -2430,18 +2459,18 @@
 
                 if (data.status === 'SUCCESS') {
                     if (data.demo_stability_mode) {
-                        stabLabel.innerText = 'STABILITY_LOCKED: ON';
+                        stabLabel.setAttribute('data-i18n', 'stability_on');
+                        stabLabel.innerText = translations[currentLang]['stability_on'];
                         stabLabel.style.color = 'var(--accent-green)';
                         stabIcon.setAttribute('color', 'var(--accent-green)');
-                        control.style.borderColor = 'var(--accent-green)';
-                        control.style.background = 'rgba(16, 185, 129, 0.05)';
+                        control.classList.add('active-green');
                         logEvent("STABILITY_LOCKED: Satellite ingestion frozen to prevent narrative jumps.", "info");
                     } else {
-                        stabLabel.innerText = 'STABILITY_LOCKED: OFF';
+                        stabLabel.setAttribute('data-i18n', 'stability_off');
+                        stabLabel.innerText = translations[currentLang]['stability_off'];
                         stabLabel.style.color = 'var(--text-secondary)';
                         stabIcon.setAttribute('color', 'var(--text-secondary)');
-                        control.style.borderColor = 'var(--border-color)';
-                        control.style.background = 'rgba(255,255,255,0.03)';
+                        control.classList.remove('active-green');
                         logEvent("STABILITY_RELEASED: Resuming live satellite telemetry streams.", "info");
                     }
                     if (typeof lucide !== 'undefined') lucide.createIcons();
@@ -3065,6 +3094,11 @@
                 priority_lvl: "PRIORITY_LEVEL",
                 critical: "CRITICAL",
                 optimal: "OPTIMAL",
+                api_status_nominal: "AI_CORE: ONLINE",
+                stability_off: "STABILITY_LOCKED: OFF",
+                stability_on: "STABILITY_LOCKED: ON",
+                sov_off: "SOVEREIGN_MODE: OFF",
+                sov_on: "SOVEREIGN_MODE: ON",
                 // Action Keys
                 EMERGENCY_SHUTDOWN_SEQUENCE: "EMERGENCY SHUTDOWN SEQUENCE",
                 DYNAMIC_LOAD_REDUCTION: "DYNAMIC LOAD REDUCTION",
@@ -3148,6 +3182,11 @@
                 nav_settings: "Settings",
                 nav_esg: "ESG & Carbon Intelligence",
                 nav_energy: "Energy Intelligence",
+                api_status_nominal: "AI_CORE: ONLINE",
+                stability_off: "STABILITY_LOCKED: OFF",
+                stability_on: "STABILITY_LOCKED: ON",
+                sov_off: "SOVEREIGN_MODE: OFF",
+                sov_on: "SOVEREIGN_MODE: ON",
                 mission_solar: "Renewable Asset Intelligence (Solar DSI)",
                 mission_flare: "Emission Reduction (Flare Prevention)",
                 solar_desc: "Physics-based Dust Deposition (DSI) modeling to predict cleaning cycles and recover lost generation efficiency.",
@@ -3300,7 +3339,12 @@
                 demo_filter: "تدهور نظام الترشيح",
                 demo_replay: "محاكاة الخط الزمني",
                 demo_reset: "إعادة ضبط النظام",
-                demo_export: "تصدير مجموعة البيانات"
+                demo_export: "تصدير مجموعة البيانات",
+                api_status_nominal: "نظام الذكاء: متصل",
+                stability_off: "قفل الاستقرار: إيقاف",
+                stability_on: "قفل الاستقرار: نشط",
+                sov_off: "الوضع السيادي: إيقاف",
+                sov_on: "الوضع السيادي: نشط"
             }
         };
 
@@ -3332,6 +3376,13 @@
             // Re-trigger dynamic rendering to update text inside templates
             renderCausalGraph('SA_EAST_RU_01');
             triggerAnalysis();
+
+            // Update language display
+            const langDisplay = document.getElementById('lang-display');
+            if (langDisplay) langDisplay.innerText = currentLang.toUpperCase();
+
+            // Refresh Icons for flipped layout
+            if (typeof lucide !== 'undefined') lucide.createIcons();
 
             logEvent(currentLang === 'ar' ? "تم تغيير اللغة إلى العربية" : "Language switched to English", 'info');
         }
