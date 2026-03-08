@@ -1584,21 +1584,20 @@
                     style="padding: 20px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
                     <div style="display: flex; gap: 30px;">
                         <div style="display: flex; align-items: center; gap: 8px;">
-                            <div
-                                style="width: 10px; height: 10px; background: var(--accent-green); border-radius: 2px;">
-                            </div>
-                            <span style="font-size: 10px; opacity: 0.6;">STABLE</span>
+                            <div style="width: 10px; height: 10px; background: #10b981; border-radius: 2px;"></div>
+                            <span style="font-size: 10px; opacity: 0.6;" data-i18n="staged_normal">NORMAL</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px;">
-                            <div
-                                style="width: 10px; height: 10px; background: var(--accent-amber); border-radius: 2px;">
-                            </div>
-                            <span style="font-size: 10px; opacity: 0.6;">WARNING</span>
+                            <div style="width: 10px; height: 10px; background: #f59e0b; border-radius: 2px;"></div>
+                            <span style="font-size: 10px; opacity: 0.6;" data-i18n="staged_warning">WARNING</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px;">
-                            <div style="width: 10px; height: 10px; background: var(--accent-red); border-radius: 2px;">
-                            </div>
-                            <span style="font-size: 10px; opacity: 0.6;">CRITICAL</span>
+                            <div style="width: 10px; height: 10px; background: #f97316; border-radius: 2px;"></div>
+                            <span style="font-size: 10px; opacity: 0.6;" data-i18n="staged_high">HIGH RISK</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 10px; height: 10px; background: #ef4444; border-radius: 2px;"></div>
+                            <span style="font-size: 10px; opacity: 0.6;" data-i18n="staged_critical">CRITICAL</span>
                         </div>
                     </div>
                     <div style="font-family: 'JetBrains Mono'; font-size: 11px; color: var(--accent-red); font-weight: 800;"
@@ -2728,11 +2727,19 @@
                         document.getElementById('dominant-threat').style.color = maxThreat.includes('SALT') ? '#3b82f6' : (maxThreat.includes('THERMAL') ? '#ef4444' : '#10b981');
                     }
 
-                    // 3. Update Chart
+                    // 3. Update Chart with realistic decay curve
                     if (data.diagnostics && data.diagnostics.simulated_degradation) {
                         degChart.data.datasets[0].data = data.diagnostics.simulated_degradation;
                     } else {
-                        degChart.data.datasets[0].data = Array.from({ length: 24 }, (_, i) => 100 - (data.asset_impact.failure_probability * 100) - (i / (2 + Math.random())));
+                        // Current health is the start point (t=0)
+                        const current_health = 100 - (data.asset_impact.failure_probability * 100);
+                        // Projecting degradation over 24h assuming environmental parameters stay constant
+                        degChart.data.datasets[0].data = Array.from({ length: 24 }, (_, i) => {
+                            // Exponential decay model for visualization
+                            // Health = Health_0 * e^(-decay * time)
+                            const decay_rate = (data.asset_impact.failure_probability * 0.1) + (i * 0.015);
+                            return Math.max(0, current_health * Math.exp(-decay_rate * (i / 24)));
+                        });
                     }
                     degChart.update();
 
@@ -2765,6 +2772,37 @@
                             const savingsLabel = currentLang === 'ar' ? 'توفير مقدر' : 'EST_SAVINGS';
                             const copyText = `${actionLabel}: ${localizedAction}\n${rationaleLabel}: ${localizedRationale}\n${savingsLabel}: $${rec.avoided_cost_est}`;
 
+                            let breakdownStr = '';
+                            if (rec.avoided_cost_detail) {
+                                breakdownStr = `
+                                    <div style="font-size: 9px; color: #94a3b8; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 4px; margin-top: 4px;">
+                                        <div style="display: flex; justify-content: space-between;"><span>Replacement:</span><span>$${rec.avoided_cost_detail.equipment_replacement_cost.toLocaleString()}</span></div>
+                                        <div style="display: flex; justify-content: space-between;"><span>Prod. Loss (${rec.avoided_cost_detail.downtime_hours}h):</span><span>$${rec.avoided_cost_detail.production_loss.toLocaleString()}</span></div>
+                                    </div>
+                                `;
+                            }
+
+                            let predStr = '';
+                            if (rec.prediction_window) {
+                                predStr = `
+                                    <div style="margin-top: 8px; padding: 8px; background: rgba(59, 130, 246, 0.1); border-left: 2px solid #3b82f6; border-radius: 2px;">
+                                        <div style="font-size: 11px; font-weight: bold; color: #60a5fa;">Predicted Failure Window: ${rec.prediction_window}</div>
+                                        <div style="font-size: 10px; color: #93c5fd;">Confidence Level: ${(rec.confidence * 100).toFixed(0)}%</div>
+                                    </div>
+                                `;
+                            }
+
+                            let traceStr = '';
+                            if (rec.root_cause_trace && rec.root_cause_trace.length > 0) {
+                                const steps = rec.root_cause_trace.map(s => `<span>${s}</span>`).join('<span style="color:#475569; margin: 0 4px;">&rarr;</span>');
+                                traceStr = `
+                                    <div style="margin-top: 8px; font-size: 10px; color: #cbd5e1; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05); font-family: monospace;">
+                                        <div style="color: #94a3b8; margin-bottom: 4px; font-weight: bold;">[ROOT CAUSE TRACE]</div>
+                                        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px; line-height: 1.4;">${steps}</div>
+                                    </div>
+                                `;
+                            }
+
                             pStack.innerHTML += `
                                 <div class="${cls}" style="animation: fadeUp 0.3s ease forwards; animation-delay: ${i * 0.1}s; opacity: 0; margin-bottom: 12px; border-left: 4px solid ${isCrit ? '#ef4444' : 'var(--accent-green)'}; background: rgba(15, 23, 42, 0.7); padding: 16px; position: relative; overflow: hidden; border-radius: 4px; border-right: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);">
                                     <div class="action-badge-container" style="position: absolute; top: 12px; right: 12px; display: flex; flex-direction: column; align-items: flex-end; gap: 5px; z-index: 5;">
@@ -2777,12 +2815,15 @@
                                         <span class="action-title mono" style="font-weight: 700; color: #fff; font-size: 13px; line-height: 1.4; display: block; word-break: break-all;">${localizedAction}</span>
                                     </div>
                                     <div style="color: #cbd5e1; font-size: 13px; margin-bottom: 12px; line-height: 1.5; font-weight: 400; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px;">${localizedRationale}</div>
-                                    <div style="font-family: 'JetBrains Mono'; font-size: 11px; display: flex; flex-direction: column; gap: 4px; color: var(--accent-green); background: rgba(0,0,0,0.5); padding: 10px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05);">
+                                    ${predStr}
+                                    ${traceStr}
+                                    <div style="font-family: 'JetBrains Mono'; font-size: 11px; display: flex; flex-direction: column; gap: 4px; color: var(--accent-green); background: rgba(0,0,0,0.5); padding: 10px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05); margin-top: 10px;">
                                         <div style="display: flex; justify-content: space-between;">
                                             <span>${t.avoided_loss}:</span>
                                             <strong style="color: #fff;">$${Math.round(rec.avoided_cost_est).toLocaleString()}</strong>
                                         </div>
-                                        <div style="display: flex; justify-content: space-between;">
+                                        ${breakdownStr}
+                                        <div style="display: flex; justify-content: space-between; margin-top: 4px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 4px;">
                                             <span>${t.priority_lvl}:</span>
                                             <span style="color: ${isCrit ? '#ef4444' : 'var(--text-secondary)'}; font-weight: 800;">${rec.priority === 1 ? t.critical : t.optimal}</span>
                                         </div>
@@ -3008,6 +3049,11 @@
                 tel_node_ref: "NODE_REF",
                 tel_intensity: "INTENSITY",
                 tel_variance: "VARIANCE",
+                TECHNICAL_INSPECTION_REQUIRED: "TECHNICAL INSPECTION REQUIRED",
+                staged_normal: "NORMAL",
+                staged_warning: "WARNING",
+                staged_high: "HIGH RISK",
+                staged_critical: "CRITICAL",
                 demo_sandstorm: "SANDSTORM",
                 demo_heat: "HEAT_STRESS",
                 demo_filter: "FILTER_DEG",
@@ -3178,6 +3224,11 @@
                 mission_flare: "تخفيض الانبعاثات (منع حرق الغاز)",
                 solar_desc: "نمذجة ترسيب الغبار (DSI) القائمة على الفيزياء للتنبؤ بدورات التنظيف واستعادة كفاءة التوليد المفقودة.",
                 flare_desc: "ربط حالات شذوذ الإجهاد الميكانيكي بأحداث حرق الغاز التلقائية لتوليد أرصدة كربونية قابلة للتحقق.",
+                TECHNICAL_INSPECTION_REQUIRED: "فحص فني مطلوب",
+                staged_normal: "طبيعي",
+                staged_warning: "تحذير",
+                staged_high: "مخاطر عالية",
+                staged_critical: "خطورة هندسية",
                 demo_sandstorm: "محاكاة عاصفة رملية",
                 demo_heat: "إجهاد حراري فائق",
                 demo_filter: "تدهور نظام الترشيح",

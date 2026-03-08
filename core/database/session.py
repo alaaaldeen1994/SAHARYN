@@ -16,8 +16,8 @@ DB_NAME = os.getenv("DB_NAME", "saharyn_prod")
 DEFAULT_URL = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 DATABASE_URL = os.getenv("DATABASE_URL", DEFAULT_URL)
 
-# Fallback to SQLite if we are in local development and Postgres fails
-if os.getenv("SAHARYN_ENV") == "DEVELOPMENT" and "postgresql" in DATABASE_URL:
+# Fallback to SQLite if Postgres fails
+if "postgresql" in DATABASE_URL:
     try:
         engine = create_engine(DATABASE_URL, connect_args={'connect_timeout': 2})
         engine.connect()

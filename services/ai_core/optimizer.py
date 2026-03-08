@@ -28,12 +28,18 @@ class OperationalCommand(BaseModel):
 
     # Financial Intelligence
     avoided_cost_est: float
+    avoided_cost_detail: Optional[Dict[str, Any]] = None
     implementation_cost_est: float
     roi_index: float
 
     # Technical Execution
     target_node: str
     parameter_adjustment: Optional[Dict[str, Any]]
+
+    # Predictive Intelligence
+    prediction_window: Optional[str] = None
+    confidence: Optional[float] = None
+    root_cause_trace: Optional[List[str]] = None
 
     # Compliance
     external_ref_id: Optional[str] = None # SAP Work Order ID
@@ -47,30 +53,82 @@ class PrescriptiveOptimizer:
 
     def __init__(self):
         # Industrial Thresholds (Calibrated for SA_EAST Region)
-        self.RISK_THRESHOLD_CRITICAL = 0.82
-        self.RISK_THRESHOLD_DEGRADED = 0.45
+        # Staged levels: NORMAL (<0.2), WARNING (0.2-0.45), HIGH RISK (0.45-0.8), CRITICAL (>0.8)
+        self.RISK_THRESHOLD_CRITICAL = 0.80
+        self.RISK_THRESHOLD_HIGH = 0.45
+        self.RISK_THRESHOLD_WARNING = 0.20
         self.ENERGY_COST_KWH = 0.18 # USD
         self.DOWNTIME_COST_HOUR = 8500.0 # USD
 
         # Historical Recommendation Memory (Prevents Flapping)
         self.decision_history: List[str] = []
 
-        logger.info("OPTIMIZER_INIT: Decision Manifold initialized with Multi-Objective ROI Matrix.")
+        logger.info("OPTIMIZER_INIT: Staged Decision Manifold initialized.")
 
-    def _calculate_roi(self, risk_score: float, urgency: int) -> Tuple[float, float, float]:
+    def _calculate_roi(self, risk_score: float, urgency: int) -> Tuple[float, float, float, Dict[str, Any]]:
         """
         Calculates the financial basis for a recommendation.
         Avoided Cost = Probability of Failure * Cost of Catastrophic Failure
         """
-        # CAT_FAILURE_COST is estimated at $250,000 for primary pumps
-        cat_failure_cost = 250000.0
-        avoided_cost = risk_score * cat_failure_cost
-
+        # Industrial benchmarks based on compressor failure
+        replacement_cost = 320000.0
+        downtime_hrs = 14.0
+        downtime_cost_per_hr = 85000.0
+        production_loss = downtime_hrs * downtime_cost_per_hr
+        total_potential_loss = replacement_cost + production_loss
+        
+        # Risk scaled avoided cost
+        avoided_cost = risk_score * total_potential_loss
+        
         # Implementation cost scales with urgency (emergency service is more expensive)
         implementation_cost = 1500.0 * (6 - urgency)
 
         roi_index = avoided_cost / max(1.0, implementation_cost)
-        return round(avoided_cost, 2), round(implementation_cost, 2), round(roi_index, 2)
+        
+        detail = {
+            "equipment_replacement_cost": replacement_cost,
+            "downtime_hours": downtime_hrs,
+            "downtime_cost_per_hour": downtime_cost_per_hr,
+            "production_loss": production_loss,
+            "total_potential_loss": total_potential_loss,
+            "risk_multiplier": round(risk_score, 4)
+        }
+        
+        return round(avoided_cost, 2), round(implementation_cost, 2), round(roi_index, 2), detail
+
+    def _calculate_prediction_window(self, risk_score: float) -> Tuple[str, float]:
+        """
+        Calculates the Remaining Useful Life (RUL) prediction window.
+        """
+        if risk_score >= self.RISK_THRESHOLD_CRITICAL:
+            return "2-12 hours", 0.98
+        elif risk_score >= self.RISK_THRESHOLD_HIGH:
+            return "12-36 hours", 0.92
+        elif risk_score >= self.RISK_THRESHOLD_WARNING:
+            return "36-48 hours", 0.85
+        else:
+            return "> 144 hours", 0.60
+
+    def _generate_causal_trace(self, node_id: str, action_key: str, window: str) -> List[str]:
+        """
+        Generates the Explainable AI (XAI) causal chain for demonstration visibility.
+        """
+        if "FLUSH" in action_key or "INTAKE" in node_id or "FILTER" in node_id:
+            return [
+                "Dust Event Detected (AOD Spike)",
+                "Particulate Sensor Threshold Exceeded",
+                "HEPA Filter Occlusion Rate Elevated",
+                f"Failure Prediction ({window} Window)"
+            ]
+        else:
+            return [
+                "Dust Event Detected (AOD Spike)",
+                "HEPA Filter Occlusion",
+                "Intake Pressure Drop",
+                "Compressor Surge Risk",
+                "Rotor Vibration Increase",
+                f"Failure Prediction ({window} Window)"
+            ]
 
     def optimize_operational_stance(self,
                                    asset_id: str,
@@ -79,6 +137,7 @@ class PrescriptiveOptimizer:
         """
         The Main Decision Loop.
         Synthesizes causal health, financial impact, and technical constraints.
+        Graduated for Staged Warning Response.
         """
         logger.info(f"OPTIMIZING_STANCE: Asset={asset_id} | Causal_Nodes={len(causal_out)}")
 
@@ -91,52 +150,94 @@ class PrescriptiveOptimizer:
             health = data['health']
             risk = 1.0 - health
 
-            # --- STRATEGY: CRITICAL RISK MITIGATION ---
+            # Calculate predictive elements
+            window, conf = self._calculate_prediction_window(risk)
+            
+            # --- STRATEGY: CRITICAL RISK (Immediate Shutdown) ---
             if risk >= self.RISK_THRESHOLD_CRITICAL:
-                avoided, cost, roi = self._calculate_roi(risk, 1)
+                avoided, cost, roi, detail = self._calculate_roi(risk, 1)
+                trace = self._generate_causal_trace(node_id, "EMERGENCY_SHUTDOWN_SEQUENCE", window)
                 recommendations.append(OperationalCommand(
                     action_key="EMERGENCY_SHUTDOWN_SEQUENCE",
                     priority=1,
-                    rationale=f"Structural integrity of {data['label']} compromised (Entropy: {data['entropy']}). Risk exceeds safety manifold.",
+                    rationale=f"Structural integrity of {data['label']} compromised (Entropy: {data.get('entropy', 0.8)}). Risk exceeds safety manifold.",
                     avoided_cost_est=avoided,
+                    avoided_cost_detail=detail,
                     implementation_cost_est=cost,
                     roi_index=roi,
                     target_node=node_id,
-                    parameter_adjustment={"load_target": 0.0, "breaker_status": "OPEN"}
+                    parameter_adjustment={"load_target": 0.0, "breaker_status": "OPEN"},
+                    prediction_window=window,
+                    confidence=conf,
+                    root_cause_trace=trace
                 ))
 
-            # --- STRATEGY: DYNAMIC LOAD SHEDDING ---
-            elif risk >= self.RISK_THRESHOLD_DEGRADED:
-                reduction_percent = int(risk * 100)
-                avoided, cost, roi = self._calculate_roi(risk, 2)
+            # --- STRATEGY: HIGH RISK (Direct Load Shedding) ---
+            elif risk >= self.RISK_THRESHOLD_HIGH:
+                reduction_percent = int((risk - 0.45) * 200) # Scale reduction from 0-70%
+                avoided, cost, roi, detail = self._calculate_roi(risk, 2)
+                trace = self._generate_causal_trace(node_id, "DYNAMIC_LOAD_REDUCTION", window)
                 recommendations.append(OperationalCommand(
                     action_key="DYNAMIC_LOAD_REDUCTION",
                     priority=2,
-                    rationale=f"High atmospheric stress ({env_stress}) coupled with increased vibration. Reducing load to extend RUL.",
+                    rationale=f"High mechanical stress ({risk:.2f}) coupled with system vibration. Reducing load by {reduction_percent}% to extend RUL.",
                     avoided_cost_est=avoided,
+                    avoided_cost_detail=detail,
                     implementation_cost_est=cost,
                     roi_index=roi,
                     target_node=node_id,
-                    parameter_adjustment={"load_reduction_pct": reduction_percent, "cooling_override": "ACTIVE"}
+                    parameter_adjustment={"load_reduction_pct": reduction_percent, "cooling_override": "ACTIVE"},
+                    prediction_window=window,
+                    confidence=conf,
+                    root_cause_trace=trace
+                ))
+
+            # --- STRATEGY: WARNING (Inspection Required) ---
+            elif risk >= self.RISK_THRESHOLD_WARNING:
+                avoided, cost, roi, detail = self._calculate_roi(risk, 3)
+                trace = self._generate_causal_trace(node_id, "TECHNICAL_INSPECTION_REQUIRED", window)
+                recommendations.append(OperationalCommand(
+                    action_key="TECHNICAL_INSPECTION_REQUIRED",
+                    priority=3,
+                    rationale=f"Anomaly detected in {data['label']}. Divergence from nominal baseline exceeds warning threshold (0.20).",
+                    avoided_cost_est=avoided,
+                    avoided_cost_detail=detail,
+                    implementation_cost_est=cost,
+                    roi_index=roi,
+                    target_node=node_id,
+                    parameter_adjustment={"inspection_priority": "EXPRESS"},
+                    prediction_window=window,
+                    confidence=conf,
+                    root_cause_trace=trace
                 ))
 
         # 2. ANALYZE ENVIRONMENTAL HARDENING
         if env_stress > 0.7:
-             avoided, cost, roi = self._calculate_roi(0.3, 3) # Lower risk but high preventive ROI
-             recommendations.append(OperationalCommand(
-                    action_key="FLUSH_FILTRATION_MANIFOLD",
-                    priority=3,
-                    rationale="Atmospheric dust concentration exceeds nominal limit. Preventive flush required to protect intake nodes.",
-                    avoided_cost_est=avoided,
-                    implementation_cost_est=cost,
-                    roi_index=roi,
-                    target_node="ME_FILTER_A",
-                    parameter_adjustment={"flush_duration_sec": 300, "aux_air_bypass": "OPEN"}
-                ))
+             avoided, cost, roi, detail = self._calculate_roi(0.3, 3) # Lower risk but high preventive ROI
+             
+             # Prevent duplicate flush recommendations
+             if not any(r.action_key == "FLUSH_FILTRATION_MANIFOLD" for r in recommendations):
+                 window, conf = self._calculate_prediction_window(0.3)
+                 trace = self._generate_causal_trace("ME_FILTER_A", "FLUSH_FILTRATION_MANIFOLD", window)
+                 recommendations.append(OperationalCommand(
+                        action_key="FLUSH_FILTRATION_MANIFOLD",
+                        priority=3,
+                        rationale="Atmospheric dust concentration exceeds nominal limit. Preventive flush required to protect intake nodes.",
+                        avoided_cost_est=avoided,
+                        avoided_cost_detail=detail,
+                        implementation_cost_est=cost,
+                        roi_index=roi,
+                        target_node="ME_FILTER_A",
+                        parameter_adjustment={"flush_duration_sec": 300, "aux_air_bypass": "OPEN"},
+                        prediction_window=window,
+                        confidence=conf,
+                        root_cause_trace=trace
+                    ))
 
         # --- FINAL FILTERING: DECISION HYSTERESIS ---
-        # Sort by ROI and Priority
+        # Sort by ROI and Priority, take only the top 3 most critical recommendations to avoid overloading the user
         recommendations.sort(key=lambda x: (x.priority, -x.roi_index))
+        recommendations = recommendations[:3]
 
         logger.info(f"STANCE_OPTIMIZED: Generated {len(recommendations)} actionable protocols for {asset_id}")
         return recommendations

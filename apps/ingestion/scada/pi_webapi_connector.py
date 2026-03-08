@@ -186,8 +186,12 @@ class PIWebAPIConnector:
         tag_upper = tag_path.upper()
         
         if "VIB" in tag_upper:
-            # Vibration increases by +5.0mm/s per 1.0 AOD unit (clogging surge)
-            val = 1.2 + (stress * 5.0) + np.random.normal(0, 0.2)
+            # ISO 10816 / 20816 Calibration: 
+            # Normal: <1.5, Early: 2-3, Inspection: 3-5, High: 5-7, Critical: 7-10, Shutdown: >10
+            # AOD stress increases exponentially to map directly to these thresholds
+            base_vib = 1.2
+            clog_impact = (stress ** 2) * 12.0 # 0.95 AOD -> 10.8mm/s, 0.5 AOD -> 4.2mm/s, 0.1 AOD -> 1.32mm/s
+            val = base_vib + clog_impact + np.random.normal(0, 0.3)
         elif "TEMP" in tag_upper:
             # Temperature rises as cooling efficiency drops
             val = 65.0 + (stress * 20.0) + np.random.normal(0, 5.0)

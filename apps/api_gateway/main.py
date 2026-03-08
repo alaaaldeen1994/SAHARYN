@@ -20,7 +20,7 @@ from fastapi import FastAPI, HTTPException, Header, Depends, Request, status, Qu
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 from starlette.middleware.base import BaseHTTPMiddleware
 
 # --- INTERNAL SERVICE LAYER (Hardened Imports) ---
@@ -119,7 +119,8 @@ class InferenceRequest(BaseModel):
     aod_override: Optional[float] = Field(None, ge=0, le=5)
     wind_override: Optional[float] = Field(None, ge=0, le=150)
 
-    @validator('asset_id')
+    @field_validator('asset_id')
+    @classmethod
     def validate_asset_format(cls, v):
         if not v.startswith("PUMP_") and not v.startswith("ROTOR_"):
             raise ValueError("Invalid Asset Identity Format. Must comply with SAHARYN_ID_SPECS.")

@@ -142,12 +142,18 @@ class CausalIntegrityManifold:
         """
         Simulates how stress propagates and mutates through the mechanical manifold.
         Implements weighted decay and Bayesian-inspired health updates.
+        Graduated for SAHARYN Demonstration Stability.
         """
-        logger.info("INFERENCE_INIT: Propagating environmental stress through manifold.")
+        logger.info(f"INFERENCE_INIT: Propagating stress (AOD={env_stress}) through manifold.")
 
-        # 1. Update Atmospheric Root Stress
-        self.nodes["AT_CAMS"].health_score = max(0.1, 1.0 - env_stress)
-        self.nodes["AT_WIND"].health_score = max(0.1, 1.0 - (telemetry.get("wind_speed", 10.0) / 100.0))
+        # 1. Update Atmospheric Root Stress (Dampened)
+        # We don't want AOD 0.45 to immediately crush the root nodes.
+        # Threshold: AOD > 1.0 starts significant degradation.
+        atmos_root_health = max(0.4, 1.0 - (env_stress * 0.2)) 
+        self.nodes["AT_CAMS"].health_score = atmos_root_health
+        
+        wind_val = telemetry.get("wind_speed", 10.0)
+        self.nodes["AT_WIND"].health_score = max(0.5, 1.0 - (wind_val / 80.0))
 
         impact_report = {}
 
@@ -161,83 +167,105 @@ class CausalIntegrityManifold:
         velocity = telemetry.get("wind_speed", 10.0)
         vibration = telemetry.get("vibration", 1.2)
 
-        # Physics Constants for derivation
+        # Physics Constants (Standard Arid Normalization)
         reynolds_num = (1.225 * velocity * 0.5) / 1.846e-5
         corrosion_kinetic = 1.2e-4 * np.exp(-45 / (8.314e-3 * 310))
-        # ISO-10816 Standard: Vibrations above 3.5mm/s are 'Class C' (Restricted)
-        stress_intensity = vibration * 0.15 
+        
+        # ISO 10816 / 20816 Calibration for Demonstration Accuracy
+        # Normal: <1.5, Early: 2-3, Inspection: 3-5, High: 5-7, Critical: 7-10, Shutdown: >10
+        if vibration <= 1.5:
+            stress_intensity = vibration * 0.02
+        elif vibration <= 3.0:
+            stress_intensity = vibration * 0.05
+        elif vibration <= 5.0:
+            stress_intensity = vibration * 0.10
+        elif vibration <= 7.0:
+            stress_intensity = vibration * 0.15
+        elif vibration <= 10.0:
+            stress_intensity = vibration * 0.20
+        else:
+            # > 10.0 mm/s (Shutdown threshold)
+            stress_intensity = vibration * 0.40 
 
         for node_id in traversal_order:
             node = self.nodes.get(node_id)
             if not node: continue
 
             # --- PHYSICS DERIVATION ---
+            # Use a weighted average of parents to provide structural inertia
             parent_health = np.mean([u.health_score for u in node.upstream_dependencies]) if node.upstream_dependencies else 1.0
-            env_impact_factor = 0.15 if node.node_type != "ATMOS" else 0.0
+            
+            # --- GRADUATED DECAY MODEL ---
+            # We scale the environment impact factor by the asset type
+            # Sensors and Logical nodes are more resilient to physical dust than Mechanical ones.
+            if node.node_type == "MECHANICAL":
+                env_impact_factor = 0.08
+            elif node.node_type == "SENSOR":
+                env_impact_factor = 0.02
+            else:
+                env_impact_factor = 0.04
 
             # --- INDUSTRIAL CAUSAL CHAIN: DUST -> FILTER -> COMPRESSOR ---
             
+            extra_stress = 0.0
+
             # 3. Filter Pressure Cascade (ME_FILTER_A)
             if node_id == "ME_FILTER_A":
-                # Darcy's Law Proxy: Pressure Drop increases as dust blocks pores
-                # P_drop = Outlet_P - Inlet_P (absolute value for flow resistance)
                 in_p = telemetry.get("inlet_pressure_bar", 4.5)
                 out_p = telemetry.get("outlet_pressure_bar", 8.5)
                 pressure_delta = abs(out_p - in_p)
                 
-                clogging_factor = env_stress * (velocity / 5.0)
-                # If dust is high, health drops exponentially due to differential pressure spike
-                node.health_score = max(0.1, node.health_score - (clogging_factor * 0.3) - (pressure_delta / 25.0))
+                # Clogging is non-linear. High AOD has a compounding effect.
+                clogging_factor = (env_stress ** 1.5) * (velocity / 10.0)
+                extra_stress = (clogging_factor * 0.08) + ((pressure_delta - 4.0) / 80.0) if pressure_delta > 4.0 else (clogging_factor * 0.05)
                 impact_report["filter_clogging_index"] = round(clogging_factor, 4)
 
             # 4. Compressor Vibration Coupling (ME_COMP_01)
-            if node_id == "ME_COMP_01":
-                # Surge Logic: If upstream filter health is poor, compressor vibrates more
+            elif node_id == "ME_COMP_01":
                 filter_health = self.nodes["ME_FILTER_A"].health_score
-                surge_potential = (1.0 - filter_health) * 0.4
-                vibration_multiplier = 1.0 + surge_potential + (vibration / 10.0)
-                
-                # Combine physical stress with vibration-induced material fatigue
-                node.health_score = max(0.05, node.health_score * (1.0 - (surge_potential * 0.5)) - (stress_intensity * 0.2))
+                # Cascade effect: Poor filter health increases surge risk
+                surge_potential = (1.0 - filter_health) * 0.25
+                extra_stress = (surge_potential * 0.1) + (stress_intensity * 0.15)
                 impact_report["compressor_surge_risk"] = round(surge_potential, 4)
 
-            # 5. Solar Dust Deposition (DSI) Physics
-            if node.node_type == "ENERGY_SOLAR":
-                surface_tilt = 30.0 # Standard fixed tilt
-                aod_value = env_stress # Using AOD as proxy for concentration
-                # DSI Efficiency Loss Model: L = 1 - exp(-k * Dust_Load)
-                dust_load = aod_value * (velocity / 10.0) * np.sin(np.radians(surface_tilt))
-                dsi_loss = 1.0 - np.exp(-0.05 * dust_load)
-                node.health_score = max(0, min(1.0, node.health_score - dsi_loss))
-                impact_report["dsi_soiling_rate"] = round(dust_load, 4)
+            # 5. Solar & Flare Missions (Graduated)
+            elif node.node_type == "ENERGY_SOLAR":
+                dsi_loss = (env_stress * 0.1) * (1.0 - np.exp(-0.02 * velocity))
+                extra_stress = dsi_loss
+                impact_report["dsi_soiling_rate"] = round(dsi_loss * 10, 4)
 
-            # 5. Flare Correlation Logic
-            if node.node_type == "ENERGY_FLARE":
-                flare_event_probability = (1.0 - parent_health) * (1.0 + (stress_intensity / 5.0))
-                node.health_score = max(0, min(1.0, 1.0 - flare_event_probability))
-                impact_report["flare_prob"] = round(flare_event_probability, 4)
+            elif node.node_type == "ENERGY_FLARE":
+                flare_risk = (1.0 - parent_health) * 0.3
+                extra_stress = flare_risk
+                impact_report["flare_prob"] = round(flare_risk, 4)
 
-            # Combine Reynolds-Turbulence, Arrhenius-Corrosion, and LEFM-Stress
-            physical_divergence = (env_stress * env_impact_factor) * (1.0 + (reynolds_num / 500000.0))
-            physical_divergence += (corrosion_kinetic * 2.0) + (stress_intensity * 0.8)
+            # --- GLOBAL PHYSICS DIVERGENCE (Dampened for demonstration) ---
+            # Re-normalized Re coefficient to reduce aggressive variance
+            re_influence = (reynolds_num / 2000000.0) 
+            physical_divergence = (env_stress * env_impact_factor) * (1.0 + re_influence)
+            physical_divergence += (corrosion_kinetic * 0.5) + (stress_intensity * 0.1) + extra_stress
 
-            # Health Calculation: Temporal Continuity * 0.8 + Current State * 0.2 - Physics Stress
-            # ATMOS nodes are 'Source' nodes and do not decay mechanical performance
-            if node.node_type == "ATMOS":
-                new_health = node.health_score 
-            else:
-                new_health = (parent_health * 0.8) + (node.health_score * 0.2) - (physical_divergence * 0.8)
-            
-            node.health_score = max(0, min(1.0, new_health))
+            # --- TEMPORAL CONTINUITY (The 'Inertia' Logic) ---
+            if node.node_type != "ATMOS":
+                # To prevent health from dropping arbitrarily for AOD=0.1, we must let it recover 
+                # incrementally when stress is low. Ideal baseline divergence is 0.0
+                recovery_rate = 0.02 if physical_divergence < 0.05 else 0.0
+                
+                new_health = (parent_health * 0.3) + (node.health_score * 0.65) + (atmos_root_health * 0.05) 
+                new_health = new_health - (physical_divergence * 0.4) + recovery_rate
+                
+                node.health_score = max(0.05, min(1.0, new_health))
 
-            # Entropy Calculation (Measure of structural instability)
-            # Entropy follows a non-linear tipping point: E ~ (1-H)^2
-            node.structural_entropy = ((1.0 - node.health_score) ** 2) * 1.5
+            # Entropy Calculation (Non-linear tipping point dampened)
+            node.structural_entropy = ((1.0 - node.health_score) ** 2) * 0.8
             cumulative_entropy += node.structural_entropy
 
             impact_report[node_id] = node.to_dict()
 
-        self.global_stability_index = 1.0 - (cumulative_entropy / len(traversal_order))
+        # Update Global Stability with logarithmic dampening to keep the RUL curve realistic
+        stability_raw = 1.0 - (cumulative_entropy / len(traversal_order))
+        # Ensure stability doesn't hit 0% just because one node is slightly stressed
+        self.global_stability_index = max(0.05, stability_raw)
 
         # Update high-fidelity logs for Diligence Hub
         self.last_physics_results.update({
@@ -259,21 +287,35 @@ class CausalIntegrityManifold:
         """
         Generates a spatio-temporal stress gradient for all assets.
         Correlates atmospheric impact with mechanical structural integrity.
+        Supports Staged Warning Protocol: NORMAL, WARNING, HIGH RISK, CRITICAL.
         """
         stress_map = []
         for node_id, node in self.nodes.items():
             if node.node_type in ["MECHANICAL", "ENERGY_SOLAR", "ENERGY_FLARE"]:
-                # Calculating failure probability within 48h (Simulated)
-                failure_risk = (1.0 - node.health_score) * 1.2
-                is_critical = failure_risk > 0.7
+                # Calculating failure probability within 48h
+                risk = (1.0 - node.health_score)
+                
+                # Staged Classification
+                if risk < 0.20:
+                    status = "NORMAL"
+                    color = "#10b981" # Green
+                elif risk < 0.45:
+                    status = "WARNING"
+                    color = "#f59e0b" # Amber
+                elif risk < 0.80:
+                    status = "HIGH RISK"
+                    color = "#f97316" # Orange
+                else:
+                    status = "CRITICAL"
+                    color = "#ef4444" # Red
 
                 stress_map.append({
                     "id": node_id,
                     "label": node.label,
                     "stress_index": round(node.structural_entropy * 10, 2),
-                    "failure_prob_48h": f"{min(99.9, failure_risk * 100):.1f}%",
-                    "status": "CRITICAL" if is_critical else "STABLE",
-                    "color": "#ef4444" if is_critical else ("#f59e0b" if failure_risk > 0.3 else "#10b981")
+                    "failure_prob_48h": f"{min(99.9, risk * 100):.1f}%",
+                    "status": status,
+                    "color": color
                 })
         return stress_map
 
