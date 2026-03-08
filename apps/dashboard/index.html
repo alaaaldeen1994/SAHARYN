@@ -9,8 +9,14 @@
         content="SAHARYN AI uses live NASA and ESA satellite data to predict equipment failure 48 hours in advance — saving millions in downtime across desert infrastructure.">
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&family=Tajawal:wght@400;700;800&display=swap"
-        rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
+        rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&family=Tajawal:wght@400;700;800&display=swap"
+            rel="stylesheet">
+    </noscript>
+    <link rel="preconnect" href="https://unpkg.com">
+    <script src="https://unpkg.com/lucide@latest" defer></script>
     <style>
         :root {
             --bg: #030912;
@@ -1027,6 +1033,104 @@
             color: var(--text-dim);
             max-width: 360px;
             line-height: 1.8;
+        }
+
+        /* ── MOBILE RESPONSIVE ── */
+        @media (max-width: 768px) {
+            nav {
+                padding: 15px 20px;
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
+            .nav-links {
+                display: none;
+                /* Hidden on mobile to save space */
+            }
+
+            .hero {
+                padding: 120px 20px 60px;
+            }
+
+            h1 {
+                font-size: clamp(40px, 11vw, 60px);
+                line-height: 1.05;
+            }
+
+            h1 .dim {
+                font-size: 0.75em;
+                margin-top: 8px;
+            }
+
+            .hero-sub {
+                font-size: 16px;
+                margin-bottom: 30px;
+            }
+
+            .hero-actions {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+            }
+
+            .btn-primary {
+                text-align: center;
+                padding: 16px 20px;
+            }
+
+            .btn-secondary {
+                justify-content: center;
+            }
+
+            .hero-stats {
+                flex-direction: column;
+                margin-top: 50px;
+            }
+
+            .hstat {
+                border-right: none !important;
+                border-left: none !important;
+                border-bottom: 1px solid var(--border);
+                padding: 24px 20px;
+            }
+
+            .hstat:last-child {
+                border-bottom: none;
+            }
+
+            section {
+                padding: 70px 20px;
+            }
+
+            h2 {
+                font-size: 32px;
+            }
+
+            .section-intro {
+                font-size: 16px;
+                margin-bottom: 40px;
+            }
+
+            #impact>div {
+                grid-template-columns: 1fr !important;
+                gap: 40px !important;
+            }
+
+            .impact-numbers {
+                grid-template-columns: 1fr;
+            }
+
+            .bridges-grid,
+            .cap-grid,
+            .sector-grid,
+            .compliance-row {
+                grid-template-columns: 1fr !important;
+            }
+
+            .footer-top {
+                flex-direction: column;
+                gap: 30px;
+            }
         }
     </style>
 </head>
