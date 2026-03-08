@@ -321,30 +321,14 @@
 
         /* ── HERO ── */
         .hero {
-            min-height: 90vh;
-            /* Slightly reduced to show trust strip sooner */
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            padding: 140px 10% 80px;
+            padding: 140px 10% 120px;
             position: relative;
             overflow: hidden;
-            background: linear-gradient(to right, rgba(3, 9, 18, 1) 0%, rgba(3, 9, 18, 0.7) 40%, rgba(3, 9, 18, 0.2) 100%);
-            z-index: 10;
-        }
-
-        .hero-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background-image: url('industrial_desert_bg_v1.webp');
-            background-size: cover;
-            background-position: center;
-            opacity: 0.6;
-            filter: brightness(0.6) saturate(0.8);
+            background: radial-gradient(circle at 20% 50%, rgba(3, 9, 18, 0.8) 0%, rgba(3, 9, 18, 0.3) 100%);
         }
 
         .hero-tag {
@@ -382,14 +366,15 @@
         }
 
         .hero-sub {
-            font-size: 19px;
+            font-size: 20px;
             font-weight: 400;
-            color: var(--text-mid);
-            max-width: 520px;
-            /* Reduced for better focus */
-            line-height: 1.8;
-            margin-bottom: 40px;
-            letter-spacing: 0.2px;
+            color: var(--text);
+            /* Increased contrast */
+            max-width: 620px;
+            line-height: 1.7;
+            margin-bottom: 50px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            /* Pop against background */
         }
 
         .hero-sub strong {
@@ -407,91 +392,21 @@
         .btn-primary {
             background: var(--accent);
             color: var(--bg);
-            padding: 18px 36px;
+            padding: 18px 48px;
             font-family: var(--mono);
-            font-size: 12px;
-            font-weight: 800;
+            font-size: 13px;
+            font-weight: 700;
             letter-spacing: 1.5px;
             text-decoration: none;
             text-transform: uppercase;
-            transition: all 0.3s ease;
-            border: 1px solid var(--accent);
+            transition: 0.2s;
+            border: none;
             cursor: pointer;
-            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.2);
         }
 
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 35px var(--accent-glow);
-            filter: brightness(1.1);
-        }
-
-        .btn-outline {
-            background: transparent;
-            color: var(--text);
-            padding: 18px 36px;
-            font-family: var(--mono);
-            font-size: 12px;
-            font-weight: 800;
-            letter-spacing: 1.5px;
-            text-decoration: none;
-            text-transform: uppercase;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            cursor: pointer;
-        }
-
-        .btn-outline:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-            background: rgba(16, 185, 129, 0.05);
-            transform: translateY(-2px);
-        }
-
-        /* ── TRUST STRIP ── */
-        .trust-strip {
-            background: rgba(12, 21, 35, 0.8);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-            padding: 30px 10%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 40px;
-            z-index: 20;
-            position: relative;
-        }
-
-        .trust-label {
-            font-family: var(--mono);
-            font-size: 10px;
-            color: var(--text-dim);
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            white-space: nowrap;
-        }
-
-        .trust-logos {
-            display: flex;
-            align-items: center;
-            gap: 48px;
-            opacity: 0.6;
-            filter: grayscale(1);
-            transition: opacity 0.3s;
-        }
-
-        .trust-logos:hover {
-            opacity: 1;
-            filter: none;
-        }
-
-        .trust-logo {
-            font-family: var(--sans);
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--text-mid);
-            letter-spacing: -0.2px;
+            background: #0ea572;
+            box-shadow: 0 0 30px var(--accent-glow);
         }
 
         .btn-secondary {
@@ -604,19 +519,18 @@
 
         .bridge-card {
             background: rgba(12, 21, 35, 0.4);
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(8px);
             border: 1px solid var(--border);
             padding: 48px 40px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
             position: relative;
-            overflow: hidden;
         }
 
         .bridge-card:hover {
-            transform: translateY(-8px);
+            transform: translateY(-5px);
             border-color: var(--accent);
             background: rgba(16, 185, 129, 0.04);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
         }
 
         .bridge-card:hover {
@@ -845,22 +759,12 @@
 
         .cap-card {
             background: rgba(12, 21, 35, 0.4);
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(8px);
             border: 1px solid var(--border);
             padding: 40px;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .cap-card:hover {
-            transform: translateY(-8px);
-            border-color: var(--accent);
-            background: rgba(16, 185, 129, 0.06);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
         }
 
         .cap-card::before {
@@ -1122,7 +1026,7 @@
 
 <body>
 
-    <div class="hero-bg"></div>
+    <canvas id="bg-canvas"></canvas>
 
     <!-- ── NAVIGATION ── -->
     <nav>
@@ -1136,7 +1040,7 @@
             <a href="#capabilities" data-i18n="nav_cap">CAPABILITIES</a>
             <a href="#impact" data-i18n="nav_impact">IMPACT</a>
             <a href="#sectors" data-i18n="nav_sec">SECTORS</a>
-            <a href="about.html" data-i18n="nav_paper">WHITEPAPER</a>
+            <a href="#how" data-i18n="nav_tech">TECHNOLOGY</a>
             <button id="lang-toggle-btn" onclick="window.toggleLanguage()"
                 style="background:none;border:none;color:var(--text-dim);font-family:var(--mono);font-size:11px;cursor:pointer;letter-spacing:1px;padding: 10px;">EN
                 / عربي</button>
@@ -1182,20 +1086,7 @@
         </p>
         <div class="hero-actions">
             <a href="console.html" class="btn-primary" data-i18n="hero_cta">Open Mission Control</a>
-            <a href="mailto:info@saharyn.ai?subject=Pilot Deployment Request" class="btn-outline">Request Pilot
-                Deployment</a>
-        </div>
 
-        <!-- Trust Indicator Strip -->
-        <div class="trust-strip">
-            <div class="trust-label">PLATFORM UPLINKED WITH</div>
-            <div class="trust-logos">
-                <span class="trust-logo">NASA MODIS</span>
-                <span class="trust-logo">ESA Sentinel-2</span>
-                <span class="trust-logo">Copernicus CAMS</span>
-                <span class="trust-logo">ISO 14064-3</span>
-                <span class="trust-logo">GHG Protocol</span>
-            </div>
         </div>
         <div class="hero-stats">
             <div class="hstat">
@@ -1705,7 +1596,6 @@
                 comp_04_status: 'ISO 14064-3 (Carbon Tracking)',
                 comp_05_status: 'Data Privacy Alignment',
                 comp_06_status: 'ESG Compliance Framework',
-                nav_paper: 'WHITEPAPER',
             },
             ar: {
                 nav_home: 'الرئيسية', nav_how: 'آلية العمل', nav_cap: 'القدرات',
@@ -1785,7 +1675,6 @@
                 comp_04_status: 'ISO 14064-3 (تتبع الكربون)',
                 comp_05_status: 'التوافق مع خصوصية البيانات',
                 comp_06_status: 'إطار امتثال ESG',
-                nav_paper: 'الورقة البيضاء الفنية',
             }
         };
 
