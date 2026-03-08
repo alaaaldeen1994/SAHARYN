@@ -986,10 +986,12 @@
             SAHARYN <span>AI</span>
         </a>
         <div class="nav-links">
+            <a href="#" data-i18n="nav_home">HOME</a>
             <a href="#satellites" data-i18n="nav_how">HOW IT WORKS</a>
             <a href="#capabilities" data-i18n="nav_cap">CAPABILITIES</a>
             <a href="#impact" data-i18n="nav_impact">IMPACT</a>
             <a href="#sectors" data-i18n="nav_sec">SECTORS</a>
+            <a href="#how" data-i18n="nav_tech">TECHNOLOGY</a>
             <button id="lang-toggle-btn" onclick="window.toggleLanguage()"
                 style="background:none;border:none;color:var(--text-dim);font-family:var(--mono);font-size:11px;cursor:pointer;letter-spacing:1px;padding: 10px;">EN
                 / عربي</button>
@@ -1028,9 +1030,10 @@
 
         <h1 data-i18n="hero_h1">Predict Failures<br><span class="dim">before they happen.</span></h1>
         <p class="hero-sub" data-i18n="hero_sub">
-            SAHARYN AI connects directly to <strong>NASA and ESA satellites</strong> to monitor desert industrial
-            sites in real time — detecting dust storms, machine stress, and equipment degradation
-            <strong>up to 48 hours early</strong>.
+            SAHARYN AI combines satellite environmental intelligence with industrial telemetry and causal AI modeling to
+            predict equipment failures before they occur. By monitoring atmospheric dust, wind, temperature, and
+            mechanical stress signals such as vibration and pressure, the system identifies risk patterns and alerts
+            operators up to 48 hours before a potential failure.
         </p>
         <div class="hero-actions">
             <a href="console.html" class="btn-primary" data-i18n="hero_cta">Open Mission Control</a>
@@ -1043,19 +1046,19 @@
             </div>
             <div class="hstat">
                 <div class="hstat-val">3</div>
-                <div class="hstat-label" data-i18n="stat_sat">Live Satellite Feeds</div>
+                <div class="hstat-label" data-i18n="stat_sat">Satellite Data Sources</div>
             </div>
             <div class="hstat">
-                <div class="hstat-val">92.4%</div>
-                <div class="hstat-label" data-i18n="stat_prev">Failure Prevention Rate</div>
+                <div class="hstat-val">92%</div>
+                <div class="hstat-label" data-i18n="stat_prev">Model Confidence</div>
             </div>
             <div class="hstat">
                 <div class="hstat-val">99.9%</div>
                 <div class="hstat-label" data-i18n="stat_uptime">System Uptime</div>
             </div>
             <div class="hstat">
-                <div class="hstat-val">4.2t</div>
-                <div class="hstat-label" data-i18n="stat_co2">CO₂ Saved to Date</div>
+                <div class="hstat-val">Live</div>
+                <div class="hstat-label" data-i18n="stat_sync">Sovereign Link</div>
             </div>
         </div>
     </header>
@@ -1076,14 +1079,10 @@
                 <div class="bridge-icon green">
                     <i data-lucide="satellite" size="20"></i>
                 </div>
-                <div class="bridge-name green" data-i18n="bridge_01_name">Bridge 01 — NASA</div>
-                <div class="bridge-title" data-i18n="bridge_01_title">MODIS Aerosol Tracking</div>
+                <div class="bridge-name green" data-i18n="bridge_01_name">Bridge 01 — NASA MODIS</div>
+                <div class="bridge-title" data-i18n="bridge_01_title">Aerosol Tracking</div>
                 <div class="bridge-desc" data-i18n="bridge_01_desc">
-                    Two NASA satellites — <strong>Terra</strong> and <strong>Aqua</strong> — orbit Earth every 99
-                    minutes.
-                    We tap their MODIS sensors to get <strong>Aerosol Optical Depth (AOD)</strong> readings:
-                    a precise measure of how much dust and particulate matter is in the air above your site.
-                    This data is critical for predicting filter blockages and compressor stress 48 hours ahead.
+                    Tracks Aerosol Optical Depth (AOD) to measure dust concentration above industrial sites.
                 </div>
                 <div class="bridge-metric">
                     <span data-i18n="data_product">DATA PRODUCT</span>
@@ -1096,13 +1095,10 @@
                 <div class="bridge-icon blue">
                     <i data-lucide="scan-eye" size="20"></i>
                 </div>
-                <div class="bridge-name blue" data-i18n="bridge_02_name">Bridge 02 — ESA</div>
-                <div class="bridge-title" data-i18n="bridge_02_title">Sentinel-2 Plume Detection</div>
+                <div class="bridge-name blue" data-i18n="bridge_02_name">Bridge 02 — ESA Sentinel-2</div>
+                <div class="bridge-title" data-i18n="bridge_02_title">Plume Detection</div>
                 <div class="bridge-desc" data-i18n="bridge_02_desc">
-                    The <strong>ESA Sentinel-2</strong> satellite captures 13 spectral bands at 10-metre resolution.
-                    Our AI processes specific infrared channels to compute a
-                    <strong>Dust Detection Index (DDI)</strong> — identifying incoming sandstorm fronts
-                    that are completely invisible to standard cameras and local sensors.
+                    Detects dust plumes and land surface signatures using multi-spectral imaging.
                 </div>
                 <div class="bridge-metric">
                     <span data-i18n="resolution">RESOLUTION</span>
@@ -1115,13 +1111,11 @@
                 <div class="bridge-icon amber">
                     <i data-lucide="wind" size="20"></i>
                 </div>
-                <div class="bridge-name amber" data-i18n="bridge_03_name">Bridge 03 — ESA / EU</div>
-                <div class="bridge-title" data-i18n="bridge_03_title">Copernicus CAMS Atmosphere</div>
+                <div class="bridge-name amber" data-i18n="bridge_03_name">Bridge 03 — Copernicus CAMS</div>
+                <div class="bridge-title" data-i18n="bridge_03_title">Atmospheric Forecasts</div>
                 <div class="bridge-desc" data-i18n="bridge_03_desc">
-                    The EU's <strong>Copernicus Atmosphere Monitoring Service (CAMS)</strong> provides certified,
-                    physics-calibrated data for wind speed, temperature, humidity, and atmospheric chemistry.
-                    We use this as the "ground truth" reference layer that all our AI physics models are
-                    validated against.
+                    Provides atmospheric forecasts including wind speed, humidity, and temperature used to model
+                    environmental stress.
                 </div>
                 <div class="bridge-metric">
                     <span data-i18n="standard">STANDARD</span>
@@ -1134,9 +1128,7 @@
         <div class="live-proof">
             <div class="live-proof-dot"></div>
             <div class="live-proof-text" data-i18n="live_proof">
-                <strong>All three data bridges are active and verified right now.</strong>
-                Every satellite reading is automatically recorded in a tamper-proof audit log
-                linked to your dashboard — no manual input required.
+                These data streams are fused to produce the Dust Severity Index (DSI) for operational intelligence.
             </div>
             <div
                 style="font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: 1px; padding: 8px 16px; border: 1px solid rgba(16,185,129,0.3); background: rgba(16,185,129,0.05); display: flex; align-items: center; gap: 8px; white-space: nowrap;">
@@ -1157,31 +1149,27 @@
         <div class="steps-grid">
             <div class="step">
                 <div class="step-num">01</div>
-                <div class="step-title" data-i18n="step_01_title">Satellite Captures</div>
-                <div class="step-desc" data-i18n="step_01_desc">NASA and ESA satellites pass over your site and record
-                    atmospheric conditions —
-                    AOD, wind, surface temperature, dust plume signatures.</div>
+                <div class="step-title" data-i18n="step_01_title">Satellite Observation</div>
+                <div class="step-desc" data-i18n="step_01_desc">NASA and ESA satellites record atmospheric conditions —
+                    AOD, wind, temperature, and dust plume signatures across your site.</div>
             </div>
             <div class="step">
                 <div class="step-num">02</div>
-                <div class="step-title" data-i18n="step_02_title">AI Fuses & Calibrates</div>
-                <div class="step-desc" data-i18n="step_02_desc">SAHARYN combines all three data streams using a
-                    physics-based model (Reynolds
-                    number, Arrhenius kinetics) to create a single <strong>Dust Severity Index (DSI)</strong>.</div>
+                <div class="step-title" data-i18n="step_02_title">Environmental Stress Modeling</div>
+                <div class="step-desc" data-i18n="step_02_desc">Individual streams are fused using physics-based
+                    modeling to create a localized Dust Severity Index (DSI).</div>
             </div>
             <div class="step">
                 <div class="step-num">03</div>
-                <div class="step-title" data-i18n="step_03_title">Causal Engine Propagates</div>
-                <div class="step-desc" data-i18n="step_03_desc">A Bayesian network maps how that DSI score will move
-                    through your asset graph —
-                    filter → compressor → rotor → output — predicting where the failure will occur.</div>
+                <div class="step-title" data-i18n="step_03_title">Industrial Telemetry Analysis</div>
+                <div class="step-desc" data-i18n="step_03_desc">Causal models map environmental stressors against
+                    real-time mechanical vibration and performance telemetry.</div>
             </div>
             <div class="step">
                 <div class="step-num">04</div>
-                <div class="step-title" data-i18n="step_04_title">Prescriptions Delivered</div>
-                <div class="step-desc" data-i18n="step_04_desc">The system generates a prioritised list of actions with
-                    ROI estimates, writes a
-                    carbon credit claim to the ledger, and alerts your team — all within 0.4ms.</div>
+                <div class="step-title" data-i18n="step_04_title">Predictive Failure Detection</div>
+                <div class="step-desc" data-i18n="step_04_desc">The system identifies risk patterns and generates
+                    precise operational recommendations for maintenance teams.</div>
             </div>
         </div>
     </section>
@@ -1198,49 +1186,38 @@
             <div class="cap-card">
                 <div class="cap-icon"><i data-lucide="satellite" size="28"></i></div>
                 <div class="cap-title" data-i18n="cap_01_title">Satellite Data Fusion</div>
-                <div class="cap-desc" data-i18n="cap_01_desc">Continuously merges NASA MODIS aerosol data, ESA
-                    Sentinel-2 plume imagery, and
-                    Copernicus CAMS atmospheric profiles into one unified environmental reading.</div>
+                <div class="cap-desc" data-i18n="cap_01_desc">Continuous integration of NASA MODIS, ESA Sentinel-2, and
+                    Copernicus CAMS into a unified environmental intelligence layer.</div>
             </div>
             <div class="cap-card">
                 <div class="cap-icon"><i data-lucide="activity" size="28"></i></div>
                 <div class="cap-title" data-i18n="cap_02_title">3D Asset Stress Mapping</div>
-                <div class="cap-desc" data-i18n="cap_02_desc">Real-time structural integrity analysis of every machine
-                    on site. Visualises heat,
-                    vibration, and corrosion pressure across all assets simultaneously — colour-coded by risk level.
-                </div>
+                <div class="cap-desc" data-i18n="cap_02_desc">Real-time structural health analysis visualizing thermal,
+                    vibration, and abrasive stress across all documented assets.</div>
             </div>
             <div class="cap-card">
                 <div class="cap-icon"><i data-lucide="git-branch" size="28"></i></div>
-                <div class="cap-title" data-i18n="cap_03_title">Causal Failure Tracing</div>
-                <div class="cap-desc" data-i18n="cap_03_desc">Doesn't just say what will fail — it explains why. Our
-                    Bayesian causal graph
-                    traces the root cause through the dependency chain so engineers fix the right problem, not the
-                    symptom.</div>
+                <div class="cap-title" data-i18n="cap_03_title">Causal Failure Tracking</div>
+                <div class="cap-desc" data-i18n="cap_03_desc">Bayesian networks identify root causes across dependency
+                    chains, filtering noise from true mechanical degradation.</div>
             </div>
             <div class="cap-card">
                 <div class="cap-icon"><i data-lucide="zap" size="28"></i></div>
-                <div class="cap-title" data-i18n="cap_04_title">Prescriptive Optimiser</div>
-                <div class="cap-desc" data-i18n="cap_04_desc">Uses the AI analysis to automatically generate ranked,
-                    costed maintenance actions.
-                    Each recommendation includes an estimated ROI and avoided-downtime cost before a single technician
-                    moves.</div>
+                <div class="cap-title" data-i18n="cap_04_title">Prescriptive Optimizer</div>
+                <div class="cap-desc" data-i18n="cap_04_desc">Generates ranked maintenance actions with ROI estimates
+                    and averted downtime cost analysis.</div>
             </div>
             <div class="cap-card">
                 <div class="cap-icon"><i data-lucide="leaf" size="28"></i></div>
-                <div class="cap-title" data-i18n="cap_05_title">ESG Carbon Ledger</div>
-                <div class="cap-desc" data-i18n="cap_05_desc">Every optimisation is recorded as a cryptographically
-                    signed carbon credit claim
-                    on a blockchain ledger — audit-ready for ISO 14064-3, GHG Protocol, and Gold Standard reporting.
-                </div>
+                <div class="cap-title" data-i18n="cap_05_title">Carbon Impact Ledger</div>
+                <div class="cap-desc" data-i18n="cap_05_desc">Efficiency improvements are recorded as measurable
+                    emission reductions, aligned with standard environmental accounting frameworks.</div>
             </div>
             <div class="cap-card">
                 <div class="cap-icon"><i data-lucide="shield-check" size="28"></i></div>
                 <div class="cap-title" data-i18n="cap_06_title">Sovereign Edge Mode</div>
-                <div class="cap-desc" data-i18n="cap_06_desc">For classified sites, SAHARYN severs its cloud connection
-                    and runs entirely on
-                    local NVIDIA-powered edge clusters inside Saudi Arabia — compliant with SDAIA data-localisation
-                    regulations.</div>
+                <div class="cap-desc" data-i18n="cap_06_desc">High-security mode for sensitive sites, operating entirely
+                    on local encrypted edge clusters without cloud reliance.</div>
             </div>
         </div>
     </section>
@@ -1258,26 +1235,23 @@
                     <div class="impact-label" data-i18n="label_ddi">Dust Detection Index (ESA)</div>
                 </div>
                 <div class="impact-num">
-                    <div class="impact-val">4.2t</div>
-                    <div class="impact-label" data-i18n="label_co2">CO₂ Saved — Certified</div>
+                    <div class="impact-val">99.9%</div>
+                    <div class="impact-label" data-i18n="label_uptime">Reliability Commitment</div>
                 </div>
                 <div class="impact-num">
-                    <div class="impact-val">0.4ms</div>
-                    <div class="impact-label" data-i18n="label_lat">AI Inference Latency</div>
+                    <div class="impact-val">92%</div>
+                    <div class="impact-label" data-i18n="label_conf">Confidence Score</div>
                 </div>
             </div>
             <div class="impact-desc-col">
                 <div class="section-label" data-i18n="impact_label">Verified Environmental Impact</div>
                 <h2 data-i18n="impact_title">Operations that<br>pay for themselves.</h2>
                 <p class="impact-text" data-i18n="impact_desc_01">
-                    Every time SAHARYN prevents a failure, it generates a certified carbon credit claim.
-                    These are not estimates — they are cryptographically anchored records tied to
-                    real operational data from NASA-verified satellite measurements.
+                    Operational efficiency improvements may contribute to measurable emission reductions, which can be
+                    reported under standard environmental accounting frameworks.
                 </p>
                 <p class="impact-text" data-i18n="impact_desc_02">
-                    Investors and regulators can audit every single claim on the blockchain ledger,
-                    tracing it back to the specific satellite packet, timestamp, and AI decision
-                    that created it.
+                    Designed in alignment with GHG Protocol and ISO 14064-3.
                 </p>
                 <div class="tag-row">
                     <span class="tag">GHG Protocol</span>
@@ -1301,27 +1275,24 @@
         <div class="sector-grid">
             <div class="sector-card">
                 <div class="sector-num" data-i18n="sector_01_name">SECTOR_01</div>
-                <div class="sector-title" data-i18n="sector_01_title">Power Grid & Energy</div>
-                <div class="sector-desc" data-i18n="sector_01_desc">Protects transmission lines, turbines, and solar
-                    arrays from thermal stress and
-                    salt corrosion. Prevents outage cascades before they reach the grid.</div>
-                <span class="sector-tag" data-i18n="sector_01_tag">422 Monitored Nodes</span>
+                <div class="sector-title" data-i18n="sector_01_title">Energy and Power Infrastructure</div>
+                <div class="sector-desc" data-i18n="sector_01_desc">Protecting transmission lines, turbines, and solar
+                    arrays from thermal stress and salt corrosion.</div>
+                <span class="sector-tag" data-i18n="sector_01_tag">Grid Resilience</span>
             </div>
             <div class="sector-card">
                 <div class="sector-num" data-i18n="sector_02_name">SECTOR_02</div>
-                <div class="sector-title" data-i18n="sector_02_title">Oil, Gas & Mining</div>
-                <div class="sector-desc" data-i18n="sector_02_desc">Sub-surface structural integrity monitoring for
-                    compressors, pumps, and
-                    deep-mine infrastructure. Real-time vibration and corrosion tracking.</div>
-                <span class="sector-tag" data-i18n="sector_02_tag">4.2km Operational Depth</span>
+                <div class="sector-title" data-i18n="sector_02_title">Oil and Gas Operations</div>
+                <div class="sector-desc" data-i18n="sector_02_desc">Monitoring structural integrity for compressors,
+                    pumps, and drilling infrastructure in real-time.</div>
+                <span class="sector-tag" data-i18n="sector_02_tag">Predictive Integrity</span>
             </div>
             <div class="sector-card">
                 <div class="sector-num" data-i18n="sector_03_name">SECTOR_03</div>
-                <div class="sector-title" data-i18n="sector_03_title">Civil & Smart Cities</div>
-                <div class="sector-desc" data-i18n="sector_03_desc">Supports NEOM and Vision 2030 smart cities with
-                    disaster-resilient
-                    infrastructure monitoring and rapid recovery protocols for high-heat zones.</div>
-                <span class="sector-tag" data-i18n="sector_03_tag">99.9% Uptime SLA</span>
+                <div class="sector-title" data-i18n="sector_03_title">Mining and Heavy Industry</div>
+                <div class="sector-desc" data-i18n="sector_03_desc">Predictive maintenance for deep mine ventilation and
+                    heavy machinery in high-dust environments.</div>
+                <span class="sector-tag" data-i18n="sector_03_tag">Dust Mitigation</span>
             </div>
         </div>
     </section>
@@ -1338,42 +1309,42 @@
                 <div class="compliance-badge"><i data-lucide="shield-check" size="18"></i></div>
                 <div>
                     <div class="compliance-name">ISO 27001</div>
-                    <div class="compliance-status" data-i18n="comp_01_status">VERIFIED — Information Security</div>
+                    <div class="compliance-status" data-i18n="comp_01_status">Designed for Alignment — Info Sec</div>
                 </div>
             </div>
             <div class="compliance-item">
                 <div class="compliance-badge"><i data-lucide="cpu" size="18"></i></div>
                 <div>
-                    <div class="compliance-name">IEEE 1232</div>
-                    <div class="compliance-status" data-i18n="comp_02_status">COMPLIANT — AI Standards</div>
+                    <div class="compliance-name">SOC 2 Type II</div>
+                    <div class="compliance-status" data-i18n="comp_02_status">Best Practices — Data Security</div>
                 </div>
             </div>
             <div class="compliance-item">
                 <div class="compliance-badge"><i data-lucide="landmark" size="18"></i></div>
                 <div>
-                    <div class="compliance-name">SDAIA / SADA</div>
-                    <div class="compliance-status" data-i18n="comp_03_status">IN REVIEW — Saudi AI Governance</div>
+                    <div class="compliance-name">Data Privacy</div>
+                    <div class="compliance-status" data-i18n="comp_03_status">Regulatory Alignment</div>
                 </div>
             </div>
             <div class="compliance-item">
                 <div class="compliance-badge"><i data-lucide="leaf" size="18"></i></div>
                 <div>
                     <div class="compliance-name">GHG Protocol</div>
-                    <div class="compliance-status" data-i18n="comp_04_status">VALIDATED — Carbon Accounting</div>
+                    <div class="compliance-status" data-i18n="comp_04_status">Environmental Accounting</div>
                 </div>
             </div>
             <div class="compliance-item">
                 <div class="compliance-badge"><i data-lucide="lock" size="18"></i></div>
                 <div>
-                    <div class="compliance-name">SOC 2 Type II</div>
-                    <div class="compliance-status" data-i18n="comp_05_status">ACTIVE — Data Security</div>
+                    <div class="compliance-name">ISO 14064-3</div>
+                    <div class="compliance-status" data-i18n="comp_05_status">Carbon Tracking Standard</div>
                 </div>
             </div>
             <div class="compliance-item">
                 <div class="compliance-badge"><i data-lucide="globe" size="18"></i></div>
                 <div>
-                    <div class="compliance-name">ISO 14064-3</div>
-                    <div class="compliance-status" data-i18n="comp_06_status">ACTIVE — ESG Verification</div>
+                    <div class="compliance-name">ESG Framework</div>
+                    <div class="compliance-status" data-i18n="comp_06_status">Compliance Ready</div>
                 </div>
             </div>
         </div>
@@ -1388,12 +1359,12 @@
                     SAHARYN <span>AI</span>
                 </a>
                 <p class="footer-desc" data-i18n="footer_desc">
-                    Industrial AI for desert infrastructure — powered by NASA, ESA, and Copernicus satellites.
-                    Built for Saudi Arabia. Scaled for the world.
+                    SAHARYN AI provides industrial environmental intelligence and predictive maintenance for large-scale
+                    energy and infrastructure sites in harsh desert environments.
                 </p>
                 <div style="margin-top: 15px; font-family: var(--mono); font-size: 11px;">
-                    <span style="color: var(--text-dim);">CONTACT:</span> <a href="mailto:info@niluslab.com"
-                        style="color: var(--accent); text-decoration: none;">info@niluslab.com</a>
+                    <span style="color: var(--text-dim);">CONTACT:</span> <a href="mailto:info@saharyn.ai"
+                        style="color: var(--accent); text-decoration: none;">info@saharyn.ai</a>
                 </div>
             </div>
             <div>
@@ -1494,137 +1465,167 @@
         // ── i18n (Bilingual) ──
         const translations = {
             en: {
-                nav_how: 'HOW IT WORKS', nav_cap: 'CAPABILITIES', nav_impact: 'IMPACT',
-                nav_sec: 'SECTORS', nav_cta: 'Sign In / Sign Up',
+                nav_home: 'HOME', nav_how: 'HOW IT WORKS', nav_cap: 'CAPABILITIES',
+                nav_impact: 'IMPACT', nav_sec: 'SECTORS', nav_tech: 'TECHNOLOGY',
+                nav_cta: 'Sign In / Sign Up',
                 hero_h1: 'Predict Failures<br><span class="dim">before they happen.</span>',
-                hero_sub: 'SAHARYN AI connects directly to <strong>NASA and ESA satellites</strong> to monitor desert industrial sites in real time — detecting dust storms, machine stress, and equipment degradation <strong>up to 48 hours early</strong>.',
+                hero_sub: 'SAHARYN AI combines satellite environmental intelligence with industrial telemetry and causal AI modeling to predict equipment failures before they occur. By monitoring atmospheric dust, wind, temperature, and mechanical stress signals such as vibration and pressure, the system identifies risk patterns and alerts operators up to 48 hours before a potential failure.',
                 hero_cta: 'Open Mission Control',
                 stat_warning: 'Average Early Warning',
-                stat_sat: 'Live Satellite Feeds',
-                stat_prev: 'Failure Prevention Rate',
+                stat_sat: 'Satellite Data Sources',
+                stat_prev: 'Model Confidence (Pilot Simulation)',
                 stat_uptime: 'System Uptime',
-                stat_co2: 'CO₂ Saved to Date',
+                stat_sync: 'Sovereign Link',
                 sat_label: 'Real-Time Data Sources',
                 sat_title: 'We watch your assets<br>from space.',
                 sat_intro: 'We don\'t rely on local weather reports or ground sensors alone. SAHARYN maintains three continuously active uplinks to the world\'s most trusted satellite agencies — giving you environmental intelligence that simply cannot be gathered any other way.',
-                bridge_01_name: 'Bridge 01 — NASA',
-                bridge_01_title: 'MODIS Aerosol Tracking',
-                bridge_01_desc: 'Two NASA satellites — <strong>Terra</strong> and <strong>Aqua</strong> — orbit Earth every 99 minutes. We tap their MODIS sensors to get <strong>Aerosol Optical Depth (AOD)</strong> readings: a precise measure of how much dust and particulate matter is in the air above your site. This data is critical for predicting filter blockages and compressor stress 48 hours ahead.',
+                bridge_01_name: 'Bridge 01 — NASA MODIS',
+                bridge_01_title: 'Aerosol Tracking',
+                bridge_01_desc: 'Tracks Aerosol Optical Depth (AOD) to measure dust concentration above industrial sites.',
                 data_product: 'DATA PRODUCT',
-                bridge_02_name: 'Bridge 02 — ESA',
-                bridge_02_title: 'Sentinel-2 Plume Detection',
-                bridge_02_desc: 'The <strong>ESA Sentinel-2</strong> satellite captures 13 spectral bands at 10-metre resolution. Our AI processes specific infrared channels to compute a <strong>Dust Detection Index (DDI)</strong> — identifying incoming sandstorm fronts that are completely invisible to standard cameras and local sensors.',
+                bridge_02_name: 'Bridge 02 — ESA Sentinel-2',
+                bridge_02_title: 'Plume Detection',
+                bridge_02_desc: 'Detects dust plumes and land surface signatures using multi-spectral imaging.',
                 resolution: 'RESOLUTION',
-                bridge_03_name: 'Bridge 03 — ESA / EU',
-                bridge_03_title: 'Copernicus CAMS Atmosphere',
-                bridge_03_desc: 'The EU\'s <strong>Copernicus Atmosphere Monitoring Service (CAMS)</strong> provides certified, physics-calibrated data for wind speed, temperature, humidity, and atmospheric chemistry. We use this as the "ground truth" reference layer that all our AI physics models are validated against.',
+                bridge_03_name: 'Bridge 03 — Copernicus CAMS',
+                bridge_03_title: 'Atmospheric Forecasts',
+                bridge_03_desc: 'Provides atmospheric forecasts including wind speed, humidity, and temperature used to model environmental stress.',
                 standard: 'STANDARD',
-                live_proof: '<strong>All three data bridges are active and verified right now.</strong> Every satellite reading is automatically recorded in a tamper-proof audit log linked to your dashboard — no manual input required.',
+                live_proof: 'These data streams are fused to produce the Dust Severity Index (DSI) for operational intelligence.',
                 bridge_status_live: 'BRIDGE STATUS: LIVE',
-                how_title: 'From satellite to action<br>in under one second.',
-                how_intro: 'SAHARYN does not just collect data — it makes decisions. Here is exactly what happens from the moment a satellite captures a reading to the moment your operations team receives an alert.',
-                cap_title: 'Six engines running<br>for your operations.',
-                footer_desc: 'SAHARYN AI is a leader in industrial environmental intelligence, providing predictive maintenance and asset protection for large-scale energy and industrial sites in harsh environments.',
+                how_title: 'From satellite to action<br>in real-time.',
+                how_intro: 'SAHARYN does not just collect data — it makes decisions. Our process ensures that satellite intelligence is converted into actionable operational recommendations.',
+                cap_title: 'Core AI Modules<br>for Industrial Performance.',
+                footer_desc: 'SAHARYN AI provides industrial environmental intelligence and predictive maintenance for large-scale energy and infrastructure sites in harsh desert environments.',
                 copyright: '© 2026 SAHARYN AI INDUSTRIAL SYSTEMS — ALL RIGHTS RESERVED',
                 how_label: 'The Process',
-                step_01_title: 'Satellite Captures',
-                step_01_desc: 'NASA and ESA satellites pass over your site and record atmospheric conditions — AOD, wind, surface temperature, dust plume signatures.',
-                step_02_title: 'AI Fuses & Calibrates',
-                step_02_desc: 'SAHARYN combines all three data streams using a physics-based model (Reynolds number, Arrhenius kinetics) to create a single <strong>Dust Severity Index (DSI)</strong>.',
-                step_03_title: 'Causal Engine Propagates',
-                step_03_desc: 'A Bayesian network maps how that DSI score will move through your asset graph — filter → compressor → rotor → output — predicting where the failure will occur.',
-                step_04_title: 'Prescriptions Delivered',
-                step_04_desc: 'The system generates a prioritised list of actions with ROI estimates, writes a carbon credit claim to the ledger, and alerts your team — all within 0.4ms.',
-                cap_intro: 'Each module is independently validated and can be deployed individually or as an integrated stack.'
+                step_01_title: 'Satellite Observation',
+                step_01_desc: 'NASA and ESA satellites record atmospheric conditions — AOD, wind, temperature, and dust plume signatures across your site.',
+                step_02_title: 'Environmental Stress Modeling',
+                step_02_desc: 'Individual streams are fused using physics-based modeling to create a localized Dust Severity Index (DSI).',
+                step_03_title: 'Industrial Telemetry Analysis',
+                step_03_desc: 'Causal models map environmental stressors against real-time mechanical vibration and performance telemetry.',
+                step_04_title: 'Predictive Failure Detection',
+                step_04_desc: 'The system identifies risk patterns and generates precise operational recommendations for maintenance teams.',
+                cap_intro: 'Each module is independently validated and can be deployed individually or as an integrated stack.',
+                cap_01_title: 'Satellite Data Fusion',
+                cap_01_desc: 'Continuous integration of NASA MODIS, ESA Sentinel-2, and Copernicus CAMS into a unified environmental intelligence layer.',
+                cap_02_title: '3D Asset Stress Mapping',
+                cap_02_desc: 'Real-time structural health analysis visualizing thermal, vibration, and abrasive stress across all documented assets.',
+                cap_03_title: 'Causal Failure Tracking',
+                cap_03_desc: 'Bayesian networks identify root causes across dependency chains, filtering noise from true mechanical degradation.',
+                cap_04_title: 'Prescriptive Optimizer',
+                cap_04_desc: 'Generates ranked maintenance actions with ROI estimates and averted downtime cost analysis.',
+                cap_05_title: 'Carbon Impact Ledger',
+                cap_05_desc: 'Efficiency improvements are recorded as measurable emission reductions, aligned with standard environmental accounting frameworks.',
+                cap_06_title: 'Sovereign Edge Mode',
+                cap_06_desc: 'High-security mode for sensitive sites, operating entirely on local encrypted edge clusters without cloud reliance.',
+                cap_label: 'AI Modules',
+                label_aod: 'Live AOD (NASA MODIS)',
+                label_ddi: 'Dust Detection Index (ESA)',
+                label_uptime: 'Reliability Commitment',
+                label_conf: 'Confidence Score',
+                impact_label: 'Operational Impact',
+                impact_title: 'Intelligence that<br>Pays for Itself.',
+                impact_desc_01: 'Operational efficiency improvements may contribute to measurable emission reductions, which can be reported under standard environmental accounting frameworks.',
+                impact_desc_02: 'Designed in alignment with GHG Protocol and ISO 14064-3.',
+                sectors_label: 'Industries We Serve',
+                sectors_title: 'Engineered for the<br>World\'s Harshest Sites.',
+                sectors_intro: 'SAHARYN is designed for large-scale energy and industrial operations where extreme heat and abrasive dust are constant operational risks.',
+                sector_01_title: 'Energy and Power Infrastructure',
+                sector_01_desc: 'Protecting transmission lines, turbines, and solar arrays from thermal stress and salt corrosion.',
+                sector_02_title: 'Oil and Gas Operations',
+                sector_02_desc: 'Monitoring structural integrity for compressors, pumps, and drilling infrastructure in real-time.',
+                sector_03_title: 'Mining and Heavy Industry',
+                sector_03_desc: 'Predictive maintenance for deep mine ventilation and heavy machinery in high-dust environments.',
+                comp_label: 'Compliance and Standards',
+                comp_title: 'Enterprise Grade.<br>Pilot Ready.',
+                comp_intro: 'Designed in alignment with:',
+                comp_01_status: 'ISO 27001 (Information Security)',
+                comp_02_status: 'SOC 2 Type II (Data Security)',
+                comp_03_status: 'GHG Protocol (Env Accounting)',
+                comp_04_status: 'ISO 14064-3 (Carbon Tracking)',
+                comp_05_status: 'Data Privacy Alignment',
+                comp_06_status: 'ESG Compliance Framework',
             },
             ar: {
-                nav_how: 'آلية العمل', nav_cap: 'القدرات', nav_impact: 'الأثر',
-                nav_sec: 'القطاعات', nav_cta: 'تسجيل الدخول / الاشتراك',
+                nav_home: 'الرئيسية', nav_how: 'آلية العمل', nav_cap: 'القدرات',
+                nav_impact: 'الأثر', nav_sec: 'القطاعات', nav_tech: 'التكنولوجيا',
+                nav_cta: 'تسجيل الدخول / الاشتراك',
                 hero_h1: 'توقع الأعطال<br><span class="dim">قبل حدوثها.</span>',
-                hero_sub: 'صحارين AI متصل مباشرةً بأقمار <strong>ناسا وكالة الفضاء الأوروبية</strong> لمراقبة المواقع الصناعية الصحراوية في الوقت الفعلي — للكشف عن العواصف الرملية وضغط الآلات وتدهور المعدات <strong>قبل 48 ساعة.</strong>',
+                hero_sub: 'تجمع صحارين AI بين الذكاء البيئي للأقمار الصناعية والقياس الصناعي عن بُعد ونمذجة الذكاء الاصطناعي السببي للتنبؤ بأعطال المعدات قبل حدوثها. ومن خلال مراقبة الغبار الجوي والرياح ودرجة الحرارة وإشارات الإجهاد الميكانيكي مثل الاهتزاز والضغط، يحدد النظام أنماط المخاطر وينبه المشغلين قبل 48 ساعة من وقوع عطل محتمل.',
                 hero_cta: 'فتح مركز العمليات',
                 stat_warning: 'متوسط الإنذار المبكر',
-                stat_sat: 'تغذية الأقمار الاصطناعية الحية',
-                stat_prev: 'معدل منع الأعطال',
+                stat_sat: 'مصادر بيانات الأقمار الصناعية',
+                stat_prev: 'ثقة النموذج (محاكاة تجريبية)',
                 stat_uptime: 'وقت تشغيل النظام',
-                stat_co2: 'ثاني أكسيد الكربون المُوفر',
+                stat_sync: 'الارتباط السيادي',
                 sat_label: 'مصادر البيانات في الوقت الفعلي',
                 sat_title: 'نراقب أصولك<br>من الفضاء.',
-                sat_intro: 'لا نعتمد على تقارير الطقس المحلية أو مستشعرات الأرض وحدها. تحتفظ صحارين بثلاث وصلات نشطة باستمرار لأكثر وكالات الأقمار الاصطناعية ثقةً في العالم.',
-                bridge_01_name: 'الجسر 01 — ناسا',
-                bridge_01_title: 'تتبع هباء MODIS',
-                bridge_01_desc: 'قمران صناعيان من ناسا — <strong>Terra</strong> و <strong>Aqua</strong> — يدوران حول الأرض كل 99 دقيقة. نحن نستخدم مستشعرات MODIS الخاصة بهم للحصول على قراءات <strong>العمق البصري للهباء الجوي (AOD)</strong>: مقياس دقيق لكمية الغبار والجسيمات الموجودة في الهواء فوق موقعك. هذه البيانات ضرورية للتنبؤ بانسداد المرشحات وضعف الضاغط قبل 48 ساعة.',
+                sat_intro: 'نحن لا نعتمد على تقارير الطقس المحلية أو أجهزة الاستشعار الأرضية وحدها. تحتفظ صحارين بثلاثة روابط نشطة باستمرار مع الوكالات الأكثر ثقة في العالم.',
+                bridge_01_name: 'جسر 01 — ناسا MODIS',
+                bridge_01_title: 'تتبع الهباء الجوي',
+                bridge_01_desc: 'يتتبع العمق البصري للهباء الجوي (AOD) لقياس تركيز الغبار فوق المواقع الصناعية.',
                 data_product: 'منتج البيانات',
-                bridge_02_name: 'الجسر 02 — وكالة الفضاء الأوروبية',
-                bridge_02_title: 'كشف غبار Sentinel-2',
-                bridge_02_desc: 'يلتقط القمر الصناعي <strong>ESA Sentinel-2</strong>‏ 13 حزمة طيفية بدقة 10 أمتار. يعالج ذكاؤنا الاصطناعي قنوات الأشعة تحت الحمراء المحددة لحساب <strong>مؤشر الكشف عن الغبار (DDI)</strong> - تحديد جبهات العواصف الرملية القادمة غير المرئية تماماً للكاميرات العادية والمستشعرات المحلية.',
+                bridge_02_name: 'جسر 02 — وكالة الفضاء الأوروبية Sentinel-2',
+                bridge_02_title: 'كشف أعمدة الغبار',
+                bridge_02_desc: 'يكتشف أعمدة الغبار وبصمات سطح الأرض باستخدام التصوير متعدد الأطياف.',
                 resolution: 'الدقة',
-                bridge_03_name: 'الجسر 03 — وكالة الفضاء الأوروبية / الاتحاد الأوروبي',
-                bridge_03_title: 'غلاف كوبرنيكوس CAMS الجوي',
-                bridge_03_desc: 'توفر <strong>خدمة كوبرنيكوس لمراقبة الغلاف الجوي (CAMS)</strong> التابعة للاتحاد الأوروبي بيانات معتمدة ومعايرة فيزيائياً لسرعة الرياح ودرجة الحرارة والرطوبة وكيمياء الغلاف الجوي. نستخدم هذا كطبقة مرجعية "للحقيقة الأرضية" التي يتم التحقق من صحة جميع نماذج فيزياء الذكاء الاصطناعي الخاصة بنا بناءً عليها.',
+                bridge_03_name: 'جسر 03 — كوبرنيكوس CAMS',
+                bridge_03_title: 'توقعات الغلاف الجوي',
+                bridge_03_desc: 'يوفر توقعات الغلاف الجوي بما في ذلك سرعة الرياح والرطوبة ودرجة الحرارة المستخدمة لنمذجة الإجهاد البيئي.',
                 standard: 'المعيار',
-                live_proof: '<strong>جسور البيانات الثلاثة نشطة وتم التحقق منها الآن.</strong> يتم تسجيل كل قراءة قمر صناعي تلقائياً في سجل تدقيق مقاوم للتلاعب مرتبط بلوحة التحكم الخاصة بك - لا يلزم إدخال يدوي.',
+                live_proof: 'يتم دمج تدفقات البيانات هذه لإنتاج مؤشر شدة الغبار (DSI) للذكاء التشغيلي.',
                 bridge_status_live: 'حالة الجسر: مباشر',
-                how_title: 'من القمر الصناعي إلى الإجراء<br>في أقل من ثانية.',
-                how_intro: 'صحارين لا تجمع البيانات فحسب — بل تتخذ قرارات. إليك بالضبط ما يحدث من اللحظة التي يلتقط فيها القمر الاصطناعي قراءة حتى لحظة تلقي فريق العمليات تنبيهاً.',
-                cap_title: 'ستة محركات تعمل<br>من أجل عملياتك.',
-                footer_desc: 'صحارين AI هي شركة رائدة في مجال الاستخبارات البيئية الصناعية، حيث توفر الصيانة التنبؤية وحماية الأصول لمواقع الطاقة والمواقع الصناعية واسعة النطاق في البيئات القاسية.',
+                how_title: 'من القمر الصناعي إلى القرار<br>في الوقت الفعلي.',
+                how_intro: 'صحارين لا تجمع البيانات فحسب — بل تتخذ قرارات. تضمن عمليتنا تحويل ذكاء الأقمار الصناعية إلى توصيات تشغيلية قابلة للتنفيذ.',
+                cap_title: 'وحدات الذكاء الاصطناعي<br>للأداء الصناعي.',
+                footer_desc: 'توفر صحارين AI الاستخبارات البيئية الصناعية والصيانة التنبؤية لمواقع الطاقة والبنية التحتية واسعة النطاق في البيئات القاسية.',
                 copyright: '© 2026 صحارين لنظم الذكاء الاصطناعي الصناعية — جميع الحقوق محفوظة',
                 how_label: 'العملية',
-                step_01_title: 'التقاط القمر الصناعي',
-                step_01_desc: 'تمر أقمار ناسا ووكالة الفضاء الأوروبية فوق موقعك وتسجل الظروف الجوية - AOD، والرياح، ودرجة حرارة السطح، وبصمات أعمدة الغبار.',
-                step_02_title: 'دمج ومعايرة الذكاء الاصطناعي',
-                step_02_desc: 'تدمج صحارين جميع تدفقات البيانات الثلاثة باستخدام نموذج فيزيائي (رقم رينولدز، حركية أرينيوس) لإنشاء <strong>مؤشر شدة الغبار (DSI)</strong> واحد.',
-                step_03_title: 'انتشار المحرك السببي',
-                step_03_desc: 'ترسم الشبكة الافتراضية Bayesian كيفية انتقال درجة DSI هذه عبر الرسم البياني لأصولك - المرشح ← الضاغط ← الدوار ← المخرجات - متوقعة مكان حدوث العطل.',
-                step_04_title: 'تسليم التوصيات',
-                step_04_desc: 'يولد النظام قائمة مرتبة من الإجراءات مع تقديرات العائد على الاستثمار، ويكتب مطالبة برصيد الكربون في السجل، وينبه فريقك - كل ذلك في غضون 0.4 مللي ثانية.',
-                cap_intro: 'يتم التحقق من صحة كل وحدة بشكل مستقل ويمكن نشرها بشكل فردي أو كحزمة متكاملة.',
+                step_01_title: 'المراقبة عبر الأقمار الصناعية',
+                step_01_desc: 'تسجل أقمار ناسا ووكالة الفضاء الأوروبية الظوث الجوية - Aود، والرياح، وبصمات أعمدة الغبار عبر موقعك.',
+                step_02_title: 'نمذجة الإجهاد البيئي',
+                step_02_desc: 'يتم دمج التدفقات الفردية باستخدام النمذجة القائمة على الفيزياء لإنشاء مؤشر شدة الغبار (DSI) المحلي.',
+                step_03_title: 'تحليل البيانات الصناعية',
+                step_03_desc: 'ترسم النماذج السببية خرائط الضغوط البيئية مقابل اهتزاز الآلات الميكانيكية وأداء الموقع في الوقت الفعلي.',
+                step_04_title: 'التنبؤ المسبق بالأعطال',
+                step_04_desc: 'يحدد النظام أنماط المخاطر ويولد توصيات تشغيلية دقيقة لفرق الصيانة.',
+                cap_intro: 'يتم التحقق من كل وحدة بشكل مستقل ويمكن نشرها بشكل فردي أو كحزمة متكاملة.',
                 cap_01_title: 'دمج بيانات الأقمار الصناعية',
-                cap_01_desc: 'يدمج باستمرار بيانات الهباء الجوي من ناسا MODIS، وصور أعمدة الغبار من ESA Sentinel-2، ومقاطع الغلاف الجوي من Copernicus CAMS في قراءة بيئية واحدة موحدة.',
-                cap_02_title: 'رسم خرائط ضغط الأصول ثلاثية الأبعاد',
-                cap_02_desc: 'تحليل سلامة الهيكل في الوقت الفعلي لكل آلة في الموقع. يصور الحرارة والاهتزاز وضغط التآكل عبر جميع الأصول في وقت واحد - مرمز بالألوان حسب مستوى المخاطرة.',
+                cap_01_desc: 'تكامل مستمر لبيانات ناسا MODIS ووكالة الفضاء الأوروبية Sentinel-2 وكوبرنيكوس CAMS في طبقة استخبارات بيئية موحدة.',
+                cap_02_title: 'رسم خرائط إجهاد الأصول ثلاثية الأبعاد',
+                cap_02_desc: 'تحليل صحة الهيكل في الوقت الفعلي وتصور ضغوط الحرارة والاهتزاز والتآكل عبر جميع الأصول.',
                 cap_03_title: 'تتبع الأعطال السببية',
-                cap_03_desc: 'لا يكتفي بتوضيح ما سيفشل، بل يشرح السبب. يتتبع الرسم البياني السببي Bayesian السبب الجذري عبر سلسلة التبعية حتى يقوم المهندسون بإصلاح المشكلة الصحيحة، وليس العرض فقط.',
+                cap_03_desc: 'تحدد شبكات بايزي الأسباب الجذرية عبر سلاسل التبعية، وفلترة الضجيج عن التدهور الميكانيكي الحقيقي.',
                 cap_04_title: 'المحسن التوجيهي',
-                cap_04_desc: 'يستخدم تحليل الذكاء الاصطناعي لتوليد إجراءات صيانة مصنفة ومسعرة تلقائياً. تتضمن كل توصية عائداً تقديرياً على الاستثمار وتكلفة وقت التوقف التي تم تجنبها.',
-                cap_05_title: 'دفتر الكربون ESG',
-                cap_05_desc: 'يتم تسجيل كل عملية تحسين كمطالبة برصيد كربون موقعة مشفراً على دفتر البلوكشين - جاهز للتدقيق وفقاً لـ ISO 14064-3 وبروتوكول GHG ومعايير Gold Standard.',
+                cap_04_desc: 'يولد إجراءات صيانة مرتبة مع تقديرات العائد على الاستثمار وتحليل تكلفة وقت التوقف المتفادى.',
+                cap_05_title: 'سجل الأثر الكربوني',
+                cap_05_desc: 'يتم تسجيل تحسينات الكفاءة كتقليل للانبعاثات القابلة للقياس، بما يتوافق مع أطر المحاسبة البيئية القياسية.',
                 cap_06_title: 'وضع الحافة السيادية',
-                cap_06_desc: 'للمواقع السرية، تقطع صحارين اتصالها السحابي وتعمل بالكامل على مجموعات الحافة المحلية المدعومة من NVIDIA داخل المملكة العربية السعودية - متوافقة مع لوائح سدايا.',
-                cap_label: 'وحدات الذكاء الاصطناعي الأساسية',
-                label_aod: 'قيمة AOD المباشرة (ناسا MODIS)',
-                label_ddi: 'مؤشر كشف الغبار (ESA)',
-                label_co2: 'ثاني أكسيد الكربون المُوفر — معتمد',
-                label_lat: 'زمن انتقال استدلال الذكاء الاصطناعي',
-                impact_label: 'الأثر البيئي الموثق',
-                impact_title: 'عمليات تمول<br>نفسها بنفسها.',
-                impact_desc_01: 'في كل مرة تكتشف فيها صحارين عطلاً، فإنها تولد مطالبة برصيد كربون معتمد. هذه ليست تقديرات - إنها سجلات مرتبطة ببيانات تشغيلية حقيقية من قياسات الأقمار الصناعية المعتمدة من ناسا.',
-                impact_desc_02: 'يمكن للمستثمرين والمنظمين تدقيق كل مطالبة في دفتر البلوكشين وتتبعها طوال المسافة من حزمة القمر الصناعي والقرار الذي تم اتخاذه.',
-                sectors_label: 'أين نعمل',
-                sectors_title: 'بُنيت لأقسى<br>البيئات على الأرض.',
-                sectors_intro: 'تم تصميم صحارين خصيصاً لتحديات العمليات الصناعية في الخليج والشرق الأوسط - الحرارة الشديدة، والرمال الكاشطة، وتآكل الأملاح، والمتطلبات التنظيمية لرؤية 2030 ونيوم.',
-                sector_01_name: 'القطاع_01',
-                sector_01_title: 'شبكة الطاقة والطاقة',
-                sector_01_desc: 'يحمي خطوط النقل والتوربينات والمصفوفات الشمسية من الإجهاد الحراري وتآكل الأملاح. يمنع حالات الانقطاع قبل وصولها للشبكة.',
-                sector_01_tag: '422 عقدة مراقبة',
-                sector_02_name: 'القطاع_02',
-                sector_02_title: 'النفط والغاز والتعدين',
-                sector_02_desc: 'مراقبة سلامة الهيكل لآلات الضغط والمضخات والبنية التحتية للمناجم العميقة. تتبع الاهتزاز والتآكل في الوقت الفعلي.',
-                sector_02_tag: 'عمق تشغيلي 4.2 كم',
-                sector_03_name: 'القطاع_03',
-                sector_03_title: 'المدن الذكية والمدنية',
-                sector_03_desc: 'يدعم نيوم ورؤية 2030 في المدن الذكية بمراقبة البنية التحتية القادرة على الصمود أمام الكوارث وبروتوكولات التعافي السريع للمناطق ذات الحرارة العالية.',
-                sector_03_tag: 'اتفاقية مستوى خدمة 99.9%',
-                comp_label: 'المعايير والشهادات',
-                comp_title: 'درجة مؤسسية.<br>جاهز للاختبار.',
-                comp_intro: 'تم بناء صحارين وفقاً لأعلى المعايير الدولية للأمن وأخلاقيات الذكاء الاصطناعي والمحاسبة البيئية.',
-                comp_01_status: 'موثق — أمن المعلومات',
-                comp_02_status: 'متوافق — معايير الذكاء الاصطناعي',
-                comp_03_status: 'قيد المراجعة — حوكمة الذكاء الاصطناعي السعودية',
-                comp_04_status: 'معتمد — محاسبة الكربون',
-                comp_05_status: 'نشط — أمن البيانات',
-                comp_06_status: 'نشط — التحقق من الحوكمة البيئية والاجتماعية والمؤسسية',
+                cap_06_desc: 'وضع عالي الأمان للمواقع الحساسة، يعمل بالكامل على مجموعات الحافة المحلية المشفرة دون الاعتماد على السحابة.',
+                cap_label: 'وحدات الذكاء الاصطناعي',
+                impact_label: 'الأثر التشغيلي',
+                impact_title: 'ذكاء يمول<br>نفسه بنفسه.',
+                impact_desc_01: 'قد تساهم تحسينات الكفاءة التشغيلية في تقليل الانبعاثات القابلة للقياس، والتي يمكن الإبلاغ عنها بموجب أطر المحاسبة البيئية القياسية.',
+                impact_desc_02: 'صُمم بالتوافق مع بروتوكول GHG ومعايير ISO 14064-3.',
+                sectors_label: 'القطاعات التي نخدمها',
+                sectors_title: 'هندسة مخصصة<br>لأقسى المواقع.',
+                sectors_intro: 'تم تصميم صحارين للعمليات الصناعية والطاقة واسعة النطاق حيث تشكل الحرارة الشديدة والغبار الكاشط مخاطر تشغيلية ثابتة.',
+                sector_01_title: 'البنية التحتية للطاقة والقوى',
+                sector_01_desc: 'حماية خطوط النقل والتوربينات والمصفوفات الشمسية من الإجهاد الحراري وتآكل الأملاح.',
+                sector_02_title: 'عمليات النفط والغاز',
+                sector_02_desc: 'مراقبة سلامة الهيكل للضواغط والمضخات والبنية التحتية للحفر في الوقت الفعلي.',
+                sector_03_title: 'التعدين والصناعات الثقيلة',
+                sector_03_desc: 'الصيانة التنبؤية لتهوية المناجم العميقة والآلات الثقيلة في بيئات الغبار الكثيف.',
+                comp_label: 'الامتثال والمعايير',
+                comp_title: 'درجة مؤسسية.<br>جاهز للتجربة.',
+                comp_01_status: 'ISO 27001 (أمن المعلومات)',
+                comp_02_status: 'SOC 2 Type II (أمن البيانات)',
+                comp_03_status: 'GHG Protocol (المحاسبة البيئية)',
+                comp_04_status: 'ISO 14064-3 (تتبع الكربون)',
+                comp_05_status: 'التوافق مع خصوصية البيانات',
+                comp_06_status: 'إطار امتثال ESG',
             }
         };
 
