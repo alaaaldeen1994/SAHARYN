@@ -1035,82 +1035,88 @@
             line-height: 1.8;
         }
 
-        /* ── SATELLITE SCANNER VISUAL ── */
-        .scanner-container {
-            position: relative;
-            width: 100%;
-            max-width: 1100px;
+        /* ── DUAL CORE INTEL VISUAL ── */
+        .intel-showcase {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            max-width: 1200px;
             margin: 0 auto 80px auto;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid var(--border-bright);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
-            display: flex;
-            cursor: pointer;
-            cursor: ew-resize;
         }
 
-        .scanner-img {
+        .intel-card {
+            background: rgba(12, 21, 35, 0.4);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .intel-card:hover {
+            border-color: var(--accent);
+            background: rgba(16, 185, 129, 0.04);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .intel-img-wrapper {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 24px;
+        }
+
+        .intel-img {
             display: block;
             width: 100%;
             height: auto;
-            object-fit: cover;
             aspect-ratio: 16/9;
+            object-fit: cover;
+            transition: transform 0.5s ease;
         }
 
-        .scanner-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('images/facility_scanned.jpg');
-            background-size: cover;
-            background-position: center;
-            clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);
-            /* Smooth snapback when mouse leaves */
-            transition: clip-path 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        .intel-card:hover .intel-img {
+            transform: scale(1.03);
         }
 
-        .scanner-container:hover .scanner-overlay,
-        .scanner-container:active .scanner-overlay {
-            transition: none;
+        .intel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .scan-line {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 50%;
-            width: 2px;
-            background: var(--accent);
-            box-shadow: 0 0 15px var(--accent), 0 0 30px var(--accent);
-            transform: translateX(-50%);
-            pointer-events: none;
-            z-index: 10;
-            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        .intel-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 8px;
         }
 
-        .scanner-container:hover .scan-line,
-        .scanner-container:active .scan-line {
-            transition: none;
+        .intel-desc {
+            font-size: 14px;
+            color: var(--text-mid);
+            line-height: 1.6;
         }
 
-        .scan-line::after {
-            content: 'SCAN';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: var(--bg-card);
-            color: var(--accent);
-            border: 1px solid var(--accent);
-            padding: 4px 10px;
+        .intel-badge {
             font-family: var(--mono);
             font-size: 10px;
-            letter-spacing: 2px;
-            border-radius: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            color: var(--text-mid);
+            letter-spacing: 1px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 20px;
+        }
+
+        .intel-badge.active {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent);
+            border: 1px solid rgba(16, 185, 129, 0.3);
         }
 
 
@@ -1188,6 +1194,10 @@
             .section-intro {
                 font-size: 16px;
                 margin-bottom: 40px;
+            }
+
+            .intel-showcase {
+                grid-template-columns: 1fr;
             }
 
             #impact>div {
@@ -1312,11 +1322,32 @@
             giving you environmental intelligence that simply cannot be gathered any other way.
         </p>
 
-        <!-- SATELLITE SCANNER VISUAL -->
-        <div class="scanner-container" id="satellite-scanner">
-            <img src="images/facility_base.jpg" class="scanner-img" alt="Base Industrial Site">
-            <div class="scanner-overlay" id="scanner-overlay"></div>
-            <div class="scan-line" id="scan-line"></div>
+        <!-- DUAL CORE INTEL VISUAL -->
+        <div class="intel-showcase">
+            <div class="intel-card">
+                <div class="intel-badge">RAW OPTICAL // 10m BASELINE</div>
+                <div class="intel-img-wrapper">
+                    <img src="images/facility_base.jpg" class="intel-img" alt="Base Industrial Site">
+                </div>
+                <div class="intel-title">Surface Infrastructure</div>
+                <div class="intel-desc">
+                    Standard high-resolution visual telemetry captures ground operations, providing the physical
+                    substrate for mapping.
+                </div>
+            </div>
+            <div class="intel-card">
+                <div class="intel-badge active">
+                    <i data-lucide="zap" size="12"></i> OVERLAY ACTIVATED
+                </div>
+                <div class="intel-img-wrapper">
+                    <img src="images/facility_scanned.jpg" class="intel-img" alt="Intelligence Overlay">
+                </div>
+                <div class="intel-title">Environmental Stress Manifold</div>
+                <div class="intel-desc">
+                    Multi-spectral data fusion reveals invisible stressors (thermal gradients, dust density, and
+                    vibration nodes) in real-time.
+                </div>
+            </div>
         </div>
 
         <div class="bridges-grid">
@@ -1899,38 +1930,6 @@
         updateClock();
         setInterval(fetchLiveData, 8000);
         setInterval(updateClock, 1000);
-
-        // ── Interactive Scanner Logic ──
-        const initScanner = () => {
-            const container = document.getElementById('satellite-scanner');
-            const overlay = document.getElementById('scanner-overlay');
-            const line = document.getElementById('scan-line');
-            if (!container) return;
-
-            const updateScanner = (e) => {
-                const rect = container.getBoundingClientRect();
-                let x = e.clientX || (e.touches && e.touches[0].clientX);
-                if (x === undefined) return;
-                x = x - rect.left;
-                let percent = (x / rect.width) * 100;
-                percent = Math.max(0, Math.min(100, percent));
-
-                overlay.style.clipPath = `polygon(0 0, ${percent}% 0, ${percent}% 100%, 0 100%)`;
-                line.style.left = `${percent}%`;
-            };
-
-            container.addEventListener('mousemove', updateScanner);
-            container.addEventListener('touchmove', updateScanner);
-
-            // Snap back to 50% on leave
-            const resetScanner = () => {
-                overlay.style.clipPath = `polygon(0 0, 50% 0, 50% 100%, 0 100%)`;
-                line.style.left = `50%`;
-            };
-            container.addEventListener('mouseleave', resetScanner);
-            container.addEventListener('touchend', resetScanner);
-        };
-        initScanner();
 
 
         // -- Firebase Auth Integration --
