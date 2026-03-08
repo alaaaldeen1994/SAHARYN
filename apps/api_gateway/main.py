@@ -415,7 +415,7 @@ async def execute_resilience_inference(
 
 @app.get("/v2/telemetry/stream", tags=["Telemetry"])
 async def get_telemetry_stream(site_id: str = "SA_EAST_RU_01"):
-    # Link to Real Satellite ETL Core
+    # Link to Real Satellite ETL Core - Real-time bridge execution
     packet = satellite_etl.transform_spectral_data("LIVE_STREAM", site_id)
     
     # RECORD SATELLITE SYNC IN PERMANENT AUDIT LEDGER
