@@ -95,7 +95,31 @@ class SatelliteETLService:
 
         # Operation Mode: SIMULATION | LIVE
         self.mode = os.getenv("SAHARYN_SATELLITE_MODE", "SIMULATION").upper()
+        self.cached_demo_packet: Optional[SatelliteDataPacket] = None
         logger.info(f"ETL_ENGINE: Initialized in {self.mode} mode with Triple-Source Bridge.")
+
+    def get_frozen_demo_packet(self, site_id: str) -> SatelliteDataPacket:
+        """
+        Returns a stable, frozen telemetry packet for demonstrations.
+        Prevents live satellite drifts from disrupting the presentation narrative.
+        """
+        if self.cached_demo_packet and self.cached_demo_packet.site_id == site_id:
+            return self.cached_demo_packet
+        
+        # First-run initialization of frozen state
+        self.cached_demo_packet = SatelliteDataPacket(
+            site_id=site_id,
+            timestamp=datetime.utcnow(),
+            source_agency="SAHARYN_STABILITY_LOCK",
+            aod_550nm=0.12,
+            dust_concentration=24.0,
+            temp_2m_k=305.0,
+            wind_u_component=2.1,
+            wind_v_component=1.4,
+            provenance_url="INTERNAL://DEMO_STABILITY_LOCK",
+            integrity_hash="SH-STABILITY-LOCKED-DEMO-V2"
+        )
+        return self.cached_demo_packet
 
     def _generate_integrity_hash(self, payload: str) -> str:
         """

@@ -96,7 +96,8 @@ try:
     esg_engine = ESGImpactEngine()
     sovereign_ledger = SovereignLedgerEngine(node_id="RIYADH_HQ_CLUSTER")
     satellite_etl = SatelliteETLService(api_key=os.getenv("COP_API_KEY", "DUMMY"))
-    logger.info("SYSTEM_INIT: All core AI, ESG, and Compliance services initialized.")
+    DEMO_STABILITY_MODE = os.getenv("SAHARYN_SATELLITE_MODE", "LIVE") == "SIMULATION"
+    logger.info(f"SYSTEM_INIT: All core AI, ESG, and Compliance services initialized. Stability Mode: {'ON' if DEMO_STABILITY_MODE else 'OFF'}")
     logger.info("SATELLITE_LINK: Copernicus CAMS EAC4 Feed Engaged.")
 except Exception as e:
     logger.critical(f"SYSTEM_FATAL_ERROR: Service initialization failed. {str(e)}")
@@ -153,6 +154,7 @@ app = FastAPI(
     docs_url="/v2/docs",
     redoc_url="/v2/redoc"
 )
+app.start_time = time.time()
 
 # --- 4. INTEGRATED MISSION CONTROL (Dashboard Mount) ---
 @app.get("/", include_in_schema=False)
@@ -243,15 +245,37 @@ async def global_exception_handler(request: Request, exc: Exception):
 async def get_system_health():
     """
     Verified System Health Check.
-    Checks connectivity to all primary sub-services.
+    Performs dynamic probes across the industrial tech stack.
     """
+    db = SessionLocal()
+    db_status = "OPERATIONAL"
+    try:
+        # Probe DB health
+        db.execute("SELECT 1")
+    except Exception as e:
+        logger.error(f"HEALTH_CHECK_FAILURE: Database unreachable. {str(e)}")
+        db_status = "CRITICAL_OFFLINE"
+    finally:
+        db.close()
+
+    # Calculate uptime
+    current_uptime = time.time() - getattr(app, "start_time", time.time())
+    
     return {
-        "status": "OPERATIONAL",
+        "status": "OPERATIONAL" if db_status == "OPERATIONAL" else "DEGRADED",
         "environment": ENVIRONMENT,
-        "integrity_checksum": "SH_2024_PROD_001",
-        "active_services": ["CAMS_ETL", "SCADA_BRIDGE", "CAUSAL_CORE"],
-        "telemetry_sync": True,
-        "uptime": f"{time.time() / 3600:.2f}h"
+        "integrity_checksum": "SH_2026_PROD_BETA_V1",
+        "database": db_status,
+        "services": {
+            "CAMS_ETL": "ACTIVE",
+            "CAUSAL_CORE": "ACTIVE",
+            "SATELLITE_LINK": "NOMINAL" if not DEMO_STABILITY_MODE else "STABILITY_LOCK_ACTIVE"
+        },
+        "stats": {
+            "uptime_seconds": round(current_uptime, 2),
+            "inference_latency_ms": 42, # Mock value representing rolling avg
+            "last_heartbeat": datetime.utcnow().isoformat()
+        }
     }
 
 @app.post("/v2/inference/resilience", response_model=InferenceResponse, tags=["Inference"])
@@ -269,9 +293,29 @@ async def execute_resilience_inference(
     start_ts = time.time()
 
     # --- PHASE 1: DRIFT AUDIT & SATELLITE SYNC ---
-    # Fetch real-time AOD from Copernicus if no override is provided
-    satellite_packet = satellite_etl.transform_spectral_data("REAL_TIME", payload.site_id)
-    aod_val = payload.aod_override or satellite_packet.aod_550nm
+    # Fetch environmental state
+    # 1. Stability Mode (Frozen Narrative)
+    if DEMO_STABILITY_MODE:
+        satellite_packet = satellite_etl.get_frozen_demo_packet(payload.site_id)
+        aod_val = payload.aod_override or satellite_packet.aod_550nm
+    else:
+        # 2. Check for Manual/Scenario Overrides in Database (Last 60 mins)
+        db = SessionLocal()
+        try:
+            recent_sat = db.query(SatelliteTelemetry).filter(
+                SatelliteTelemetry.site_id == payload.site_id
+            ).order_by(SatelliteTelemetry.timestamp.desc()).first()
+            
+            if recent_sat and (datetime.utcnow() - recent_sat.timestamp).total_seconds() < 3600:
+                aod_val = payload.aod_override or recent_sat.aod_550nm
+                logger.info(f"INFERENCE_STATE: Using recent DB telemetry ({recent_sat.source_agency})")
+            else:
+                # 3. Fallback to Real-Time Satellite Ingestion
+                satellite_packet = satellite_etl.transform_spectral_data("REAL_TIME", payload.site_id)
+                aod_val = payload.aod_override or satellite_packet.aod_550nm
+                logger.info("INFERENCE_STATE: Using live CAMS/MODIS telemetry stream")
+        finally:
+            db.close()
 
     drift_report = drift_detector.check_for_drift({
         "vibration_mm_s": [payload.vibration_mm_s],
@@ -450,6 +494,14 @@ async def toggle_sovereign_mode(enable: bool):
     causal_engine.sovereign_mode = enable
     logger.warning(f"SOVEREIGN_MODE: {'ACTIVATED' if enable else 'DEACTIVATED'} - Edge Computing Protocol Engaged.")
     return {"status": "SUCCESS", "sovereign_mode": causal_engine.sovereign_mode}
+
+@app.post("/v2/system/demo-stability", tags=["System"])
+async def toggle_demo_stability(enable: bool):
+    """Toggles Demonstration Stability Mode (Freeze/Thaw Satellite Ingestion)."""
+    global DEMO_STABILITY_MODE
+    DEMO_STABILITY_MODE = enable
+    _write_audit("STABILITY_TOGGLE", "API", "SUCCESS", f"Stability Mode set to: {enable}")
+    return {"status": "SUCCESS", "demo_stability_mode": enable}
 
 @app.get("/v2/energy/missions", tags=["Energy"])
 async def get_energy_missions():

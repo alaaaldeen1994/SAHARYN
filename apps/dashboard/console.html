@@ -787,6 +787,16 @@
                         style="font-family: 'JetBrains Mono'; font-size: 10px; color: var(--accent-green); letter-spacing: 1px;">PHYSICS-INFORMED
                         AI STABILITY: NOMINAL</span>
                 </div>
+                <div id="stability-control" title="Requires ADMIN role" onclick="toggleStabilityMode()"
+                    aria-disabled="true"
+                    style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 4px 12px; border-radius: 4px; display: flex; align-items: center; gap: 8px; cursor: not-allowed; transition: 0.3s; opacity: 0.4; pointer-events: none;">
+                    <i data-lucide="anchor" id="stab-icon" size="14" color="var(--text-secondary)"></i>
+                    <span id="stab-label"
+                        style="font-family: 'JetBrains Mono'; font-size: 10px; color: var(--text-secondary); letter-spacing: 1px;">STABILITY_LOCKED:
+                        OFF</span>
+                    <i data-lucide="lock" id="stab-lock-icon" size="11" color="var(--text-secondary)"
+                        style="margin-left: 2px;"></i>
+                </div>
                 <div id="sovereign-control" title="Requires ADMIN role" data-rbac-action="toggle_sovereign"
                     onclick="toggleSovereignMode()" aria-disabled="true"
                     style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 4px 12px; border-radius: 4px; display: flex; align-items: center; gap: 8px; cursor: not-allowed; transition: 0.3s; opacity: 0.4; pointer-events: none;">
@@ -2408,6 +2418,40 @@
                 console.error("Sovereign Toggle Failure", e);
             }
         }
+        async function toggleStabilityMode() {
+            const control = document.getElementById('stability-control');
+            const stabLabel = document.getElementById('stab-label');
+            const stabIcon = document.getElementById('stab-icon');
+            const currentlyOn = stabLabel.innerText.includes('ON');
+
+            try {
+                const res = await fetch(`/v2/system/demo-stability?enable=${!currentlyOn}`, { method: 'POST' });
+                const data = await res.json();
+
+                if (data.status === 'SUCCESS') {
+                    if (data.demo_stability_mode) {
+                        stabLabel.innerText = 'STABILITY_LOCKED: ON';
+                        stabLabel.style.color = 'var(--accent-green)';
+                        stabIcon.setAttribute('color', 'var(--accent-green)');
+                        control.style.borderColor = 'var(--accent-green)';
+                        control.style.background = 'rgba(16, 185, 129, 0.05)';
+                        logEvent("STABILITY_LOCKED: Satellite ingestion frozen to prevent narrative jumps.", "info");
+                    } else {
+                        stabLabel.innerText = 'STABILITY_LOCKED: OFF';
+                        stabLabel.style.color = 'var(--text-secondary)';
+                        stabIcon.setAttribute('color', 'var(--text-secondary)');
+                        control.style.borderColor = 'var(--border-color)';
+                        control.style.background = 'rgba(255,255,255,0.03)';
+                        logEvent("STABILITY_RELEASED: Resuming live satellite telemetry streams.", "info");
+                    }
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                }
+            } catch (e) {
+                logEvent('STABILITY_TOGGLE_FAILED: Could not reach API gateway.', 'warn');
+                console.error("Stability Toggle Failure", e);
+            }
+        }
+        window.toggleStabilityMode = toggleStabilityMode;
 
 
         async function updateAssetStressMap() {
@@ -3434,6 +3478,27 @@
                 deleteBtn.style.opacity = '0.3';
                 deleteBtn.style.cursor = 'not-allowed';
                 deleteBtn.title = `Requires ADMIN role (current: ${role})`;
+            }
+
+            // Stability mode button — ADMIN+ only
+            const stabilityBtn = document.getElementById('stability-control');
+            const stabLockIcon = document.getElementById('stab-lock-icon');
+            if (stabilityBtn) {
+                if (actions.toggle_sovereign) { // Using same permission key for demo controls
+                    stabilityBtn.setAttribute('aria-disabled', 'false');
+                    stabilityBtn.style.opacity = '1';
+                    stabilityBtn.style.pointerEvents = 'auto';
+                    stabilityBtn.style.cursor = 'pointer';
+                    stabilityBtn.title = 'Demonstration Stability Mode — Click to toggle';
+                    if (stabLockIcon) stabLockIcon.style.display = 'none';
+                } else {
+                    stabilityBtn.setAttribute('aria-disabled', 'true');
+                    stabilityBtn.style.opacity = '0.4';
+                    stabilityBtn.style.pointerEvents = 'none';
+                    stabilityBtn.style.cursor = 'not-allowed';
+                    stabilityBtn.title = `STABILITY_MODE: Requires ADMIN role (current: ${role})`;
+                    if (stabLockIcon) stabLockIcon.style.display = 'inline';
+                }
             }
 
             // Sovereign mode button — ADMIN+ only
