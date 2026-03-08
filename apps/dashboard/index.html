@@ -990,8 +990,8 @@
             <a href="#capabilities" data-i18n="nav_cap">CAPABILITIES</a>
             <a href="#impact" data-i18n="nav_impact">IMPACT</a>
             <a href="#sectors" data-i18n="nav_sec">SECTORS</a>
-            <button onclick="toggleLanguage()"
-                style="background:none;border:none;color:var(--text-dim);font-family:var(--mono);font-size:11px;cursor:pointer;letter-spacing:1px;">EN
+            <button id="lang-toggle-btn" onclick="window.toggleLanguage()"
+                style="background:none;border:none;color:var(--text-dim);font-family:var(--mono);font-size:11px;cursor:pointer;letter-spacing:1px;padding: 10px;">EN
                 / عربي</button>
             <div class="nav-cta" id="login-btn" style="cursor:pointer;" data-i18n="nav_cta">Sign In / Sign Up</div>
 
@@ -1628,17 +1628,23 @@
             }
         };
 
-        let lang = 'en';
-        function toggleLanguage() {
-            lang = lang === 'en' ? 'ar' : 'en';
-            document.body.dir = lang === 'ar' ? 'rtl' : 'ltr';
+        window.lang = 'en';
+        window.toggleLanguage = function () {
+            window.lang = window.lang === 'en' ? 'ar' : 'en';
+            document.body.dir = window.lang === 'ar' ? 'rtl' : 'ltr';
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const k = el.getAttribute('data-i18n');
-                if (translations[lang][k]) el.innerHTML = translations[lang][k];
+                if (translations[window.lang][k]) el.innerHTML = translations[window.lang][k];
             });
+
+            // Update toggle button text
+            const btn = document.getElementById('lang-toggle-btn');
+            if (btn) btn.innerText = window.lang === 'en' ? 'EN / عربي' : 'عربي / EN';
+
             // Re-render icons for RTL alignment
             if (typeof lucide !== 'undefined') lucide.createIcons();
-        }
+            console.log(`Language switched to: ${window.lang}`);
+        };
 
         lucide.createIcons();
         fetchLiveData();
@@ -1685,7 +1691,7 @@
 
                     // Update all buttons that used to say "Sign In"
                     i18nButtons.forEach(btn => {
-                        btn.innerText = lang === 'ar' ? "فتح مركز العمليات" : "Open Mission Control";
+                        btn.innerText = window.lang === 'ar' ? "فتح مركز العمليات" : "Open Mission Control";
                         if (btn.tagName === 'A') btn.href = 'console.html';
                     });
 
@@ -1701,7 +1707,7 @@
                     if (systemStatus) systemStatus.innerText = "GUEST_MODE";
 
                     i18nButtons.forEach(btn => {
-                        btn.innerText = translations[lang]['nav_cta'];
+                        btn.innerText = translations[window.lang]['nav_cta'];
                         if (btn.tagName === 'A') btn.href = '#';
                     });
                 }
