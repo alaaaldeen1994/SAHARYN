@@ -1,6 +1,6 @@
 import networkx as nx
 import numpy as np
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any
 from core.common.base import get_logger
 
 logger = get_logger("CausalBayesianEngine")

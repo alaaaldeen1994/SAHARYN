@@ -3,7 +3,6 @@ import time
 import requests
 import json
 import os
-import signal
 
 def run_test():
     print("Starting Saharyn AI API Gateway on port 8003...")
@@ -67,7 +66,7 @@ def run_test():
     process.terminate()
     try:
         process.wait(timeout=5)
-    except:
+    except Exception:
         process.kill()
 
 if __name__ == "__main__":

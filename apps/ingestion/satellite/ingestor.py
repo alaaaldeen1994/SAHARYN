@@ -1,7 +1,7 @@
 import ee
 import datetime
 from typing import Dict, Any
-from core.common.base import BaseConnector, get_logger
+from core.common.base import BaseConnector
 
 class SatelliteIngestor(BaseConnector):
     """

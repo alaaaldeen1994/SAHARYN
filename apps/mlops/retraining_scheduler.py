@@ -12,19 +12,25 @@ Run this as a separate service:
     python apps/mlops/retraining_scheduler.py
 """
 
-import os
-import time
 import logging
+import os
 import schedule
 import threading
-from datetime import datetime, timedelta
-from typing import Dict, Any
+import time
+from datetime import datetime
+from typing import Dict, Optional, Any # Keep Any as it's used in get_stats
 
-from apps.mlops.mlflow_manager import SAHARYNMLflow
-from services.monitoring.drift_detector import DriftDetectionEngine
-from services.ai_core.training_pipeline import TrainingPipelines
+import numpy as np
 import pandas as pd
 import sqlalchemy as sa
+from dotenv import load_dotenv
+
+# Real-world API Connectors
+from apps.mlops.mlflow_manager import SAHARYNMLflow
+from services.ai_core.training_pipeline import TrainingPipelines
+from services.monitoring.drift_detector import DriftDetectionEngine
+
+load_dotenv()
 
 logger = logging.getLogger("SAHARYN_RETRAINING")
 
@@ -118,7 +124,7 @@ class RetrainingScheduler:
         Returns True if retraining started, False if skipped (already running).
         """
         if not self._retraining_lock.acquire(blocking=False):
-            logger.warning(f"Retraining skipped — another run is in progress")
+            logger.warning("Retraining skipped — another run is in progress")
             return False
 
         try:
@@ -171,7 +177,7 @@ class RetrainingScheduler:
                 if promoted:
                     logger.info(f"NEW PRODUCTION MODEL: {model_key} v{version}")
                 else:
-                    logger.warning(f"Model did not pass quality gate — keeping old model")
+                    logger.warning("Model did not pass quality gate — keeping old model")
 
             return True
 

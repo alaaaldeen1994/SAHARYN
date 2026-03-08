@@ -1,9 +1,8 @@
 import logging
 import time
 import random
-import uuid
 from datetime import datetime
-from typing import Dict, Any, List
+from typing import Dict, List
 from pydantic import BaseModel
 
 logger = logging.getLogger("SCADA_Gateway")

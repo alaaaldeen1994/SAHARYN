@@ -1,5 +1,4 @@
-import numpy as np
-from typing import List, Dict, Any
+from typing import Dict, Any
 from pydantic import BaseModel
 from core.common.base import get_logger
 

@@ -1,4 +1,3 @@
-import os
 
 dashboard_path = 'apps/dashboard/console.html'
 index_path = 'apps/dashboard/index.html'

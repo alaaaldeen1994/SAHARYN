@@ -8,11 +8,9 @@ the models into the MLflow Model Registry.
 This makes the system "real" from day one.
 """
 
-import os
 import logging
 import pandas as pd
 import numpy as np
-from datetime import datetime
 
 from apps.mlops.mlflow_manager import SAHARYNMLflow
 from services.ai_core.training_pipeline import TrainingPipelines
@@ -45,7 +43,7 @@ def bootstrap_models():
     ) + np.random.normal(0, 0.03, n)
     df_dsi = pd.DataFrame(dsi_data)
 
-    with mlflow_mgr.start_run(model_key="dust_severity", run_name="production_bootstrap_v1") as run:
+    with mlflow_mgr.start_run(model_key="dust_severity", run_name="production_bootstrap_v1"):
         model, metrics = TrainingPipelines.train_dust_severity(df_dsi)
         mlflow_mgr.log_metrics(metrics)
         model_info = mlflow_mgr.register_model(model, "dust_severity")
@@ -73,7 +71,7 @@ def bootstrap_models():
     ) + np.random.normal(0, 0.02, n)
     df_asset = pd.DataFrame(asset_data)
 
-    with mlflow_mgr.start_run(model_key="asset_performance", run_name="production_bootstrap_v1") as run:
+    with mlflow_mgr.start_run(model_key="asset_performance", run_name="production_bootstrap_v1"):
         model, metrics = TrainingPipelines.train_asset_performance(df_asset)
         mlflow_mgr.log_metrics(metrics)
         model_info = mlflow_mgr.register_model(model, "asset_performance")

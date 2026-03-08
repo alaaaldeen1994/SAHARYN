@@ -1,20 +1,17 @@
-import os
 import time
 import json
 import logging
 import asyncio
 import hashlib
-import uuid
 from datetime import datetime, timezone
-from typing import Dict, List, Optional
-
-from dotenv import load_dotenv
-load_dotenv()
+from typing import Dict, Optional
 
 from apps.ingestion.scada.pi_webapi_connector import PIWebAPIConnector
 from core.database.session import SessionLocal
 from core.database.models import SensorTelemetry, SatelliteTelemetry
 from services.ai_core.causal_engine import CausalIntegrityManifold
+from dotenv import load_dotenv
+load_dotenv()
 
 # --- CONFIGURATION ---
 MAPPING_PATH = "config/pilot_tag_mapping.json"

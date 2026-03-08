@@ -78,7 +78,6 @@ class AssetPerformancePredictorV2:
 
         # 3. RUL Calculation (Remaining Useful Life)
         # Standard service life being consumed at accelerated rate
-        base_rul_hrs = 24000 # 3-year standard MTBF
         # Accelerated aging factor: Integral of (dsi * temp_stress)
         aging_factor = np.mean(dsi_forecast) * 1.5
         rul_loss_hrs = aging_factor * len(dsi_forecast) # Storm consumes extra life

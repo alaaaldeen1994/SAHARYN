@@ -1,9 +1,8 @@
 import logging
 import hashlib
-import json
 import uuid
 from datetime import datetime
-from typing import List, Dict, Any, Optional
+from typing import List
 from pydantic import BaseModel
 from core.database.session import SessionLocal
 from core.database.models import CarbonLedger

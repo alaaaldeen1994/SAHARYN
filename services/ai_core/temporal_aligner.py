@@ -7,12 +7,10 @@ Function: Synchronizing Disparate Signal Frequencies for Multi-Modal Inference
 """
 
 import logging
-import time
-import json
 import pandas as pd
 import numpy as np
-from datetime import datetime, timedelta, timezone
-from typing import Dict, List, Optional, Any, Union
+from datetime import datetime, timedelta
+from typing import Dict, List, Any
 
 # --- LOGGING ---
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - [%(levelname)s] - %(message)s")

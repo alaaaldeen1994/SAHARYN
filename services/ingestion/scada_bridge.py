@@ -5,16 +5,14 @@ Standards: IEC 62443 (Cybersecurity), OPC UA v1.04, Modbus TCP
 Function: Field Data Infiltration, Signal Processing, and Air-Gapped Buffering
 """
 
-import os
 import time
-import uuid
 import json
 import logging
 import random
 import hmac
 import hashlib
 from datetime import datetime
-from typing import Dict, List, Optional, Any, Union
+from typing import Dict, List, Optional
 from collections import deque
 
 from pydantic import BaseModel, Field, validator
@@ -138,7 +136,7 @@ class SecureSCADABridge:
             if random.random() < 0.05: # 5% simulated network failure
                 raise ConnectionError("Upstream API Unreachable [Simulated]")
 
-            logger.info(f"DISPATCH_SUCCESS: Payload ACK received from Core API. Queue Clear.")
+            logger.info("DISPATCH_SUCCESS: Payload ACK received from Core API. Queue Clear.")
             return True
 
         except ConnectionError:

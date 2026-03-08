@@ -1,6 +1,6 @@
 import numpy as np
 import networkx as nx
-from typing import Dict, List, Any, Optional
+from typing import Dict, List
 from core.common.base import get_logger
 
 class IndustrialCausalEngine:
@@ -31,7 +31,8 @@ class IndustrialCausalEngine:
 
     def _sync_matrix(self):
         n = len(self.asset_mapping)
-        if n == 0: return
+        if n == 0:
+            return
         self.adjacency_matrix = np.zeros((n, n))
         for u, v, d in self.graph.edges(data=True):
             self.adjacency_matrix[self.asset_mapping[u], self.asset_mapping[v]] = d['weight']
@@ -42,7 +43,8 @@ class IndustrialCausalEngine:
         P_final = (I - A)^-1 * P_initial
         """
         n = len(self.asset_mapping)
-        if n == 0: return primary_failures
+        if n == 0:
+            return primary_failures
 
         # P vector initialization
         p_initial = np.zeros(n)
@@ -52,7 +54,7 @@ class IndustrialCausalEngine:
 
         # Leontief inverse style propagation for dependency chains
         # We cap the spectral radius to ensure convergence if cycles exist
-        I = np.eye(n)
+        np.eye(n)
         try:
             # P_total = P_initial + A*P_initial + A^2*P_initial ...
             # We use a finite sum for industrial stability (usually max depth 5-10)

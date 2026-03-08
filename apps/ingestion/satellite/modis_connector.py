@@ -21,7 +21,7 @@ import os
 import logging
 import time
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
 import requests
 import numpy as np
@@ -206,7 +206,7 @@ class MODISAerosolConnector:
             # Metadata properties
             links = granule.get("links", [])
             download_url = next(
-                (l["href"] for l in links if l.get("rel") == "http://esipfed.org/ns/fedsearch/1.1/data#"),
+                (link["href"] for link in links if link.get("rel") == "http://esipfed.org/ns/fedsearch/1.1/data#"),
                 None
             )
 
@@ -283,7 +283,7 @@ class MODISAerosolConnector:
     def validate_connection(self) -> Dict:
         """Health check — tests connectivity to NASA Earthdata."""
         try:
-            resp = self._get(
+            self._get(
                 f"{EARTHDATA_SEARCH}/collections.json",
                 params={"short_name": "MOD08_D3", "page_size": 1},
             )

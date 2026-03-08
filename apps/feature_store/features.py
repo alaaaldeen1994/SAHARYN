@@ -18,16 +18,13 @@ from datetime import timedelta
 from feast import (
     Entity,
     FeatureService,
-    FeatureStore,
     FeatureView,
     Field,
-    PushSource,
-    RequestSource,
 )
 from feast.infra.offline_stores.contrib.postgres_offline_store.postgres_source import (
     PostgreSQLSource,
 )
-from feast.types import Float32, Float64, Int32, String
+from feast.types import Float32, String
 
 
 # ─────────────────────────────────────────────────────────────

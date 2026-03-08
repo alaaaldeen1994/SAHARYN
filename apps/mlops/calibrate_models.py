@@ -10,7 +10,6 @@ import logging
 import pandas as pd
 import numpy as np
 import xgboost as xgb
-from datetime import datetime
 
 # Setup paths
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

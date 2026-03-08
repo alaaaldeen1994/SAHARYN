@@ -14,8 +14,7 @@ Key Features:
 import logging
 import numpy as np
 import pandas as pd
-from typing import Dict, Any, Tuple
-from datetime import datetime
+from typing import Dict, Tuple
 
 import xgboost as xgb
 from sklearn.model_selection import train_test_split

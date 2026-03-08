@@ -22,7 +22,7 @@ Standards alignment:
 
 import logging
 import numpy as np
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger("SAHARYN_SHAP")
 
@@ -224,7 +224,6 @@ class SHAPExplainer:
         """
         if self._explainer is not None:
             try:
-                import shap
                 values = self._explainer.shap_values(input_features)
                 # For binary classifiers, values is a list [neg_class, pos_class]
                 if isinstance(values, list):

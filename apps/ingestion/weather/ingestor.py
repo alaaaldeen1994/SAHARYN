@@ -1,7 +1,6 @@
 import cdsapi
-import os
 from typing import Dict, Any
-from core.common.base import BaseConnector, get_logger
+from core.common.base import BaseConnector
 
 class WeatherIngestor(BaseConnector):
     """

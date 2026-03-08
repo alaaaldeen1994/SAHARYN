@@ -1,7 +1,7 @@
 import os
 import logging
 import datetime
-from typing import List, Optional, Dict, Any
+from typing import List
 from tenacity import retry, stop_after_attempt, wait_exponential
 import cdsapi
 import ee

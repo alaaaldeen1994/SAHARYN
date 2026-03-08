@@ -1,7 +1,7 @@
 import asyncio
 import time
-from typing import Dict, Any, List
-from core.common.base import BaseConnector, get_logger
+from typing import Dict, Any
+from core.common.base import BaseConnector
 
 class SCADAGateway(BaseConnector):
     """

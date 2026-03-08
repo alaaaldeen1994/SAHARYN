@@ -1,6 +1,5 @@
-import numpy as np
 from scipy.stats import ks_2samp
-from typing import List, Dict
+from typing import List, Dict, Any
 from core.common.base import get_logger
 
 class DriftDetector:

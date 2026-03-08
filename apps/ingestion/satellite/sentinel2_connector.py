@@ -27,9 +27,8 @@ import os
 import logging
 import numpy as np
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Optional, Tuple
 
-from tenacity import retry, stop_after_attempt, wait_exponential
 
 logger = logging.getLogger("SAHARYN_SENTINEL2")
 
@@ -131,7 +130,7 @@ class Sentinel2Connector:
         try:
             from sentinelhub import (
                 BBox, CRS, DataCollection, SentinelHubRequest,
-                MimeType, WcsRequest, bbox_to_dimensions,
+                MimeType, bbox_to_dimensions,
             )
 
             bbox = BBox(

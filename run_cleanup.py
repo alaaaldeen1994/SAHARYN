@@ -1,4 +1,3 @@
-import re
 
 def clean_console():
     filepath = 'apps/dashboard/console.html'

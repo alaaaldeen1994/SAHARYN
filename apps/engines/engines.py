@@ -34,7 +34,7 @@ class PrescriptiveOptimizer:
                 recommendations.append({
                     "asset_id": asset_id,
                     "action": "ADVANCE_PM",
-                    "reason": f"Economic optimization: Expected failure loss exceeds PM cost.",
+                    "reason": "Economic optimization: Expected failure loss exceeds PM cost.",
                     "priority": "HIGH",
                     "est_savings": expected_loss - self.maintenance_cost_base
                 })

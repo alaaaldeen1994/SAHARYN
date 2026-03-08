@@ -156,8 +156,7 @@ def get_user_role(uid: str) -> Optional[str]:
 # FastAPI dependency for RBAC-gated endpoints
 def require_permission(required: Permission):
     """FastAPI dependency factory for permission-based endpoint guarding."""
-    from fastapi import HTTPException, Header
-    from core.security.manager import SecurityManager
+    from fastapi import Header
 
     async def _check(x_api_key: str = Header(...)):
         # In production: decode JWT, extract role, check permissions

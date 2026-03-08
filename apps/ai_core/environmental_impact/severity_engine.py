@@ -2,7 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 import xgboost as xgb
-from typing import Dict, Any, Tuple
+from typing import Dict, Any
 from core.common.base import get_logger
 
 # MLOps readiness
@@ -42,7 +42,7 @@ class EnvironmentalImpactEngineV2:
             self.mlflow_mgr = SAHARYNMLflow()
             self.model = self.mlflow_mgr.load_production_model(self.model_key)
             if self.model:
-                logger.info(f"Loaded production model from MLflow registry")
+                logger.info("Loaded production model from MLflow registry")
                 return
         except Exception as e:
             logger.error(f"Failed to load model from MLflow: {e}")
@@ -76,6 +76,9 @@ class EnvironmentalImpactEngineV2:
         Inference with Quantile-based Uncertainty Estimation.
         Outputs: DSI (Mean), Lower bound (p10), Upper bound (p90).
         """
+        # 0. Generate features
+        features = self.engineer_features(aod, wind, temp, humidity)
+
         # 1. Inference using REAL model if available
         if self.model:
             try:

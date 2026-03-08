@@ -21,7 +21,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, field_validator
-from starlette.middleware.base import BaseHTTPMiddleware
 
 # --- INTERNAL SERVICE LAYER (Hardened Imports) ---
 from services.ai_core.causal_engine import CausalIntegrityManifold
@@ -38,19 +37,15 @@ from core.database.models import SatelliteTelemetry, SensorTelemetry, Prediction
 
 # --- Security Layer ---
 from core.security.siem_forwarder import (
-    get_siem, SIEMEvent, SIEMEventType, SIEMSeverity,
-    emit_auth_failure, emit_auth_success, emit_model_drift,
-    emit_inference_event, emit_sovereign_change, emit_esg_claim,
+    emit_auth_failure, emit_auth_success, emit_sovereign_change,
 )
 from core.security.rbac import get_role_capabilities_json, Role
 
 # --- RBAC Security Layer (with graceful fallback) ---
 try:
-    from core.security.rbac import (
-        get_current_user, require_permission, require_site_access,
-        create_access_token, UserContext, Role, Permission,
-        TokenRequest, TokenResponse,
-    )
+    # Only import what is actually used or needed for future expansion
+    # Currently Role is already imported at the top level
+    from core.security.rbac import Role
     _RBAC_AVAILABLE = True
 except ImportError as _rbac_err:
     _RBAC_AVAILABLE = False
@@ -488,13 +483,6 @@ async def get_physics_stress_map():
         "map": causal_engine.get_asset_stress_map()
     }
 
-@app.post("/v2/system/sovereign", tags=["System"])
-async def toggle_sovereign_mode(enable: bool):
-    """Activates air-gapped Sovereign Edge Inference mode."""
-    causal_engine.sovereign_mode = enable
-    logger.warning(f"SOVEREIGN_MODE: {'ACTIVATED' if enable else 'DEACTIVATED'} - Edge Computing Protocol Engaged.")
-    return {"status": "SUCCESS", "sovereign_mode": causal_engine.sovereign_mode}
-
 @app.post("/v2/system/demo-stability", tags=["System"])
 async def toggle_demo_stability(enable: bool):
     """Toggles Demonstration Stability Mode (Freeze/Thaw Satellite Ingestion)."""
@@ -574,7 +562,7 @@ async def export_demo_dataset():
                 {"ts": p.timestamp.isoformat(), "asset": p.asset_id, "fail_prob": p.failure_prob} for p in pred
             ],
             "carbon_ledger": [
-                {"ts": l.timestamp.isoformat(), "cert": l.certificate_id, "kg": l.esg_impact_kg} for l in ledger
+                {"ts": item.timestamp.isoformat(), "cert": item.certificate_id, "kg": item.esg_impact_kg} for item in ledger
             ],
             "causal_integrity_manifold": {
                 "global_stability": causal_engine.global_stability_index,

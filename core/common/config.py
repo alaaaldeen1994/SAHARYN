@@ -1,6 +1,5 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field, SecretStr
-from typing import Optional
 
 class Settings(BaseSettings):
     # Professional Configuration Management

@@ -16,7 +16,6 @@ Usage:
 
 import os
 import logging
-import time
 from datetime import datetime
 from typing import Any, Dict, Optional
 from contextlib import contextmanager

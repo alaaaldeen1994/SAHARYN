@@ -24,7 +24,7 @@ OT Security Note:
 
 import os
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from typing import Dict, List, Optional, Any
 from urllib.parse import urljoin
 

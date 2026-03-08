@@ -1,7 +1,6 @@
 import os
 import json
 import logging
-import time
 from datetime import datetime
 from typing import Dict, Any
 from apps.ai_core.environmental_impact.severity_engine import EnvironmentalImpactEngineV2

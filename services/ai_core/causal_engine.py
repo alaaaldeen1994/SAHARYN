@@ -11,7 +11,7 @@ import uuid
 import json
 import numpy as np
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Dict, List
 
 # --- LOGGING ---
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - [%(levelname)s] - %(message)s")
@@ -189,7 +189,8 @@ class CausalIntegrityManifold:
 
         for node_id in traversal_order:
             node = self.nodes.get(node_id)
-            if not node: continue
+            if not node:
+                continue
 
             # --- PHYSICS DERIVATION ---
             # Use a weighted average of parents to provide structural inertia

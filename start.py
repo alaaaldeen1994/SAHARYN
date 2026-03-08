@@ -21,8 +21,8 @@ def start_system():
     )
 
     print("\n✅ System is launching!")
-    print(f"🔗 API docs: http://localhost:8000/docs")
-    print(f"🔗 Dashboard: http://localhost:8081/index.html")
+    print("🔗 API docs: http://localhost:8000/docs")
+    print("🔗 Dashboard: http://localhost:8081/index.html")
     print("\nPress Ctrl+C to stop the system.")
 
     try:

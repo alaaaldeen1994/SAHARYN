@@ -1,7 +1,7 @@
 import logging
 import random
 from datetime import datetime, timedelta
-from typing import List, Dict, Any
+from typing import List
 from pydantic import BaseModel
 
 logger = logging.getLogger("CMMS_Ingestor")

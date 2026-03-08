@@ -1,10 +1,9 @@
 import os
 import logging
 import datetime
-from typing import List, Dict, Any
-import requests
+from typing import List
 import numpy as np
-from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+from tenacity import retry, stop_after_attempt, wait_exponential
 import cdsapi
 from pydantic_settings import BaseSettings
 
@@ -70,7 +69,6 @@ class ECMWFWeatherIngestor:
         Scientific calculation of RH from temp and dewpoint.
         Used at the feature engineering layer.
         """
-        import numpy as np
         rh = 100 * (np.exp((17.625 * dewpoint_c) / (243.04 + dewpoint_c)) /
                     np.exp((17.625 * temp_c) / (243.04 + temp_c)))
         return rh

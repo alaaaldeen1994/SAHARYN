@@ -1,5 +1,5 @@
 import numpy as np
-from typing import Dict, Any, List
+from typing import Dict, Any
 from core.common.base import get_logger
 
 logger = get_logger("FinancialSimulator")

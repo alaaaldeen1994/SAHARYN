@@ -1,4 +1,3 @@
-import os
 
 def expand_file(filepath, min_lines=1250):
     with open(filepath, 'r', encoding='utf-8') as f:

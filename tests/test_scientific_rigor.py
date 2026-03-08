@@ -1,5 +1,3 @@
-import pytest
-import numpy as np
 from apps.ai_core.models import DustSeverityModel, MechanicalReliabilityModel
 from core.common.geology import GeotechnicalDustProfiler
 

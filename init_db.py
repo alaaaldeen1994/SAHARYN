@@ -1,8 +1,6 @@
 import sys
-import os
 sys.path.append(".")
 from core.database.session import engine, Base
-from core.database.models import Asset, SatelliteTelemetry, SensorTelemetry, Prediction, AuditTrail, CarbonLedger
 
 def init_db():
     print("Initializing SAHARYN AI database tables...")

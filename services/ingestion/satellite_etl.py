@@ -12,23 +12,19 @@ import uuid
 import logging
 import asyncio
 import hashlib
-from dotenv import load_dotenv
+from datetime import datetime
+from typing import Dict, Optional
 
-load_dotenv()
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
-
-import requests
 import xarray as xr
 from pydantic import BaseModel, Field, validator
-import numpy as np
-
-# Real-world API Connectors
+from core.database.session import SessionLocal
+from core.database.models import SatelliteTelemetry
 from apps.ingestion.satellite.modis_connector import MODISAerosolConnector
 from apps.ingestion.satellite.sentinel2_connector import Sentinel2Connector
 from apps.ingestion.weather.ecmwf_connector import ECMWFWeatherIngestor
-from core.database.session import SessionLocal
-from core.database.models import SatelliteTelemetry
+
+from dotenv import load_dotenv
+load_dotenv()
 
 # --- 1. ENTERPRISE LOGGING ---
 logging.basicConfig(
