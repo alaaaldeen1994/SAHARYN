@@ -1035,6 +1035,85 @@
             line-height: 1.8;
         }
 
+        /* ── SATELLITE SCANNER VISUAL ── */
+        .scanner-container {
+            position: relative;
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto 80px auto;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-bright);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            display: flex;
+            cursor: pointer;
+            cursor: ew-resize;
+        }
+
+        .scanner-img {
+            display: block;
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+            aspect-ratio: 16/9;
+        }
+
+        .scanner-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('images/facility_scanned.jpg');
+            background-size: cover;
+            background-position: center;
+            clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);
+            /* Smooth snapback when mouse leaves */
+            transition: clip-path 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .scanner-container:hover .scanner-overlay,
+        .scanner-container:active .scanner-overlay {
+            transition: none;
+        }
+
+        .scan-line {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 2px;
+            background: var(--accent);
+            box-shadow: 0 0 15px var(--accent), 0 0 30px var(--accent);
+            transform: translateX(-50%);
+            pointer-events: none;
+            z-index: 10;
+            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .scanner-container:hover .scan-line,
+        .scanner-container:active .scan-line {
+            transition: none;
+        }
+
+        .scan-line::after {
+            content: 'SCAN';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--bg-card);
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            padding: 4px 10px;
+            font-family: var(--mono);
+            font-size: 10px;
+            letter-spacing: 2px;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+
         /* ── MOBILE RESPONSIVE ── */
         @media (max-width: 768px) {
             nav {
@@ -1232,6 +1311,13 @@
             SAHARYN maintains three continuously active uplinks to the world's most trusted satellite agencies —
             giving you environmental intelligence that simply cannot be gathered any other way.
         </p>
+
+        <!-- SATELLITE SCANNER VISUAL -->
+        <div class="scanner-container" id="satellite-scanner">
+            <img src="images/facility_base.jpg" class="scanner-img" alt="Base Industrial Site">
+            <div class="scanner-overlay" id="scanner-overlay"></div>
+            <div class="scan-line" id="scan-line"></div>
+        </div>
 
         <div class="bridges-grid">
             <!-- NASA MODIS -->
@@ -1813,6 +1899,39 @@
         updateClock();
         setInterval(fetchLiveData, 8000);
         setInterval(updateClock, 1000);
+
+        // ── Interactive Scanner Logic ──
+        const initScanner = () => {
+            const container = document.getElementById('satellite-scanner');
+            const overlay = document.getElementById('scanner-overlay');
+            const line = document.getElementById('scan-line');
+            if (!container) return;
+
+            const updateScanner = (e) => {
+                const rect = container.getBoundingClientRect();
+                let x = e.clientX || (e.touches && e.touches[0].clientX);
+                if (x === undefined) return;
+                x = x - rect.left;
+                let percent = (x / rect.width) * 100;
+                percent = Math.max(0, Math.min(100, percent));
+
+                overlay.style.clipPath = `polygon(0 0, ${percent}% 0, ${percent}% 100%, 0 100%)`;
+                line.style.left = `${percent}%`;
+            };
+
+            container.addEventListener('mousemove', updateScanner);
+            container.addEventListener('touchmove', updateScanner);
+
+            // Snap back to 50% on leave
+            const resetScanner = () => {
+                overlay.style.clipPath = `polygon(0 0, 50% 0, 50% 100%, 0 100%)`;
+                line.style.left = `50%`;
+            };
+            container.addEventListener('mouseleave', resetScanner);
+            container.addEventListener('touchend', resetScanner);
+        };
+        initScanner();
+
 
         // -- Firebase Auth Integration --
         import { login, logout, auth } from "./firebase-init.js";
