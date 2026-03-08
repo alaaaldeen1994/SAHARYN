@@ -39,6 +39,7 @@ class OperationalCommand(BaseModel):
     # Predictive Intelligence
     prediction_window: Optional[str] = None
     confidence: Optional[float] = None
+    confidence_drivers: Optional[Dict[str, float]] = None
     root_cause_trace: Optional[List[str]] = None
 
     # Compliance
@@ -96,18 +97,31 @@ class PrescriptiveOptimizer:
         
         return round(avoided_cost, 2), round(implementation_cost, 2), round(roi_index, 2), detail
 
-    def _calculate_prediction_window(self, risk_score: float) -> Tuple[str, float]:
+    def _calculate_prediction_window(self, risk_score: float, env_stress: float = 0.5) -> Tuple[str, float, Dict[str, float]]:
         """
         Calculates the Remaining Useful Life (RUL) prediction window.
+        Returns (window_str, total_confidence, confidence_drivers)
         """
+        # Logic for window and total confidence
         if risk_score >= self.RISK_THRESHOLD_CRITICAL:
-            return "2-12 hours", 0.98
+            window, conf = "2-12 hours", 0.98
         elif risk_score >= self.RISK_THRESHOLD_HIGH:
-            return "12-36 hours", 0.92
+            window, conf = "12-36 hours", 0.92
         elif risk_score >= self.RISK_THRESHOLD_WARNING:
-            return "36-48 hours", 0.85
+            window, conf = "36-48 hours", 0.85
         else:
-            return "> 144 hours", 0.60
+            window, conf = "> 144 hours", 0.60
+
+        # Confidence Drivers (Simulated based on operational variance for demo impact)
+        # In production, these would be derived from the uncertainty of each upstream node
+        drivers = {
+            "Satellite Data Stability": round(0.94 + (env_stress * 0.05), 2),
+            "Telemetry Signal Consistency": round(0.91 + (risk_score * 0.08), 2),
+            "Environmental Model Confidence": round(0.89 + (env_stress * 0.07), 2),
+            "Sensor Noise Levels": round(0.96 - (risk_score * 0.05), 2)
+        }
+        
+        return window, conf, drivers
 
     def _generate_causal_trace(self, node_id: str, action_key: str, window: str) -> List[str]:
         """
@@ -151,7 +165,7 @@ class PrescriptiveOptimizer:
             risk = 1.0 - health
 
             # Calculate predictive elements
-            window, conf = self._calculate_prediction_window(risk)
+            window, conf, drivers = self._calculate_prediction_window(risk, env_stress)
             
             # --- STRATEGY: CRITICAL RISK (Immediate Shutdown) ---
             if risk >= self.RISK_THRESHOLD_CRITICAL:
@@ -169,6 +183,7 @@ class PrescriptiveOptimizer:
                     parameter_adjustment={"load_target": 0.0, "breaker_status": "OPEN"},
                     prediction_window=window,
                     confidence=conf,
+                    confidence_drivers=drivers,
                     root_cause_trace=trace
                 ))
 
@@ -189,6 +204,7 @@ class PrescriptiveOptimizer:
                     parameter_adjustment={"load_reduction_pct": reduction_percent, "cooling_override": "ACTIVE"},
                     prediction_window=window,
                     confidence=conf,
+                    confidence_drivers=drivers,
                     root_cause_trace=trace
                 ))
 
@@ -208,6 +224,7 @@ class PrescriptiveOptimizer:
                     parameter_adjustment={"inspection_priority": "EXPRESS"},
                     prediction_window=window,
                     confidence=conf,
+                    confidence_drivers=drivers,
                     root_cause_trace=trace
                 ))
 
@@ -217,7 +234,7 @@ class PrescriptiveOptimizer:
              
              # Prevent duplicate flush recommendations
              if not any(r.action_key == "FLUSH_FILTRATION_MANIFOLD" for r in recommendations):
-                 window, conf = self._calculate_prediction_window(0.3)
+                 window, conf, drivers = self._calculate_prediction_window(0.3, env_stress)
                  trace = self._generate_causal_trace("ME_FILTER_A", "FLUSH_FILTRATION_MANIFOLD", window)
                  recommendations.append(OperationalCommand(
                         action_key="FLUSH_FILTRATION_MANIFOLD",
@@ -231,6 +248,7 @@ class PrescriptiveOptimizer:
                         parameter_adjustment={"flush_duration_sec": 300, "aux_air_bypass": "OPEN"},
                         prediction_window=window,
                         confidence=conf,
+                        confidence_drivers=drivers,
                         root_cause_trace=trace
                     ))
 
