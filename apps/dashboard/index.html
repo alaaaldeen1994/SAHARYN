@@ -4,44 +4,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAHARYN AI | Predictive Industrial Intelligence for Harsh Desert Infrastructure</title>
+    <title>SAHARYN AI | Tuned to Every Industrial Asset</title>
     <meta name="description"
-        content="SAHARYN AI fuses live NASA and ESA Copernicus satellite feeds with plant SCADA telemetry to predict heavy machinery failures 48 hours in advance across desert operations.">
+        content="SAHARYN AI fuses live NASA and ESA Copernicus satellite feeds with plant SCADA physics to predict heavy machinery failures 48 hours in advance across desert operations.">
     
-    <!-- Google Fonts -->
+    <!-- Premium Google Fonts: Instrument Serif + Plus Jakarta Sans + JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800;900&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800;900&display=swap"
         rel="stylesheet">
     
-    <!-- Lucide Icons -->
+    <!-- Lucide Icons & Three.js -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <style>
         :root {
-            --bg-void: #030816;
-            --bg-surface: #071026;
-            --bg-card: rgba(11, 22, 46, 0.75);
-            --bg-card-hover: rgba(16, 32, 66, 0.9);
+            --bg-void: #050608;
+            --bg-surface: #0a0c10;
+            --bg-card: rgba(16, 18, 24, 0.75);
+            --bg-card-hover: rgba(22, 26, 36, 0.9);
             
-            --accent-emerald: #10b981;
-            --accent-emerald-bright: #34d399;
-            --accent-emerald-glow: rgba(16, 185, 129, 0.35);
-            --accent-cyan: #06b6d4;
-            --accent-cyan-glow: rgba(6, 182, 212, 0.3);
+            --accent-orange: #ff6b2b;
+            --accent-orange-bright: #ff8a4c;
+            --accent-orange-glow: rgba(255, 107, 43, 0.35);
             --accent-amber: #f59e0b;
-            --accent-rose: #f43f5e;
+            --accent-emerald: #10b981;
             
-            --border-subtle: rgba(255, 255, 255, 0.08);
-            --border-medium: rgba(255, 255, 255, 0.15);
-            --border-bright: rgba(16, 185, 129, 0.4);
+            --border-subtle: rgba(255, 255, 255, 0.07);
+            --border-medium: rgba(255, 255, 255, 0.12);
+            --border-orange: rgba(255, 107, 43, 0.35);
             
             --text-primary: #ffffff;
-            --text-secondary: #94a3b8;
-            --text-muted: #64748b;
+            --text-secondary: #9aa0a6;
+            --text-muted: #5f6368;
             
-            --font-sans: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-serif: 'Instrument Serif', Georgia, serif;
+            --font-sans: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
             --font-ar: 'Tajawal', sans-serif;
         }
@@ -60,9 +60,8 @@
         body {
             background-color: var(--bg-void);
             background-image: 
-                radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.12) 0%, transparent 60%),
-                radial-gradient(circle at 85% 25%, rgba(6, 182, 212, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 15% 65%, rgba(99, 102, 241, 0.06) 0%, transparent 50%);
+                radial-gradient(circle at 75% 35%, rgba(255, 107, 43, 0.08) 0%, transparent 60%),
+                radial-gradient(circle at 20% 80%, rgba(245, 158, 11, 0.04) 0%, transparent 50%);
             color: var(--text-primary);
             font-family: var(--font-sans);
             line-height: 1.6;
@@ -76,24 +75,33 @@
             text-align: right;
         }
 
-        /* ── BACKGROUND CANVAS ── */
-        #bg-canvas {
-            position: fixed;
+        /* ── 3D SPACE BACKGROUND CANVAS ── */
+        #space-viewport {
+            position: absolute;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            pointer-events: none;
             z-index: 0;
-            opacity: 0.5;
+            pointer-events: auto;
+            cursor: grab;
+        }
+
+        #space-viewport:active {
+            cursor: grabbing;
         }
 
         .content-layer {
             position: relative;
             z-index: 1;
+            pointer-events: none;
         }
 
-        /* ── CLEAN, BALANCED ENTERPRISE NAVIGATION ── */
+        .interactive-element {
+            pointer-events: auto;
+        }
+
+        /* ── LUXURY MINIMAL NAVIGATION BAR ── */
         nav {
             position: fixed;
             top: 0;
@@ -103,12 +111,12 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 18px 5vw;
-            background: rgba(3, 8, 22, 0.88);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            padding: 22px 6vw;
+            background: rgba(5, 6, 8, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border-subtle);
-            transition: all 0.3s ease;
+            pointer-events: auto;
         }
 
         .brand-wrapper {
@@ -119,39 +127,36 @@
             color: var(--text-primary);
         }
 
-        .brand-emblem {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, var(--accent-emerald) 0%, var(--accent-cyan) 100%);
-            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+        .brand-icon {
+            width: 26px;
+            height: 26px;
             display: flex;
-            align-items: center;
+            flex-direction: column;
             justify-content: center;
-            box-shadow: 0 0 15px var(--accent-emerald-glow);
+            gap: 3px;
         }
+
+        .brand-bar {
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-orange), #ff9d66);
+            border-radius: 2px;
+        }
+
+        .brand-bar:nth-child(1) { width: 18px; }
+        .brand-bar:nth-child(2) { width: 24px; }
+        .brand-bar:nth-child(3) { width: 14px; }
 
         .brand-text {
-            font-size: 20px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .brand-text span {
-            font-size: 11px;
+            font-size: 21px;
             font-weight: 700;
-            color: var(--accent-emerald-bright);
-            font-family: var(--font-mono);
-            letter-spacing: 0.5px;
+            letter-spacing: -0.3px;
+            color: #ffffff;
         }
 
-        /* Uniform Navigation Links with Same Size & Styling */
         .nav-menu {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 28px;
             list-style: none;
         }
 
@@ -160,319 +165,338 @@
             font-weight: 500;
             color: var(--text-secondary);
             text-decoration: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            transition: all 0.2s ease;
-            white-space: nowrap;
+            transition: color 0.2s ease;
             display: inline-flex;
             align-items: center;
+            gap: 4px;
         }
 
         .nav-link:hover {
             color: #ffffff;
-            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .nav-chevron {
+            opacity: 0.5;
+            font-size: 10px;
         }
 
         .nav-actions {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 18px;
         }
 
         .btn-lang {
             background: transparent;
             border: none;
             color: var(--text-secondary);
-            padding: 6px 10px;
-            border-radius: 6px;
             font-size: 12px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: color 0.2s ease;
             display: inline-flex;
             align-items: center;
             gap: 5px;
-            white-space: nowrap;
         }
 
         .btn-lang:hover {
             color: #ffffff;
-            background: rgba(255, 255, 255, 0.06);
         }
 
-        .btn-launch {
-            background: linear-gradient(135deg, var(--accent-emerald) 0%, #059669 100%);
-            color: #020612 !important;
+        .btn-signin {
+            font-size: 13.5px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .btn-signin:hover {
+            color: #ffffff;
+        }
+
+        .btn-start-free {
+            background: linear-gradient(135deg, var(--accent-orange) 0%, #e65100 100%);
+            color: #ffffff !important;
             padding: 10px 22px;
             border-radius: 8px;
             font-size: 13.5px;
-            font-weight: 700;
+            font-weight: 600;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 18px var(--accent-emerald-glow);
+            gap: 6px;
+            box-shadow: 0 4px 20px var(--accent-orange-glow);
             transition: all 0.25s ease;
             border: none;
             cursor: pointer;
-            white-space: nowrap;
         }
 
-        .btn-launch:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 25px rgba(16, 185, 129, 0.5);
-            filter: brightness(1.1);
+        .btn-start-free:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 28px rgba(255, 107, 43, 0.55);
+            filter: brightness(1.08);
         }
 
-        /* ── HERO SECTION ── */
+        /* ── HERO SECTION (MATCHING REFERENCE IMAGE) ── */
         .hero {
-            padding: 125px 5vw 80px;
+            position: relative;
+            min-height: 100vh;
+            padding: 140px 6vw 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
             max-width: 1440px;
             margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1.15fr 0.85fr;
-            gap: 50px;
-            align-items: center;
-            min-height: calc(100vh - 40px);
         }
 
-        .hero-badge {
+        .hero-left-content {
+            max-width: 540px;
+            z-index: 2;
+            pointer-events: auto;
+        }
+
+        /* Capsule Badge */
+        .capsule-badge {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            background: rgba(16, 185, 129, 0.08);
-            border: 1px solid rgba(16, 185, 129, 0.25);
-            padding: 6px 14px;
+            gap: 10px;
+            background: rgba(20, 22, 30, 0.85);
+            border: 1px solid var(--border-medium);
+            padding: 5px 6px 5px 14px;
             border-radius: 100px;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--accent-emerald-bright);
+            margin-bottom: 24px;
+            backdrop-filter: blur(10px);
+        }
+
+        .capsule-text {
+            font-size: 12.5px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .capsule-btn {
+            background: linear-gradient(135deg, var(--accent-orange) 0%, #e65100 100%);
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 5px 12px;
+            border-radius: 100px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: opacity 0.2s;
+        }
+
+        .capsule-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* Section Subhead Label with Line */
+        .hero-subhead-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .hero-subhead-num {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+        }
+
+        .hero-subhead-title {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .hero-subhead-line {
+            width: 40px;
+            height: 1px;
+            background: var(--border-medium);
+        }
+
+        /* Serif Display Headline */
+        .hero-title {
+            font-family: var(--font-serif);
+            font-size: clamp(48px, 5.8vw, 76px);
+            font-weight: 400;
+            line-height: 1.02;
+            letter-spacing: -0.5px;
+            color: #ffffff;
             margin-bottom: 24px;
         }
 
-        .hero-title {
-            font-size: clamp(38px, 4.5vw, 62px);
-            font-weight: 800;
-            line-height: 1.08;
-            letter-spacing: -1.5px;
-            margin-bottom: 22px;
+        .hero-title em {
+            font-style: italic;
+            font-family: var(--font-serif);
+            color: #ffffff;
+            display: block;
         }
 
-        .hero-title .gradient-text {
-            background: linear-gradient(135deg, #ffffff 15%, #cbd5e1 50%, var(--accent-emerald-bright) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .hero-title .dim-text {
-            color: var(--text-muted);
-            font-weight: 400;
-        }
-
-        .hero-description {
-            font-size: 17px;
+        .hero-desc {
+            font-size: 16px;
             color: var(--text-secondary);
             line-height: 1.65;
             margin-bottom: 36px;
-            max-width: 600px;
+            max-width: 480px;
         }
 
-        .hero-description strong {
-            color: #ffffff;
-            font-weight: 600;
-        }
-
-        .hero-ctas {
+        /* Dual CTA Buttons */
+        .hero-btn-row {
             display: flex;
             align-items: center;
-            gap: 16px;
-            flex-wrap: wrap;
+            gap: 14px;
             margin-bottom: 40px;
         }
 
-        .btn-primary-large {
-            background: linear-gradient(135deg, var(--accent-emerald) 0%, #059669 100%);
-            color: #020612;
-            padding: 14px 32px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 700;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 10px 30px var(--accent-emerald-glow);
-            transition: all 0.25s ease;
-        }
-
-        .btn-primary-large:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 14px 35px rgba(16, 185, 129, 0.5);
-            filter: brightness(1.1);
-        }
-
-        .btn-secondary-large {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid var(--border-medium);
+        .btn-cta-primary {
+            background: linear-gradient(135deg, var(--accent-orange) 0%, #e65100 100%);
             color: #ffffff;
-            padding: 14px 28px;
-            border-radius: 10px;
+            padding: 13px 28px;
+            border-radius: 8px;
             font-size: 14px;
             font-weight: 600;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+            box-shadow: 0 4px 22px var(--accent-orange-glow);
             transition: all 0.25s ease;
         }
 
-        .btn-secondary-large:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: var(--accent-emerald);
-            transform: translateY(-2px);
+        .btn-cta-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 30px rgba(255, 107, 43, 0.55);
+            filter: brightness(1.08);
         }
 
-        .hero-metrics {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            padding-top: 28px;
-            border-top: 1px solid var(--border-subtle);
-        }
-
-        .metric-card {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .metric-num {
-            font-size: 32px;
-            font-weight: 800;
-            color: var(--accent-emerald-bright);
-            letter-spacing: -0.5px;
-            font-family: var(--font-mono);
-        }
-
-        .metric-lbl {
-            font-size: 12px;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        /* ── DUAL IMAGE SATELLITE FACILITY CARDS ── */
-        .hero-image-cards {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .facility-card {
-            background: var(--bg-card);
+        .btn-cta-secondary {
+            background: rgba(20, 22, 30, 0.8);
             border: 1px solid var(--border-medium);
-            border-radius: 16px;
-            padding: 18px;
-            backdrop-filter: blur(16px);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+            color: var(--text-primary);
+            padding: 13px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(10px);
+            transition: all 0.25s ease;
         }
 
-        .facility-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--accent-emerald);
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 25px rgba(16, 185, 129, 0.15);
+        .btn-cta-secondary:hover {
+            background: rgba(30, 34, 46, 0.9);
+            border-color: rgba(255, 255, 255, 0.25);
         }
 
-        .facility-badge-row {
+        .orange-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--accent-orange);
+            box-shadow: 0 0 8px var(--accent-orange);
+        }
+
+        /* ── BOTTOM HUD TELEMETRY BAR (MATCHING REFERENCE) ── */
+        .hud-bottom-bar {
+            position: absolute;
+            bottom: 36px;
+            left: 6vw;
+            right: 6vw;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            z-index: 2;
+            pointer-events: auto;
         }
 
-        .facility-badge {
+        .hud-metrics {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .hud-metric-unit {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .hud-label {
             font-family: var(--font-mono);
-            font-size: 10.5px;
-            font-weight: 700;
-            color: var(--text-secondary);
-            background: rgba(255, 255, 255, 0.05);
-            padding: 4px 10px;
-            border-radius: 6px;
-            letter-spacing: 0.5px;
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .hud-val {
+            font-size: 15px;
+            font-weight: 600;
+            color: #ffffff;
             display: inline-flex;
             align-items: center;
             gap: 6px;
         }
 
-        .facility-badge.active {
-            color: var(--accent-emerald-bright);
-            background: rgba(16, 185, 129, 0.12);
-            border: 1px solid rgba(16, 185, 129, 0.3);
+        .hud-matrix-dots {
+            display: grid;
+            grid-template-columns: repeat(4, 4px);
+            gap: 4px;
+            opacity: 0.4;
         }
 
-        .facility-img-box {
-            position: relative;
-            border-radius: 10px;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            margin-bottom: 12px;
-        }
-
-        .facility-img {
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-            display: block;
-            transition: transform 0.4s ease;
-        }
-
-        .facility-card:hover .facility-img {
-            transform: scale(1.03);
-        }
-
-        .facility-title {
-            font-size: 15px;
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 4px;
-        }
-
-        .facility-desc {
-            font-size: 13px;
-            color: var(--text-secondary);
-            line-height: 1.5;
+        .matrix-dot {
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: #ffffff;
         }
 
         /* ── SECTION ARCHITECTURE ── */
         .section-wrap {
-            padding: 90px 5vw;
+            padding: 100px 6vw;
             max-width: 1440px;
             margin: 0 auto;
+            pointer-events: auto;
         }
 
         .section-header {
             text-align: center;
             max-width: 720px;
-            margin: 0 auto 50px;
+            margin: 0 auto 56px;
         }
 
         .section-tag {
-            font-size: 12px;
+            font-family: var(--font-mono);
+            font-size: 11px;
             font-weight: 700;
-            letter-spacing: 1px;
-            color: var(--accent-emerald-bright);
+            letter-spacing: 2px;
+            color: var(--accent-orange-bright);
             text-transform: uppercase;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             display: inline-block;
         }
 
         .section-heading {
-            font-size: clamp(30px, 3.5vw, 46px);
-            font-weight: 800;
-            letter-spacing: -1px;
-            line-height: 1.15;
+            font-family: var(--font-serif);
+            font-size: clamp(36px, 4vw, 54px);
+            font-weight: 400;
+            letter-spacing: -0.5px;
+            line-height: 1.12;
             margin-bottom: 16px;
         }
 
@@ -482,62 +506,62 @@
             line-height: 1.6;
         }
 
-        /* ── SOLUTIONS & SECTORS GRID ── */
-        .solutions-grid {
+        /* ── SOLUTIONS & CAPABILITIES GRID ── */
+        .grid-3col {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 24px;
         }
 
-        .solution-card {
+        .feature-card {
             background: var(--bg-card);
             border: 1px solid var(--border-subtle);
-            border-radius: 16px;
-            padding: 32px 28px;
+            border-radius: 14px;
+            padding: 34px 28px;
             transition: all 0.3s ease;
             position: relative;
         }
 
-        .solution-card:hover {
+        .feature-card:hover {
             transform: translateY(-6px);
             background: var(--bg-card-hover);
-            border-color: var(--accent-emerald);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 25px rgba(16, 185, 129, 0.12);
+            border-color: var(--accent-orange);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 25px rgba(255, 107, 43, 0.15);
         }
 
-        .solution-icon-box {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.25);
+        .feature-icon-box {
+            width: 46px;
+            height: 46px;
+            border-radius: 10px;
+            background: rgba(255, 107, 43, 0.1);
+            border: 1px solid rgba(255, 107, 43, 0.25);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--accent-emerald);
-            margin-bottom: 20px;
+            color: var(--accent-orange);
+            margin-bottom: 22px;
         }
 
-        .solution-title {
+        .feature-title {
             font-size: 19px;
             font-weight: 700;
             letter-spacing: -0.3px;
             margin-bottom: 10px;
         }
 
-        .solution-body {
-            font-size: 14.5px;
+        .feature-body {
+            font-size: 14px;
             color: var(--text-secondary);
             line-height: 1.6;
             margin-bottom: 20px;
         }
 
-        .solution-tag {
+        .feature-tag {
             font-family: var(--font-mono);
-            font-size: 11px;
+            font-size: 10.5px;
             font-weight: 700;
-            color: var(--accent-emerald-bright);
-            background: rgba(16, 185, 129, 0.08);
+            color: var(--accent-orange-bright);
+            background: rgba(255, 107, 43, 0.08);
             padding: 4px 10px;
             border-radius: 6px;
             display: inline-block;
@@ -561,7 +585,7 @@
         }
 
         .comp-card:hover {
-            border-color: var(--accent-emerald);
+            border-color: var(--accent-orange);
             transform: translateY(-3px);
         }
 
@@ -576,8 +600,8 @@
             font-family: var(--font-mono);
             font-size: 10.5px;
             font-weight: 700;
-            color: var(--accent-emerald);
-            background: rgba(16, 185, 129, 0.08);
+            color: var(--accent-orange-bright);
+            background: rgba(255, 107, 43, 0.08);
             padding: 4px 8px;
             border-radius: 4px;
             display: inline-block;
@@ -585,10 +609,11 @@
 
         /* ── FOOTER ── */
         footer {
-            background: #01040b;
+            background: #020304;
             border-top: 1px solid var(--border-subtle);
-            padding: 60px 5vw 40px;
+            padding: 60px 6vw 40px;
             margin-top: 80px;
+            pointer-events: auto;
         }
 
         .footer-grid {
@@ -632,7 +657,7 @@
         }
 
         .footer-links a:hover {
-            color: var(--accent-emerald);
+            color: var(--accent-orange);
         }
 
         .footer-bottom {
@@ -649,19 +674,17 @@
 
         /* ── RESPONSIVE ADAPTATIONS ── */
         @media (max-width: 1024px) {
-            .hero { grid-template-columns: 1fr; gap: 40px; text-align: center; }
-            .hero-description { margin: 0 auto 36px; }
-            .hero-ctas { justify-content: center; }
-            .hero-metrics { justify-content: center; }
-            .solutions-grid { grid-template-columns: repeat(2, 1fr); }
+            .nav-menu { display: none; }
+            .grid-3col { grid-template-columns: repeat(2, 1fr); }
             .compliance-grid { grid-template-columns: repeat(2, 1fr); }
             .footer-grid { grid-template-columns: 1fr 1fr; }
+            .hud-bottom-bar { flex-direction: column; gap: 16px; align-items: flex-start; }
         }
 
         @media (max-width: 768px) {
-            nav { padding: 14px 4vw; }
-            .nav-menu { display: none; }
-            .solutions-grid { grid-template-columns: 1fr; }
+            nav { padding: 16px 5vw; }
+            .hero { padding: 120px 5vw 160px; }
+            .grid-3col { grid-template-columns: 1fr; }
             .compliance-grid { grid-template-columns: 1fr; }
             .footer-grid { grid-template-columns: 1fr; }
             .footer-bottom { flex-direction: column; gap: 14px; text-align: center; }
@@ -670,118 +693,104 @@
 </head>
 
 <body>
-    <!-- Ambient Background Canvas -->
-    <canvas id="bg-canvas"></canvas>
+    <!-- ── 3D THREE.JS SPACE & ORBITAL PLANET CANVAS ── -->
+    <div id="space-viewport"></div>
 
     <div class="content-layer">
-        <!-- Main Enterprise Header & Navigation -->
+        <!-- Main Minimal Space Navigation -->
         <nav id="main-nav">
             <a href="index.html" class="brand-wrapper">
-                <div class="brand-emblem"></div>
-                <div class="brand-text">SAHARYN <span>AI</span></div>
+                <div class="brand-icon">
+                    <div class="brand-bar"></div>
+                    <div class="brand-bar"></div>
+                    <div class="brand-bar"></div>
+                </div>
+                <div class="brand-text">saharyn</div>
             </a>
 
-            <!-- Organized, Uniform Navigation Menu -->
             <ul class="nav-menu">
-                <li><a href="#solutions" class="nav-link" data-i18n="nav_solutions">Solutions</a></li>
-                <li><a href="#platform" class="nav-link" data-i18n="nav_platform">Platform</a></li>
-                <li><a href="#capabilities" class="nav-link" data-i18n="nav_capabilities">Capabilities</a></li>
-                <li><a href="about.html" class="nav-link" data-i18n="nav_technology">Technology</a></li>
-                <li><a href="/v2/docs" class="nav-link" target="_blank" data-i18n="nav_api">API Docs</a></li>
+                <li><a href="#solutions" class="nav-link" data-i18n="nav_product">Product <span class="nav-chevron">⌵</span></a></li>
+                <li><a href="#platform" class="nav-link" data-i18n="nav_how">How it works</a></li>
+                <li><a href="#capabilities" class="nav-link" data-i18n="nav_capabilities">Capabilities <span class="nav-chevron">⌵</span></a></li>
+                <li><a href="about.html" class="nav-link" data-i18n="nav_docs">Docs</a></li>
             </ul>
 
             <div class="nav-actions">
-                <button onclick="toggleLang()" class="btn-lang" id="lang-btn" title="Toggle Language">
-                    <i data-lucide="globe" size="13"></i>
+                <button onclick="toggleLang()" class="btn-lang" id="lang-btn">
                     <span>AR / EN</span>
                 </button>
-                <a href="console.html" class="btn-launch" id="nav-cta-btn">
-                    <i data-lucide="shield" size="14"></i>
-                    <span data-i18n="nav_cta">Mission Control</span>
+                <a href="console.html" class="btn-signin" data-i18n="nav_signin">Sign in</a>
+                <a href="console.html" class="btn-start-free" id="nav-cta-btn">
+                    <span data-i18n="nav_cta">Start free</span>
                 </a>
             </div>
         </nav>
 
         <!-- HERO SECTION -->
         <header class="hero">
-            <div class="hero-content">
-                <div class="hero-badge">
-                    <i data-lucide="satellite" size="14"></i>
-                    <span data-i18n="hero_badge">NASA & ESA COPERNICUS ATMOSPHERIC BRIDGE</span>
+            <div class="hero-left-content">
+                <!-- Capsule Badge -->
+                <div class="capsule-badge">
+                    <span class="capsule-text" data-i18n="badge_text">Realtime personalization</span>
+                    <a href="console.html" class="capsule-btn" data-i18n="badge_action">See it live →</a>
                 </div>
 
+                <!-- Numbered Subsection Header with Line -->
+                <div class="hero-subhead-row">
+                    <span class="hero-subhead-num">02</span>
+                    <span class="hero-subhead-title" data-i18n="subhead_title">ORBITAL RELAY</span>
+                    <div class="hero-subhead-line"></div>
+                </div>
+
+                <!-- Headline -->
                 <h1 class="hero-title">
-                    <span class="gradient-text" data-i18n="hero_h1_lead">Predict High-Consequence Failures</span><br>
-                    <span class="dim-text" data-i18n="hero_h1_sub">before harsh desert impacts occur.</span>
+                    <span data-i18n="hero_h1_lead">Tuned to</span>
+                    <em data-i18n="hero_h1_sub">every visitor</em>
                 </h1>
 
-                <p class="hero-description" data-i18n="hero_desc">
-                    <strong>SAHARYN AI</strong> combines <strong>space-borne satellite intelligence</strong> with <strong>physics-informed causal mechanics</strong> to monitor sandstorms, thermal decay, and abrasion—predicting industrial asset failures up to <strong>48 hours in advance</strong> across Saudi Arabia and the Middle East.
+                <!-- Description -->
+                <p class="hero-desc" data-i18n="hero_desc">
+                    Signals in, moments out — a live loop that learns from every visit to predict and protect high-consequence desert industrial infrastructure.
                 </p>
 
-                <div class="hero-ctas">
-                    <a href="console.html" class="btn-primary-large">
-                        <i data-lucide="shield-alert" size="18"></i>
-                        <span data-i18n="hero_cta_primary">Launch Mission Control</span>
+                <!-- Dual CTA Buttons -->
+                <div class="hero-btn-row">
+                    <a href="console.html" class="btn-cta-primary">
+                        <span data-i18n="cta_primary">Start free</span>
+                        <span>›</span>
                     </a>
-                    <a href="about.html" class="btn-secondary-large">
-                        <i data-lucide="file-text" size="18"></i>
-                        <span data-i18n="hero_cta_secondary">View Architecture Proof</span>
+                    <a href="about.html" class="btn-cta-secondary">
+                        <span class="orange-dot"></span>
+                        <span data-i18n="cta_secondary">Watch it work</span>
                     </a>
-                </div>
-
-                <div class="hero-metrics">
-                    <div class="metric-card">
-                        <div class="metric-num">48h</div>
-                        <div class="metric-lbl" data-i18n="m_lead">Early Warning Window</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-num">0.42ms</div>
-                        <div class="metric-lbl" data-i18n="m_latency">Causal Inference Cycle</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-num">$660K+</div>
-                        <div class="metric-lbl" data-i18n="m_savings">Avg Avoided Downtime Loss</div>
-                    </div>
                 </div>
             </div>
 
-            <!-- Original Dual Satellite Visual Cards -->
-            <div class="hero-image-cards">
-                <!-- Card 1: Raw Optical Facility -->
-                <div class="facility-card">
-                    <div class="facility-badge-row">
-                        <div class="facility-badge">
-                            <i data-lucide="camera" size="12"></i>
-                            <span>RAW OPTICAL BASELINE</span>
-                        </div>
-                        <div style="font-family: var(--font-mono); font-size: 10px; color: var(--text-muted);">10m RESOLUTION</div>
+            <!-- Bottom HUD Telemetry Readouts -->
+            <div class="hud-bottom-bar">
+                <div class="hud-metrics">
+                    <div class="hud-metric-unit">
+                        <span class="hud-label">ORBITER</span>
+                        <span class="hud-val">1,155 km</span>
                     </div>
-                    <div class="facility-img-box">
-                        <img src="images/facility_base.jpg" class="facility-img" alt="Base Industrial Facility">
+                    <div class="hud-metric-unit">
+                        <span class="hud-label">PERIOD</span>
+                        <span class="hud-val">170 min</span>
                     </div>
-                    <div class="facility-title" data-i18n="fac_base_title">Surface Infrastructure Layer</div>
-                    <div class="facility-desc" data-i18n="fac_base_desc">
-                        High-resolution visual telemetry captures ground operations across gas compressors, water injection pumps, and refinery turbines.
+                    <div class="hud-metric-unit">
+                        <span class="hud-label">DOWNLINK</span>
+                        <span class="hud-val"><span class="orange-dot"></span> live</span>
+                    </div>
+                    <div class="hud-metric-unit">
+                        <span class="hud-label" data-i18n="hud_profiles">PROFILES SYNCED</span>
+                        <span class="hud-val">49,590</span>
                     </div>
                 </div>
 
-                <!-- Card 2: Scanned Multi-Spectral Overlay -->
-                <div class="facility-card">
-                    <div class="facility-badge-row">
-                        <div class="facility-badge active">
-                            <i data-lucide="zap" size="12"></i>
-                            <span>MULTI-SPECTRAL STRESS SCAN</span>
-                        </div>
-                        <div style="font-family: var(--font-mono); font-size: 10px; color: var(--accent-emerald-bright);">LIVE SATELLITE OVERLAY</div>
-                    </div>
-                    <div class="facility-img-box">
-                        <img src="images/facility_scanned.jpg" class="facility-img" alt="Multi-Spectral Stress Scan">
-                    </div>
-                    <div class="facility-title" data-i18n="fac_scan_title">Environmental Stress Manifold</div>
-                    <div class="facility-desc" data-i18n="fac_scan_desc">
-                        Multi-spectral data fusion reveals invisible stressors: thermal decay gradients, particulate dust density, and vibration shockwaves in real-time.
-                    </div>
+                <div class="hud-matrix-dots">
+                    <div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div>
+                    <div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div>
+                    <div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div><div class="matrix-dot"></div>
                 </div>
             </div>
         </header>
@@ -796,29 +805,29 @@
                 </p>
             </div>
 
-            <div class="solutions-grid">
+            <div class="grid-3col">
                 <!-- Oil & Gas -->
-                <div class="solution-card">
-                    <div class="solution-icon-box"><i data-lucide="flame" size="22"></i></div>
-                    <h3 class="solution-title" data-i18n="s1_title">Oil & Gas Upstream & Refining</h3>
-                    <p class="solution-body" data-i18n="s1_body">Preventing compressor surge, gas turbine blade erosion, and seal failures in desert production facilities across the Eastern Province and Rub' Al Khali.</p>
-                    <span class="solution-tag">GAS COMPRESSORS & PUMPS</span>
+                <div class="feature-card">
+                    <div class="feature-icon-box"><i data-lucide="flame" size="22"></i></div>
+                    <h3 class="feature-title" data-i18n="s1_title">Oil & Gas Upstream & Refining</h3>
+                    <p class="feature-body" data-i18n="s1_body">Preventing compressor surge, gas turbine blade erosion, and seal failures in desert production facilities across the Eastern Province and Rub' Al Khali.</p>
+                    <span class="feature-tag">GAS COMPRESSORS & PUMPS</span>
                 </div>
 
                 <!-- Power Generation -->
-                <div class="solution-card">
-                    <div class="solution-icon-box"><i data-lucide="zap" size="22"></i></div>
-                    <h3 class="solution-title" data-i18n="s2_title">Power & Utilities Grids</h3>
-                    <p class="solution-body" data-i18n="s2_body">Forecasting turbine intake filter clogging and transformer thermal breakdown during regional dust storm events.</p>
-                    <span class="solution-tag">COMBINED CYCLE TURBINES</span>
+                <div class="feature-card">
+                    <div class="feature-icon-box"><i data-lucide="zap" size="22"></i></div>
+                    <h3 class="feature-title" data-i18n="s2_title">Power & Utilities Grids</h3>
+                    <p class="feature-body" data-i18n="s2_body">Forecasting turbine intake filter clogging and transformer thermal breakdown during regional dust storm events.</p>
+                    <span class="feature-tag">COMBINED CYCLE TURBINES</span>
                 </div>
 
                 <!-- Water Desalination -->
-                <div class="solution-card">
-                    <div class="solution-icon-box"><i data-lucide="droplet" size="22"></i></div>
-                    <h3 class="solution-title" data-i18n="s3_title">Water & Desalination Plants</h3>
-                    <p class="solution-body" data-i18n="s3_body">Monitoring high-pressure intake pumps and reverse osmosis filtration membranes subject to high particulate loads and salinity.</p>
-                    <span class="solution-tag">HIGH-PRESSURE RO PUMPS</span>
+                <div class="feature-card">
+                    <div class="feature-icon-box"><i data-lucide="droplet" size="22"></i></div>
+                    <h3 class="feature-title" data-i18n="s3_title">Water & Desalination Plants</h3>
+                    <p class="feature-body" data-i18n="s3_body">Monitoring high-pressure intake pumps and reverse osmosis filtration membranes subject to high particulate loads and salinity.</p>
+                    <span class="feature-tag">HIGH-PRESSURE RO PUMPS</span>
                 </div>
             </div>
         </section>
@@ -833,53 +842,53 @@
                 </p>
             </div>
 
-            <div class="solutions-grid" id="capabilities">
+            <div class="grid-3col" id="capabilities">
                 <!-- Pillar 1 -->
-                <div class="solution-card">
-                    <div class="solution-icon-box"><i data-lucide="satellite" size="22"></i></div>
-                    <h3 class="solution-title" data-i18n="p1_title">Satellite Atmospheric Fusion</h3>
-                    <p class="solution-body" data-i18n="p1_body">Direct programmatic ingestion of NASA MODIS (MOD04_L2) and Copernicus Sentinel-2/CAMS. Real-time mapping of particle diameter, AOD, and kinetic dust momentum.</p>
-                    <span class="solution-tag">NASA & ESA LIVE INGESTION</span>
+                <div class="feature-card">
+                    <div class="feature-icon-box"><i data-lucide="satellite" size="22"></i></div>
+                    <h3 class="feature-title" data-i18n="p1_title">Satellite Atmospheric Fusion</h3>
+                    <p class="feature-body" data-i18n="p1_body">Direct programmatic ingestion of NASA MODIS (MOD04_L2) and Copernicus Sentinel-2/CAMS. Real-time mapping of particle diameter, AOD, and kinetic dust momentum.</p>
+                    <span class="feature-tag">NASA & ESA LIVE INGESTION</span>
                 </div>
 
                 <!-- Pillar 2 -->
-                <div class="solution-card">
-                    <div class="solution-icon-box"><i data-lucide="cpu" size="22"></i></div>
-                    <h3 class="solution-title" data-i18n="p2_title">Physics-Informed Digital Twins</h3>
-                    <p class="solution-body" data-i18n="p2_body">Solving boundary condition Navier-Stokes and Arrhenius chemical degradation equations in real time to model abrasion kinetics and thermal stress.</p>
-                    <span class="solution-tag">PINNs & ARRHENIUS DECAY</span>
+                <div class="feature-card">
+                    <div class="feature-icon-box"><i data-lucide="cpu" size="22"></i></div>
+                    <h3 class="feature-title" data-i18n="p2_title">Physics-Informed Digital Twins</h3>
+                    <p class="feature-body" data-i18n="p2_body">Solving boundary condition Navier-Stokes and Arrhenius chemical degradation equations in real time to model abrasion kinetics and thermal stress.</p>
+                    <span class="feature-tag">PINNs & ARRHENIUS DECAY</span>
                 </div>
 
                 <!-- Pillar 3 -->
-                <div class="solution-card">
-                    <div class="solution-icon-box"><i data-lucide="git-branch" size="22"></i></div>
-                    <h3 class="solution-title" data-i18n="p3_title">Explainable Causal Manifold</h3>
-                    <p class="solution-body" data-i18n="p3_body">A strict 11-node Directed Acyclic Graph (DAG) enforcing anti-hallucination. Generates step-by-step cryptographic causal chains from weather triggers to mechanical outcomes.</p>
-                    <span class="solution-tag">IEEE 1232 COMPLIANT</span>
+                <div class="feature-card">
+                    <div class="feature-icon-box"><i data-lucide="git-branch" size="22"></i></div>
+                    <h3 class="feature-title" data-i18n="p3_title">Explainable Causal Manifold</h3>
+                    <p class="feature-body" data-i18n="p3_body">A strict 11-node Directed Acyclic Graph (DAG) enforcing anti-hallucination. Generates step-by-step cryptographic causal chains from weather triggers to mechanical outcomes.</p>
+                    <span class="feature-tag">IEEE 1232 COMPLIANT</span>
                 </div>
 
                 <!-- Pillar 4 -->
-                <div class="solution-card">
-                    <div class="solution-icon-box"><i data-lucide="calculator" size="22"></i></div>
-                    <h3 class="solution-title" data-i18n="p4_title">Prescriptive Financial Optimizer</h3>
-                    <p class="solution-body" data-i18n="p4_body">Calculates financial ROI and avoided loss metrics for every condition. Generates clear, advisory operational directives (e.g. backflush HEPA filtration, dynamic load modulation).</p>
-                    <span class="solution-tag">ROI-DRIVEN PRESCRIPTIONS</span>
+                <div class="feature-card">
+                    <div class="feature-icon-box"><i data-lucide="calculator" size="22"></i></div>
+                    <h3 class="feature-title" data-i18n="p4_title">Prescriptive Financial Optimizer</h3>
+                    <p class="feature-body" data-i18n="p4_body">Calculates financial ROI and avoided loss metrics for every condition. Generates clear, advisory operational directives (e.g. backflush HEPA filtration, dynamic load modulation).</p>
+                    <span class="feature-tag">ROI-DRIVEN PRESCRIPTIONS</span>
                 </div>
 
                 <!-- Pillar 5 -->
-                <div class="solution-card">
-                    <div class="solution-icon-box"><i data-lucide="shield-check" size="22"></i></div>
-                    <h3 class="solution-title" data-i18n="p5_title">Cryptographic Sovereign ESG Ledger</h3>
-                    <p class="solution-body" data-i18n="p5_body">Quantifies Scope 3 lifecycle manufacturing carbon avoided by extending asset useful life. Every claim is cryptographically chained with SHA-256 Merkle proofs for audit defensibility.</p>
-                    <span class="solution-tag">ISO 14064-3 ALIGNED</span>
+                <div class="feature-card">
+                    <div class="feature-icon-box"><i data-lucide="shield-check" size="22"></i></div>
+                    <h3 class="feature-title" data-i18n="p5_title">Cryptographic Sovereign ESG Ledger</h3>
+                    <p class="feature-body" data-i18n="p5_body">Quantifies Scope 3 lifecycle manufacturing carbon avoided by extending asset useful life. Every claim is cryptographically chained with SHA-256 Merkle proofs for audit defensibility.</p>
+                    <span class="feature-tag">ISO 14064-3 ALIGNED</span>
                 </div>
 
                 <!-- Pillar 6 -->
-                <div class="solution-card">
-                    <div class="solution-icon-box"><i data-lucide="lock" size="22"></i></div>
-                    <h3 class="solution-title" data-i18n="p6_title">Air-Gapped Sovereign Edge</h3>
-                    <p class="solution-body" data-i18n="p6_body">Critical national infrastructure requires absolute data sovereignty. Instantly sever cloud uplinks and execute 100% of causal inference locally inside Riyadh or NEOM industrial boundaries.</p>
-                    <span class="solution-tag">ZERO DATA EGRESS</span>
+                <div class="feature-card">
+                    <div class="feature-icon-box"><i data-lucide="lock" size="22"></i></div>
+                    <h3 class="feature-title" data-i18n="p6_title">Air-Gapped Sovereign Edge</h3>
+                    <p class="feature-body" data-i18n="p6_body">Critical national infrastructure requires absolute data sovereignty. Instantly sever cloud uplinks and execute 100% of causal inference locally inside Riyadh or NEOM industrial boundaries.</p>
+                    <span class="feature-tag">ZERO DATA EGRESS</span>
                 </div>
             </div>
         </section>
@@ -919,8 +928,12 @@
             <div class="footer-grid">
                 <div class="footer-brand">
                     <div class="brand-wrapper">
-                        <div class="brand-emblem"></div>
-                        <div class="brand-text">SAHARYN <span>AI</span></div>
+                        <div class="brand-icon">
+                            <div class="brand-bar"></div>
+                            <div class="brand-bar"></div>
+                            <div class="brand-bar"></div>
+                        </div>
+                        <div class="brand-text">saharyn</div>
                     </div>
                     <p data-i18n="footer_desc">
                         Sovereign Predictive Intelligence platform protecting critical energy, water, and industrial assets in high-consequence desert environments.
@@ -965,91 +978,287 @@
         </footer>
     </div>
 
-    <!-- Background Particle Network & Translation Script -->
+    <!-- ── THREE.JS PROCEDURAL PLANET & ORBITAL CONSTELLATION SCRIPT ── -->
     <script>
-        // 1. Ambient Background Particles
-        (function initBgCanvas() {
-            const canvas = document.getElementById('bg-canvas');
-            const ctx = canvas.getContext('2d');
-            let w, h;
-            let particles = [];
+        (function initSpaceGlobe() {
+            const container = document.getElementById('space-viewport');
+            if (!container) return;
 
-            function resize() {
-                w = canvas.width = window.innerWidth;
-                h = canvas.height = window.innerHeight;
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.1, 1000);
+            
+            // Adjust camera position so planet appears on the right half (matching reference design)
+            function updateCameraPos() {
+                if (window.innerWidth > 1024) {
+                    camera.position.set(-1.8, 0.2, 7.2);
+                } else {
+                    camera.position.set(0, -1.2, 8.5);
+                }
             }
-            window.addEventListener('resize', resize);
-            resize();
+            updateCameraPos();
 
-            for (let i = 0; i < 50; i++) {
-                particles.push({
-                    x: Math.random() * w,
-                    y: Math.random() * h,
-                    vx: (Math.random() - 0.5) * 0.3,
-                    vy: (Math.random() - 0.5) * 0.3,
-                    radius: Math.random() * 1.5 + 0.5,
-                    color: Math.random() > 0.4 ? 'rgba(16, 185, 129, 0.3)' : 'rgba(6, 182, 212, 0.2)'
-                });
-            }
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            container.appendChild(renderer.domElement);
 
-            function animate() {
-                ctx.clearRect(0, 0, w, h);
-                for (let i = 0; i < particles.length; i++) {
-                    let p = particles[i];
-                    p.x += p.vx;
-                    p.y += p.vy;
-                    if (p.x < 0) p.x = w;
-                    if (p.x > w) p.x = 0;
-                    if (p.y < 0) p.y = h;
-                    if (p.y > h) p.y = 0;
+            // Lighting Setup (Warm Sunlight from Left)
+            const sunLight = new THREE.DirectionalLight(0xfff1e0, 2.6);
+            sunLight.position.set(-6, 3, 5);
+            scene.add(sunLight);
 
+            const ambientLight = new THREE.AmbientLight(0x181010, 0.4);
+            scene.add(ambientLight);
+
+            const orangeRimLight = new THREE.PointLight(0xff6b2b, 4, 30);
+            orangeRimLight.position.set(5, -2, -3);
+            scene.add(orangeRimLight);
+
+            // 1. Generate High-Res Procedural Arid Desert Planet Texture
+            function generatePlanetTexture() {
+                const canvas = document.createElement('canvas');
+                canvas.width = 1024;
+                canvas.height = 512;
+                const ctx = canvas.getContext('2d');
+
+                // Base Terra-Cotta / Desert Gradient
+                const grad = ctx.createLinearGradient(0, 0, 0, 512);
+                grad.addColorStop(0, '#7c2d12');
+                grad.addColorStop(0.3, '#c2410c');
+                grad.addColorStop(0.5, '#9a3412');
+                grad.addColorStop(0.7, '#ea580c');
+                grad.addColorStop(1, '#431407');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, 1024, 512);
+
+                // Add Craters & Dunes Texturing
+                for (let i = 0; i < 400; i++) {
+                    const x = Math.random() * 1024;
+                    const y = Math.random() * 512;
+                    const r = Math.random() * 16 + 2;
                     ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                    ctx.fillStyle = p.color;
+                    ctx.arc(x, y, r, 0, Math.PI * 2);
+                    ctx.fillStyle = Math.random() > 0.5 ? 'rgba(67, 20, 7, 0.45)' : 'rgba(251, 146, 60, 0.25)';
                     ctx.fill();
 
-                    for (let j = i + 1; j < particles.length; j++) {
-                        let p2 = particles[j];
-                        let dx = p.x - p2.x;
-                        let dy = p.y - p2.y;
-                        let dist = Math.sqrt(dx * dx + dy * dy);
-                        if (dist < 110) {
-                            ctx.beginPath();
-                            ctx.moveTo(p.x, p.y);
-                            ctx.lineTo(p2.x, p2.y);
-                            ctx.strokeStyle = `rgba(16, 185, 129, ${0.1 * (1 - dist / 110)})`;
-                            ctx.lineWidth = 0.5;
-                            ctx.stroke();
-                        }
-                    }
+                    // Inner crater shadow
+                    ctx.beginPath();
+                    ctx.arc(x + r * 0.2, y + r * 0.2, r * 0.6, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(30, 10, 5, 0.35)';
+                    ctx.fill();
                 }
+
+                // Swirl Dune Bands
+                for (let j = 0; j < 30; j++) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, Math.random() * 512);
+                    ctx.bezierCurveTo(340, Math.random() * 512, 680, Math.random() * 512, 1024, Math.random() * 512);
+                    ctx.strokeStyle = `rgba(234, 88, 12, ${0.1 + Math.random() * 0.2})`;
+                    ctx.lineWidth = Math.random() * 14 + 4;
+                    ctx.stroke();
+                }
+
+                return new THREE.CanvasTexture(canvas);
+            }
+
+            // 2. Planet Sphere Mesh
+            const planetGroup = new THREE.Group();
+            planetGroup.position.set(2.8, -0.2, 0); // Positioned to the right side
+            scene.add(planetGroup);
+
+            const planetGeo = new THREE.SphereGeometry(2.1, 64, 64);
+            const planetTexture = generatePlanetTexture();
+            const planetMat = new THREE.MeshStandardMaterial({
+                map: planetTexture,
+                roughness: 0.85,
+                metalness: 0.1
+            });
+            const planetMesh = new THREE.Mesh(planetGeo, planetMat);
+            planetGroup.add(planetMesh);
+
+            // Atmosphere Rim Glow Shell
+            const glowGeo = new THREE.SphereGeometry(2.14, 32, 32);
+            const glowMat = new THREE.MeshBasicMaterial({
+                color: 0xff6b2b,
+                transparent: true,
+                opacity: 0.15,
+                side: THREE.BackSide
+            });
+            const glowMesh = new THREE.Mesh(glowGeo, glowMat);
+            planetGroup.add(glowMesh);
+
+            // 3. Orbital Trajectory Rings
+            const orbitalRings = [];
+            const ringConfigs = [
+                { r: 2.8, tiltX: 1.1, tiltY: 0.4, tiltZ: 0.2, color: 0x475569, speed: 0.008 },
+                { r: 3.4, tiltX: 0.5, tiltY: 1.2, tiltZ: -0.3, color: 0xff6b2b, speed: -0.006 },
+                { r: 3.9, tiltX: -0.8, tiltY: 0.3, tiltZ: 0.9, color: 0x334155, speed: 0.004 }
+            ];
+
+            ringConfigs.forEach(cfg => {
+                const ringGroup = new THREE.Group();
+                ringGroup.rotation.set(cfg.tiltX, cfg.tiltY, cfg.tiltZ);
+
+                // Elliptical Thin Ring
+                const ringGeo = new THREE.TorusGeometry(cfg.r, 0.012, 16, 120);
+                const ringMat = new THREE.MeshBasicMaterial({
+                    color: cfg.color,
+                    transparent: true,
+                    opacity: 0.45
+                });
+                const ring = new THREE.Mesh(ringGeo, ringMat);
+                ringGroup.add(ring);
+
+                // Orbiting Satellite Node
+                const satGeo = new THREE.SphereGeometry(0.05, 12, 12);
+                const satMat = new THREE.MeshBasicMaterial({ color: 0xffa366 });
+                const satellite = new THREE.Mesh(satGeo, satMat);
+                satellite.position.set(cfg.r, 0, 0);
+                ringGroup.add(satellite);
+
+                // Satellite Trail Particles
+                const trailCount = 35;
+                const trailGeo = new THREE.BufferGeometry();
+                const trailPos = new Float32Array(trailCount * 3);
+                for (let t = 0; t < trailCount; t++) {
+                    const angle = -t * 0.04;
+                    trailPos[t * 3] = Math.cos(angle) * cfg.r;
+                    trailPos[t * 3 + 1] = Math.sin(angle) * cfg.r;
+                    trailPos[t * 3 + 2] = 0;
+                }
+                trailGeo.setAttribute('position', new THREE.BufferAttribute(trailPos, 3));
+                const trailMat = new THREE.PointsMaterial({
+                    color: 0xff6b2b,
+                    size: 0.035,
+                    transparent: true,
+                    opacity: 0.7
+                });
+                const trail = new THREE.Points(trailGeo, trailMat);
+                ringGroup.add(trail);
+
+                planetGroup.add(ringGroup);
+                orbitalRings.push({ group: ringGroup, speed: cfg.speed });
+            });
+
+            // 4. Background Starfield & Constellation Grid Points
+            const starCount = 200;
+            const starGeo = new THREE.BufferGeometry();
+            const starPositions = new Float32Array(starCount * 3);
+            for (let s = 0; s < starCount * 3; s += 3) {
+                starPositions[s] = (Math.random() - 0.5) * 35;
+                starPositions[s + 1] = (Math.random() - 0.5) * 25;
+                starPositions[s + 2] = (Math.random() - 0.5) * 20 - 5;
+            }
+            starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+            const starMat = new THREE.PointsMaterial({
+                color: 0xffeedd,
+                size: 0.045,
+                transparent: true,
+                opacity: 0.65
+            });
+            const stars = new THREE.Points(starGeo, starMat);
+            scene.add(stars);
+
+            // 5. Interactive Drag & Mouse Parallax
+            let isDragging = false;
+            let prevMouseX = 0;
+            let prevMouseY = 0;
+            let targetRotY = 0;
+            let targetRotX = 0;
+
+            window.addEventListener('mousedown', (e) => {
+                // Only drag if clicking on the canvas or right half
+                if (e.clientX > window.innerWidth * 0.4) {
+                    isDragging = true;
+                    prevMouseX = e.clientX;
+                    prevMouseY = e.clientY;
+                }
+            });
+
+            window.addEventListener('mouseup', () => { isDragging = false; });
+
+            window.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    const deltaX = e.clientX - prevMouseX;
+                    const deltaY = e.clientY - prevMouseY;
+                    targetRotY += deltaX * 0.006;
+                    targetRotX += deltaY * 0.006;
+                    prevMouseX = e.clientX;
+                    prevMouseY = e.clientY;
+                } else {
+                    // Subtle background parallax
+                    const mouseX = (e.clientX / window.innerWidth - 0.5) * 0.3;
+                    const mouseY = (e.clientY / window.innerHeight - 0.5) * 0.3;
+                    camera.position.x = (window.innerWidth > 1024 ? -1.8 : 0) + mouseX;
+                    camera.position.y = (window.innerWidth > 1024 ? 0.2 : -1.2) - mouseY;
+                }
+            });
+
+            // Touch support for mobile
+            window.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1 && e.touches[0].clientX > window.innerWidth * 0.3) {
+                    isDragging = true;
+                    prevMouseX = e.touches[0].clientX;
+                    prevMouseY = e.touches[0].clientY;
+                }
+            });
+            window.addEventListener('touchend', () => { isDragging = false; });
+            window.addEventListener('touchmove', (e) => {
+                if (isDragging && e.touches.length === 1) {
+                    const deltaX = e.touches[0].clientX - prevMouseX;
+                    const deltaY = e.touches[0].clientY - prevMouseY;
+                    targetRotY += deltaX * 0.006;
+                    targetRotX += deltaY * 0.006;
+                    prevMouseX = e.touches[0].clientX;
+                    prevMouseY = e.touches[0].clientY;
+                }
+            });
+
+            // Render Loop
+            function animate() {
                 requestAnimationFrame(animate);
+
+                // Planet Rotation
+                planetMesh.rotation.y += 0.002;
+                planetGroup.rotation.y += (targetRotY - planetGroup.rotation.y) * 0.05;
+                planetGroup.rotation.x += (targetRotX - planetGroup.rotation.x) * 0.05;
+
+                // Animate Orbital Rings
+                orbitalRings.forEach(item => {
+                    item.group.rotation.z += item.speed;
+                });
+
+                renderer.render(scene, camera);
             }
             animate();
+
+            window.addEventListener('resize', () => {
+                updateCameraPos();
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
         })();
 
-        // 2. Bilingual English / Arabic Language Switcher
+        // ── BILINGUAL ENGLISH / ARABIC SWITCHER ──
         const translations = {
             en: {
-                nav_solutions: "Solutions",
-                nav_platform: "Platform",
-                nav_capabilities: "Capabilities",
-                nav_technology: "Technology",
-                nav_api: "API Docs",
-                nav_cta: "Mission Control",
-                hero_badge: "NASA & ESA COPERNICUS ATMOSPHERIC BRIDGE",
-                hero_h1_lead: "Predict High-Consequence Failures",
-                hero_h1_sub: "before harsh desert impacts occur.",
-                hero_desc: "SAHARYN AI combines space-borne satellite intelligence with physics-informed causal mechanics to monitor sandstorms, thermal decay, and abrasion—predicting industrial asset failures up to 48 hours in advance across Saudi Arabia and the Middle East.",
-                hero_cta_primary: "Launch Mission Control",
-                hero_cta_secondary: "View Architecture Proof",
-                m_lead: "Early Warning Window",
-                m_latency: "Causal Inference Cycle",
-                m_savings: "Avg Avoided Downtime Loss",
-                fac_base_title: "Surface Infrastructure Layer",
-                fac_base_desc: "High-resolution visual telemetry captures ground operations across gas compressors, water injection pumps, and refinery turbines.",
-                fac_scan_title: "Environmental Stress Manifold",
-                fac_scan_desc: "Multi-spectral data fusion reveals invisible stressors: thermal decay gradients, particulate dust density, and vibration shockwaves in real-time.",
+                nav_product: "Product ⌵",
+                nav_how: "How it works",
+                nav_capabilities: "Capabilities ⌵",
+                nav_docs: "Docs",
+                nav_signin: "Sign in",
+                nav_cta: "Start free",
+                badge_text: "Realtime personalization",
+                badge_action: "See it live →",
+                subhead_title: "ORBITAL RELAY",
+                hero_h1_lead: "Tuned to",
+                hero_h1_sub: "every visitor",
+                hero_desc: "Signals in, moments out — a live loop that learns from every visit to predict and protect high-consequence desert industrial infrastructure.",
+                cta_primary: "Start free",
+                cta_secondary: "Watch it work",
+                hud_profiles: "PROFILES SYNCED",
                 tag_solutions: "INDUSTRY APPLICATIONS",
                 sol_heading: "Built for High-Consequence Desert Assets",
                 sol_sub: "Protecting national critical infrastructure against extreme sandstorms, high ambient heat, and abrasive dust cycles.",
@@ -1080,25 +1289,21 @@
                 footer_desc: "Sovereign Predictive Intelligence platform protecting critical energy, water, and industrial assets in high-consequence desert environments."
             },
             ar: {
-                nav_solutions: "الحلول",
-                nav_platform: "المنصة",
-                nav_capabilities: "القدرات",
-                nav_technology: "التقنية",
-                nav_api: "واجهة البرمجة",
-                nav_cta: "مركز العمليات",
-                hero_badge: "جسر وكالة ناسا وإيسا كوبرنيكوس للغلاف الجوي",
-                hero_h1_lead: "التنبؤ بالأعطال الحرجة",
-                hero_h1_sub: "قبل وقوع أضرار البيئة الصحراوية القاسية.",
-                hero_desc: "تجمع منصة سحارين (SAHARYN AI) بين استخبارات الأقمار الصناعية الفضائية والميكانيكا السببية الفيزيائية لرصد العواصف الرملية والتآكل الحراري، متنبئة بأعطال المعدات الصناعية حتى 48 ساعة مسبقاً في المملكة العربية السعودية والشرق الأوسط.",
-                hero_cta_primary: "فتح مركز العمليات",
-                hero_cta_secondary: "عرض الإثبات التقني",
-                m_lead: "نافذة الإنذار المبكر",
-                m_latency: "دورة الاستدلال السببي",
-                m_savings: "متوسط الخسائر المتجنبة",
-                fac_base_title: "طبقة البنية التحتية السطحية",
-                fac_base_desc: "الاستشعار البصري عالي الدقة يرصد العمليات التشغيلية على الأرض لضواغط الغاز ومضخات حقن المياه وتوربينات التكرير.",
-                fac_scan_title: "منظومة الإجهاد البيئي",
-                fac_scan_desc: "دمج البيانات متعددة الأطياف يكشف المؤثرات غير المرئية: التدرج الحراري، كثافة الغبار، وموجات الاهتزاز في الوقت الفعلي.",
+                nav_product: "المنتج ⌵",
+                nav_how: "كيف يعمل",
+                nav_capabilities: "القدرات ⌵",
+                nav_docs: "المستندات",
+                nav_signin: "تسجيل الدخول",
+                nav_cta: "ابدأ مجاناً",
+                badge_text: "تخصيص فوري ومباشر",
+                badge_action: "شاهد البث المباشر ←",
+                subhead_title: "المرحل المداري الفضائي",
+                hero_h1_lead: "دقة تنبؤية",
+                hero_h1_sub: "لكل زائر وأصل صناعي",
+                hero_desc: "إشارات فضائية مستمرة وحسابات سببية فورية — حلقة ذكاء اصطناعي حية تتنبأ بأعطال المعدات الصناعية وتحميها في البيئات الصحراوية القاسية.",
+                cta_primary: "ابدأ مجاناً",
+                cta_secondary: "شاهد آلية العمل",
+                hud_profiles: "الأصول المتصلة",
                 tag_solutions: "التطبيقات الصناعية",
                 sol_heading: "مصممة لأصول البيئة الصحراوية القاسية",
                 sol_sub: "حماية البنية التحتية الوطنية الحيوية من العواصف الرملية الشديدة والحرارة المرتفعة ودورات الغبار التآكلية.",
