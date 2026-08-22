@@ -15,26 +15,25 @@
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800;900&display=swap"
         rel="stylesheet">
     
-    <!-- Lucide Icons & Three.js -->
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <style>
         :root {
-            --bg-void: #050608;
+            --bg: #060608;
             --bg-surface: #0a0c10;
             --bg-card: rgba(16, 18, 24, 0.75);
             --bg-card-hover: rgba(22, 26, 36, 0.9);
             
-            --accent-orange: #ff6b2b;
+            --accent-orange: #ff6b2c;
             --accent-orange-bright: #ff8a4c;
-            --accent-orange-glow: rgba(255, 107, 43, 0.35);
+            --accent-orange-glow: rgba(255, 107, 44, 0.35);
             --accent-amber: #f59e0b;
             --accent-emerald: #10b981;
             
             --border-subtle: rgba(255, 255, 255, 0.07);
             --border-medium: rgba(255, 255, 255, 0.12);
-            --border-orange: rgba(255, 107, 43, 0.35);
+            --border-orange: rgba(255, 107, 44, 0.35);
             
             --text-primary: #ffffff;
             --text-secondary: #94a3b8;
@@ -57,10 +56,7 @@
         }
 
         body {
-            background-color: var(--bg-void);
-            background-image: 
-                radial-gradient(circle at 65% 40%, rgba(255, 107, 43, 0.08) 0%, transparent 55%),
-                radial-gradient(circle at 15% 85%, rgba(245, 158, 11, 0.04) 0%, transparent 50%);
+            background-color: var(--bg);
             color: var(--text-primary);
             font-family: var(--font-sans);
             line-height: 1.6;
@@ -74,30 +70,36 @@
             text-align: right;
         }
 
-        /* ── 3D SPACE BACKGROUND CANVAS ── */
-        #space-viewport {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
+        /* ── STARFIELD BACKGROUND ── */
+        .stars {
+            position: fixed;
+            inset: 0;
             z-index: 0;
-            pointer-events: auto;
-            cursor: grab;
+            pointer-events: none;
+            background-image:
+                radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,.8) 50%, transparent 50%),
+                radial-gradient(1px 1px at 40% 70%, rgba(255,255,255,.6) 50%, transparent 50%),
+                radial-gradient(1.5px 1.5px at 60% 20%, rgba(255,255,255,.9) 50%, transparent 50%),
+                radial-gradient(1px 1px at 80% 50%, rgba(255,255,255,.5) 50%, transparent 50%),
+                radial-gradient(1px 1px at 10% 80%, rgba(255,255,255,.7) 50%, transparent 50%),
+                radial-gradient(1.5px 1.5px at 90% 15%, rgba(255,255,255,.8) 50%, transparent 50%),
+                radial-gradient(1px 1px at 30% 90%, rgba(255,255,255,.4) 50%, transparent 50%),
+                radial-gradient(1px 1px at 70% 85%, rgba(255,255,255,.6) 50%, transparent 50%),
+                radial-gradient(1px 1px at 50% 45%, rgba(255,255,255,.5) 50%, transparent 50%),
+                radial-gradient(1.5px 1.5px at 15% 55%, rgba(255,255,255,.7) 50%, transparent 50%);
+            background-size: 600px 600px, 800px 800px, 900px 900px, 700px 700px,
+                             1000px 1000px, 850px 850px, 750px 750px, 950px 950px, 650px 650px, 880px 880px;
+            animation: drift 120s linear infinite;
         }
 
-        #space-viewport:active {
-            cursor: grabbing;
+        @keyframes drift {
+            from { background-position: 0 0; }
+            to   { background-position: 0 600px; }
         }
 
         .content-layer {
             position: relative;
             z-index: 1;
-            pointer-events: none;
-        }
-
-        .interactive-element {
-            pointer-events: auto;
         }
 
         /* ── LUXURY MINIMAL NAVIGATION BAR ── */
@@ -111,11 +113,10 @@
             justify-content: space-between;
             align-items: center;
             padding: 20px 6vw;
-            background: rgba(5, 6, 8, 0.75);
+            background: rgba(6, 6, 8, 0.85);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border-subtle);
-            pointer-events: auto;
         }
 
         .brand-wrapper {
@@ -221,7 +222,7 @@
 
         .btn-start-free:hover {
             transform: translateY(-1px);
-            box-shadow: 0 6px 25px rgba(255, 107, 43, 0.55);
+            box-shadow: 0 6px 25px rgba(255, 107, 44, 0.55);
             filter: brightness(1.08);
         }
 
@@ -237,10 +238,18 @@
             margin: 0 auto;
         }
 
+        .hero-grid-wrap {
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 50px;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
         .hero-left-content {
             max-width: 540px;
             z-index: 2;
-            pointer-events: auto;
         }
 
         /* Capsule Badge */
@@ -311,7 +320,7 @@
             background: var(--border-medium);
         }
 
-        /* Modern Crisp Typography (High-Impact, No Serif) */
+        /* Modern Crisp Typography */
         .hero-title {
             font-family: var(--font-sans);
             font-size: clamp(34px, 3.8vw, 54px);
@@ -372,7 +381,7 @@
 
         .btn-cta-primary:hover {
             transform: translateY(-1px);
-            box-shadow: 0 6px 26px rgba(255, 107, 43, 0.55);
+            box-shadow: 0 6px 26px rgba(255, 107, 44, 0.55);
             filter: brightness(1.08);
         }
 
@@ -405,6 +414,120 @@
             box-shadow: 0 0 8px var(--accent-orange);
         }
 
+        /* ================= THE BALL (EARTH + SATELLITES — USER CODE) ================= */
+        .planet-stage {
+            position: relative;
+            width: min(440px, 42vw);
+            aspect-ratio: 1;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+
+        .earth {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 62%; aspect-ratio: 1; border-radius: 50%;
+            background-image: url('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg');
+            background-size: 200% 100%;
+            background-color: #33200e; /* desert tone while texture loads */
+            animation: earth-spin 80s linear infinite;
+            filter: sepia(0.55) hue-rotate(-18deg) saturate(1.35) contrast(1.05) brightness(0.95);
+            box-shadow:
+                inset -30px -24px 60px rgba(20,8,0,0.8),
+                0 0 60px rgba(255,140,60,0.35),
+                0 0 160px rgba(255,107,44,0.15);
+            overflow: hidden;
+        }
+
+        /* Night-side shading */
+        .earth::after {
+            content: ""; position: absolute; inset: 0; border-radius: 50%;
+            background: radial-gradient(circle at 66% 34%, transparent 38%, rgba(15,5,0,0.75) 88%);
+        }
+
+        /* Texture scrolls horizontally = planet rotates */
+        @keyframes earth-spin {
+            from { background-position: 0% 50%; }
+            to   { background-position: 200% 50%; }
+        }
+
+        /* ================= ORBIT RINGS ================= */
+        .orbit {
+            position: absolute; top: 50%; left: 50%;
+            border: 1px dashed rgba(255,255,255,0.15);
+            border-radius: 50%;
+        }
+        .orbit-1 { width: 82%;  height: 82%;  transform: translate(-50%,-50%) rotate(-18deg); }
+        .orbit-2 { width: 100%; height: 100%; transform: translate(-50%,-50%) rotate(24deg); }
+        .orbit-3 { width: 118%; height: 52%;  transform: translate(-50%,-50%) rotate(-8deg); }
+
+        /* ================= ROTATING CARRIERS ================= */
+        .spin-wrap { position: absolute; top: 50%; left: 50%; pointer-events: none; }
+        .spin-1 { width: 82%;  height: 82%;  animation: orb1 14s linear infinite; }
+        .spin-2 { width: 100%; height: 100%; animation: orb2 22s linear infinite reverse; }
+        .spin-3 { width: 118%; height: 52%;  animation: orb3 30s linear infinite; }
+
+        @keyframes orb1 {
+            from { transform: translate(-50%,-50%) rotate(-18deg) rotate(0deg); }
+            to   { transform: translate(-50%,-50%) rotate(-18deg) rotate(360deg); }
+        }
+        @keyframes orb2 {
+            from { transform: translate(-50%,-50%) rotate(24deg) rotate(0deg); }
+            to   { transform: translate(-50%,-50%) rotate(24deg) rotate(360deg); }
+        }
+        @keyframes orb3 {
+            from { transform: translate(-50%,-50%) rotate(-8deg) rotate(0deg); }
+            to   { transform: translate(-50%,-50%) rotate(-8deg) rotate(360deg); }
+        }
+
+        /* ---- Anchor points on carrier edges ---- */
+        .anchor-t { position: absolute; top: 0;    left: 50%; }
+        .anchor-b { position: absolute; bottom: 0; left: 50%; }
+        .anchor-l { position: absolute; left: 0;   top: 50%; }
+
+        /* ================= SATELLITES ================= */
+        .sat {
+            position: absolute; top: 0; left: 0;
+            width: 88px; height: 52px; margin-left: -44px; margin-top: -26px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 8px rgba(255,255,255,0.4));
+        }
+        .sat.small { width: 66px; height: 40px; margin-left: -33px; margin-top: -20px; }
+
+        /* Counter-rotation keeps satellites upright while orbiting */
+        .spin-1 .sat { animation: ctr1 14s linear infinite; }
+        .spin-2 .sat { animation: ctr2 22s linear infinite reverse; }
+        @keyframes ctr1 {
+            from { transform: rotate(18deg)  rotate(0deg); }
+            to   { transform: rotate(18deg)  rotate(-360deg); }
+        }
+        @keyframes ctr2 {
+            from { transform: rotate(-24deg) rotate(0deg); }
+            to   { transform: rotate(-24deg) rotate(-360deg); }
+        }
+
+        /* ---- Glowing dots ---- */
+        .sat-dot {
+            position: absolute; top: 0; left: 0;
+            width: 9px; height: 9px; border-radius: 50%;
+            background: var(--text-primary); box-shadow: 0 0 12px rgba(255,255,255,0.9);
+            transform: translate(-50%,-50%);
+        }
+        .sat-dot.sm {
+            width: 6px; height: 6px;
+            background: var(--accent-orange); box-shadow: 0 0 8px rgba(255,107,44,0.9);
+        }
+
+        /* ---- Signal tether to planet ---- */
+        .tether {
+            position: absolute; top: 0; left: 0; width: 1px; height: 90px;
+            transform: translateX(-50%);
+            background: linear-gradient(to bottom, rgba(255,107,44,0.5), transparent);
+        }
+
         /* ── BOTTOM HUD TELEMETRY BAR ── */
         .hud-bottom-bar {
             position: absolute;
@@ -417,7 +540,6 @@
             padding-top: 20px;
             border-top: 1px solid rgba(255, 255, 255, 0.08);
             z-index: 2;
-            pointer-events: auto;
         }
 
         .hud-metrics {
@@ -468,7 +590,6 @@
             padding: 90px 6vw;
             max-width: 1440px;
             margin: 0 auto;
-            pointer-events: auto;
         }
 
         .section-header {
@@ -522,15 +643,15 @@
             transform: translateY(-5px);
             background: var(--bg-card-hover);
             border-color: var(--accent-orange);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 25px rgba(255, 107, 43, 0.15);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 25px rgba(255, 107, 44, 0.15);
         }
 
         .feature-icon-box {
             width: 42px;
             height: 42px;
             border-radius: 10px;
-            background: rgba(255, 107, 43, 0.1);
-            border: 1px solid rgba(255, 107, 43, 0.25);
+            background: rgba(255, 107, 44, 0.1);
+            border: 1px solid rgba(255, 107, 44, 0.25);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -557,7 +678,7 @@
             font-size: 10px;
             font-weight: 700;
             color: var(--accent-orange-bright);
-            background: rgba(255, 107, 43, 0.08);
+            background: rgba(255, 107, 44, 0.08);
             padding: 3px 8px;
             border-radius: 5px;
             display: inline-block;
@@ -597,7 +718,7 @@
             font-size: 10px;
             font-weight: 700;
             color: var(--accent-orange-bright);
-            background: rgba(255, 107, 43, 0.08);
+            background: rgba(255, 107, 44, 0.08);
             padding: 3px 7px;
             border-radius: 4px;
             display: inline-block;
@@ -609,7 +730,6 @@
             border-top: 1px solid var(--border-subtle);
             padding: 50px 6vw 36px;
             margin-top: 70px;
-            pointer-events: auto;
         }
 
         .footer-grid {
@@ -671,6 +791,11 @@
         /* ── RESPONSIVE ADAPTATIONS ── */
         @media (max-width: 1024px) {
             .nav-menu { display: none; }
+            .hero-grid-wrap { grid-template-columns: 1fr; text-align: center; }
+            .hero-left-content { margin: 0 auto; }
+            .hero-subhead-row { justify-content: center; }
+            .hero-btn-row { justify-content: center; }
+            .planet-stage { width: min(360px, 80vw); margin-top: 20px; }
             .grid-3col { grid-template-columns: repeat(2, 1fr); }
             .compliance-grid { grid-template-columns: repeat(2, 1fr); }
             .footer-grid { grid-template-columns: 1fr 1fr; }
@@ -689,8 +814,8 @@
 </head>
 
 <body>
-    <!-- ── 3D THREE.JS SPACE & ORBITAL PLANET CANVAS ── -->
-    <div id="space-viewport"></div>
+    <!-- ── STARFIELD BACKGROUND ── -->
+    <div class="stars"></div>
 
     <div class="content-layer">
         <!-- Main Minimal Space Navigation -->
@@ -722,43 +847,80 @@
             </div>
         </nav>
 
-        <!-- HERO SECTION (CLEAN MODERN TYPOGRAPHY & BALANCED PROPORTIONS) -->
+        <!-- HERO SECTION -->
         <header class="hero">
-            <div class="hero-left-content">
-                <!-- Capsule Badge -->
-                <div class="capsule-badge">
-                    <span class="capsule-text" data-i18n="badge_text">NASA & ESA Live Feeds</span>
-                    <a href="console.html" class="capsule-btn" data-i18n="badge_action">Console →</a>
+            <div class="hero-grid-wrap">
+                <div class="hero-left-content">
+                    <!-- Capsule Badge -->
+                    <div class="capsule-badge">
+                        <span class="capsule-text" data-i18n="badge_text">NASA & ESA Live Feeds</span>
+                        <a href="console.html" class="capsule-btn" data-i18n="badge_action">Console →</a>
+                    </div>
+
+                    <!-- Numbered Subsection Header with Line -->
+                    <div class="hero-subhead-row">
+                        <span class="hero-subhead-num">01</span>
+                        <span class="hero-subhead-title" data-i18n="subhead_title">SOVEREIGN PREDICTIVE INTELLIGENCE</span>
+                        <div class="hero-subhead-line"></div>
+                    </div>
+
+                    <!-- High-Impact Crisp Headline -->
+                    <h1 class="hero-title">
+                        <span class="title-gradient" data-i18n="hero_h1_lead">Predict High-Consequence Failures</span>
+                        <span class="title-sub" data-i18n="hero_h1_sub">Before harsh desert impacts occur.</span>
+                    </h1>
+
+                    <!-- Concise Description -->
+                    <p class="hero-desc" data-i18n="hero_desc">
+                        SAHARYN fuses live space-borne satellite feeds with physics-informed causal mechanics to predict heavy equipment breakdowns up to 48 hours in advance across desert operations.
+                    </p>
+
+                    <!-- Dual CTA Buttons -->
+                    <div class="hero-btn-row">
+                        <a href="console.html" class="btn-cta-primary">
+                            <span data-i18n="cta_primary">Launch Mission Control</span>
+                            <span>›</span>
+                        </a>
+                        <a href="about.html" class="btn-cta-secondary">
+                            <span class="orange-dot"></span>
+                            <span data-i18n="cta_secondary">Architecture Proof</span>
+                        </a>
+                    </div>
                 </div>
 
-                <!-- Numbered Subsection Header with Line -->
-                <div class="hero-subhead-row">
-                    <span class="hero-subhead-num">01</span>
-                    <span class="hero-subhead-title" data-i18n="subhead_title">SOVEREIGN PREDICTIVE INTELLIGENCE</span>
-                    <div class="hero-subhead-line"></div>
-                </div>
+                <!-- ================= THE BALL + SATELLITES (EXACT USER CODE INTEGRATION) ================= -->
+                <div class="planet-stage">
+                    <!-- The Earth ball -->
+                    <div class="earth"></div>
 
-                <!-- High-Impact Crisp Headline -->
-                <h1 class="hero-title">
-                    <span class="title-gradient" data-i18n="hero_h1_lead">Predict High-Consequence Failures</span>
-                    <span class="title-sub" data-i18n="hero_h1_sub">Before harsh desert impacts occur.</span>
-                </h1>
+                    <!-- Orbit rings -->
+                    <div class="orbit orbit-1"></div>
+                    <div class="orbit orbit-2"></div>
+                    <div class="orbit orbit-3"></div>
 
-                <!-- Concise Description -->
-                <p class="hero-desc" data-i18n="hero_desc">
-                    SAHARYN fuses live space-borne satellite feeds with physics-informed causal mechanics to predict heavy equipment breakdowns up to 48 hours in advance across desert operations.
-                </p>
+                    <!-- Orbit 1: large satellite + small orange dot -->
+                    <div class="spin-wrap spin-1">
+                        <div class="anchor-t">
+                            <img class="sat" alt="Satellite" src="">
+                        </div>
+                        <div class="anchor-b"><div class="sat-dot sm"></div></div>
+                    </div>
 
-                <!-- Dual CTA Buttons -->
-                <div class="hero-btn-row">
-                    <a href="console.html" class="btn-cta-primary">
-                        <span data-i18n="cta_primary">Launch Mission Control</span>
-                        <span>›</span>
-                    </a>
-                    <a href="about.html" class="btn-cta-secondary">
-                        <span class="orange-dot"></span>
-                        <span data-i18n="cta_secondary">Architecture Proof</span>
-                    </a>
+                    <!-- Orbit 2: second satellite (counter-rotating) + white dot -->
+                    <div class="spin-wrap spin-2">
+                        <div class="anchor-t">
+                            <img class="sat small" alt="Satellite" src="">
+                        </div>
+                        <div class="anchor-l"><div class="sat-dot"></div></div>
+                    </div>
+
+                    <!-- Orbit 3: white dot + signal tether -->
+                    <div class="spin-wrap spin-3">
+                        <div class="anchor-t">
+                            <div class="tether"></div>
+                            <div class="sat-dot"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -974,264 +1136,82 @@
         </footer>
     </div>
 
-    <!-- ── THREE.JS COMPACT, SYMMETRICAL 3D GLOBE & ORBITAL CONSTELLATION ── -->
+    <!-- ── SATELLITE SVG INJECTION & TRANSLATION SCRIPT ── -->
     <script>
-        (function initSpaceGlobe() {
-            const container = document.getElementById('space-viewport');
-            if (!container) return;
+        /* ================= REALISTIC SATELLITES (SVG — ALWAYS LOAD) ================= */
+        const SAT_LARGE = "data:image/svg+xml," + encodeURIComponent(`
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 56">
+              <defs>
+                <linearGradient id="body" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#f0eee9"/><stop offset="0.5" stop-color="#cfccc4"/>
+                  <stop offset="1" stop-color="#8f8c85"/>
+                </linearGradient>
+                <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#2a4d8f"/><stop offset="1" stop-color="#16294f"/>
+                </linearGradient>
+                <radialGradient id="dish" cx="0.4" cy="0.35" r="0.9">
+                  <stop offset="0" stop-color="#eae7e0"/><stop offset="1" stop-color="#9a978f"/>
+                </radialGradient>
+              </defs>
+              <!-- Solar panel wings with cell grid -->
+              <g stroke="#0d1c36" stroke-width="0.8">
+                <rect x="2" y="18" width="30" height="20" rx="1.5" fill="url(#panel)"/>
+                <path d="M9.5 18v20 M17 18v20 M24.5 18v20 M2 28h30" stroke="#5b83c4" stroke-width="0.7"/>
+                <rect x="64" y="18" width="30" height="20" rx="1.5" fill="url(#panel)"/>
+                <path d="M71.5 18v20 M79 18v20 M86.5 18v20 M64 28h30" stroke="#5b83c4" stroke-width="0.7"/>
+              </g>
+              <!-- Deployment arms -->
+              <line x1="32" y1="28" x2="40" y2="28" stroke="#b8b5ad" stroke-width="2.5"/>
+              <line x1="56" y1="28" x2="64" y2="28" stroke="#b8b5ad" stroke-width="2.5"/>
+              <!-- Main bus with gold MLI foil -->
+              <rect x="40" y="17" width="16" height="22" rx="2.5" fill="url(#body)" stroke="#6f6c65"/>
+              <rect x="42.5" y="29" width="11" height="8" rx="1" fill="#c9971f" opacity="0.85"/>
+              <rect x="42.5" y="19" width="11" height="7" rx="1" fill="#31425e"/>
+              <!-- Parabolic dish + feed strut -->
+              <ellipse cx="48" cy="10" rx="9" ry="5" fill="url(#dish)" stroke="#77746c"/>
+              <line x1="48" y1="10" x2="52" y2="15" stroke="#77746c" stroke-width="1.2"/>
+              <circle cx="52" cy="15" r="1.3" fill="#4c5b72"/>
+              <!-- High-gain antenna mast -->
+              <line x1="55" y1="17" x2="59" y2="9" stroke="#b8b5ad" stroke-width="1.4"/>
+              <circle cx="59" cy="8" r="2" fill="none" stroke="#d8d5cf" stroke-width="1"/>
+              <path d="M57 5 a3.5 3.5 0 0 1 4 0" fill="none" stroke="#8fb4e8" stroke-width="0.9" opacity="0.8"/>
+              <!-- Blinking beacon -->
+              <circle cx="41" cy="15" r="1.5" fill="#ff3b3b">
+                <animate attributeName="opacity" values="0.1;1;0.1" dur="1.6s" repeatCount="indefinite"/>
+              </circle>
+            </svg>`);
 
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(36, window.innerWidth / window.innerHeight, 0.1, 1000);
-            
-            // Adjusted camera position for symmetrical, well-framed composition
-            function updateCameraPos() {
-                if (window.innerWidth > 1024) {
-                    camera.position.set(-0.6, 0.0, 6.2);
-                } else {
-                    camera.position.set(0, -0.8, 7.2);
-                }
-            }
-            updateCameraPos();
+        const SAT_SMALL = "data:image/svg+xml," + encodeURIComponent(`
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 56">
+              <defs>
+                <linearGradient id="body2" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#e8e5de"/><stop offset="1" stop-color="#8a877f"/>
+                </linearGradient>
+                <linearGradient id="panel2" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#b35418"/><stop offset="1" stop-color="#6b2f0c"/>
+                </linearGradient>
+              </defs>
+              <g stroke="#3d1a06" stroke-width="0.8">
+                <rect x="8" y="20" width="24" height="16" rx="1.5" fill="url(#panel2)"/>
+                <path d="M16 20v16 M24 20v16" stroke="#e07a2e" stroke-width="0.7"/>
+                <rect x="64" y="20" width="24" height="16" rx="1.5" fill="url(#panel2)"/>
+                <path d="M72 20v16 M80 20v16" stroke="#e07a2e" stroke-width="0.7"/>
+              </g>
+              <line x1="32" y1="28" x2="40" y2="28" stroke="#b8b5ad" stroke-width="2.2"/>
+              <line x1="56" y1="28" x2="64" y2="28" stroke="#b8b5ad" stroke-width="2.2"/>
+              <rect x="40" y="19" width="16" height="18" rx="2" fill="url(#body2)" stroke="#6f6c65"/>
+              <rect x="43" y="22" width="10" height="6" rx="1" fill="#31425e"/>
+              <ellipse cx="48" cy="13" rx="7" ry="4" fill="#d8d5cf" stroke="#77746c"/>
+              <circle cx="51" cy="17" r="1.1" fill="#4c5b72"/>
+              <circle cx="56" cy="17" r="1.4" fill="#ffd23b">
+                <animate attributeName="opacity" values="0.15;1;0.15" dur="2.1s" repeatCount="indefinite"/>
+              </circle>
+            </svg>`);
 
-            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            renderer.toneMapping = THREE.ACESFilmicToneMapping;
-            container.appendChild(renderer.domElement);
-
-            // Lighting Setup (Crisp Studio Space Lighting)
-            const sunLight = new THREE.DirectionalLight(0xfff6ea, 3.2);
-            sunLight.position.set(-5, 3.5, 4.5);
-            scene.add(sunLight);
-
-            const ambientLight = new THREE.AmbientLight(0x1a1210, 0.5);
-            scene.add(ambientLight);
-
-            const orangeRimLight = new THREE.PointLight(0xff6b2b, 4.5, 25);
-            orangeRimLight.position.set(3.5, -1.8, -2);
-            scene.add(orangeRimLight);
-
-            // 1. Seamless Photorealistic Procedural Desert Earth Texture (Zero Polar Distortion)
-            function generatePlanetTexture() {
-                const canvas = document.createElement('canvas');
-                canvas.width = 1024;
-                canvas.height = 512;
-                const ctx = canvas.getContext('2d');
-
-                // Smooth Warm Desert Sphere Base
-                const grad = ctx.createLinearGradient(0, 0, 0, 512);
-                grad.addColorStop(0, '#5a220a');
-                grad.addColorStop(0.25, '#99350a');
-                grad.addColorStop(0.5, '#c2410c');
-                grad.addColorStop(0.75, '#ea580c');
-                grad.addColorStop(1, '#4a1504');
-                ctx.fillStyle = grad;
-                ctx.fillRect(0, 0, 1024, 512);
-
-                // Seamless Organic Topography Bands (Smooth Dunes & Highlands)
-                for (let i = 0; i < 25; i++) {
-                    const y = 80 + i * 14;
-                    ctx.beginPath();
-                    ctx.moveTo(0, y);
-                    ctx.bezierCurveTo(256, y + (Math.sin(i) * 18), 768, y - (Math.cos(i) * 18), 1024, y);
-                    ctx.strokeStyle = `rgba(${220 + (i % 35)}, ${70 + (i * 3)}, 18, 0.18)`;
-                    ctx.lineWidth = 12 + (i % 8);
-                    ctx.stroke();
-                }
-
-                // Subtle Atmospheric Dust Clouds
-                for (let c = 0; c < 15; c++) {
-                    const cx = Math.random() * 1024;
-                    const cy = 120 + Math.random() * 272;
-                    const cRad = 40 + Math.random() * 80;
-                    const cGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, cRad);
-                    cGrad.addColorStop(0, 'rgba(255, 230, 200, 0.12)');
-                    cGrad.addColorStop(1, 'transparent');
-                    ctx.fillStyle = cGrad;
-                    ctx.beginPath();
-                    ctx.arc(cx, cy, cRad, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-
-                return new THREE.CanvasTexture(canvas);
-            }
-
-            // 2. Planet Sphere Mesh — Compact, Symmetrical & Proportional (Radius = 1.18)
-            const planetGroup = new THREE.Group();
-            planetGroup.position.set(1.45, 0.05, 0); // Perfectly centered in the right quadrant
-            scene.add(planetGroup);
-
-            const planetGeo = new THREE.SphereGeometry(1.18, 64, 64);
-            const planetTexture = generatePlanetTexture();
-            const planetMat = new THREE.MeshStandardMaterial({
-                map: planetTexture,
-                roughness: 0.8,
-                metalness: 0.1
-            });
-            const planetMesh = new THREE.Mesh(planetGeo, planetMat);
-            planetGroup.add(planetMesh);
-
-            // Atmosphere Rim Glow Shell
-            const glowGeo = new THREE.SphereGeometry(1.22, 32, 32);
-            const glowMat = new THREE.MeshBasicMaterial({
-                color: 0xff6b2b,
-                transparent: true,
-                opacity: 0.22,
-                side: THREE.BackSide
-            });
-            const glowMesh = new THREE.Mesh(glowGeo, glowMat);
-            planetGroup.add(glowMesh);
-
-            // 3. Compact, Symmetrical Orbital Trajectory Rings
-            const orbitalRings = [];
-            const ringConfigs = [
-                { r: 1.62, tiltX: 1.05, tiltY: 0.35, tiltZ: 0.2, color: 0x475569, speed: 0.007 },
-                { r: 2.05, tiltX: 0.45, tiltY: 1.15, tiltZ: -0.25, color: 0xff6b2b, speed: -0.005 },
-                { r: 2.38, tiltX: -0.75, tiltY: 0.25, tiltZ: 0.85, color: 0x334155, speed: 0.004 }
-            ];
-
-            ringConfigs.forEach(cfg => {
-                const ringGroup = new THREE.Group();
-                ringGroup.rotation.set(cfg.tiltX, cfg.tiltY, cfg.tiltZ);
-
-                // Elliptical Thin Ring
-                const ringGeo = new THREE.TorusGeometry(cfg.r, 0.008, 16, 120);
-                const ringMat = new THREE.MeshBasicMaterial({
-                    color: cfg.color,
-                    transparent: true,
-                    opacity: 0.45
-                });
-                const ring = new THREE.Mesh(ringGeo, ringMat);
-                ringGroup.add(ring);
-
-                // Orbiting Satellite Node
-                const satGeo = new THREE.SphereGeometry(0.038, 12, 12);
-                const satMat = new THREE.MeshBasicMaterial({ color: 0xffa366 });
-                const satellite = new THREE.Mesh(satGeo, satMat);
-                satellite.position.set(cfg.r, 0, 0);
-                ringGroup.add(satellite);
-
-                // Satellite Trail Particles
-                const trailCount = 25;
-                const trailGeo = new THREE.BufferGeometry();
-                const trailPos = new Float32Array(trailCount * 3);
-                for (let t = 0; t < trailCount; t++) {
-                    const angle = -t * 0.04;
-                    trailPos[t * 3] = Math.cos(angle) * cfg.r;
-                    trailPos[t * 3 + 1] = Math.sin(angle) * cfg.r;
-                    trailPos[t * 3 + 2] = 0;
-                }
-                trailGeo.setAttribute('position', new THREE.BufferAttribute(trailPos, 3));
-                const trailMat = new THREE.PointsMaterial({
-                    color: 0xff6b2b,
-                    size: 0.03,
-                    transparent: true,
-                    opacity: 0.7
-                });
-                const trail = new THREE.Points(trailGeo, trailMat);
-                ringGroup.add(trail);
-
-                planetGroup.add(ringGroup);
-                orbitalRings.push({ group: ringGroup, speed: cfg.speed });
-            });
-
-            // 4. Background Starfield & Constellation Grid Points
-            const starCount = 160;
-            const starGeo = new THREE.BufferGeometry();
-            const starPositions = new Float32Array(starCount * 3);
-            for (let s = 0; s < starCount * 3; s += 3) {
-                starPositions[s] = (Math.random() - 0.5) * 35;
-                starPositions[s + 1] = (Math.random() - 0.5) * 25;
-                starPositions[s + 2] = (Math.random() - 0.5) * 20 - 5;
-            }
-            starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
-            const starMat = new THREE.PointsMaterial({
-                color: 0xffeedd,
-                size: 0.04,
-                transparent: true,
-                opacity: 0.65
-            });
-            const stars = new THREE.Points(starGeo, starMat);
-            scene.add(stars);
-
-            // 5. Interactive Drag & Mouse Parallax
-            let isDragging = false;
-            let prevMouseX = 0;
-            let prevMouseY = 0;
-            let targetRotY = 0;
-            let targetRotX = 0;
-
-            window.addEventListener('mousedown', (e) => {
-                if (e.clientX > window.innerWidth * 0.35) {
-                    isDragging = true;
-                    prevMouseX = e.clientX;
-                    prevMouseY = e.clientY;
-                }
-            });
-
-            window.addEventListener('mouseup', () => { isDragging = false; });
-
-            window.addEventListener('mousemove', (e) => {
-                if (isDragging) {
-                    const deltaX = e.clientX - prevMouseX;
-                    const deltaY = e.clientY - prevMouseY;
-                    targetRotY += deltaX * 0.006;
-                    targetRotX += deltaY * 0.006;
-                    prevMouseX = e.clientX;
-                    prevMouseY = e.clientY;
-                } else {
-                    const mouseX = (e.clientX / window.innerWidth - 0.5) * 0.2;
-                    const mouseY = (e.clientY / window.innerHeight - 0.5) * 0.2;
-                    camera.position.x = (window.innerWidth > 1024 ? -0.6 : 0) + mouseX;
-                    camera.position.y = (window.innerWidth > 1024 ? 0.0 : -0.8) - mouseY;
-                }
-            });
-
-            // Touch support for mobile
-            window.addEventListener('touchstart', (e) => {
-                if (e.touches.length === 1 && e.touches[0].clientX > window.innerWidth * 0.3) {
-                    isDragging = true;
-                    prevMouseX = e.touches[0].clientX;
-                    prevMouseY = e.touches[0].clientY;
-                }
-            });
-            window.addEventListener('touchend', () => { isDragging = false; });
-            window.addEventListener('touchmove', (e) => {
-                if (isDragging && e.touches.length === 1) {
-                    const deltaX = e.touches[0].clientX - prevMouseX;
-                    const deltaY = e.touches[0].clientY - prevMouseY;
-                    targetRotY += deltaX * 0.006;
-                    targetRotX += deltaY * 0.006;
-                    prevMouseX = e.touches[0].clientX;
-                    prevMouseY = e.touches[0].clientY;
-                }
-            });
-
-            // Render Loop
-            function animate() {
-                requestAnimationFrame(animate);
-
-                // Planet Rotation
-                planetMesh.rotation.y += 0.0025;
-                planetGroup.rotation.y += (targetRotY - planetGroup.rotation.y) * 0.05;
-                planetGroup.rotation.x += (targetRotX - planetGroup.rotation.x) * 0.05;
-
-                // Animate Orbital Rings
-                orbitalRings.forEach(item => {
-                    item.group.rotation.z += item.speed;
-                });
-
-                renderer.render(scene, camera);
-            }
-            animate();
-
-            window.addEventListener('resize', () => {
-                updateCameraPos();
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
-        })();
+        // Inject the satellite images
+        document.querySelectorAll('img.sat').forEach(img => {
+            img.src = img.classList.contains('small') ? SAT_SMALL : SAT_LARGE;
+        });
 
         // ── BILINGUAL ENGLISH / ARABIC SWITCHER ──
         const translations = {
@@ -1293,7 +1273,7 @@
                 badge_text: "استيعاب مباشر لبيانات ناسا وإيسا",
                 badge_action: "وحدة التحكم ←",
                 subhead_title: "الذكاء الاصطناعي التنبؤي السيادي",
-                hero_h1_lead: "التنبؤ بالأعطال الحرجة للمعدات",
+                hero_h1_lead: "التنبؤ بأعطال المعدات الصناعية",
                 hero_h1_sub: "قبل وقوع أضرار البيئة الصحراوية.",
                 hero_desc: "تجمع منصة سحارين (SAHARYN) بين استخبارات الأقمار الصناعية الفضائية والميكانيكا السببية الفيزيائية للتنبؤ بأعطال المعدات الصناعية حتى 48 ساعة مسبقاً في البيئات الصحراوية.",
                 cta_primary: "فتح مركز العمليات",
