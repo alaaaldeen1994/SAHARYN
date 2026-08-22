@@ -8,15 +8,18 @@
     <meta name="description"
         content="SAHARYN AI fuses live NASA and ESA Copernicus satellite feeds with plant SCADA physics to predict heavy machinery failures 48 hours in advance across desert operations.">
     
-    <!-- Modern Enterprise Google Fonts: Plus Jakarta Sans + Inter + JetBrains Mono -->
+    <!-- Preload Critical Earth Texture -->
+    <link rel="preload" as="image" href="images/earth-blue-marble.jpg">
+
+    <!-- Modern Enterprise Google Fonts: Plus Jakarta Sans + Inter + JetBrains Mono (Optimized Weights) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800;900&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@600;700;800&family=Tajawal:wght@500;700;800&display=swap"
         rel="stylesheet">
     
     <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide@latest" defer></script>
 
     <style>
         :root {
@@ -388,10 +391,11 @@
             position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%);
             width: 62%; aspect-ratio: 1; border-radius: 50%;
-            background-image: url('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg');
+            background-image: url('images/earth-blue-marble.jpg');
             background-size: 200% 100%;
             background-color: #33200e; /* desert tone while texture loads */
             animation: earth-spin 80s linear infinite;
+            will-change: background-position;
             filter: sepia(0.55) hue-rotate(-18deg) saturate(1.35) contrast(1.05) brightness(0.95);
             box-shadow:
                 inset -30px -24px 60px rgba(20,8,0,0.8),
@@ -958,7 +962,7 @@
                 <!-- Solar Energy & PV Dust Degradation -->
                 <div class="feature-card">
                     <div class="feature-img-wrap">
-                        <img src="images/solar_dust_impact.jpg" alt="Solar PV Dust Soiling & Degradation" class="feature-img">
+                        <img src="images/solar_dust_impact.jpg" alt="Solar PV Dust Soiling & Degradation" class="feature-img" loading="lazy" decoding="async">
                         <div class="feature-img-gradient"></div>
                     </div>
                     <div class="feature-content-wrap">
@@ -972,7 +976,7 @@
                 <!-- Oil & Gas Turbines & Upstream Compressors -->
                 <div class="feature-card">
                     <div class="feature-img-wrap">
-                        <img src="images/gas_turbine_impact.jpg" alt="Oil & Gas Turbines & Compressors" class="feature-img">
+                        <img src="images/gas_turbine_impact.jpg" alt="Oil & Gas Turbines & Compressors" class="feature-img" loading="lazy" decoding="async">
                         <div class="feature-img-gradient"></div>
                     </div>
                     <div class="feature-content-wrap">
@@ -986,7 +990,7 @@
                 <!-- Water Desalination & High-Pressure Pumps -->
                 <div class="feature-card">
                     <div class="feature-img-wrap">
-                        <img src="images/water_desalination_impact.jpg" alt="Water Desalination & High-Pressure Pumps" class="feature-img">
+                        <img src="images/water_desalination_impact.jpg" alt="Water Desalination & High-Pressure Pumps" class="feature-img" loading="lazy" decoding="async">
                         <div class="feature-img-gradient"></div>
                     </div>
                     <div class="feature-content-wrap">
