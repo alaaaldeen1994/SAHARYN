@@ -248,72 +248,19 @@
         }
 
         .hero-left-content {
-            max-width: 660px;
+            max-width: 720px;
             z-index: 2;
         }
 
-        /* Capsule Badge (Clean 2-Color: Orange Accent + Crisp White) */
-        .capsule-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(255, 107, 44, 0.08);
-            border: 1px solid rgba(255, 107, 44, 0.35);
-            padding: 5px 14px;
-            border-radius: 100px;
-            margin-bottom: 18px;
-            backdrop-filter: blur(10px);
-        }
-
-        .capsule-text {
-            font-family: var(--font-mono);
-            font-size: 11px;
-            font-weight: 700;
-            color: #ffffff;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        /* Section Subhead Label with Line */
-        .hero-subhead-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 14px;
-        }
-
-        .hero-subhead-num {
-            font-family: var(--font-mono);
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--accent-orange);
-            letter-spacing: 1px;
-        }
-
-        .hero-subhead-title {
-            font-family: var(--font-mono);
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            color: #ffffff;
-            text-transform: uppercase;
-        }
-
-        .hero-subhead-line {
-            width: 35px;
-            height: 1px;
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        /* Pure Crisp White Display Headline (Single Solid White Color) */
+        /* Pure Crisp White Display Headline (Single Solid White Color, 2 Clean Lines) */
         .hero-title {
             font-family: var(--font-sans);
-            font-size: clamp(28px, 3.2vw, 44px);
+            font-size: clamp(26px, 2.9vw, 42px);
             font-weight: 800;
             line-height: 1.18;
             letter-spacing: -0.03em;
             color: #ffffff;
-            margin-bottom: 18px;
+            margin-bottom: 22px;
             hyphens: none;
             word-break: keep-all;
         }
@@ -323,18 +270,29 @@
             color: #ffffff !important;
         }
 
-        .hero-title .title-sub {
-            color: #ffffff !important;
+        .hero-title .hero-line-main {
+            white-space: nowrap;
+        }
+
+        .hero-title .hero-line-sub {
             font-weight: 800;
-            margin-top: 4px;
+            margin-top: 6px;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title .hero-line-main,
+            .hero-title .hero-line-sub {
+                white-space: normal;
+            }
         }
 
         .hero-desc {
-            font-size: 15px;
+            font-size: 15.5px;
             color: #94a3b8;
-            line-height: 1.6;
+            line-height: 1.65;
             margin-bottom: 28px;
-            max-width: 540px;
+            max-width: 560px;
         }
 
         /* Solid Orange Hero CTA Button */
@@ -852,23 +810,10 @@
         <header class="hero">
             <div class="hero-grid-wrap">
                 <div class="hero-left-content">
-                    <!-- Capsule Badge (Clean 2-Color: Orange Accent + Crisp White, No Console ->) -->
-                    <div class="capsule-badge">
-                        <span class="orange-dot"></span>
-                        <span class="capsule-text" data-i18n="badge_text">NASA & ESA LIVE FEEDS</span>
-                    </div>
-
-                    <!-- Numbered Subsection Header with Line -->
-                    <div class="hero-subhead-row">
-                        <span class="hero-subhead-num">01</span>
-                        <span class="hero-subhead-title" data-i18n="subhead_title">SOVEREIGN PREDICTIVE INTELLIGENCE</span>
-                        <div class="hero-subhead-line"></div>
-                    </div>
-
-                    <!-- High-Impact Pure White Display Headline -->
+                    <!-- High-Impact Pure White Display Headline (Clean 2 Lines) -->
                     <h1 class="hero-title">
-                        <span data-i18n="hero_h1_lead">Predict High-Consequence Failures</span>
-                        <span class="title-sub" data-i18n="hero_h1_sub">before desert impacts occur.</span>
+                        <span class="hero-line-main" data-i18n="hero_h1_lead">Predict High-Consequence Failures</span>
+                        <span class="hero-line-sub" data-i18n="hero_h1_sub">before desert impacts occur.</span>
                     </h1>
 
                     <!-- Concise Description -->
