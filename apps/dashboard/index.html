@@ -200,30 +200,26 @@
         }
 
         .btn-start-free {
-            background: transparent;
-            color: #ff6b2c !important;
-            border: 1.5px solid #ff6b2c;
-            padding: 6px 16px;
+            background: #ffffff;
+            color: #060608 !important;
+            border: 1px solid #ffffff;
+            padding: 8px 22px;
             border-radius: 100px;
-            font-family: var(--font-mono);
-            font-size: 11px;
+            font-family: var(--font-sans);
+            font-size: 13px;
             font-weight: 700;
-            letter-spacing: 1px;
-            text-transform: uppercase;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 5px;
             transition: all 0.25s ease;
             cursor: pointer;
         }
 
         .btn-start-free:hover {
-            background: rgba(255, 107, 44, 0.12);
-            color: #ff8a4c !important;
-            border-color: #ff8a4c;
-            box-shadow: 0 0 14px rgba(255, 107, 44, 0.35);
+            background: #f1f5f9;
+            border-color: #f1f5f9;
+            box-shadow: 0 4px 18px rgba(255, 255, 255, 0.35);
             transform: translateY(-1px);
         }
 
@@ -589,28 +585,62 @@
         .grid-3col {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 22px;
+            gap: 24px;
         }
 
         .feature-card {
             background: var(--bg-card);
             border: 1px solid var(--border-subtle);
-            border-radius: 14px;
-            padding: 30px 24px;
-            transition: all 0.3s ease;
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.35s ease;
             position: relative;
+            display: flex;
+            flex-direction: column;
         }
 
         .feature-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-6px);
             background: var(--bg-card-hover);
-            border-color: var(--accent-orange);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 25px rgba(255, 107, 44, 0.15);
+            border-color: rgba(255, 107, 44, 0.4);
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 107, 44, 0.2);
+        }
+
+        .feature-img-wrap {
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            position: relative;
+            background: #000000;
+        }
+
+        .feature-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .feature-card:hover .feature-img {
+            transform: scale(1.06);
+        }
+
+        .feature-img-gradient {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, transparent 30%, rgba(13, 16, 23, 0.95) 100%);
+        }
+
+        .feature-content-wrap {
+            padding: 24px 22px 28px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
 
         .feature-icon-box {
-            width: 42px;
-            height: 42px;
+            width: 40px;
+            height: 40px;
             border-radius: 10px;
             background: rgba(255, 107, 44, 0.1);
             border: 1px solid rgba(255, 107, 44, 0.25);
@@ -618,7 +648,7 @@
             align-items: center;
             justify-content: center;
             color: var(--accent-orange);
-            margin-bottom: 18px;
+            margin-bottom: 16px;
         }
 
         .feature-title {
@@ -626,6 +656,7 @@
             font-weight: 700;
             letter-spacing: -0.3px;
             margin-bottom: 8px;
+            color: #ffffff;
         }
 
         .feature-body {
@@ -633,6 +664,7 @@
             color: var(--text-secondary);
             line-height: 1.6;
             margin-bottom: 18px;
+            flex: 1;
         }
 
         .feature-tag {
@@ -641,9 +673,11 @@
             font-weight: 700;
             color: var(--accent-orange-bright);
             background: rgba(255, 107, 44, 0.08);
-            padding: 3px 8px;
-            border-radius: 5px;
+            border: 1px solid rgba(255, 107, 44, 0.2);
+            padding: 4px 10px;
+            border-radius: 6px;
             display: inline-block;
+            align-self: flex-start;
         }
 
         /* ── COMPLIANCE BADGES ── */
@@ -921,28 +955,46 @@
             </div>
 
             <div class="grid-3col">
-                <!-- Oil & Gas -->
+                <!-- Solar Energy & PV Dust Degradation -->
                 <div class="feature-card">
-                    <div class="feature-icon-box"><i data-lucide="flame" size="20"></i></div>
-                    <h3 class="feature-title" data-i18n="s1_title">Oil & Gas Upstream & Refining</h3>
-                    <p class="feature-body" data-i18n="s1_body">Preventing compressor surge, gas turbine blade erosion, and seal failures in desert production facilities across the Eastern Province and Rub' Al Khali.</p>
-                    <span class="feature-tag">GAS COMPRESSORS & PUMPS</span>
+                    <div class="feature-img-wrap">
+                        <img src="images/solar_dust_impact.jpg" alt="Solar PV Dust Soiling & Degradation" class="feature-img">
+                        <div class="feature-img-gradient"></div>
+                    </div>
+                    <div class="feature-content-wrap">
+                        <div class="feature-icon-box"><i data-lucide="sun" size="20"></i></div>
+                        <h3 class="feature-title" data-i18n="s1_title">Solar PV & Dust Soiling Intelligence</h3>
+                        <p class="feature-body" data-i18n="s1_body">Predicting dust deposition index (DDI), optical transmittance loss, and thermal hotspots across utility-scale desert solar farms to trigger autonomous robotic cleaning before power yields collapse.</p>
+                        <span class="feature-tag">SOLAR PV & INVERTER ARRAYS</span>
+                    </div>
                 </div>
 
-                <!-- Power Generation -->
+                <!-- Oil & Gas Turbines & Upstream Compressors -->
                 <div class="feature-card">
-                    <div class="feature-icon-box"><i data-lucide="zap" size="20"></i></div>
-                    <h3 class="feature-title" data-i18n="s2_title">Power & Utilities Grids</h3>
-                    <p class="feature-body" data-i18n="s2_body">Forecasting turbine intake filter clogging and transformer thermal breakdown during regional dust storm events.</p>
-                    <span class="feature-tag">COMBINED CYCLE TURBINES</span>
+                    <div class="feature-img-wrap">
+                        <img src="images/gas_turbine_impact.jpg" alt="Oil & Gas Turbines & Compressors" class="feature-img">
+                        <div class="feature-img-gradient"></div>
+                    </div>
+                    <div class="feature-content-wrap">
+                        <div class="feature-icon-box"><i data-lucide="flame" size="20"></i></div>
+                        <h3 class="feature-title" data-i18n="s2_title">Gas Turbines & Upstream Compressors</h3>
+                        <p class="feature-body" data-i18n="s2_body">Preventing compressor surge, gas turbine blade erosion, and seal failures in desert production facilities across the Eastern Province and Rub' Al Khali.</p>
+                        <span class="feature-tag">GAS COMPRESSORS & PUMPS</span>
+                    </div>
                 </div>
 
-                <!-- Water Desalination -->
+                <!-- Water Desalination & High-Pressure Pumps -->
                 <div class="feature-card">
-                    <div class="feature-icon-box"><i data-lucide="droplet" size="20"></i></div>
-                    <h3 class="feature-title" data-i18n="s3_title">Water & Desalination Plants</h3>
-                    <p class="feature-body" data-i18n="s3_body">Monitoring high-pressure intake pumps and reverse osmosis filtration membranes subject to high particulate loads and salinity.</p>
-                    <span class="feature-tag">HIGH-PRESSURE RO PUMPS</span>
+                    <div class="feature-img-wrap">
+                        <img src="images/water_desalination_impact.jpg" alt="Water Desalination & High-Pressure Pumps" class="feature-img">
+                        <div class="feature-img-gradient"></div>
+                    </div>
+                    <div class="feature-content-wrap">
+                        <div class="feature-icon-box"><i data-lucide="droplet" size="20"></i></div>
+                        <h3 class="feature-title" data-i18n="s3_title">Water & Desalination Infrastructure</h3>
+                        <p class="feature-body" data-i18n="s3_body">Monitoring high-pressure intake pumps and reverse osmosis filtration membranes subject to high particulate loads and salinity.</p>
+                        <span class="feature-tag">HIGH-PRESSURE RO PUMPS</span>
+                    </div>
                 </div>
             </div>
         </section>
@@ -1194,11 +1246,11 @@
                 tag_solutions: "INDUSTRY APPLICATIONS",
                 sol_heading: "Built for High-Consequence Desert Assets",
                 sol_sub: "Protecting national critical infrastructure against extreme sandstorms, high ambient heat, and abrasive dust cycles.",
-                s1_title: "Oil & Gas Upstream & Refining",
-                s1_body: "Preventing compressor surge, gas turbine blade erosion, and seal failures in desert production facilities across the Eastern Province and Rub' Al Khali.",
-                s2_title: "Power & Utilities Grids",
-                s2_body: "Forecasting turbine intake filter clogging and transformer thermal breakdown during regional dust storm events.",
-                s3_title: "Water & Desalination Plants",
+                s1_title: "Solar PV & Dust Soiling Intelligence",
+                s1_body: "Predicting dust deposition index (DDI), optical transmittance loss, and thermal hotspots across utility-scale desert solar farms to trigger autonomous robotic cleaning before power yields collapse.",
+                s2_title: "Gas Turbines & Upstream Compressors",
+                s2_body: "Preventing compressor surge, gas turbine blade erosion, and seal failures in desert production facilities across the Eastern Province and Rub' Al Khali.",
+                s3_title: "Water & Desalination Infrastructure",
                 s3_body: "Monitoring high-pressure intake pumps and reverse osmosis filtration membranes subject to high particulate loads and salinity.",
                 tag_capabilities: "PLATFORM ARCHITECTURE",
                 pillars_heading: "5 Sovereign Mechanisms of Action",
@@ -1242,11 +1294,11 @@
                 tag_solutions: "التطبيقات الصناعية",
                 sol_heading: "مصممة لأصول البيئة الصحراوية القاسية",
                 sol_sub: "حماية البنية التحتية الوطنية الحيوية من العواصف الرملية الشديدة والحرارة المرتفعة ودورات الغبار التآكلية.",
-                s1_title: "استكشاف وتكرير النفط والغاز",
-                s1_body: "منع اندفاع الضواغط وتآكل شفرات التوربينات وتلف السدادات في منشآت الإنتاج بالمنطقة الشرقية والربع الخالي.",
-                s2_title: "شبكات توليد الطاقة والمرافق",
-                s2_body: "التنبؤ بانسداد فلاتر سحب التوربينات والانهيار الحراري للمحولات أثناء العواصف الرملية الإقليمية.",
-                s3_title: "محطات تحلية وضخ المياه",
+                s1_title: "الطاقة الشمسية وتآكل ألواح الكهروضوئية بالغبار",
+                s1_body: "التنبؤ بمؤشر ترسب الغبار (DDI) وفقدان النفاذية البصرية والبقع الحرارية في محطات الطاقة الشمسية الصحراوية لتفعيل التنظيف الآلي قبل انخفاض الإنتاجية.",
+                s2_title: "توربينات الغاز والضواغط التشغيلية",
+                s2_body: "منع اندفاع الضواغط وتآكل شفرات التوربينات وتلف السدادات في منشآت الإنتاج بالمنطقة الشرقية والربع الخالي.",
+                s3_title: "البنية التحتية لتحلية ومضخات المياه",
                 s3_body: "مراقبة مضخات السحب عالية الضغط وأغشية التناضح العكسي المعرضة للترسبات الجزيئية العالية والملوحة.",
                 tag_capabilities: "هندسة المنصة",
                 pillars_heading: "5 آليات عمل سيادية",
