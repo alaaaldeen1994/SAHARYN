@@ -199,40 +199,32 @@
             gap: 5px;
         }
 
-        .btn-signin {
-            color: var(--text-secondary);
-            font-size: 13.5px;
-            font-weight: 500;
-            text-decoration: none;
-            transition: color 0.2s ease;
-            white-space: nowrap;
-        }
-
-        .btn-signin:hover {
-            color: #ffffff;
-        }
-
         .btn-start-free {
-            background: linear-gradient(135deg, var(--accent-orange) 0%, #e65100 100%);
-            color: #ffffff !important;
-            padding: 9px 20px;
-            border-radius: 8px;
-            font-size: 13.5px;
+            background: transparent;
+            color: #ff6b2c !important;
+            border: 1.5px solid #ff6b2c;
+            padding: 8px 24px;
+            border-radius: 100px;
+            font-family: var(--font-mono);
+            font-size: 12px;
             font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 6px;
-            box-shadow: 0 4px 18px var(--accent-orange-glow);
             transition: all 0.25s ease;
-            border: none;
             cursor: pointer;
         }
 
         .btn-start-free:hover {
+            background: rgba(255, 107, 44, 0.12);
+            color: #ff8a4c !important;
+            border-color: #ff8a4c;
+            box-shadow: 0 0 18px rgba(255, 107, 44, 0.35);
             transform: translateY(-1px);
-            box-shadow: 0 6px 25px rgba(255, 107, 44, 0.55);
-            filter: brightness(1.08);
         }
 
         /* ── HERO SECTION ── */
@@ -374,24 +366,30 @@
         }
 
         .btn-cta-primary {
-            background: linear-gradient(135deg, var(--accent-orange) 0%, #e65100 100%);
-            color: #ffffff;
-            padding: 13px 26px;
-            border-radius: 8px;
-            font-size: 13.5px;
+            background: transparent;
+            color: #ff6b2c;
+            border: 1.5px solid #ff6b2c;
+            padding: 12px 28px;
+            border-radius: 100px;
+            font-family: var(--font-mono);
+            font-size: 13px;
             font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            box-shadow: 0 4px 20px var(--accent-orange-glow);
             transition: all 0.25s ease;
+            cursor: pointer;
         }
 
         .btn-cta-primary:hover {
+            background: rgba(255, 107, 44, 0.12);
+            color: #ff8a4c;
+            border-color: #ff8a4c;
+            box-shadow: 0 0 20px rgba(255, 107, 44, 0.4);
             transform: translateY(-1px);
-            box-shadow: 0 6px 26px rgba(255, 107, 44, 0.55);
-            filter: brightness(1.08);
         }
 
         .btn-cta-secondary {
@@ -1340,6 +1338,42 @@
         // Initialize Lucide Icons
         document.addEventListener('DOMContentLoaded', () => {
             if (typeof lucide !== 'undefined') lucide.createIcons();
+        });
+    </script>
+
+    <!-- Firebase Authentication & Login Interceptor -->
+    <script type="module">
+        import { login, auth } from "./firebase-init.js";
+
+        async function handleStartFree(e) {
+            if (e) e.preventDefault();
+
+            // If user is already authenticated in Firebase, go directly to console
+            if (auth && auth.currentUser) {
+                window.location.href = "console.html";
+                return;
+            }
+
+            // Trigger Google Firebase authentication popup
+            try {
+                const user = await login();
+                if (user) {
+                    console.log("Firebase authenticated as:", user.email);
+                    window.location.href = "console.html";
+                }
+            } catch (err) {
+                console.error("Sign-in popup error:", err);
+                window.location.href = "console.html";
+            }
+        }
+
+        window.handleStartFree = handleStartFree;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const startButtons = document.querySelectorAll(".btn-start-free, .btn-cta-primary");
+            startButtons.forEach(btn => {
+                btn.addEventListener("click", handleStartFree);
+            });
         });
     </script>
 </body>
