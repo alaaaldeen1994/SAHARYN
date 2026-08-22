@@ -236,75 +236,16 @@
             filter: brightness(1.1);
         }
 
-        /* ── LIVE TELEMETRY STREAM TICKER ── */
-        .live-ribbon {
-            margin-top: 68px;
-            background: rgba(4, 10, 24, 0.95);
-            border-bottom: 1px solid var(--border-subtle);
-            padding: 9px 4vw;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 12px;
-            color: var(--text-secondary);
-            overflow-x: auto;
-            white-space: nowrap;
-            gap: 24px;
-        }
-
-        .ribbon-pulse {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--accent-emerald-bright);
-            font-weight: 600;
-            font-size: 12px;
-        }
-
-        .dot-pulse {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: var(--accent-emerald);
-            box-shadow: 0 0 10px var(--accent-emerald);
-            animation: ping 1.8s infinite;
-        }
-
-        @keyframes ping {
-            0% { transform: scale(0.85); opacity: 1; }
-            50% { transform: scale(1.5); opacity: 0.5; }
-            100% { transform: scale(0.85); opacity: 1; }
-        }
-
-        .ribbon-items {
-            display: flex;
-            align-items: center;
-            gap: 28px;
-            font-family: var(--font-mono);
-            font-size: 11px;
-        }
-
-        .ribbon-item {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .ribbon-val {
-            color: #ffffff;
-            font-weight: 700;
-        }
-
         /* ── HERO SECTION ── */
         .hero {
-            padding: 60px 4vw 80px;
+            padding: 130px 4vw 80px;
             max-width: 1440px;
             margin: 0 auto;
             display: grid;
             grid-template-columns: 1.15fr 0.85fr;
             gap: 50px;
             align-items: center;
-            min-height: calc(100vh - 120px);
+            min-height: 100vh;
         }
 
         .hero-badge {
@@ -914,36 +855,6 @@
                 </a>
             </div>
         </nav>
-
-        <!-- Live Space Agency Fusion Ribbon -->
-        <div class="live-ribbon">
-            <div class="ribbon-pulse">
-                <span class="dot-pulse"></span>
-                <span data-i18n="live_stream_status">Live Satellite-to-Plant Telemetry: Active</span>
-            </div>
-            <div class="ribbon-items">
-                <div class="ribbon-item">
-                    <span>NASA TERRA AOD:</span>
-                    <span class="ribbon-val" id="ticker-aod">0.822</span>
-                </div>
-                <div class="ribbon-item">
-                    <span>COPERNICUS TEMP:</span>
-                    <span class="ribbon-val" id="ticker-temp">45.2 °C</span>
-                </div>
-                <div class="ribbon-item">
-                    <span>WIND VECTOR:</span>
-                    <span class="ribbon-val" id="ticker-wind">18.2 m/s</span>
-                </div>
-                <div class="ribbon-item">
-                    <span>SENTINEL-2 DDI:</span>
-                    <span class="ribbon-val" id="ticker-ddi">0.04 DDI</span>
-                </div>
-                <div class="ribbon-item">
-                    <span>STABILITY INDEX:</span>
-                    <span class="ribbon-val" style="color: var(--accent-emerald-bright);" id="ticker-gsi">94.2%</span>
-                </div>
-            </div>
-        </div>
 
         <!-- HERO SECTION -->
         <header class="hero">
@@ -1586,14 +1497,8 @@
                     if (aodVal > 10.0) aodVal = (aodVal / 200.0); // Normalize if raw scalar
                     const formattedAod = aodVal.toFixed(3);
 
-                    const el1 = document.getElementById('ticker-aod');
                     const el2 = document.getElementById('card-aod');
-                    if (el1) el1.innerText = formattedAod;
                     if (el2) el2.innerText = `${formattedAod} AOD`;
-                }
-                if (ddiFeed) {
-                    const el = document.getElementById('ticker-ddi');
-                    if (el) el.innerText = ddiFeed.value;
                 }
             } catch (e) {
                 // Fallback maintains smooth display
@@ -1606,7 +1511,6 @@
         const translations = {
             en: {
                 nav_how: "Platform", nav_cap: "Capabilities", nav_sim: "Physics Simulator", nav_tech: "Architecture Whitepaper", nav_cta: "Mission Control",
-                live_stream_status: "Live Satellite-to-Plant Telemetry: Active",
                 hero_badge: "NASA & ESA COPERNICUS ATMOSPHERIC BRIDGE",
                 hero_h1_lead: "Predict High-Consequence Failures", hero_h1_sub: "before harsh desert impacts occur.",
                 hero_desc: "SAHARYN AI combines space-borne satellite intelligence with physics-informed causal mechanics to monitor sandstorms, thermal decay, and abrasion—predicting industrial asset failures up to 48 hours in advance across Saudi Arabia and the Middle East.",
@@ -1629,7 +1533,6 @@
             },
             ar: {
                 nav_how: "المنصة", nav_cap: "القدرات", nav_sim: "محاكي الفيزياء", nav_tech: "ورقة العمل التقنية", nav_cta: "مركز العمليات",
-                live_stream_status: "ربط الأقمار الصناعية بالمصنع: نشط",
                 hero_badge: "جسر وكالة ناسا وإيسا كوبرنيكوس للغلاف الجوي",
                 hero_h1_lead: "التنبؤ بالأعطال الحرجة", hero_h1_sub: "قبل وقوع أضرار البيئة الصحراوية القاسية.",
                 hero_desc: "تجمع منصة سحارين (SAHARYN AI) بين استخبارات الأقمار الصناعية الفضائية والميكانيكا السببية الفيزيائية لرصد العواصف الرملية والتآكل الحراري، متنبئة بأعطال المعدات الصناعية حتى 48 ساعة مسبقاً في المملكة العربية السعودية والشرق الأوسط.",
