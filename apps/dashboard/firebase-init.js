@@ -27,7 +27,7 @@ if (auth) {
     });
 }
 
-// Helper for Google Sign-In with popup + fallback
+// Helper for Google Sign-In (Single Clean Popup)
 export async function login() {
     if (!auth || !provider) {
         console.warn("Firebase Auth is not initialized.");
@@ -35,27 +35,14 @@ export async function login() {
     }
     try {
         const result = await signInWithPopup(auth, provider);
-        if (result && result.user) {
-            return result.user;
-        }
+        return result?.user || null;
     } catch (error) {
-        if (error.code === 'auth/popup-blocked' || error.code === 'auth/popup-closed-by-user' && error.message.includes('blocked')) {
-            console.log("Popup blocked, falling back to redirect...");
-            await signInWithRedirect(auth, provider);
-            return null;
-        } else if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
-            console.log("Sign-in cancelled or popup closed by user.");
-            return null;
+        if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
+            console.log("Sign-in popup closed by user.");
         } else {
             console.error("Authentication error:", error);
-            // Attempt redirect on any popup communication failure
-            try {
-                await signInWithRedirect(auth, provider);
-            } catch (e) {
-                console.error("Redirect fallback failed:", e);
-            }
-            return null;
         }
+        return null;
     }
 }
 

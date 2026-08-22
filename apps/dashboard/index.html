@@ -800,7 +800,7 @@
                 <button onclick="toggleLang()" class="btn-lang" id="lang-btn">
                     <span>AR / EN</span>
                 </button>
-                <a href="javascript:void(0)" class="btn-start-free" id="nav-cta-btn" onclick="handleAuthAction(event)">
+                <a href="javascript:void(0)" class="btn-start-free" id="nav-cta-btn">
                     <span data-i18n="nav_cta">Log in</span>
                 </a>
             </div>
@@ -823,7 +823,7 @@
 
                     <!-- Solid Orange Hero Button -->
                     <div class="hero-btn-row">
-                        <a href="javascript:void(0)" class="btn-hero-primary" id="hero-start-btn" onclick="handleAuthAction(event)">
+                        <a href="javascript:void(0)" class="btn-hero-primary" id="hero-start-btn">
                             <span data-i18n="cta_primary">Start Free</span>
                         </a>
                     </div>
@@ -1296,31 +1296,21 @@
     <!-- Firebase Authentication & Login Flow -->
     <script type="module">
         import { login, auth } from "./firebase-init.js";
-        import { onAuthStateChanged, getRedirectResult } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-        let isAuthenticating = false;
+        let isAuthLocked = false;
 
-        // 1. Check if user arrived back from a Google Redirect
+        // Active session listener: if user is authenticated, redirect immediately
         if (auth) {
-            getRedirectResult(auth).then(result => {
-                if (result && result.user) {
-                    window.location.href = "console.html";
-                }
-            }).catch(e => console.warn(e));
-
-            // 2. Continuous Auth State Listener: if authenticated while waiting, redirect to console immediately
             onAuthStateChanged(auth, (user) => {
-                if (user && isAuthenticating) {
-                    isAuthenticating = false;
+                if (user) {
                     window.location.href = "console.html";
                 }
             });
         }
 
-        // 3. Custom Event Listener from firebase-init.js
         window.addEventListener('saharyn-auth-changed', (e) => {
-            if (e.detail && isAuthenticating) {
-                isAuthenticating = false;
+            if (e.detail) {
                 window.location.href = "console.html";
             }
         });
@@ -1331,23 +1321,26 @@
                 e.stopPropagation();
             }
 
+            // Prevent simultaneous double clicks
+            if (isAuthLocked) return;
+            isAuthLocked = true;
+
             // If user is already authenticated in Firebase, go directly to console
             if (auth && auth.currentUser) {
                 window.location.href = "console.html";
                 return;
             }
 
-            isAuthenticating = true;
-
-            // Trigger Google Firebase Authentication popup
+            // Open exactly ONE clean Google Sign-In popup
             try {
                 const user = await login();
                 if (user) {
-                    isAuthenticating = false;
                     window.location.href = "console.html";
                 }
             } catch (err) {
                 console.error("Auth flow error:", err);
+            } finally {
+                setTimeout(() => { isAuthLocked = false; }, 2000);
             }
         }
 
