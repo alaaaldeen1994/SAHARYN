@@ -14,6 +14,7 @@ import traceback
 from datetime import datetime
 from typing import Dict, List, Optional, Any
 import collections
+from sqlalchemy import text
 
 import asyncio
 from fastapi import FastAPI, HTTPException, Header, Depends, Request, status, Query, BackgroundTasks
@@ -41,15 +42,7 @@ from core.security.siem_forwarder import (
 )
 from core.security.rbac import get_role_capabilities_json, Role
 
-# --- RBAC Security Layer (with graceful fallback) ---
-try:
-    # Only import what is actually used or needed for future expansion
-    # Currently Role is already imported at the top level
-    from core.security.rbac import Role
     _RBAC_AVAILABLE = True
-except ImportError as _rbac_err:
-    _RBAC_AVAILABLE = False
-    # API will fall back to API-key-only auth — logged after logger is initialized
 
 # --- 1. LOGGING (must be first — everything below depends on it) ---
 LOG_FORMAT = "%(asctime)s - %(name)s - [%(process)d] - [%(levelname)s] - %(message)s"
@@ -246,7 +239,7 @@ async def get_system_health():
     db_status = "OPERATIONAL"
     try:
         # Probe DB health
-        db.execute("SELECT 1")
+        db.execute(text("SELECT 1"))
     except Exception as e:
         logger.error(f"HEALTH_CHECK_FAILURE: Database unreachable. {str(e)}")
         db_status = "CRITICAL_OFFLINE"

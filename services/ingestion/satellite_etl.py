@@ -12,6 +12,7 @@ import uuid
 import logging
 import asyncio
 import hashlib
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 from datetime import datetime
 from typing import Dict, Optional
 
@@ -159,42 +160,64 @@ class SatelliteETLService:
         # Default source agency
         agency = "NASA_MODIS_LIVE" if self.mode == "LIVE" else "ESA_COPERNICUS_MOCK"
 
-        # 1. ESA Copernicus (Temp & Wind)
+        # 1. ESA Copernicus (Temp & Wind) — capped at 5s
+        _ECMWF_TIMEOUT = 5  # seconds
         try:
             if self.mode == "LIVE":
-                # Attempt to pull daily forecast through cdsapi
-                forecast_path = self.ecmwf_bridge.ingest_forecast([lat + 0.5, lon - 0.5, lat - 0.5, lon + 0.5])
-                ds = xr.open_dataset(forecast_path, engine='cfgrib')
-                real_temp_k = float(ds['t2m'].values.flatten()[0])
+                def _fetch_ecmwf():
+                    return self.ecmwf_bridge.ingest_forecast([lat + 0.5, lon - 0.5, lat - 0.5, lon + 0.5])
+                with ThreadPoolExecutor(max_workers=1) as ex:
+                    future = ex.submit(_fetch_ecmwf)
+                    try:
+                        forecast_path = future.result(timeout=_ECMWF_TIMEOUT)
+                        import xarray as xr
+                        ds = xr.open_dataset(forecast_path, engine='cfgrib')
+                        real_temp_k = float(ds['t2m'].values.flatten()[0])
+                    except FuturesTimeoutError:
+                        logger.warning("ECMWF_TIMEOUT: Exceeded 5s limit. Using climatological fallback.")
+                        real_temp_k = 318.5
             else:
-                # Fallback to local GRIB if it exists
-                grib_path = r"c:\Users\tariq\sample_data.grib"
-                if os.path.exists(grib_path):
-                    ds = xr.open_dataset(grib_path, engine='cfgrib')
-                    real_temp_k = float(ds['t2m'].values.flatten()[0])
-                else:
-                    real_temp_k = 318.5 # 45C default
+                real_temp_k = 318.5  # 45°C desert default
         except Exception as e:
             logger.warning(f"ECMWF_SYNC_FAILURE: {e}. Using climatological fallback.")
             real_temp_k = 318.5
 
-        # 2. NASA MODIS (AOD)
+        # 2. NASA MODIS (AOD) — capped at 5s
+        _MODIS_TIMEOUT = 5  # seconds
         try:
-            nasa_data = self.modis_bridge.fetch_aod_for_site(site_id, lat, lon)
-            if nasa_data:
-                nasa_aod = nasa_data["aerosol_optical_depth"]
-                logger.info(f"NASA_SYNC: MODIS AOD for {site_id}: {nasa_aod:.4f}")
-            else:
-                raise ValueError("No granule available")
+            def _fetch_modis():
+                return self.modis_bridge.fetch_aod_for_site(site_id, lat, lon)
+            with ThreadPoolExecutor(max_workers=1) as ex:
+                future = ex.submit(_fetch_modis)
+                try:
+                    nasa_data = future.result(timeout=_MODIS_TIMEOUT)
+                    if nasa_data:
+                        nasa_aod = nasa_data["aerosol_optical_depth"]
+                        logger.info(f"NASA_SYNC: MODIS AOD for {site_id}: {nasa_aod:.4f}")
+                    else:
+                        raise ValueError("No granule available")
+                except FuturesTimeoutError:
+                    logger.warning("NASA_TIMEOUT: Exceeded 5s limit. Using regional mean.")
+                    nasa_aod = 0.45
         except Exception as e:
             logger.warning(f"NASA_BRIDGE_FAILURE: {e}. Interpolating from historical mean.")
-            nasa_aod = 0.45 # Conservative regional mean
+            nasa_aod = 0.45  # Conservative regional mean
 
-        # 3. Sentinel Hub (Plume Tracking)
+        # 3. Sentinel Hub (Plume Tracking) — capped at 5s
+        _SENTINEL_TIMEOUT = 5  # seconds
         try:
-            sentinel_data = self.sentinel_bridge.detect_dust_plume(site_id, lat, lon)
-            plume_detected = sentinel_data.get("dust_plume_detected", False)
-            ddi = sentinel_data.get("dust_detection_index", 0.0)
+            def _fetch_sentinel():
+                return self.sentinel_bridge.detect_dust_plume(site_id, lat, lon)
+            with ThreadPoolExecutor(max_workers=1) as ex:
+                future = ex.submit(_fetch_sentinel)
+                try:
+                    sentinel_data = future.result(timeout=_SENTINEL_TIMEOUT)
+                    plume_detected = sentinel_data.get("dust_plume_detected", False)
+                    ddi = sentinel_data.get("dust_detection_index", 0.0)
+                except FuturesTimeoutError:
+                    logger.warning("SENTINEL_TIMEOUT: Exceeded 5s limit. Plume status NOMINAL.")
+                    plume_detected = False
+                    ddi = 0.0
         except Exception as e:
             logger.warning(f"SENTINEL_HUB_FAILURE: {e}. Plume status set to NOMINAL.")
             plume_detected = False

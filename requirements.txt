@@ -26,3 +26,6 @@ xarray
 cfgrib
 schedule
 shap
+sentinelhub
+firebase-admin
+httpx

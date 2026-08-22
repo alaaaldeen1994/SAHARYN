@@ -28,7 +28,7 @@ class ECMWFWeatherIngestor:
     def __init__(self):
         self.client = cdsapi.Client(url=config.ECMWF_API_URL, key=config.ECMWF_API_KEY)
 
-    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=30))
+    @retry(stop=stop_after_attempt(2), wait=wait_exponential(multiplier=1, min=1, max=5))
     def ingest_forecast(self, area: List[float]):
         """
         72-hour forecast ingestion (ERA5-Land or Reanalysis-5).

@@ -84,8 +84,8 @@ class MODISAerosolConnector:
         return session
 
     @retry(
-        stop=stop_after_attempt(3),
-        wait=wait_exponential(multiplier=1, min=2, max=30),
+        stop=stop_after_attempt(2),
+        wait=wait_exponential(multiplier=1, min=1, max=5),
         retry=retry_if_exception_type(requests.RequestException),
     )
     def _get(self, url: str, params: Dict = None) -> Dict:
