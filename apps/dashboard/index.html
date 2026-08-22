@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAHARYN AI | Tuned to Every Industrial Asset</title>
+    <title>SAHARYN AI | Predictive Industrial Intelligence for Harsh Desert Infrastructure</title>
     <meta name="description"
         content="SAHARYN AI fuses live NASA and ESA Copernicus satellite feeds with plant SCADA physics to predict heavy machinery failures 48 hours in advance across desert operations.">
     
@@ -60,8 +60,8 @@
         body {
             background-color: var(--bg-void);
             background-image: 
-                radial-gradient(circle at 75% 35%, rgba(255, 107, 43, 0.08) 0%, transparent 60%),
-                radial-gradient(circle at 20% 80%, rgba(245, 158, 11, 0.04) 0%, transparent 50%);
+                radial-gradient(circle at 70% 40%, rgba(255, 107, 43, 0.09) 0%, transparent 55%),
+                radial-gradient(circle at 15% 85%, rgba(245, 158, 11, 0.05) 0%, transparent 50%);
             color: var(--text-primary);
             font-family: var(--font-sans);
             line-height: 1.6;
@@ -112,7 +112,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 22px 6vw;
-            background: rgba(5, 6, 8, 0.7);
+            background: rgba(5, 6, 8, 0.75);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border-subtle);
@@ -183,7 +183,7 @@
         .nav-actions {
             display: flex;
             align-items: center;
-            gap: 18px;
+            gap: 16px;
         }
 
         .btn-lang {
@@ -200,18 +200,6 @@
         }
 
         .btn-lang:hover {
-            color: #ffffff;
-        }
-
-        .btn-signin {
-            font-size: 13.5px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            text-decoration: none;
-            transition: color 0.2s ease;
-        }
-
-        .btn-signin:hover {
             color: #ffffff;
         }
 
@@ -238,7 +226,7 @@
             filter: brightness(1.08);
         }
 
-        /* ── HERO SECTION (MATCHING REFERENCE IMAGE) ── */
+        /* ── HERO SECTION ── */
         .hero {
             position: relative;
             min-height: 100vh;
@@ -251,7 +239,7 @@
         }
 
         .hero-left-content {
-            max-width: 540px;
+            max-width: 580px;
             z-index: 2;
             pointer-events: auto;
         }
@@ -305,7 +293,7 @@
             font-family: var(--font-mono);
             font-size: 11px;
             font-weight: 700;
-            color: var(--text-muted);
+            color: var(--accent-orange);
             letter-spacing: 1px;
         }
 
@@ -347,7 +335,7 @@
             color: var(--text-secondary);
             line-height: 1.65;
             margin-bottom: 36px;
-            max-width: 480px;
+            max-width: 520px;
         }
 
         /* Dual CTA Buttons */
@@ -408,7 +396,7 @@
             box-shadow: 0 0 8px var(--accent-orange);
         }
 
-        /* ── BOTTOM HUD TELEMETRY BAR (MATCHING REFERENCE) ── */
+        /* ── BOTTOM HUD TELEMETRY BAR ── */
         .hud-bottom-bar {
             position: absolute;
             bottom: 36px;
@@ -709,59 +697,59 @@
             </a>
 
             <ul class="nav-menu">
-                <li><a href="#solutions" class="nav-link" data-i18n="nav_product">Product <span class="nav-chevron">⌵</span></a></li>
-                <li><a href="#platform" class="nav-link" data-i18n="nav_how">How it works</a></li>
+                <li><a href="#solutions" class="nav-link" data-i18n="nav_solutions">Solutions <span class="nav-chevron">⌵</span></a></li>
+                <li><a href="#platform" class="nav-link" data-i18n="nav_platform">Platform</a></li>
                 <li><a href="#capabilities" class="nav-link" data-i18n="nav_capabilities">Capabilities <span class="nav-chevron">⌵</span></a></li>
-                <li><a href="about.html" class="nav-link" data-i18n="nav_docs">Docs</a></li>
+                <li><a href="about.html" class="nav-link" data-i18n="nav_technology">Technology</a></li>
+                <li><a href="/v2/docs" class="nav-link" target="_blank" data-i18n="nav_api">API Docs</a></li>
             </ul>
 
             <div class="nav-actions">
                 <button onclick="toggleLang()" class="btn-lang" id="lang-btn">
                     <span>AR / EN</span>
                 </button>
-                <a href="console.html" class="btn-signin" data-i18n="nav_signin">Sign in</a>
                 <a href="console.html" class="btn-start-free" id="nav-cta-btn">
-                    <span data-i18n="nav_cta">Start free</span>
+                    <span data-i18n="nav_cta">Mission Control</span>
                 </a>
             </div>
         </nav>
 
-        <!-- HERO SECTION -->
+        <!-- HERO SECTION (SAHARYN REAL BUSINESS TELEMETRY & COPY) -->
         <header class="hero">
             <div class="hero-left-content">
                 <!-- Capsule Badge -->
                 <div class="capsule-badge">
-                    <span class="capsule-text" data-i18n="badge_text">Realtime personalization</span>
-                    <a href="console.html" class="capsule-btn" data-i18n="badge_action">See it live →</a>
+                    <span class="capsule-text" data-i18n="badge_text">NASA & ESA Satellite Ingestion</span>
+                    <a href="console.html" class="capsule-btn" data-i18n="badge_action">Launch Console →</a>
                 </div>
 
                 <!-- Numbered Subsection Header with Line -->
                 <div class="hero-subhead-row">
-                    <span class="hero-subhead-num">02</span>
-                    <span class="hero-subhead-title" data-i18n="subhead_title">ORBITAL RELAY</span>
+                    <span class="hero-subhead-num">01</span>
+                    <span class="hero-subhead-title" data-i18n="subhead_title">SOVEREIGN PREDICTIVE INTELLIGENCE</span>
                     <div class="hero-subhead-line"></div>
                 </div>
 
                 <!-- Headline -->
                 <h1 class="hero-title">
-                    <span data-i18n="hero_h1_lead">Tuned to</span>
-                    <em data-i18n="hero_h1_sub">every visitor</em>
+                    <span data-i18n="hero_h1_lead">Predict High-Consequence Failures</span>
+                    <em data-i18n="hero_h1_sub">before harsh desert impacts occur.</em>
                 </h1>
 
                 <!-- Description -->
                 <p class="hero-desc" data-i18n="hero_desc">
-                    Signals in, moments out — a live loop that learns from every visit to predict and protect high-consequence desert industrial infrastructure.
+                    SAHARYN AI combines live space-borne satellite feeds with physics-informed causal mechanics to monitor sandstorms, thermal decay, and abrasion—predicting heavy industrial asset breakdowns up to 48 hours in advance across Saudi Arabia and the Middle East.
                 </p>
 
                 <!-- Dual CTA Buttons -->
                 <div class="hero-btn-row">
                     <a href="console.html" class="btn-cta-primary">
-                        <span data-i18n="cta_primary">Start free</span>
+                        <span data-i18n="cta_primary">Launch Mission Control</span>
                         <span>›</span>
                     </a>
                     <a href="about.html" class="btn-cta-secondary">
                         <span class="orange-dot"></span>
-                        <span data-i18n="cta_secondary">Watch it work</span>
+                        <span data-i18n="cta_secondary">View Architecture Proof</span>
                     </a>
                 </div>
             </div>
@@ -770,20 +758,20 @@
             <div class="hud-bottom-bar">
                 <div class="hud-metrics">
                     <div class="hud-metric-unit">
-                        <span class="hud-label">ORBITER</span>
-                        <span class="hud-val">1,155 km</span>
+                        <span class="hud-label" data-i18n="hud_warning">EARLY WARNING</span>
+                        <span class="hud-val">48 Hours</span>
                     </div>
                     <div class="hud-metric-unit">
-                        <span class="hud-label">PERIOD</span>
-                        <span class="hud-val">170 min</span>
+                        <span class="hud-label" data-i18n="hud_latency">INFERENCE CYCLE</span>
+                        <span class="hud-val">0.42 ms</span>
                     </div>
                     <div class="hud-metric-unit">
-                        <span class="hud-label">DOWNLINK</span>
-                        <span class="hud-val"><span class="orange-dot"></span> live</span>
+                        <span class="hud-label" data-i18n="hud_downlink">DOWNLINK</span>
+                        <span class="hud-val"><span class="orange-dot"></span> live (NASA / ESA)</span>
                     </div>
                     <div class="hud-metric-unit">
-                        <span class="hud-label" data-i18n="hud_profiles">PROFILES SYNCED</span>
-                        <span class="hud-val">49,590</span>
+                        <span class="hud-label" data-i18n="hud_savings">AVOIDED LOSS</span>
+                        <span class="hud-val">$660K+ / Event</span>
                     </div>
                 </div>
 
@@ -985,14 +973,14 @@
             if (!container) return;
 
             const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 1000);
             
-            // Adjust camera position so planet appears on the right half (matching reference design)
+            // Adjusted camera position to frame the entire planet cleanly without clipping
             function updateCameraPos() {
                 if (window.innerWidth > 1024) {
-                    camera.position.set(-1.8, 0.2, 7.2);
+                    camera.position.set(-0.8, 0.1, 7.0);
                 } else {
-                    camera.position.set(0, -1.2, 8.5);
+                    camera.position.set(0, -1.0, 8.2);
                 }
             }
             updateCameraPos();
@@ -1004,85 +992,85 @@
             container.appendChild(renderer.domElement);
 
             // Lighting Setup (Warm Sunlight from Left)
-            const sunLight = new THREE.DirectionalLight(0xfff1e0, 2.6);
-            sunLight.position.set(-6, 3, 5);
+            const sunLight = new THREE.DirectionalLight(0xfff5e6, 2.8);
+            sunLight.position.set(-6, 3.5, 5);
             scene.add(sunLight);
 
-            const ambientLight = new THREE.AmbientLight(0x181010, 0.4);
+            const ambientLight = new THREE.AmbientLight(0x1a1212, 0.45);
             scene.add(ambientLight);
 
             const orangeRimLight = new THREE.PointLight(0xff6b2b, 4, 30);
-            orangeRimLight.position.set(5, -2, -3);
+            orangeRimLight.position.set(4, -2, -2);
             scene.add(orangeRimLight);
 
-            // 1. Generate High-Res Procedural Arid Desert Planet Texture
+            // 1. Generate High-Res Procedural Arid Desert Earth/Arabian Peninsula Planet Texture
             function generatePlanetTexture() {
                 const canvas = document.createElement('canvas');
                 canvas.width = 1024;
                 canvas.height = 512;
                 const ctx = canvas.getContext('2d');
 
-                // Base Terra-Cotta / Desert Gradient
+                // Deep Space / Atmospheric Base
                 const grad = ctx.createLinearGradient(0, 0, 0, 512);
-                grad.addColorStop(0, '#7c2d12');
-                grad.addColorStop(0.3, '#c2410c');
-                grad.addColorStop(0.5, '#9a3412');
-                grad.addColorStop(0.7, '#ea580c');
-                grad.addColorStop(1, '#431407');
+                grad.addColorStop(0, '#5c220c');
+                grad.addColorStop(0.3, '#b43b08');
+                grad.addColorStop(0.55, '#8c2e0a');
+                grad.addColorStop(0.8, '#d94e08');
+                grad.addColorStop(1, '#3b1004');
                 ctx.fillStyle = grad;
                 ctx.fillRect(0, 0, 1024, 512);
 
-                // Add Craters & Dunes Texturing
-                for (let i = 0; i < 400; i++) {
+                // Add Desert Topography & Craters
+                for (let i = 0; i < 350; i++) {
                     const x = Math.random() * 1024;
                     const y = Math.random() * 512;
-                    const r = Math.random() * 16 + 2;
+                    const r = Math.random() * 14 + 2;
                     ctx.beginPath();
                     ctx.arc(x, y, r, 0, Math.PI * 2);
-                    ctx.fillStyle = Math.random() > 0.5 ? 'rgba(67, 20, 7, 0.45)' : 'rgba(251, 146, 60, 0.25)';
+                    ctx.fillStyle = Math.random() > 0.5 ? 'rgba(50, 14, 4, 0.45)' : 'rgba(251, 146, 60, 0.25)';
                     ctx.fill();
 
-                    // Inner crater shadow
+                    // Subtle crater shadow
                     ctx.beginPath();
-                    ctx.arc(x + r * 0.2, y + r * 0.2, r * 0.6, 0, Math.PI * 2);
-                    ctx.fillStyle = 'rgba(30, 10, 5, 0.35)';
+                    ctx.arc(x + r * 0.15, y + r * 0.15, r * 0.55, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(25, 8, 3, 0.35)';
                     ctx.fill();
                 }
 
-                // Swirl Dune Bands
-                for (let j = 0; j < 30; j++) {
+                // Swirling Desert Sand Dune Formations
+                for (let j = 0; j < 35; j++) {
                     ctx.beginPath();
                     ctx.moveTo(0, Math.random() * 512);
                     ctx.bezierCurveTo(340, Math.random() * 512, 680, Math.random() * 512, 1024, Math.random() * 512);
-                    ctx.strokeStyle = `rgba(234, 88, 12, ${0.1 + Math.random() * 0.2})`;
-                    ctx.lineWidth = Math.random() * 14 + 4;
+                    ctx.strokeStyle = `rgba(234, 88, 12, ${0.12 + Math.random() * 0.2})`;
+                    ctx.lineWidth = Math.random() * 16 + 4;
                     ctx.stroke();
                 }
 
                 return new THREE.CanvasTexture(canvas);
             }
 
-            // 2. Planet Sphere Mesh
+            // 2. Planet Sphere Mesh — Centered with generous margin from screen edge
             const planetGroup = new THREE.Group();
-            planetGroup.position.set(2.8, -0.2, 0); // Positioned to the right side
+            planetGroup.position.set(1.55, 0.0, 0); // Positioned comfortably to the left of the edge
             scene.add(planetGroup);
 
-            const planetGeo = new THREE.SphereGeometry(2.1, 64, 64);
+            const planetGeo = new THREE.SphereGeometry(1.95, 64, 64);
             const planetTexture = generatePlanetTexture();
             const planetMat = new THREE.MeshStandardMaterial({
                 map: planetTexture,
-                roughness: 0.85,
-                metalness: 0.1
+                roughness: 0.82,
+                metalness: 0.12
             });
             const planetMesh = new THREE.Mesh(planetGeo, planetMat);
             planetGroup.add(planetMesh);
 
             // Atmosphere Rim Glow Shell
-            const glowGeo = new THREE.SphereGeometry(2.14, 32, 32);
+            const glowGeo = new THREE.SphereGeometry(1.99, 32, 32);
             const glowMat = new THREE.MeshBasicMaterial({
                 color: 0xff6b2b,
                 transparent: true,
-                opacity: 0.15,
+                opacity: 0.18,
                 side: THREE.BackSide
             });
             const glowMesh = new THREE.Mesh(glowGeo, glowMat);
@@ -1091,9 +1079,9 @@
             // 3. Orbital Trajectory Rings
             const orbitalRings = [];
             const ringConfigs = [
-                { r: 2.8, tiltX: 1.1, tiltY: 0.4, tiltZ: 0.2, color: 0x475569, speed: 0.008 },
-                { r: 3.4, tiltX: 0.5, tiltY: 1.2, tiltZ: -0.3, color: 0xff6b2b, speed: -0.006 },
-                { r: 3.9, tiltX: -0.8, tiltY: 0.3, tiltZ: 0.9, color: 0x334155, speed: 0.004 }
+                { r: 2.6, tiltX: 1.05, tiltY: 0.35, tiltZ: 0.2, color: 0x475569, speed: 0.007 },
+                { r: 3.1, tiltX: 0.45, tiltY: 1.15, tiltZ: -0.25, color: 0xff6b2b, speed: -0.005 },
+                { r: 3.5, tiltX: -0.75, tiltY: 0.25, tiltZ: 0.85, color: 0x334155, speed: 0.004 }
             ];
 
             ringConfigs.forEach(cfg => {
@@ -1101,7 +1089,7 @@
                 ringGroup.rotation.set(cfg.tiltX, cfg.tiltY, cfg.tiltZ);
 
                 // Elliptical Thin Ring
-                const ringGeo = new THREE.TorusGeometry(cfg.r, 0.012, 16, 120);
+                const ringGeo = new THREE.TorusGeometry(cfg.r, 0.011, 16, 120);
                 const ringMat = new THREE.MeshBasicMaterial({
                     color: cfg.color,
                     transparent: true,
@@ -1111,7 +1099,7 @@
                 ringGroup.add(ring);
 
                 // Orbiting Satellite Node
-                const satGeo = new THREE.SphereGeometry(0.05, 12, 12);
+                const satGeo = new THREE.SphereGeometry(0.048, 12, 12);
                 const satMat = new THREE.MeshBasicMaterial({ color: 0xffa366 });
                 const satellite = new THREE.Mesh(satGeo, satMat);
                 satellite.position.set(cfg.r, 0, 0);
@@ -1168,8 +1156,7 @@
             let targetRotX = 0;
 
             window.addEventListener('mousedown', (e) => {
-                // Only drag if clicking on the canvas or right half
-                if (e.clientX > window.innerWidth * 0.4) {
+                if (e.clientX > window.innerWidth * 0.35) {
                     isDragging = true;
                     prevMouseX = e.clientX;
                     prevMouseY = e.clientY;
@@ -1187,11 +1174,10 @@
                     prevMouseX = e.clientX;
                     prevMouseY = e.clientY;
                 } else {
-                    // Subtle background parallax
-                    const mouseX = (e.clientX / window.innerWidth - 0.5) * 0.3;
-                    const mouseY = (e.clientY / window.innerHeight - 0.5) * 0.3;
-                    camera.position.x = (window.innerWidth > 1024 ? -1.8 : 0) + mouseX;
-                    camera.position.y = (window.innerWidth > 1024 ? 0.2 : -1.2) - mouseY;
+                    const mouseX = (e.clientX / window.innerWidth - 0.5) * 0.25;
+                    const mouseY = (e.clientY / window.innerHeight - 0.5) * 0.25;
+                    camera.position.x = (window.innerWidth > 1024 ? -0.8 : 0) + mouseX;
+                    camera.position.y = (window.innerWidth > 1024 ? 0.1 : -1.0) - mouseY;
                 }
             });
 
@@ -1244,21 +1230,24 @@
         // ── BILINGUAL ENGLISH / ARABIC SWITCHER ──
         const translations = {
             en: {
-                nav_product: "Product ⌵",
-                nav_how: "How it works",
+                nav_solutions: "Solutions ⌵",
+                nav_platform: "Platform",
                 nav_capabilities: "Capabilities ⌵",
-                nav_docs: "Docs",
-                nav_signin: "Sign in",
-                nav_cta: "Start free",
-                badge_text: "Realtime personalization",
-                badge_action: "See it live →",
-                subhead_title: "ORBITAL RELAY",
-                hero_h1_lead: "Tuned to",
-                hero_h1_sub: "every visitor",
-                hero_desc: "Signals in, moments out — a live loop that learns from every visit to predict and protect high-consequence desert industrial infrastructure.",
-                cta_primary: "Start free",
-                cta_secondary: "Watch it work",
-                hud_profiles: "PROFILES SYNCED",
+                nav_technology: "Technology",
+                nav_api: "API Docs",
+                nav_cta: "Mission Control",
+                badge_text: "NASA & ESA Satellite Ingestion",
+                badge_action: "Launch Console →",
+                subhead_title: "SOVEREIGN PREDICTIVE INTELLIGENCE",
+                hero_h1_lead: "Predict High-Consequence Failures",
+                hero_h1_sub: "before harsh desert impacts occur.",
+                hero_desc: "SAHARYN AI combines live space-borne satellite feeds with physics-informed causal mechanics to monitor sandstorms, thermal decay, and abrasion—predicting heavy industrial asset breakdowns up to 48 hours in advance across Saudi Arabia and the Middle East.",
+                cta_primary: "Launch Mission Control",
+                cta_secondary: "View Architecture Proof",
+                hud_warning: "EARLY WARNING",
+                hud_latency: "INFERENCE CYCLE",
+                hud_downlink: "DOWNLINK",
+                hud_savings: "AVOIDED LOSS",
                 tag_solutions: "INDUSTRY APPLICATIONS",
                 sol_heading: "Built for High-Consequence Desert Assets",
                 sol_sub: "Protecting national critical infrastructure against extreme sandstorms, high ambient heat, and abrasive dust cycles.",
@@ -1289,21 +1278,24 @@
                 footer_desc: "Sovereign Predictive Intelligence platform protecting critical energy, water, and industrial assets in high-consequence desert environments."
             },
             ar: {
-                nav_product: "المنتج ⌵",
-                nav_how: "كيف يعمل",
+                nav_solutions: "الحلول ⌵",
+                nav_platform: "المنصة",
                 nav_capabilities: "القدرات ⌵",
-                nav_docs: "المستندات",
-                nav_signin: "تسجيل الدخول",
-                nav_cta: "ابدأ مجاناً",
-                badge_text: "تخصيص فوري ومباشر",
-                badge_action: "شاهد البث المباشر ←",
-                subhead_title: "المرحل المداري الفضائي",
-                hero_h1_lead: "دقة تنبؤية",
-                hero_h1_sub: "لكل زائر وأصل صناعي",
-                hero_desc: "إشارات فضائية مستمرة وحسابات سببية فورية — حلقة ذكاء اصطناعي حية تتنبأ بأعطال المعدات الصناعية وتحميها في البيئات الصحراوية القاسية.",
-                cta_primary: "ابدأ مجاناً",
-                cta_secondary: "شاهد آلية العمل",
-                hud_profiles: "الأصول المتصلة",
+                nav_technology: "التقنية",
+                nav_api: "واجهة البرمجة",
+                nav_cta: "مركز العمليات",
+                badge_text: "استيعاب مباشر لبيانات ناسا وإيسا",
+                badge_action: "فتح وحدة التحكم ←",
+                subhead_title: "الذكاء الاصطناعي التنبؤي السيادي",
+                hero_h1_lead: "التنبؤ بالأعطال الحرجة",
+                hero_h1_sub: "قبل وقوع أضرار البيئة الصحراوية القاسية.",
+                hero_desc: "تجمع منصة سحارين (SAHARYN AI) بين استخبارات الأقمار الصناعية الفضائية والميكانيكا السببية الفيزيائية لرصد العواصف الرملية والتآكل الحراري، متنبئة بأعطال المعدات الصناعية حتى 48 ساعة مسبقاً في المملكة العربية السعودية والشرق الأوسط.",
+                cta_primary: "فتح مركز العمليات",
+                cta_secondary: "عرض الإثبات التقني",
+                hud_warning: "أفق الإنذار المبكر",
+                hud_latency: "دورة الاستدلال السببي",
+                hud_downlink: "البث المباشر",
+                hud_savings: "الخسائر المتجنبة",
                 tag_solutions: "التطبيقات الصناعية",
                 sol_heading: "مصممة لأصول البيئة الصحراوية القاسية",
                 sol_sub: "حماية البنية التحتية الوطنية الحيوية من العواصف الرملية الشديدة والحرارة المرتفعة ودورات الغبار التآكلية.",
