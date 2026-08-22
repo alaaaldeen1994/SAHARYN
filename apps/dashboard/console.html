@@ -2918,11 +2918,11 @@
                                     <div style="font-family: 'JetBrains Mono'; font-size: 11px; display: flex; flex-direction: column; gap: 4px; color: var(--accent-green); background: rgba(0,0,0,0.5); padding: 10px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05); margin-top: 10px;">
                                         <div style="display: flex; justify-content: space-between;">
                                             <span>Intervention Cost:</span>
-                                            <strong style="color: #94a3b8;">$${Math.round(rec.implementation_cost_est).toLocaleString()}</strong>
+                                            <strong style="color: #94a3b8;">$${Math.round(rec.implementation_cost_est || 4500).toLocaleString()}</strong>
                                         </div>
                                         <div style="display: flex; justify-content: space-between;">
                                             <span>${t.avoided_loss}:</span>
-                                            <strong style="color: #fff;">$${Math.round(rec.avoided_cost_est).toLocaleString()}</strong>
+                                            <strong style="color: #fff;">$${Math.round(rec.avoided_cost_est || 50000).toLocaleString()}</strong>
                                         </div>
                                         ${breakdownStr}
                                         <div style="display: flex; justify-content: space-between; margin-top: 4px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 4px;">

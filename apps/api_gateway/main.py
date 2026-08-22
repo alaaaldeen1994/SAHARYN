@@ -121,6 +121,8 @@ class ActionRecommendation(BaseModel):
     rationale: str
     roi_index: float
     avoided_cost_est: float
+    implementation_cost_est: float = 0.0
+    avoided_cost_detail: Optional[Dict[str, Any]] = None
     priority: int
 
 class InferenceResponse(BaseModel):
@@ -341,6 +343,8 @@ async def execute_resilience_inference(
             rationale=cmd.rationale,
             roi_index=cmd.roi_index,
             avoided_cost_est=cmd.avoided_cost_est,
+            implementation_cost_est=getattr(cmd, 'implementation_cost_est', 4500.0),
+            avoided_cost_detail=getattr(cmd, 'avoided_cost_detail', None),
             priority=cmd.priority
         ) for cmd in prescriptions
     ]
