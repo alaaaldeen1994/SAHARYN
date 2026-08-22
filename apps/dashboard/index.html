@@ -8,11 +8,11 @@
     <meta name="description"
         content="SAHARYN AI fuses live NASA and ESA Copernicus satellite feeds with plant SCADA physics to predict heavy machinery failures 48 hours in advance across desert operations.">
     
-    <!-- Premium Google Fonts: Instrument Serif + Plus Jakarta Sans + JetBrains Mono -->
+    <!-- Modern Enterprise Google Fonts: Plus Jakarta Sans + Inter + JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800;900&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800;900&display=swap"
         rel="stylesheet">
     
     <!-- Lucide Icons & Three.js -->
@@ -37,10 +37,9 @@
             --border-orange: rgba(255, 107, 43, 0.35);
             
             --text-primary: #ffffff;
-            --text-secondary: #9aa0a6;
-            --text-muted: #5f6368;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
             
-            --font-serif: 'Instrument Serif', Georgia, serif;
             --font-sans: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
             --font-ar: 'Tajawal', sans-serif;
@@ -148,8 +147,8 @@
 
         .brand-text {
             font-size: 21px;
-            font-weight: 700;
-            letter-spacing: -0.3px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
             color: #ffffff;
         }
 
@@ -209,7 +208,7 @@
             padding: 9px 20px;
             border-radius: 8px;
             font-size: 13.5px;
-            font-weight: 600;
+            font-weight: 700;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
@@ -239,7 +238,7 @@
         }
 
         .hero-left-content {
-            max-width: 520px;
+            max-width: 540px;
             z-index: 2;
             pointer-events: auto;
         }
@@ -286,7 +285,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 14px;
+            margin-bottom: 16px;
         }
 
         .hero-subhead-num {
@@ -312,36 +311,40 @@
             background: var(--border-medium);
         }
 
-        /* Refined Display Headline (Balanced, No Hyphenation) */
+        /* Modern Crisp Typography (High-Impact, No Serif) */
         .hero-title {
-            font-family: var(--font-serif);
-            font-size: clamp(34px, 3.6vw, 52px);
-            font-weight: 400;
+            font-family: var(--font-sans);
+            font-size: clamp(34px, 3.8vw, 54px);
+            font-weight: 800;
             line-height: 1.12;
-            letter-spacing: -0.5px;
-            color: #ffffff;
-            margin-bottom: 18px;
+            letter-spacing: -0.03em;
+            margin-bottom: 20px;
             hyphens: none;
             word-break: keep-all;
         }
 
-        .hero-title span {
+        .hero-title .title-gradient {
+            background: linear-gradient(135deg, #ffffff 30%, #ff8a4c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             display: block;
         }
 
-        .hero-title em {
-            font-style: italic;
-            font-family: var(--font-serif);
+        .hero-title .title-sub {
             color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.88em;
             display: block;
+            margin-top: 6px;
+            letter-spacing: -0.02em;
         }
 
         .hero-desc {
-            font-size: 14.5px;
+            font-size: 15px;
             color: var(--text-secondary);
-            line-height: 1.6;
-            margin-bottom: 30px;
-            max-width: 470px;
+            line-height: 1.65;
+            margin-bottom: 32px;
+            max-width: 480px;
         }
 
         /* Dual CTA Buttons */
@@ -355,10 +358,10 @@
         .btn-cta-primary {
             background: linear-gradient(135deg, var(--accent-orange) 0%, #e65100 100%);
             color: #ffffff;
-            padding: 12px 24px;
+            padding: 13px 26px;
             border-radius: 8px;
             font-size: 13.5px;
-            font-weight: 600;
+            font-weight: 700;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
@@ -377,10 +380,10 @@
             background: rgba(20, 22, 30, 0.8);
             border: 1px solid var(--border-medium);
             color: var(--text-primary);
-            padding: 12px 20px;
+            padding: 13px 22px;
             border-radius: 8px;
             font-size: 13.5px;
-            font-weight: 500;
+            font-weight: 600;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
@@ -486,10 +489,9 @@
         }
 
         .section-heading {
-            font-family: var(--font-serif);
-            font-size: clamp(32px, 3.5vw, 48px);
-            font-weight: 400;
-            letter-spacing: -0.5px;
+            font-size: clamp(30px, 3.5vw, 44px);
+            font-weight: 800;
+            letter-spacing: -0.03em;
             line-height: 1.15;
             margin-bottom: 14px;
         }
@@ -720,7 +722,7 @@
             </div>
         </nav>
 
-        <!-- HERO SECTION (CLEAN, PROPORTIONAL & PUNCHY) -->
+        <!-- HERO SECTION (CLEAN MODERN TYPOGRAPHY & BALANCED PROPORTIONS) -->
         <header class="hero">
             <div class="hero-left-content">
                 <!-- Capsule Badge -->
@@ -736,10 +738,10 @@
                     <div class="hero-subhead-line"></div>
                 </div>
 
-                <!-- Balanced Headline -->
+                <!-- High-Impact Crisp Headline -->
                 <h1 class="hero-title">
-                    <span data-i18n="hero_h1_lead">Predict Industrial Asset Failures</span>
-                    <em data-i18n="hero_h1_sub">before desert impacts occur.</em>
+                    <span class="title-gradient" data-i18n="hero_h1_lead">Predict High-Consequence Failures</span>
+                    <span class="title-sub" data-i18n="hero_h1_sub">Before harsh desert impacts occur.</span>
                 </h1>
 
                 <!-- Concise Description -->
@@ -972,21 +974,21 @@
         </footer>
     </div>
 
-    <!-- ── THREE.JS PROCEDURAL PLANET & ORBITAL CONSTELLATION SCRIPT ── -->
+    <!-- ── THREE.JS COMPACT, SYMMETRICAL 3D GLOBE & ORBITAL CONSTELLATION ── -->
     <script>
         (function initSpaceGlobe() {
             const container = document.getElementById('space-viewport');
             if (!container) return;
 
             const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(38, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const camera = new THREE.PerspectiveCamera(36, window.innerWidth / window.innerHeight, 0.1, 1000);
             
-            // Adjusted camera position to frame the globe comfortably on the right side
+            // Adjusted camera position for symmetrical, well-framed composition
             function updateCameraPos() {
                 if (window.innerWidth > 1024) {
-                    camera.position.set(-0.65, 0.05, 6.6);
+                    camera.position.set(-0.6, 0.0, 6.2);
                 } else {
-                    camera.position.set(0, -0.9, 7.8);
+                    camera.position.set(0, -0.8, 7.2);
                 }
             }
             updateCameraPos();
@@ -997,96 +999,95 @@
             renderer.toneMapping = THREE.ACESFilmicToneMapping;
             container.appendChild(renderer.domElement);
 
-            // Lighting Setup (Warm Sunlight from Left)
-            const sunLight = new THREE.DirectionalLight(0xfff8ee, 2.8);
-            sunLight.position.set(-5, 3, 5);
+            // Lighting Setup (Crisp Studio Space Lighting)
+            const sunLight = new THREE.DirectionalLight(0xfff6ea, 3.2);
+            sunLight.position.set(-5, 3.5, 4.5);
             scene.add(sunLight);
 
-            const ambientLight = new THREE.AmbientLight(0x161010, 0.45);
+            const ambientLight = new THREE.AmbientLight(0x1a1210, 0.5);
             scene.add(ambientLight);
 
-            const orangeRimLight = new THREE.PointLight(0xff6b2b, 3.5, 25);
-            orangeRimLight.position.set(3.5, -2, -2);
+            const orangeRimLight = new THREE.PointLight(0xff6b2b, 4.5, 25);
+            orangeRimLight.position.set(3.5, -1.8, -2);
             scene.add(orangeRimLight);
 
-            // 1. High-Quality Seamless Procedural Desert Terrestrial Sphere Texture (No Polar Pinching)
+            // 1. Seamless Photorealistic Procedural Desert Earth Texture (Zero Polar Distortion)
             function generatePlanetTexture() {
                 const canvas = document.createElement('canvas');
                 canvas.width = 1024;
                 canvas.height = 512;
                 const ctx = canvas.getContext('2d');
 
-                // Base Warm Desert Terrain Gradient
+                // Smooth Warm Desert Sphere Base
                 const grad = ctx.createLinearGradient(0, 0, 0, 512);
-                grad.addColorStop(0, '#5a200a');
-                grad.addColorStop(0.2, '#993308');
-                grad.addColorStop(0.4, '#c2410c');
-                grad.addColorStop(0.6, '#ea580c');
-                grad.addColorStop(0.8, '#8a2b06');
+                grad.addColorStop(0, '#5a220a');
+                grad.addColorStop(0.25, '#99350a');
+                grad.addColorStop(0.5, '#c2410c');
+                grad.addColorStop(0.75, '#ea580c');
                 grad.addColorStop(1, '#4a1504');
                 ctx.fillStyle = grad;
                 ctx.fillRect(0, 0, 1024, 512);
 
-                // Smooth Organic Landmasses & Dunes (Restricted to non-polar equatorial latitude to prevent pinch)
-                for (let i = 0; i < 60; i++) {
-                    const x = Math.random() * 1024;
-                    const y = 80 + Math.random() * 352; // Keep away from poles (y=0 and y=512)
-                    const rad = 25 + Math.random() * 65;
-                    const spotGrad = ctx.createRadialGradient(x, y, 0, x, y, rad);
-                    spotGrad.addColorStop(0, Math.random() > 0.4 ? 'rgba(251, 146, 60, 0.35)' : 'rgba(45, 12, 4, 0.45)');
-                    spotGrad.addColorStop(1, 'transparent');
-                    ctx.fillStyle = spotGrad;
+                // Seamless Organic Topography Bands (Smooth Dunes & Highlands)
+                for (let i = 0; i < 25; i++) {
+                    const y = 80 + i * 14;
                     ctx.beginPath();
-                    ctx.arc(x, y, rad, 0, Math.PI * 2);
-                    ctx.fill();
+                    ctx.moveTo(0, y);
+                    ctx.bezierCurveTo(256, y + (Math.sin(i) * 18), 768, y - (Math.cos(i) * 18), 1024, y);
+                    ctx.strokeStyle = `rgba(${220 + (i % 35)}, ${70 + (i * 3)}, 18, 0.18)`;
+                    ctx.lineWidth = 12 + (i % 8);
+                    ctx.stroke();
                 }
 
-                // Fine Surface Topography Speckles
-                for (let k = 0; k < 300; k++) {
-                    const sx = Math.random() * 1024;
-                    const sy = 60 + Math.random() * 392;
-                    const sr = Math.random() * 5 + 1;
-                    ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255, 180, 120, 0.25)' : 'rgba(30, 8, 2, 0.35)';
+                // Subtle Atmospheric Dust Clouds
+                for (let c = 0; c < 15; c++) {
+                    const cx = Math.random() * 1024;
+                    const cy = 120 + Math.random() * 272;
+                    const cRad = 40 + Math.random() * 80;
+                    const cGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, cRad);
+                    cGrad.addColorStop(0, 'rgba(255, 230, 200, 0.12)');
+                    cGrad.addColorStop(1, 'transparent');
+                    ctx.fillStyle = cGrad;
                     ctx.beginPath();
-                    ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+                    ctx.arc(cx, cy, cRad, 0, Math.PI * 2);
                     ctx.fill();
                 }
 
                 return new THREE.CanvasTexture(canvas);
             }
 
-            // 2. Planet Sphere Mesh — Centered with generous breathing room
+            // 2. Planet Sphere Mesh — Compact, Symmetrical & Proportional (Radius = 1.18)
             const planetGroup = new THREE.Group();
-            planetGroup.position.set(1.35, 0.0, 0); // Positioned comfortably inward from the right edge
+            planetGroup.position.set(1.45, 0.05, 0); // Perfectly centered in the right quadrant
             scene.add(planetGroup);
 
-            const planetGeo = new THREE.SphereGeometry(1.8, 64, 64);
+            const planetGeo = new THREE.SphereGeometry(1.18, 64, 64);
             const planetTexture = generatePlanetTexture();
             const planetMat = new THREE.MeshStandardMaterial({
                 map: planetTexture,
-                roughness: 0.85,
+                roughness: 0.8,
                 metalness: 0.1
             });
             const planetMesh = new THREE.Mesh(planetGeo, planetMat);
             planetGroup.add(planetMesh);
 
             // Atmosphere Rim Glow Shell
-            const glowGeo = new THREE.SphereGeometry(1.84, 32, 32);
+            const glowGeo = new THREE.SphereGeometry(1.22, 32, 32);
             const glowMat = new THREE.MeshBasicMaterial({
                 color: 0xff6b2b,
                 transparent: true,
-                opacity: 0.18,
+                opacity: 0.22,
                 side: THREE.BackSide
             });
             const glowMesh = new THREE.Mesh(glowGeo, glowMat);
             planetGroup.add(glowMesh);
 
-            // 3. Orbital Trajectory Rings
+            // 3. Compact, Symmetrical Orbital Trajectory Rings
             const orbitalRings = [];
             const ringConfigs = [
-                { r: 2.4, tiltX: 1.05, tiltY: 0.35, tiltZ: 0.2, color: 0x475569, speed: 0.007 },
-                { r: 2.9, tiltX: 0.45, tiltY: 1.15, tiltZ: -0.25, color: 0xff6b2b, speed: -0.005 },
-                { r: 3.3, tiltX: -0.75, tiltY: 0.25, tiltZ: 0.85, color: 0x334155, speed: 0.004 }
+                { r: 1.62, tiltX: 1.05, tiltY: 0.35, tiltZ: 0.2, color: 0x475569, speed: 0.007 },
+                { r: 2.05, tiltX: 0.45, tiltY: 1.15, tiltZ: -0.25, color: 0xff6b2b, speed: -0.005 },
+                { r: 2.38, tiltX: -0.75, tiltY: 0.25, tiltZ: 0.85, color: 0x334155, speed: 0.004 }
             ];
 
             ringConfigs.forEach(cfg => {
@@ -1094,7 +1095,7 @@
                 ringGroup.rotation.set(cfg.tiltX, cfg.tiltY, cfg.tiltZ);
 
                 // Elliptical Thin Ring
-                const ringGeo = new THREE.TorusGeometry(cfg.r, 0.01, 16, 120);
+                const ringGeo = new THREE.TorusGeometry(cfg.r, 0.008, 16, 120);
                 const ringMat = new THREE.MeshBasicMaterial({
                     color: cfg.color,
                     transparent: true,
@@ -1104,14 +1105,14 @@
                 ringGroup.add(ring);
 
                 // Orbiting Satellite Node
-                const satGeo = new THREE.SphereGeometry(0.045, 12, 12);
+                const satGeo = new THREE.SphereGeometry(0.038, 12, 12);
                 const satMat = new THREE.MeshBasicMaterial({ color: 0xffa366 });
                 const satellite = new THREE.Mesh(satGeo, satMat);
                 satellite.position.set(cfg.r, 0, 0);
                 ringGroup.add(satellite);
 
                 // Satellite Trail Particles
-                const trailCount = 30;
+                const trailCount = 25;
                 const trailGeo = new THREE.BufferGeometry();
                 const trailPos = new Float32Array(trailCount * 3);
                 for (let t = 0; t < trailCount; t++) {
@@ -1123,7 +1124,7 @@
                 trailGeo.setAttribute('position', new THREE.BufferAttribute(trailPos, 3));
                 const trailMat = new THREE.PointsMaterial({
                     color: 0xff6b2b,
-                    size: 0.035,
+                    size: 0.03,
                     transparent: true,
                     opacity: 0.7
                 });
@@ -1135,7 +1136,7 @@
             });
 
             // 4. Background Starfield & Constellation Grid Points
-            const starCount = 180;
+            const starCount = 160;
             const starGeo = new THREE.BufferGeometry();
             const starPositions = new Float32Array(starCount * 3);
             for (let s = 0; s < starCount * 3; s += 3) {
@@ -1146,7 +1147,7 @@
             starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
             const starMat = new THREE.PointsMaterial({
                 color: 0xffeedd,
-                size: 0.045,
+                size: 0.04,
                 transparent: true,
                 opacity: 0.65
             });
@@ -1179,10 +1180,10 @@
                     prevMouseX = e.clientX;
                     prevMouseY = e.clientY;
                 } else {
-                    const mouseX = (e.clientX / window.innerWidth - 0.5) * 0.22;
-                    const mouseY = (e.clientY / window.innerHeight - 0.5) * 0.22;
-                    camera.position.x = (window.innerWidth > 1024 ? -0.65 : 0) + mouseX;
-                    camera.position.y = (window.innerWidth > 1024 ? 0.05 : -0.9) - mouseY;
+                    const mouseX = (e.clientX / window.innerWidth - 0.5) * 0.2;
+                    const mouseY = (e.clientY / window.innerHeight - 0.5) * 0.2;
+                    camera.position.x = (window.innerWidth > 1024 ? -0.6 : 0) + mouseX;
+                    camera.position.y = (window.innerWidth > 1024 ? 0.0 : -0.8) - mouseY;
                 }
             });
 
@@ -1211,7 +1212,7 @@
                 requestAnimationFrame(animate);
 
                 // Planet Rotation
-                planetMesh.rotation.y += 0.002;
+                planetMesh.rotation.y += 0.0025;
                 planetGroup.rotation.y += (targetRotY - planetGroup.rotation.y) * 0.05;
                 planetGroup.rotation.x += (targetRotX - planetGroup.rotation.x) * 0.05;
 
@@ -1244,8 +1245,8 @@
                 badge_text: "NASA & ESA Live Feeds",
                 badge_action: "Console →",
                 subhead_title: "SOVEREIGN PREDICTIVE INTELLIGENCE",
-                hero_h1_lead: "Predict Industrial Asset Failures",
-                hero_h1_sub: "before desert impacts occur.",
+                hero_h1_lead: "Predict High-Consequence Failures",
+                hero_h1_sub: "Before harsh desert impacts occur.",
                 hero_desc: "SAHARYN fuses live space-borne satellite feeds with physics-informed causal mechanics to predict heavy equipment breakdowns up to 48 hours in advance across desert operations.",
                 cta_primary: "Launch Mission Control",
                 cta_secondary: "Architecture Proof",
@@ -1292,7 +1293,7 @@
                 badge_text: "استيعاب مباشر لبيانات ناسا وإيسا",
                 badge_action: "وحدة التحكم ←",
                 subhead_title: "الذكاء الاصطناعي التنبؤي السيادي",
-                hero_h1_lead: "التنبؤ بأعطال المعدات الصناعية",
+                hero_h1_lead: "التنبؤ بالأعطال الحرجة للمعدات",
                 hero_h1_sub: "قبل وقوع أضرار البيئة الصحراوية.",
                 hero_desc: "تجمع منصة سحارين (SAHARYN) بين استخبارات الأقمار الصناعية الفضائية والميكانيكا السببية الفيزيائية للتنبؤ بأعطال المعدات الصناعية حتى 48 ساعة مسبقاً في البيئات الصحراوية.",
                 cta_primary: "فتح مركز العمليات",
