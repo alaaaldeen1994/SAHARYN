@@ -42,7 +42,7 @@ from core.security.siem_forwarder import (
 )
 from core.security.rbac import get_role_capabilities_json, Role
 
-    _RBAC_AVAILABLE = True
+_RBAC_AVAILABLE = True
 
 # --- 1. LOGGING (must be first — everything below depends on it) ---
 LOG_FORMAT = "%(asctime)s - %(name)s - [%(process)d] - [%(levelname)s] - %(message)s"
