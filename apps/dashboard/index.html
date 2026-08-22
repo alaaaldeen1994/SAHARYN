@@ -4,40 +4,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAHARYN AI | Protecting Industrial Assets in the Desert</title>
+    <title>SAHARYN AI | Sovereign Industrial Intelligence for Critical Desert Infrastructure</title>
     <meta name="description"
-        content="SAHARYN AI uses live NASA and ESA satellite data to predict equipment failure 48 hours in advance — saving millions in downtime across desert infrastructure.">
+        content="SAHARYN AI fuses live NASA and ESA Copernicus satellite feeds with plant SCADA physics to predict high-consequence asset failures 48 hours in advance.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&family=Tajawal:wght@400;700;800&display=swap"
-        rel="stylesheet" media="print" onload="this.media='all'">
-    <noscript>
-        <link
-            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&family=Tajawal:wght@400;700;800&display=swap"
-            rel="stylesheet">
-    </noscript>
-    <link rel="preconnect" href="https://unpkg.com">
-    <script src="https://unpkg.com/lucide@latest" defer></script>
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap"
+        rel="stylesheet">
+    
+    <!-- Lucide Icons & Three.js -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
     <style>
         :root {
-            --bg: #030912;
-            --bg-card: #0c1523;
-            --accent: #10b981;
-            --accent-glow: rgba(16, 185, 129, 0.3);
-            --accent-dim: rgba(16, 185, 129, 0.08);
-            --blue: #3b82f6;
-            --amber: #f59e0b;
-            --text: #f1f5f9;
-            --text-dim: #64748b;
-            --text-mid: #94a3b8;
-            --border: #1e293b;
-            --border-bright: #334155;
-            --mono: 'JetBrains Mono', monospace;
-            --sans: 'Inter', sans-serif;
+            --bg-void: #020611;
+            --bg-surface: #070f1e;
+            --bg-card: rgba(13, 25, 48, 0.7);
+            --bg-card-hover: rgba(19, 36, 68, 0.85);
+            --bg-glass: rgba(10, 20, 38, 0.65);
+            
+            --accent-emerald: #10b981;
+            --accent-emerald-bright: #34d399;
+            --accent-emerald-glow: rgba(16, 185, 129, 0.35);
+            --accent-cyan: #06b6d4;
+            --accent-cyan-glow: rgba(6, 182, 212, 0.3);
+            --accent-violet: #8b5cf6;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            
+            --border-subtle: rgba(255, 255, 255, 0.07);
+            --border-medium: rgba(255, 255, 255, 0.12);
+            --border-bright: rgba(16, 185, 129, 0.4);
+            
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            
+            --font-sans: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --font-ar: 'Tajawal', sans-serif;
         }
 
-        *,
-        *::before,
-        *::after {
+        *, *::before, *::after {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
@@ -48,1964 +60,1426 @@
         }
 
         body {
-            background: var(--bg);
-            color: var(--text);
-            font-family: var(--sans);
-            overflow-x: hidden;
+            background-color: var(--bg-void);
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.12) 0%, transparent 60%),
+                radial-gradient(circle at 85% 30%, rgba(6, 182, 212, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 15% 70%, rgba(139, 92, 246, 0.06) 0%, transparent 50%);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
             line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
         }
 
         body[dir="rtl"] {
-            font-family: 'Tajawal', sans-serif;
+            font-family: var(--font-ar);
         }
 
-        /* ── NAVIGATION ── */
+        /* ── AMBIENT CANVAS BACKGROUND ── */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.7;
+        }
+
+        .content-layer {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ── PREMIUM HEADER & NAVIGATION ── */
         nav {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            z-index: 200;
+            z-index: 1000;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 22px 60px;
-            background: rgba(3, 9, 18, 0.85);
-            backdrop-filter: blur(20px);
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 800;
-            font-size: 20px;
-            letter-spacing: -0.5px;
-            text-decoration: none;
-            color: var(--text);
-        }
-
-        .brand-hex {
-            width: 28px;
-            height: 28px;
-            background: var(--accent);
-            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
-        }
-
-        .brand span {
-            font-weight: 300;
-            opacity: 0.5;
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 36px;
-        }
-
-        .nav-links a {
-            font-family: var(--mono);
-            font-size: 11px;
-            letter-spacing: 1.5px;
-            color: var(--text-mid);
-            text-decoration: none;
-            text-transform: uppercase;
-            transition: color 0.2s;
-        }
-
-        .nav-links a:hover {
-            color: var(--text);
-        }
-
-        .nav-cta {
-            font-family: var(--mono);
-            font-size: 11px;
-            font-weight: 800;
-            letter-spacing: 1.5px;
-            text-decoration: none;
-            text-transform: uppercase;
-            color: var(--accent) !important;
-            background: transparent;
-            padding: 10px 22px;
-            border: 1px solid var(--accent);
-            border-radius: 4px;
+            padding: 16px 5vw;
+            background: rgba(2, 6, 17, 0.82);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border-bottom: 1px solid var(--border-subtle);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .nav-cta:hover {
-            color: var(--bg) !important;
-            background: var(--accent);
-            box-shadow: 0 0 20px var(--accent-glow);
+        .brand-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .brand-emblem {
+            width: 34px;
+            height: 34px;
+            background: linear-gradient(135deg, var(--accent-emerald) 0%, var(--accent-cyan) 100%);
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px var(--accent-emerald-glow);
+            animation: pulse-glow 4s infinite ease-in-out;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); }
+            50% { box-shadow: 0 0 25px rgba(6, 182, 212, 0.6); }
+        }
+
+        .brand-text {
+            font-size: 20px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+        }
+
+        .brand-text span {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--accent-emerald);
+            font-family: var(--font-mono);
+            letter-spacing: 1px;
+        }
+
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-link {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            text-transform: uppercase;
+            transition: color 0.2s, transform 0.2s;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
             transform: translateY(-1px);
         }
 
-        /* ── RTL OVERRIDES ── */
-        body[dir="rtl"] {
-            font-family: 'Tajawal', sans-serif;
-            text-align: right;
-        }
-
-        body[dir="rtl"] .hero {
-            text-align: right;
-        }
-
-        body[dir="rtl"] .hero-tag {
-            flex-direction: row-reverse;
-        }
-
-        body[dir="rtl"] .hstat {
-            border-right: none;
-            border-left: 1px solid var(--border);
-        }
-
-        body[dir="rtl"] .hstat:last-child {
-            border-left: none;
-        }
-
-        body[dir="rtl"] .dropdown-menu {
-            right: auto;
-            left: 0;
-            text-align: right;
-        }
-
-        body[dir="rtl"] .dropdown-item {
-            text-align: right;
-            flex-direction: row-reverse;
-        }
-
-        body[dir="rtl"] .bridge-card,
-        body[dir="rtl"] .step,
-        body[dir="rtl"] .cap-card,
-        body[dir="rtl"] .impact-num,
-        body[dir="rtl"] .sector-card {
-            text-align: right;
-        }
-
-        body[dir="rtl"] .bridge-metric,
-        body[dir="rtl"] .live-proof,
-        body[dir="rtl"] .footer-top,
-        body[dir="rtl"] .footer-copy {
-            flex-direction: row-reverse;
-        }
-
-        body[dir="rtl"] .live-proof-text {
-            text-align: right;
-        }
-
-        body[dir="rtl"] .compliance-item {
-            flex-direction: row-reverse;
-            text-align: right;
-        }
-
-        body[dir="rtl"] .section-label {
-            text-align: right;
-        }
-
-        /* ── USER DROPDOWN ── */
-        .user-dropdown {
-            position: relative;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-        }
-
-        .user-avatar {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            background: var(--bg-card);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid var(--border);
-            transition: 0.2s;
-            overflow: hidden;
-        }
-
-        .user-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .user-avatar:hover {
-            border-color: var(--accent);
-            box-shadow: 0 0 15px var(--accent-glow);
-        }
-
-        .dropdown-menu {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            margin-top: 15px;
-            width: 200px;
-            background: #0c1523;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
-            display: none;
-            flex-direction: column;
-            padding: 8px 0;
-            z-index: 300;
-            animation: dropdownFade 0.2s ease-out;
-        }
-
-        @keyframes dropdownFade {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .dropdown-menu.active {
-            display: flex;
-        }
-
-        .user-info-header {
-            padding: 14px 20px;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 6px;
-        }
-
-        .user-name-label {
-            font-size: 13px;
-            font-weight: 700;
-            color: #fff;
-            display: block;
-        }
-
-        .user-email-label {
-            font-size: 11px;
-            color: var(--text-mid);
-            display: block;
-            margin-top: 2px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .dropdown-item {
-            padding: 12px 20px;
-            font-size: 12px;
-            color: var(--text-mid);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            transition: 0.2s;
-            text-decoration: none;
-            cursor: pointer;
-            border: none;
-            background: none;
-            width: 100%;
-            text-align: left;
-            font-family: var(--sans);
-        }
-
-        .dropdown-item:hover {
-            background: rgba(16, 185, 129, 0.05);
-            color: var(--accent);
-        }
-
-        .dropdown-item i {
-            opacity: 0.7;
-        }
-
-        .dropdown-item.sign-out {
-            color: #ef4444;
-            border-top: 1px solid var(--border);
-            margin-top: 4px;
-            padding-top: 14px;
-        }
-
-
-
-
-        /* ── HERO ── */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 140px 10% 120px;
-            position: relative;
-            overflow: hidden;
-            background: radial-gradient(circle at 20% 50%, rgba(3, 9, 18, 0.8) 0%, rgba(3, 9, 18, 0.3) 100%);
-        }
-
-        .hero-tag {
-            font-family: var(--mono);
-            font-size: 11px;
-            color: var(--accent);
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            margin-bottom: 28px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .hero-tag::before {
+        .nav-link::after {
             content: '';
-            display: block;
-            width: 30px;
-            height: 1px;
-            background: var(--accent);
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-emerald);
+            transition: width 0.3s ease;
         }
 
-        h1 {
-            font-size: clamp(52px, 9vw, 115px);
-            font-weight: 800;
-            line-height: 0.85;
-            letter-spacing: -3px;
-            margin-bottom: 40px;
-            /* Target gap headline -> subtitle ≈ 32-40px */
-            color: #fff;
+        .nav-link:hover::after {
+            width: 100%;
         }
 
-        h1 .dim {
-            font-size: 0.82em;
-            /* ~18% reduction */
-            color: var(--text-mid);
-            opacity: 0.8;
-            /* Emphasis on primary headline */
-            font-weight: 300;
-            letter-spacing: -1px;
-            /* Avoid stretched look */
-            display: block;
-        }
-
-        .hero-sub {
-            font-size: 20px;
-            font-weight: 400;
-            color: rgba(241, 245, 249, 0.85);
-            /* Balanced contrast */
-            max-width: 600px;
-            line-height: 1.7;
-            margin-bottom: 52px;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-        }
-
-        .hero-sub strong {
-            color: var(--accent);
-            font-weight: 700;
-        }
-
-        .hero-actions {
+        .nav-actions {
             display: flex;
-            gap: 20px;
             align-items: center;
-            flex-wrap: wrap;
+            gap: 16px;
         }
 
-        .btn-primary {
-            background: var(--accent);
-            color: var(--bg);
-            padding: 18px 48px;
-            font-family: var(--mono);
-            font-size: 13px;
+        .btn-lang {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-medium);
+            color: var(--text-primary);
+            padding: 7px 14px;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            font-size: 11px;
             font-weight: 700;
-            letter-spacing: 1.5px;
-            text-decoration: none;
-            text-transform: uppercase;
-            transition: 0.2s;
-            border: none;
             cursor: pointer;
+            transition: all 0.2s ease;
         }
 
-        .btn-primary:hover {
-            background: #0ea572;
-            box-shadow: 0 0 30px var(--accent-glow);
+        .btn-lang:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent-emerald);
         }
 
-        .btn-secondary {
-            color: var(--text-mid);
-            padding: 18px 0;
-            font-family: var(--mono);
-            font-size: 12px;
-            letter-spacing: 1.5px;
+        .btn-launch {
+            background: linear-gradient(135deg, var(--accent-emerald) 0%, #059669 100%);
+            color: #020611 !important;
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1px;
             text-decoration: none;
             text-transform: uppercase;
-            transition: color 0.2s;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 8px;
+            box-shadow: 0 4px 20px var(--accent-emerald-glow);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            cursor: pointer;
         }
 
-        .btn-secondary:hover {
-            color: var(--text);
+        .btn-launch:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(16, 185, 129, 0.5);
+            filter: brightness(1.1);
         }
 
-        /* hero stat strip */
-        .hero-stats {
-            display: flex;
-            gap: 0;
-            margin-top: 80px;
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .hstat {
-            flex: 1;
-            padding: 24px 32px;
-            border-right: 1px solid var(--border);
-        }
-
-        .hstat:last-child {
-            border-right: none;
-        }
-
-        .hstat-val {
-            font-size: 36px;
-            font-weight: 800;
-            color: var(--accent);
-            letter-spacing: -1px;
-            line-height: 1;
-        }
-
-        .hstat-label {
-            font-family: var(--mono);
-            font-size: 10px;
-            color: var(--text-dim);
-            letter-spacing: 1.5px;
-            margin-top: 6px;
-            text-transform: uppercase;
-        }
-
-        canvas#bg-canvas {
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        /* ── SECTIONS ── */
-        section {
-            padding: 110px 10%;
-            position: relative;
-            z-index: 10;
-        }
-
-        .section-label {
-            font-family: var(--mono);
-            font-size: 10px;
-            letter-spacing: 3px;
-            color: var(--accent);
-            text-transform: uppercase;
-            margin-bottom: 20px;
-            opacity: 0.8;
-        }
-
-        h2 {
-            font-size: clamp(32px, 4vw, 54px);
-            font-weight: 800;
-            line-height: 1.05;
-            letter-spacing: -1.5px;
-            margin-bottom: 20px;
-            color: #fff;
-        }
-
-        .section-intro {
-            font-size: 18px;
-            color: var(--text-mid);
-            max-width: 640px;
-            line-height: 1.75;
-            margin-bottom: 60px;
-        }
-
-        /* ── SATELLITE BRIDGE ── */
-        #satellites {
-            background: var(--bg);
-            border-top: 1px solid var(--border);
-        }
-
-        .bridges-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 60px;
-        }
-
-        .bridge-card {
-            background: rgba(12, 21, 35, 0.4);
-            backdrop-filter: blur(8px);
-            border: 1px solid var(--border);
-            padding: 48px 40px;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .bridge-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent);
-            background: rgba(16, 185, 129, 0.04);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        .bridge-card:hover {
-            background: rgba(16, 185, 129, 0.04);
-        }
-
-        .bridge-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 28px;
-        }
-
-        .bridge-icon.green {
-            background: rgba(16, 185, 129, 0.12);
-            color: var(--accent);
-            border: 1px solid rgba(16, 185, 129, 0.25);
-        }
-
-        .bridge-icon.blue {
-            background: rgba(59, 130, 246, 0.12);
-            color: var(--blue);
-            border: 1px solid rgba(59, 130, 246, 0.25);
-        }
-
-        .bridge-icon.amber {
-            background: rgba(245, 158, 11, 0.12);
-            color: var(--amber);
-            border: 1px solid rgba(245, 158, 11, 0.25);
-        }
-
-        .bridge-name {
-            font-family: var(--mono);
-            font-size: 11px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-bottom: 12px;
-        }
-
-        .bridge-name.green {
-            color: var(--accent);
-        }
-
-        .bridge-name.blue {
-            color: var(--blue);
-        }
-
-        .bridge-name.amber {
-            color: var(--amber);
-        }
-
-        .bridge-title {
-            font-size: 22px;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 14px;
-            letter-spacing: -0.3px;
-        }
-
-        .bridge-desc {
-            font-size: 15px;
-            color: var(--text-mid);
-            line-height: 1.7;
-        }
-
-        .bridge-metric {
-            margin-top: 24px;
-            padding-top: 20px;
-            border-top: 1px solid var(--border);
-            font-family: var(--mono);
-            font-size: 11px;
-            color: var(--text-dim);
+        /* ── LIVE TELEMETRY TICKER RIBBON ── */
+        .live-ribbon {
+            margin-top: 76px;
+            background: rgba(4, 11, 24, 0.9);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 8px 5vw;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-secondary);
+            overflow-x: auto;
+            white-space: nowrap;
+            gap: 20px;
         }
 
-        .bridge-metric-val {
-            font-weight: 600;
-            font-size: 13px;
+        .ribbon-pulse {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--accent-emerald-bright);
+            font-weight: 700;
         }
 
-        .bridge-metric-val.green {
-            color: var(--accent);
+        .dot-pulse {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-emerald);
+            box-shadow: 0 0 10px var(--accent-emerald);
+            animation: ping 1.8s infinite;
         }
 
-        .bridge-metric-val.blue {
-            color: var(--blue);
+        @keyframes ping {
+            0% { transform: scale(0.9); opacity: 1; }
+            50% { transform: scale(1.4); opacity: 0.6; }
+            100% { transform: scale(0.9); opacity: 1; }
         }
 
-        .bridge-metric-val.amber {
-            color: var(--amber);
-        }
-
-        .live-proof {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            padding: 30px 36px;
+        .ribbon-items {
             display: flex;
             align-items: center;
-            gap: 24px;
+            gap: 28px;
         }
 
-        .live-proof-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: var(--accent);
-            flex-shrink: 0;
-            box-shadow: 0 0 12px var(--accent);
-            animation: pulse 1.8s infinite;
+        .ribbon-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        .live-proof-text {
-            font-size: 15px;
-            color: var(--text-mid);
-            flex: 1;
-        }
-
-        .live-proof-text strong {
-            color: #fff;
-        }
-
-        .live-proof-id {
-            font-family: var(--mono);
-            font-size: 11px;
-            color: var(--accent);
-            letter-spacing: 1px;
-            padding: 8px 16px;
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            background: rgba(16, 185, 129, 0.05);
-        }
-
-        /* ── HOW IT WORKS ── */
-        #how {
-            background: rgba(255, 255, 255, 0.01);
-            border-top: 1px solid var(--border);
-        }
-
-        .steps-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
-            /* More spacing for better clarity */
-            margin-top: 40px;
-        }
-
-        .step {
-            background: rgba(12, 21, 35, 0.6);
-            /* Translucent premium feel */
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border);
-            padding: 40px 32px;
-            position: relative;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow: hidden;
-        }
-
-        .step::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background: var(--accent);
-            transform: scaleX(0);
-            transform-origin: left;
-            transition: transform 0.4s;
-        }
-
-        .step:hover {
-            transform: translateY(-8px);
-            border-color: var(--accent-glow);
-            background: rgba(16, 185, 129, 0.04);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-        }
-
-        .step:hover::after {
-            transform: scaleX(1);
-        }
-
-        .step-num {
-            font-family: var(--mono);
-            font-size: 40px;
-            font-weight: 800;
-            color: var(--accent);
-            opacity: 0.25;
-            /* More visible than before */
-            line-height: 1;
-            margin-bottom: 24px;
-            letter-spacing: -2px;
-            transition: opacity 0.3s;
-        }
-
-        .step:hover .step-num {
-            opacity: 0.6;
-        }
-
-        .step-title {
-            font-size: 18px;
+        .ribbon-val {
+            color: var(--text-primary);
             font-weight: 700;
-            color: #fff;
-            margin-bottom: 10px;
         }
 
-        .step-desc {
-            font-size: 14px;
-            color: var(--text-mid);
-            line-height: 1.65;
-        }
-
-        /* ── AI CAPABILITIES ── */
-        #capabilities {
-            border-top: 1px solid var(--border);
-        }
-
-        .cap-grid {
+        /* ── HERO SECTION ── */
+        .hero {
+            padding: 70px 5vw 90px;
+            max-width: 1440px;
+            margin: 0 auto;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 24px;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 60px;
+            align-items: center;
+            min-height: calc(100vh - 120px);
         }
 
-        .cap-card {
-            background: rgba(12, 21, 35, 0.4);
-            backdrop-filter: blur(8px);
-            border: 1px solid var(--border);
-            padding: 40px;
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            padding: 6px 14px;
+            border-radius: 100px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--accent-emerald-bright);
+            letter-spacing: 0.5px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(10px);
+        }
+
+        .hero-title {
+            font-size: clamp(38px, 4.5vw, 64px);
+            font-weight: 900;
+            line-height: 1.08;
+            letter-spacing: -1.5px;
+            margin-bottom: 24px;
+        }
+
+        .hero-title .gradient-text {
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, var(--accent-emerald) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-title .dim-text {
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .hero-description {
+            font-size: 17px;
+            color: var(--text-secondary);
+            line-height: 1.65;
+            margin-bottom: 36px;
+            max-width: 620px;
+        }
+
+        .hero-description strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .hero-ctas {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 48px;
+        }
+
+        .btn-primary-large {
+            background: linear-gradient(135deg, var(--accent-emerald) 0%, #059669 100%);
+            color: #020611;
+            padding: 16px 36px;
+            border-radius: 8px;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-decoration: none;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 30px var(--accent-emerald-glow);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-primary-large:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(16, 185, 129, 0.5);
+            filter: brightness(1.1);
+        }
+
+        .btn-secondary-large {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-medium);
+            color: var(--text-primary);
+            padding: 16px 30px;
+            border-radius: 8px;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-decoration: none;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary-large:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--accent-emerald);
+            transform: translateY(-2px);
+        }
+
+        .hero-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            padding-top: 32px;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .metric-card {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .metric-num {
+            font-family: var(--font-mono);
+            font-size: 30px;
+            font-weight: 900;
+            color: var(--accent-emerald-bright);
+            letter-spacing: -0.5px;
+        }
+
+        .metric-lbl {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ── HERO INTERACTIVE 3D DIGITAL TWIN PREVIEW ── */
+        .twin-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-medium);
+            border-radius: 16px;
+            padding: 24px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
             position: relative;
             overflow: hidden;
         }
 
-        .cap-card::before {
+        .twin-card::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
+            right: 0;
             height: 2px;
-            background: var(--accent);
-            transform: scaleX(0);
-            transform-origin: left;
-            transition: transform 0.3s;
+            background: linear-gradient(90deg, transparent, var(--accent-emerald), transparent);
         }
 
-        .cap-card:hover::before {
-            transform: scaleX(1);
-        }
-
-        .cap-card:hover {
-            border-color: var(--accent);
-            background: rgba(16, 185, 129, 0.03);
-        }
-
-        .cap-icon {
-            color: var(--accent);
-            margin-bottom: 20px;
-        }
-
-        .cap-title {
-            font-size: 17px;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 10px;
-        }
-
-        .cap-desc {
-            font-size: 14px;
-            color: var(--text-mid);
-            line-height: 1.65;
-        }
-
-        /* ── IMPACT / ESG ── */
-        #impact {
-            background: rgba(16, 185, 129, 0.02);
-            border-top: 1px solid var(--border);
-        }
-
-        .impact-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 80px;
-            align-items: center;
-        }
-
-        .impact-numbers {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2px;
-            background: var(--border);
-            border: 1px solid var(--border);
-        }
-
-        .impact-num {
-            background: var(--bg-card);
-            padding: 36px 30px;
-        }
-
-        .impact-val {
-            font-size: 48px;
-            font-weight: 800;
-            color: var(--accent);
-            letter-spacing: -2px;
-            line-height: 1;
-        }
-
-        .impact-label {
-            font-family: var(--mono);
-            font-size: 10px;
-            letter-spacing: 1.5px;
-            color: var(--text-dim);
-            margin-top: 8px;
-            text-transform: uppercase;
-        }
-
-        .impact-desc-col h2 {
-            margin-bottom: 24px;
-        }
-
-        .impact-text {
-            font-size: 17px;
-            color: var(--text-mid);
-            line-height: 1.75;
-            margin-bottom: 30px;
-        }
-
-        .tag-row {
+        .twin-header {
             display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-subtle);
         }
 
-        .tag {
-            font-family: var(--mono);
+        .twin-badge {
+            font-family: var(--font-mono);
             font-size: 10px;
-            letter-spacing: 1px;
-            padding: 7px 14px;
-            border: 1px solid var(--border);
-            color: var(--text-dim);
-            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            background: rgba(6, 182, 212, 0.1);
+            padding: 4px 10px;
+            border-radius: 4px;
+            border: 1px solid rgba(6, 182, 212, 0.25);
         }
 
-        /* ── SECTORS ── */
-        #sectors {
-            border-top: 1px solid var(--border);
-        }
-
-        .sector-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-        }
-
-        .sector-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            padding: 32px;
-            transition: 0.25s;
+        #twin-viewport {
+            width: 100%;
+            height: 360px;
+            border-radius: 8px;
+            background: radial-gradient(circle at center, #0e1e38 0%, #030814 100%);
             position: relative;
             overflow: hidden;
-        }
-
-        .sector-card:hover {
-            border-color: rgba(16, 185, 129, 0.4);
-            transform: translateY(-4px);
-        }
-
-        .sector-num {
-            font-family: var(--mono);
-            font-size: 10px;
-            color: var(--text-dim);
-            letter-spacing: 2px;
-            margin-bottom: 16px;
-        }
-
-        .sector-title {
-            font-size: 22px;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 12px;
-        }
-
-        .sector-desc {
-            font-size: 15px;
-            color: var(--text-mid);
-            line-height: 1.65;
-            margin-bottom: 28px;
-        }
-
-        .sector-tag {
-            font-family: var(--mono);
-            font-size: 10px;
-            color: var(--accent);
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            padding: 6px 12px;
-            border: 1px solid rgba(16, 185, 129, 0.25);
-            background: rgba(16, 185, 129, 0.06);
-            display: inline-block;
-        }
-
-        /* ── COMPLIANCE ── */
-        #compliance {
-            background: rgba(255, 255, 255, 0.01);
-            border-top: 1px solid var(--border);
-        }
-
-        .compliance-row {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2px;
-            background: var(--border);
-            border: 1px solid var(--border);
-        }
-
-        .compliance-item {
-            background: var(--bg-card);
-            padding: 30px 28px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .compliance-badge {
-            width: 42px;
-            height: 42px;
-            border-radius: 8px;
-            background: rgba(16, 185, 129, 0.08);
-            border: 1px solid rgba(16, 185, 129, 0.2);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--accent);
-            flex-shrink: 0;
         }
 
-        .compliance-name {
-            font-weight: 700;
-            font-size: 15px;
-            color: #fff;
-            margin-bottom: 3px;
+        .twin-overlay-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 18px;
         }
 
-        .compliance-status {
-            font-family: var(--mono);
+        .stat-pill {
+            background: rgba(2, 6, 17, 0.6);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .stat-pill-lbl {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+
+        .stat-pill-val {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        /* ── SECTION ARCHITECTURE ── */
+        .section-wrap {
+            padding: 100px 5vw;
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 760px;
+            margin: 0 auto 60px;
+        }
+
+        .section-tag {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: var(--accent-emerald-bright);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            display: inline-block;
+        }
+
+        .section-heading {
+            font-size: clamp(30px, 3.5vw, 48px);
+            font-weight: 900;
+            letter-spacing: -1px;
+            line-height: 1.15;
+            margin-bottom: 18px;
+        }
+
+        .section-subtext {
+            font-size: 16px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* ── 5 PILLARS OF INDUSTRIAL RESILIENCE ── */
+        .pillars-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .pillar-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 36px 30px;
+            backdrop-filter: blur(16px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .pillar-card:hover {
+            transform: translateY(-6px);
+            background: var(--bg-card-hover);
+            border-color: var(--accent-emerald);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(16, 185, 129, 0.15);
+        }
+
+        .pillar-icon-box {
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-emerald);
+            margin-bottom: 24px;
+        }
+
+        .pillar-num {
+            position: absolute;
+            top: 24px;
+            right: 28px;
+            font-family: var(--font-mono);
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-muted);
+            opacity: 0.4;
+        }
+
+        .pillar-title {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+            margin-bottom: 12px;
+        }
+
+        .pillar-body {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .pillar-tag {
+            font-family: var(--font-mono);
             font-size: 10px;
-            color: var(--accent);
+            font-weight: 700;
+            color: var(--accent-emerald-bright);
+            background: rgba(16, 185, 129, 0.08);
+            padding: 4px 10px;
+            border-radius: 4px;
+            align-self: flex-start;
+        }
+
+        /* ── INTERACTIVE DUST & PHYSICS SIMULATOR ── */
+        .simulator-box {
+            background: linear-gradient(135deg, rgba(8, 18, 38, 0.85) 0%, rgba(3, 9, 20, 0.95) 100%);
+            border: 1px solid var(--border-medium);
+            border-radius: 20px;
+            padding: 48px;
+            backdrop-filter: blur(24px);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            align-items: center;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+        }
+
+        .sim-control-group {
+            margin-bottom: 28px;
+        }
+
+        .sim-control-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .sim-slider {
+            width: 100%;
+            height: 6px;
+            -webkit-appearance: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            outline: none;
+        }
+
+        .sim-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent-emerald);
+            box-shadow: 0 0 12px var(--accent-emerald);
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .sim-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .sim-output-card {
+            background: rgba(2, 6, 17, 0.7);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 28px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .sim-metric {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .sim-metric-lbl {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--text-muted);
             letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .sim-metric-val {
+            font-family: var(--font-mono);
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--text-primary);
+        }
+
+        /* ── ENTERPRISE COMPLIANCE & STANDARDS ── */
+        .compliance-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .comp-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 24px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .comp-card:hover {
+            border-color: var(--accent-emerald);
+            transform: translateY(-3px);
+        }
+
+        .comp-name {
+            font-family: var(--font-mono);
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .comp-status {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--accent-emerald);
+            background: rgba(16, 185, 129, 0.08);
+            padding: 3px 8px;
+            border-radius: 4px;
+            display: inline-block;
         }
 
         /* ── FOOTER ── */
         footer {
-            padding: 80px 10% 40px;
-            border-top: 1px solid var(--border);
-            background: #000;
+            background: #01040a;
+            border-top: 1px solid var(--border-subtle);
+            padding: 60px 5vw 40px;
+            margin-top: 100px;
         }
 
-        .footer-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            margin-bottom: 60px;
-            gap: 40px;
-            flex-wrap: wrap;
-        }
-
-        .footer-copy {
-            font-family: var(--mono);
-            font-size: 10px;
-            color: var(--text-dim);
-            letter-spacing: 1px;
-            padding-top: 30px;
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .footer-desc {
-            font-size: 14px;
-            color: var(--text-dim);
-            max-width: 360px;
-            line-height: 1.8;
-        }
-
-        /* ── DUAL CORE INTEL VISUAL ── */
-        .intel-showcase {
+        .footer-grid {
+            max-width: 1440px;
+            margin: 0 auto;
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            max-width: 1200px;
-            margin: 0 auto 80px auto;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 60px;
+            margin-bottom: 50px;
         }
 
-        .intel-card {
-            background: rgba(12, 21, 35, 0.4);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 24px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .intel-card:hover {
-            border-color: var(--accent);
-            background: rgba(16, 185, 129, 0.04);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
-            transform: translateY(-5px);
-        }
-
-        .intel-img-wrapper {
-            position: relative;
-            border-radius: 10px;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            margin-bottom: 24px;
-        }
-
-        .intel-img {
-            display: block;
-            width: 100%;
-            height: auto;
-            aspect-ratio: 16/9;
-            object-fit: cover;
-            transition: transform 0.5s ease;
-        }
-
-        .intel-card:hover .intel-img {
-            transform: scale(1.03);
-        }
-
-        .intel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .intel-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--text);
-            margin-bottom: 8px;
-        }
-
-        .intel-desc {
+        .footer-brand p {
             font-size: 14px;
-            color: var(--text-mid);
+            color: var(--text-secondary);
             line-height: 1.6;
+            margin-top: 14px;
+            max-width: 380px;
         }
 
-        .intel-badge {
-            font-family: var(--mono);
-            font-size: 10px;
-            padding: 6px 12px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 6px;
-            color: var(--text-mid);
-            letter-spacing: 1px;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
+        .footer-col h4 {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            color: var(--text-primary);
+            text-transform: uppercase;
             margin-bottom: 20px;
         }
 
-        .intel-badge.active {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--accent);
-            border: 1px solid rgba(16, 185, 129, 0.3);
+        .footer-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.2s;
+        }
 
-        /* ── MOBILE RESPONSIVE ── */
+        .footer-links a:hover {
+            color: var(--accent-emerald);
+        }
+
+        .footer-bottom {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+
+        /* ── RESPONSIVE ADAPTATIONS ── */
+        @media (max-width: 1024px) {
+            .hero { grid-template-columns: 1fr; gap: 40px; text-align: center; }
+            .hero-description { margin: 0 auto 36px; }
+            .hero-ctas { justify-content: center; }
+            .hero-metrics { justify-content: center; }
+            .pillars-grid { grid-template-columns: repeat(2, 1fr); }
+            .simulator-box { grid-template-columns: 1fr; }
+            .compliance-grid { grid-template-columns: repeat(2, 1fr); }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+        }
+
         @media (max-width: 768px) {
-            nav {
-                padding: 15px 20px;
-                flex-wrap: wrap;
-                gap: 15px;
-            }
-
-            .nav-links {
-                display: none;
-                /* Hidden on mobile to save space */
-            }
-
-            .hero {
-                padding: 120px 20px 60px;
-            }
-
-            h1 {
-                font-size: clamp(40px, 11vw, 60px);
-                line-height: 1.05;
-            }
-
-            h1 .dim {
-                font-size: 0.75em;
-                margin-top: 8px;
-            }
-
-            .hero-sub {
-                font-size: 16px;
-                margin-bottom: 30px;
-            }
-
-            .hero-actions {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 15px;
-            }
-
-            .btn-primary {
-                text-align: center;
-                padding: 16px 20px;
-            }
-
-            .btn-secondary {
-                justify-content: center;
-            }
-
-            .hero-stats {
-                flex-direction: column;
-                margin-top: 50px;
-            }
-
-            .hstat {
-                border-right: none !important;
-                border-left: none !important;
-                border-bottom: 1px solid var(--border);
-                padding: 24px 20px;
-            }
-
-            .hstat:last-child {
-                border-bottom: none;
-            }
-
-            section {
-                padding: 70px 20px;
-            }
-
-            h2 {
-                font-size: 32px;
-            }
-
-            .section-intro {
-                font-size: 16px;
-                margin-bottom: 40px;
-            }
-
-            .intel-showcase {
-                grid-template-columns: 1fr;
-            }
-
-            #impact>div {
-                grid-template-columns: 1fr !important;
-                gap: 40px !important;
-            }
-
-            .impact-numbers {
-                grid-template-columns: 1fr;
-            }
-
-            .bridges-grid,
-            .cap-grid,
-            .sector-grid,
-            .compliance-row {
-                grid-template-columns: 1fr !important;
-            }
-
-            .footer-top {
-                flex-direction: column;
-                gap: 30px;
-            }
+            nav { padding: 14px 4vw; }
+            .nav-menu { display: none; }
+            .pillars-grid { grid-template-columns: 1fr; }
+            .compliance-grid { grid-template-columns: 1fr; }
+            .footer-grid { grid-template-columns: 1fr; }
+            .footer-bottom { flex-direction: column; gap: 14px; text-align: center; }
         }
     </style>
 </head>
 
 <body>
-
+    <!-- Background Canvas -->
     <canvas id="bg-canvas"></canvas>
 
-    <!-- ── NAVIGATION ── -->
-    <nav>
-        <a href="#" class="brand">
-            <div class="brand-hex"></div>
-            SAHARYN <span>AI</span>
-        </a>
-        <div class="nav-links">
-            <a href="#" data-i18n="nav_home">HOME</a>
-            <a href="#satellites" data-i18n="nav_how">HOW IT WORKS</a>
-            <a href="#capabilities" data-i18n="nav_cap">CAPABILITIES</a>
-            <a href="#impact" data-i18n="nav_impact">IMPACT</a>
-            <a href="#sectors" data-i18n="nav_sec">SECTORS</a>
-            <a href="#how" data-i18n="nav_tech">TECHNOLOGY</a>
-            <button id="lang-toggle-btn" onclick="window.toggleLanguage()"
-                style="background:none;border:none;color:var(--text-dim);font-family:var(--mono);font-size:11px;cursor:pointer;letter-spacing:1px;padding: 10px;">EN
-                / عربي</button>
-            <div class="nav-cta" id="login-btn" style="cursor:pointer;" data-i18n="nav_cta">Sign In / Sign Up</div>
+    <div class="content-layer">
+        <!-- Main Navigation Bar -->
+        <nav id="main-nav">
+            <a href="index.html" class="brand-wrapper">
+                <div class="brand-emblem"></div>
+                <div class="brand-text">SAHARYN <span>AI CORE</span></div>
+            </a>
 
-            <!-- User Profile Dropdown (Hidden initially) -->
-            <div class="user-dropdown" id="user-profile" style="display: none;">
-                <div class="user-avatar" id="landing-avatar">
-                    <i data-lucide="user" size="18" color="var(--accent)"></i>
-                </div>
-                <div class="dropdown-menu" id="landing-menu">
-                    <div class="user-info-header">
-                        <span class="user-name-label" id="landing-user-name">Guest User</span>
-                        <span class="user-email-label" id="landing-user-email">Not Signed In</span>
-                    </div>
-                    <a href="console.html" class="dropdown-item">
-                        <i data-lucide="gauge" size="14"></i>
-                        Open Mission Control
-                    </a>
-                    <a href="console.html#settings" class="dropdown-item">
-                        <i data-lucide="settings" size="14"></i>
-                        Settings
-                    </a>
-                    <div class="dropdown-item sign-out" id="landing-logout-btn">
-                        <i data-lucide="log-out" size="14"></i>
-                        Sign Out
-                    </div>
-                </div>
-            </div>
+            <ul class="nav-menu">
+                <li><a href="#how-it-works" class="nav-link" data-i18n="nav_how">HOW IT WORKS</a></li>
+                <li><a href="#pillars" class="nav-link" data-i18n="nav_cap">CAPABILITIES</a></li>
+                <li><a href="#simulator" class="nav-link" data-i18n="nav_sim">PHYSICS SIMULATOR</a></li>
+                <li><a href="about.html" class="nav-link" data-i18n="nav_tech">TECHNICAL WHITEPAPER</a></li>
+                <li><a href="/v2/docs" class="nav-link" target="_blank">API DOCS</a></li>
+            </ul>
 
-        </div>
-    </nav>
-
-    <!-- ── HERO ── -->
-    <header class="hero">
-
-        <h1 data-i18n="hero_h1">Predict Failures<br><span class="dim">before they happen.</span></h1>
-        <p class="hero-sub" data-i18n="hero_sub">
-            <strong>SAHARYN AI</strong> combines <strong>satellite intelligence</strong> with
-            <strong>industrial telemetry</strong> to detect <strong>environmental stress</strong> and predict equipment
-            failures before they occur. By monitoring dust, wind, temperature, vibration, and pressure signals, the
-            platform alerts operators up to <strong>48 hours</strong> before a potential failure.
-        </p>
-        <div class="hero-actions">
-            <a href="console.html" class="btn-primary" data-i18n="hero_cta">Open Mission Control</a>
-
-        </div>
-        <div class="hero-stats">
-            <div class="hstat">
-                <div class="hstat-val">48h</div>
-                <div class="hstat-label" data-i18n="stat_warning">Average Early Warning</div>
-            </div>
-            <div class="hstat">
-                <div class="hstat-val">3</div>
-                <div class="hstat-label" data-i18n="stat_sat">Satellite Data Sources</div>
-            </div>
-            <div class="hstat">
-                <div class="hstat-val">92%</div>
-                <div class="hstat-label" data-i18n="stat_prev">Model Confidence</div>
-            </div>
-            <div class="hstat">
-                <div class="hstat-val">99.9%</div>
-                <div class="hstat-label" data-i18n="stat_uptime">System Uptime</div>
-            </div>
-            <div class="hstat">
-                <div class="hstat-val">Live</div>
-                <div class="hstat-label" data-i18n="stat_sync">Sovereign Link</div>
-            </div>
-        </div>
-    </header>
-
-    <!-- ── SATELLITE BRIDGES ── -->
-    <section id="satellites">
-        <div class="section-label" data-i18n="sat_label">Real-Time Data Sources</div>
-        <h2 data-i18n="sat_title">We watch your assets<br>from space.</h2>
-        <p class="section-intro" data-i18n="sat_intro">
-            We don't rely on local weather reports or ground sensors alone.
-            SAHARYN maintains three continuously active uplinks to the world's most trusted satellite agencies —
-            giving you environmental intelligence that simply cannot be gathered any other way.
-        </p>
-
-        <!-- DUAL CORE INTEL VISUAL -->
-        <div class="intel-showcase">
-            <div class="intel-card">
-                <div class="intel-badge">RAW OPTICAL // 10m BASELINE</div>
-                <div class="intel-img-wrapper">
-                    <img src="images/facility_base.jpg" class="intel-img" alt="Base Industrial Site">
-                </div>
-                <div class="intel-title">Surface Infrastructure</div>
-                <div class="intel-desc">
-                    Standard high-resolution visual telemetry captures ground operations, providing the physical
-                    substrate for mapping.
-                </div>
-            </div>
-            <div class="intel-card">
-                <div class="intel-badge active">
-                    <i data-lucide="zap" size="12"></i> OVERLAY ACTIVATED
-                </div>
-                <div class="intel-img-wrapper">
-                    <img src="images/facility_scanned.jpg" class="intel-img" alt="Intelligence Overlay">
-                </div>
-                <div class="intel-title">Environmental Stress Manifold</div>
-                <div class="intel-desc">
-                    Multi-spectral data fusion reveals invisible stressors (thermal gradients, dust density, and
-                    vibration nodes) in real-time.
-                </div>
-            </div>
-        </div>
-
-        <div class="bridges-grid">
-            <!-- NASA MODIS -->
-            <div class="bridge-card">
-                <div class="bridge-icon green">
-                    <i data-lucide="satellite" size="20"></i>
-                </div>
-                <div class="bridge-name green" data-i18n="bridge_01_name">Bridge 01 — NASA MODIS</div>
-                <div class="bridge-title" data-i18n="bridge_01_title">Aerosol Tracking</div>
-                <div class="bridge-desc" data-i18n="bridge_01_desc">
-                    Tracks Aerosol Optical Depth (AOD) to measure dust concentration above industrial sites.
-                </div>
-                <div class="bridge-metric">
-                    <span data-i18n="data_product">DATA PRODUCT</span>
-                    <span class="bridge-metric-val green">MOD04_L2 / MOD08_D3</span>
-                </div>
-            </div>
-
-            <!-- ESA Sentinel-2 -->
-            <div class="bridge-card">
-                <div class="bridge-icon blue">
-                    <i data-lucide="scan-eye" size="20"></i>
-                </div>
-                <div class="bridge-name blue" data-i18n="bridge_02_name">Bridge 02 — ESA Sentinel-2</div>
-                <div class="bridge-title" data-i18n="bridge_02_title">Plume Detection</div>
-                <div class="bridge-desc" data-i18n="bridge_02_desc">
-                    Detects dust plumes and land surface signatures using multi-spectral imaging.
-                </div>
-                <div class="bridge-metric">
-                    <span data-i18n="resolution">RESOLUTION</span>
-                    <span class="bridge-metric-val blue">10-metre precision</span>
-                </div>
-            </div>
-
-            <!-- Copernicus CAMS -->
-            <div class="bridge-card">
-                <div class="bridge-icon amber">
-                    <i data-lucide="wind" size="20"></i>
-                </div>
-                <div class="bridge-name amber" data-i18n="bridge_03_name">Bridge 03 — Copernicus CAMS</div>
-                <div class="bridge-title" data-i18n="bridge_03_title">Atmospheric Forecasts</div>
-                <div class="bridge-desc" data-i18n="bridge_03_desc">
-                    Provides atmospheric forecasts including wind speed, humidity, and temperature used to model
-                    environmental stress.
-                </div>
-                <div class="bridge-metric">
-                    <span data-i18n="standard">STANDARD</span>
-                    <span class="bridge-metric-val amber">ISO 14064-3 / GHG Protocol</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Live proof bar -->
-        <div class="live-proof">
-            <div class="live-proof-dot"></div>
-            <div class="live-proof-text" data-i18n="live_proof">
-                These data streams are fused to produce the Dust Severity Index (DSI) for operational intelligence.
-            </div>
-            <div
-                style="font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: 1px; padding: 8px 16px; border: 1px solid rgba(16,185,129,0.3); background: rgba(16,185,129,0.05); display: flex; align-items: center; gap: 8px; white-space: nowrap;">
-                <i data-lucide="check-circle" size="14"></i>
-                <span data-i18n="bridge_status_live">BRIDGE STATUS: LIVE</span>
-            </div>
-        </div>
-    </section>
-
-    <!-- ── HOW IT WORKS ── -->
-    <section id="how">
-        <div class="section-label" data-i18n="how_label">The Process</div>
-        <h2 data-i18n="how_title">From satellite to action<br>in under one second.</h2>
-        <p class="section-intro" data-i18n="how_intro">
-            SAHARYN does not just collect data — it makes decisions. Here is exactly what happens from the moment a
-            satellite captures a reading to the moment your operations team receives an alert.
-        </p>
-        <div class="steps-grid">
-            <div class="step">
-                <div class="step-num">01</div>
-                <div class="step-title" data-i18n="step_01_title">Satellite Observation</div>
-                <div class="step-desc" data-i18n="step_01_desc">NASA and ESA satellites record atmospheric conditions —
-                    AOD, wind, temperature, and dust plume signatures across your site.</div>
-            </div>
-            <div class="step">
-                <div class="step-num">02</div>
-                <div class="step-title" data-i18n="step_02_title">Environmental Stress Modeling</div>
-                <div class="step-desc" data-i18n="step_02_desc">Individual streams are fused using physics-based
-                    modeling to create a localized Dust Severity Index (DSI).</div>
-            </div>
-            <div class="step">
-                <div class="step-num">03</div>
-                <div class="step-title" data-i18n="step_03_title">Industrial Telemetry Analysis</div>
-                <div class="step-desc" data-i18n="step_03_desc">Causal models map environmental stressors against
-                    real-time mechanical vibration and performance telemetry.</div>
-            </div>
-            <div class="step">
-                <div class="step-num">04</div>
-                <div class="step-title" data-i18n="step_04_title">Predictive Failure Detection</div>
-                <div class="step-desc" data-i18n="step_04_desc">The system identifies risk patterns and generates
-                    precise operational recommendations for maintenance teams.</div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ── AI CAPABILITIES ── -->
-    <section id="capabilities">
-        <div class="section-label" data-i18n="cap_label">Core AI Modules</div>
-        <h2 data-i18n="cap_title">Six engines running<br>for your operations.</h2>
-        <p class="section-intro" data-i18n="cap_intro">Each module is independently validated and can be deployed
-            individually or as an
-            integrated stack.</p>
-
-        <div class="cap-grid">
-            <div class="cap-card">
-                <div class="cap-icon"><i data-lucide="satellite" size="28"></i></div>
-                <div class="cap-title" data-i18n="cap_01_title">Satellite Data Fusion</div>
-                <div class="cap-desc" data-i18n="cap_01_desc">Continuous integration of NASA MODIS, ESA Sentinel-2, and
-                    Copernicus CAMS into a unified environmental intelligence layer.</div>
-            </div>
-            <div class="cap-card">
-                <div class="cap-icon"><i data-lucide="activity" size="28"></i></div>
-                <div class="cap-title" data-i18n="cap_02_title">3D Asset Stress Mapping</div>
-                <div class="cap-desc" data-i18n="cap_02_desc">Real-time structural health analysis visualizing thermal,
-                    vibration, and abrasive stress across all documented assets.</div>
-            </div>
-            <div class="cap-card">
-                <div class="cap-icon"><i data-lucide="git-branch" size="28"></i></div>
-                <div class="cap-title" data-i18n="cap_03_title">Causal Failure Tracking</div>
-                <div class="cap-desc" data-i18n="cap_03_desc">Bayesian networks identify root causes across dependency
-                    chains, filtering noise from true mechanical degradation.</div>
-            </div>
-            <div class="cap-card">
-                <div class="cap-icon"><i data-lucide="zap" size="28"></i></div>
-                <div class="cap-title" data-i18n="cap_04_title">Prescriptive Optimizer</div>
-                <div class="cap-desc" data-i18n="cap_04_desc">Generates ranked maintenance actions with ROI estimates
-                    and averted downtime cost analysis.</div>
-            </div>
-            <div class="cap-card">
-                <div class="cap-icon"><i data-lucide="leaf" size="28"></i></div>
-                <div class="cap-title" data-i18n="cap_05_title">Carbon Impact Ledger</div>
-                <div class="cap-desc" data-i18n="cap_05_desc">Efficiency improvements are recorded as measurable
-                    emission reductions, aligned with standard environmental accounting frameworks.</div>
-            </div>
-            <div class="cap-card">
-                <div class="cap-icon"><i data-lucide="shield-check" size="28"></i></div>
-                <div class="cap-title" data-i18n="cap_06_title">Sovereign Edge Mode</div>
-                <div class="cap-desc" data-i18n="cap_06_desc">High-security mode for sensitive sites, operating entirely
-                    on local encrypted edge clusters without cloud reliance.</div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ── IMPACT / ESG ── -->
-    <section id="impact">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;">
-            <div class="impact-numbers">
-                <div class="impact-num">
-                    <div class="impact-val" id="aod-live">—</div>
-                    <div class="impact-label" data-i18n="label_aod">Live AOD (NASA MODIS)</div>
-                </div>
-                <div class="impact-num">
-                    <div class="impact-val" id="ddi-live">—</div>
-                    <div class="impact-label" data-i18n="label_ddi">Dust Detection Index (ESA)</div>
-                </div>
-                <div class="impact-num">
-                    <div class="impact-val">99.9%</div>
-                    <div class="impact-label" data-i18n="label_uptime">Reliability Commitment</div>
-                </div>
-                <div class="impact-num">
-                    <div class="impact-val">92%</div>
-                    <div class="impact-label" data-i18n="label_conf">Confidence Score</div>
-                </div>
-            </div>
-            <div class="impact-desc-col">
-                <div class="section-label" data-i18n="impact_label">Verified Environmental Impact</div>
-                <h2 data-i18n="impact_title">Operations that<br>pay for themselves.</h2>
-                <p class="impact-text" data-i18n="impact_desc_01">
-                    Operational efficiency improvements may contribute to measurable emission reductions, which can be
-                    reported under standard environmental accounting frameworks.
-                </p>
-                <p class="impact-text" data-i18n="impact_desc_02">
-                    Designed in alignment with GHG Protocol and ISO 14064-3.
-                </p>
-                <div class="tag-row">
-                    <span class="tag">GHG Protocol</span>
-                    <span class="tag">ISO 14064-3</span>
-                    <span class="tag">Gold Standard</span>
-                    <span class="tag">SDAIA Compliant</span>
-                    <span class="tag">SOC2 Type II</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ── SECTORS ── -->
-    <section id="sectors">
-        <div class="section-label" data-i18n="sectors_label">Where We Operate</div>
-        <h2 data-i18n="sectors_title">Built for the harshest<br>environments on Earth.</h2>
-        <p class="section-intro" data-i18n="sectors_intro">
-            SAHARYN was designed specifically for the challenges of Gulf and Middle Eastern industrial operations —
-            extreme heat, abrasive sand, salt corrosion, and the regulatory requirements of Vision 2030 and NEOM.
-        </p>
-        <div class="sector-grid">
-            <div class="sector-card">
-                <div class="sector-num" data-i18n="sector_01_name">SECTOR_01</div>
-                <div class="sector-title" data-i18n="sector_01_title">Energy and Power Infrastructure</div>
-                <div class="sector-desc" data-i18n="sector_01_desc">Protecting transmission lines, turbines, and solar
-                    arrays from thermal stress and salt corrosion.</div>
-                <span class="sector-tag" data-i18n="sector_01_tag">Grid Resilience</span>
-            </div>
-            <div class="sector-card">
-                <div class="sector-num" data-i18n="sector_02_name">SECTOR_02</div>
-                <div class="sector-title" data-i18n="sector_02_title">Oil and Gas Operations</div>
-                <div class="sector-desc" data-i18n="sector_02_desc">Monitoring structural integrity for compressors,
-                    pumps, and drilling infrastructure in real-time.</div>
-                <span class="sector-tag" data-i18n="sector_02_tag">Predictive Integrity</span>
-            </div>
-            <div class="sector-card">
-                <div class="sector-num" data-i18n="sector_03_name">SECTOR_03</div>
-                <div class="sector-title" data-i18n="sector_03_title">Mining and Heavy Industry</div>
-                <div class="sector-desc" data-i18n="sector_03_desc">Predictive maintenance for deep mine ventilation and
-                    heavy machinery in high-dust environments.</div>
-                <span class="sector-tag" data-i18n="sector_03_tag">Dust Mitigation</span>
-            </div>
-        </div>
-    </section>
-
-    <!-- ── COMPLIANCE ── -->
-    <section id="compliance">
-        <div class="section-label" data-i18n="comp_label">Standards & Certifications</div>
-        <h2 data-i18n="comp_title">Enterprise-grade.<br>Audit-ready.</h2>
-        <p class="section-intro" data-i18n="comp_intro">SAHARYN is built to the highest international standards for
-            security, AI ethics, and
-            environmental accounting.</p>
-        <div class="compliance-row">
-            <div class="compliance-item">
-                <div class="compliance-badge"><i data-lucide="shield-check" size="18"></i></div>
-                <div>
-                    <div class="compliance-name">ISO 27001</div>
-                    <div class="compliance-status" data-i18n="comp_01_status">Designed for Alignment — Info Sec</div>
-                </div>
-            </div>
-            <div class="compliance-item">
-                <div class="compliance-badge"><i data-lucide="cpu" size="18"></i></div>
-                <div>
-                    <div class="compliance-name">SOC 2 Type II</div>
-                    <div class="compliance-status" data-i18n="comp_02_status">Best Practices — Data Security</div>
-                </div>
-            </div>
-            <div class="compliance-item">
-                <div class="compliance-badge"><i data-lucide="landmark" size="18"></i></div>
-                <div>
-                    <div class="compliance-name">Data Privacy</div>
-                    <div class="compliance-status" data-i18n="comp_03_status">Regulatory Alignment</div>
-                </div>
-            </div>
-            <div class="compliance-item">
-                <div class="compliance-badge"><i data-lucide="leaf" size="18"></i></div>
-                <div>
-                    <div class="compliance-name">GHG Protocol</div>
-                    <div class="compliance-status" data-i18n="comp_04_status">Environmental Accounting</div>
-                </div>
-            </div>
-            <div class="compliance-item">
-                <div class="compliance-badge"><i data-lucide="lock" size="18"></i></div>
-                <div>
-                    <div class="compliance-name">ISO 14064-3</div>
-                    <div class="compliance-status" data-i18n="comp_05_status">Carbon Tracking Standard</div>
-                </div>
-            </div>
-            <div class="compliance-item">
-                <div class="compliance-badge"><i data-lucide="globe" size="18"></i></div>
-                <div>
-                    <div class="compliance-name">ESG Framework</div>
-                    <div class="compliance-status" data-i18n="comp_06_status">Compliance Ready</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ── FOOTER ── -->
-    <footer>
-        <div class="footer-top">
-            <div>
-                <a href="#" class="brand" style="margin-bottom: 20px; display: inline-flex;">
-                    <div class="brand-hex"></div>
-                    SAHARYN <span>AI</span>
+            <div class="nav-actions">
+                <button onclick="toggleLang()" class="btn-lang" id="lang-btn">عربي / EN</button>
+                <a href="console.html" class="btn-launch" id="nav-cta-btn">
+                    <i data-lucide="terminal" size="14"></i>
+                    <span data-i18n="nav_cta">MISSION CONTROL</span>
                 </a>
-                <p class="footer-desc" data-i18n="footer_desc">
-                    SAHARYN AI provides industrial environmental intelligence and predictive maintenance for large-scale
-                    energy and infrastructure sites in harsh desert environments.
+            </div>
+        </nav>
+
+        <!-- Live Telemetry Stream Ticker -->
+        <div class="live-ribbon">
+            <div class="ribbon-pulse">
+                <span class="dot-pulse"></span>
+                <span data-i18n="live_stream_status">LIVE SPACE AGENCY FUSION: ACTIVE</span>
+            </div>
+            <div class="ribbon-items">
+                <div class="ribbon-item">
+                    <span>NASA TERRA AOD:</span>
+                    <span class="ribbon-val" id="ticker-aod">0.822</span>
+                </div>
+                <div class="ribbon-item">
+                    <span>COPERNICUS TEMP:</span>
+                    <span class="ribbon-val" id="ticker-temp">45.2 °C</span>
+                </div>
+                <div class="ribbon-item">
+                    <span>WIND VECTOR:</span>
+                    <span class="ribbon-val" id="ticker-wind">18.2 m/s</span>
+                </div>
+                <div class="ribbon-item">
+                    <span>SENTINEL-2 DDI:</span>
+                    <span class="ribbon-val" id="ticker-ddi">0.04 DDI</span>
+                </div>
+                <div class="ribbon-item">
+                    <span>STABILITY INDEX:</span>
+                    <span class="ribbon-val" style="color: var(--accent-emerald-bright);" id="ticker-gsi">94.2%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- HERO SECTION -->
+        <header class="hero">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <i data-lucide="satellite" size="14"></i>
+                    <span data-i18n="hero_badge">NASA & ESA COPERNICUS ATMOSPHERIC BRIDGE</span>
+                </div>
+
+                <h1 class="hero-title">
+                    <span class="gradient-text" data-i18n="hero_h1_lead">Predict High-Consequence Failures</span><br>
+                    <span class="dim-text" data-i18n="hero_h1_sub">before harsh desert impacts occur.</span>
+                </h1>
+
+                <p class="hero-description" data-i18n="hero_desc">
+                    <strong>SAHARYN AI</strong> combines <strong>space-borne satellite intelligence</strong> with <strong>physics-informed causal mechanics</strong> to monitor sandstorms, thermal decay, and abrasion—predicting industrial asset failures up to <strong>48 hours in advance</strong> across Saudi Arabia and the Middle East.
                 </p>
-                <div style="margin-top: 15px; font-family: var(--mono); font-size: 11px;">
-                    <span style="color: var(--text-dim);">CONTACT:</span> <a href="mailto:info@niluslab.com"
-                        style="color: var(--accent); text-decoration: none;">info@niluslab.com</a>
+
+                <div class="hero-ctas">
+                    <a href="console.html" class="btn-primary-large">
+                        <i data-lucide="shield-alert" size="18"></i>
+                        <span data-i18n="hero_cta_primary">Launch Mission Control</span>
+                    </a>
+                    <a href="about.html" class="btn-secondary-large">
+                        <i data-lucide="file-text" size="18"></i>
+                        <span data-i18n="hero_cta_secondary">View Architecture Proof</span>
+                    </a>
+                </div>
+
+                <div class="hero-metrics">
+                    <div class="metric-card">
+                        <div class="metric-num">48h</div>
+                        <div class="metric-lbl" data-i18n="m_lead">Early Warning Window</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-num">0.42ms</div>
+                        <div class="metric-lbl" data-i18n="m_latency">Causal Inference Cycle</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-num">$660K+</div>
+                        <div class="metric-lbl" data-i18n="m_savings">Avg Avoided Downtime Loss</div>
+                    </div>
                 </div>
             </div>
-            <div>
-                <a href="console.html" class="btn-primary" style="display:inline-block; margin-bottom: 16px;"
-                    data-i18n="nav_cta">Sign In / Sign Up</a>
-                <div
-                    style="font-family: var(--mono); font-size: 10px; color: var(--text-dim); letter-spacing: 1px; text-align: center;">
-                    AUTH: <span id="system-status" style="color: var(--accent);">CHECKING...</span>
+
+            <!-- Interactive 3D Digital Twin Visualizer -->
+            <div class="twin-card">
+                <div class="twin-header">
+                    <div>
+                        <div style="font-weight: 800; font-size: 14px;">DIGITAL TWIN RESILIENCE MAP</div>
+                        <div style="font-family: var(--font-mono); font-size: 10px; color: var(--text-muted);">SITE: SA_EAST_RU_01 (HARSH DESERT)</div>
+                    </div>
+                    <div class="twin-badge">PHYSICS ACTIVE</div>
+                </div>
+
+                <div id="twin-viewport">
+                    <!-- Three.js Canvas Renders Here -->
+                </div>
+
+                <div class="twin-overlay-stats">
+                    <div class="stat-pill">
+                        <span class="stat-pill-lbl">AEROSOL OPTICAL DEPTH</span>
+                        <span class="stat-pill-val" style="color: var(--accent-emerald-bright);" id="card-aod">0.45 AOD</span>
+                    </div>
+                    <div class="stat-pill">
+                        <span class="stat-pill-lbl">SURFACE TEMPERATURE</span>
+                        <span class="stat-pill-val" style="color: var(--accent-amber);" id="card-temp">45.0 °C</span>
+                    </div>
+                    <div class="stat-pill">
+                        <span class="stat-pill-lbl">RUL ESTIMATION</span>
+                        <span class="stat-pill-val" style="color: #60a5fa;" id="card-rul">919 HRS</span>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="footer-copy">
-            <span data-i18n="copyright">© 2026 SAHARYN AI INDUSTRIAL SYSTEMS — ALL RIGHTS RESERVED</span>
-            <span id="footer-clock" style="color: var(--accent);"></span>
-        </div>
-    </footer>
+        </header>
 
+        <!-- 5 SOVEREIGN PILLARS OF INDUSTRIAL AI -->
+        <section class="section-wrap" id="pillars">
+            <div class="section-header">
+                <div class="section-tag" data-i18n="tag_capabilities">ENGINEERING ADVANTAGE</div>
+                <h2 class="section-heading" data-i18n="pillars_heading">5 Sovereign Mechanisms of Action</h2>
+                <p class="section-subtext" data-i18n="pillars_sub">
+                    Eliminating the "black-box" dilemma of standard machine learning through verifiable physics and mathematical proof.
+                </p>
+            </div>
 
+            <div class="pillars-grid">
+                <!-- Pillar 1 -->
+                <div class="pillar-card">
+                    <div>
+                        <span class="pillar-num">01</span>
+                        <div class="pillar-icon-box"><i data-lucide="satellite" size="24"></i></div>
+                        <h3 class="pillar-title" data-i18n="p1_title">Satellite Atmospheric Fusion</h3>
+                        <p class="pillar-body" data-i18n="p1_body">Direct programmatic ingestion of NASA MODIS (MOD04_L2) and Copernicus Sentinel-2/CAMS. Real-time mapping of particle diameter, AOD, and kinetic dust momentum before contact.</p>
+                    </div>
+                    <div class="pillar-tag">NASA & ESA LIVE INGESTION</div>
+                </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
-    <script type="module">
-        // ── Three.js Background ──
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, innerWidth / innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), antialias: true, alpha: true });
-        renderer.setSize(innerWidth, innerHeight);
-        const geo = new THREE.PlaneGeometry(1200, 1200, 60, 60);
-        const mat = new THREE.MeshBasicMaterial({ color: 0x10b981, wireframe: true, transparent: true, opacity: 0.07 });
-        const mesh = new THREE.Mesh(geo, mat);
-        mesh.rotation.x = -Math.PI / 2.5;
-        mesh.position.y = -200;
-        const pos = geo.attributes.position;
-        for (let i = 0; i < pos.count; i++) {
-            pos.setZ(i, (Math.sin(pos.getX(i) / 50) * Math.cos(pos.getY(i) / 50) * 40) + Math.random() * 4);
-        }
-        scene.add(mesh); camera.position.z = 450;
-        let tx = 0, ty = 0;
-        document.addEventListener('mousemove', e => { tx = (e.clientX - innerWidth / 2) / 1200; ty = (e.clientY - innerHeight / 2) / 1200; });
-        (function anim() {
-            requestAnimationFrame(anim);
-            mesh.rotation.z += 0.0004;
-            camera.position.x += (tx * 80 - camera.position.x) * 0.04;
-            camera.position.y += (-ty * 80 - camera.position.y) * 0.04;
-            camera.lookAt(0, -100, 0);
-            renderer.render(scene, camera);
+                <!-- Pillar 2 -->
+                <div class="pillar-card">
+                    <div>
+                        <span class="pillar-num">02</span>
+                        <div class="pillar-icon-box"><i data-lucide="cpu" size="24"></i></div>
+                        <h3 class="pillar-title" data-i18n="p2_title">Physics-Informed Digital Twins</h3>
+                        <p class="pillar-body" data-i18n="p2_body">Solving boundary condition Navier-Stokes and Arrhenius chemical degradation equations in real time. Accurately modeling abrasion kinetics and structural thermal stress.</p>
+                    </div>
+                    <div class="pillar-tag">PINNs & ARRHENIUS DECAY</div>
+                </div>
+
+                <!-- Pillar 3 -->
+                <div class="pillar-card">
+                    <div>
+                        <span class="pillar-num">03</span>
+                        <div class="pillar-icon-box"><i data-lucide="git-branch" size="24"></i></div>
+                        <h3 class="pillar-title" data-i18n="p3_title">Explainable Causal Manifold</h3>
+                        <p class="pillar-body" data-i18n="p3_body">A strict 11-node Directed Acyclic Graph (DAG) enforcing anti-hallucination. Every failure forecast generates a step-by-step cryptographic causal chain from weather trigger to asset outcome.</p>
+                    </div>
+                    <div class="pillar-tag">IEEE 1232 COMPLIANT</div>
+                </div>
+
+                <!-- Pillar 4 -->
+                <div class="pillar-card">
+                    <div>
+                        <span class="pillar-num">04</span>
+                        <div class="pillar-icon-box"><i data-lucide="calculator" size="24"></i></div>
+                        <h3 class="pillar-title" data-i18n="p4_title">Prescriptive Financial Optimizer</h3>
+                        <p class="pillar-body" data-i18n="p4_body">Calculates financial ROI and avoided loss metrics for every condition. Generates clear, advisory operational directives (e.g. backflush HEPA filtration, dynamic load modulation).</p>
+                    </div>
+                    <div class="pillar-tag">ROI-DRIVEN PRESCRIPTIONS</div>
+                </div>
+
+                <!-- Pillar 5 -->
+                <div class="pillar-card">
+                    <div>
+                        <span class="pillar-num">05</span>
+                        <div class="pillar-icon-box"><i data-lucide="shield-check" size="24"></i></div>
+                        <h3 class="pillar-title" data-i18n="p5_title">Cryptographic Sovereign ESG Ledger</h3>
+                        <p class="pillar-body" data-i18n="p5_body">Quantifies Scope 3 lifecycle manufacturing carbon avoided by extending asset useful life. Every claim is cryptographically chained with SHA-256 Merkle proofs for ESG audit defensibility.</p>
+                    </div>
+                    <div class="pillar-tag">ISO 14064-3 ALIGNED</div>
+                </div>
+
+                <!-- Pillar 6 (Sovereign Edge) -->
+                <div class="pillar-card">
+                    <div>
+                        <span class="pillar-num">06</span>
+                        <div class="pillar-icon-box"><i data-lucide="lock" size="24"></i></div>
+                        <h3 class="pillar-title" data-i18n="p6_title">Air-Gapped Sovereign Edge</h3>
+                        <p class="pillar-body" data-i18n="p6_body">Critical national infrastructure requires absolute data sovereignty. Instantly sever cloud uplinks and execute 100% of causal inference locally inside Riyadh or NEOM industrial boundaries.</p>
+                    </div>
+                    <div class="pillar-tag">ZERO DATA EGRESS</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- INTERACTIVE CAUSAL PHYSICS SIMULATOR -->
+        <section class="section-wrap" id="simulator">
+            <div class="section-header">
+                <div class="section-tag" data-i18n="tag_sim">INTERACTIVE STRESS LABORATORY</div>
+                <h2 class="section-heading" data-i18n="sim_heading">Simulate Real-Time Desert Stress</h2>
+                <p class="section-subtext" data-i18n="sim_sub">
+                    Adjust aerosol particle density and kinetic wind speed to observe how SAHARYN's Causal Engine computes asset degradation in real time.
+                </p>
+            </div>
+
+            <div class="simulator-box">
+                <div class="sim-controls">
+                    <div class="sim-control-group">
+                        <div class="sim-control-header">
+                            <span data-i18n="slider_aod">AEROSOL OPTICAL DEPTH (AOD)</span>
+                            <span style="color: var(--accent-emerald-bright);" id="sim-aod-val">0.85</span>
+                        </div>
+                        <input type="range" min="0.05" max="2.5" step="0.05" value="0.85" class="sim-slider" id="sim-aod" oninput="runLivePhysicsSim()">
+                        <div style="display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); margin-top: 4px;">
+                            <span>Clear (0.05)</span>
+                            <span>Standard Arid (0.85)</span>
+                            <span>Severe Sandstorm (2.50)</span>
+                        </div>
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-header">
+                            <span data-i18n="slider_wind">KINETIC WIND VELOCITY</span>
+                            <span style="color: var(--accent-cyan);" id="sim-wind-val">22 m/s</span>
+                        </div>
+                        <input type="range" min="2" max="45" step="1" value="22" class="sim-slider" id="sim-wind" oninput="runLivePhysicsSim()">
+                        <div style="display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); margin-top: 4px;">
+                            <span>Calm (2 m/s)</span>
+                            <span>Moderate (22 m/s)</span>
+                            <span>Gale Storm (45 m/s)</span>
+                        </div>
+                    </div>
+
+                    <div class="sim-control-group">
+                        <div class="sim-control-header">
+                            <span data-i18n="slider_vib">ASSET VIBRATION (RMS)</span>
+                            <span style="color: var(--accent-amber);" id="sim-vib-val">2.4 mm/s</span>
+                        </div>
+                        <input type="range" min="0.5" max="10.0" step="0.1" value="2.4" class="sim-slider" id="sim-vib" oninput="runLivePhysicsSim()">
+                        <div style="display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); margin-top: 4px;">
+                            <span>ISO Zone A (&lt;1.5)</span>
+                            <span>ISO Zone B (2.4)</span>
+                            <span>ISO Zone D (&gt;7.0)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sim-outputs">
+                    <div class="sim-output-card">
+                        <div class="sim-metric">
+                            <span class="sim-metric-lbl">DUST SEVERITY INDEX</span>
+                            <span class="sim-metric-val" style="color: var(--accent-emerald-bright);" id="sim-res-dsi">0.68</span>
+                        </div>
+                        <div class="sim-metric">
+                            <span class="sim-metric-lbl">ABRASION MOMENTUM</span>
+                            <span class="sim-metric-val" style="color: var(--accent-cyan);" id="sim-res-abr">1.82 x</span>
+                        </div>
+                        <div class="sim-metric">
+                            <span class="sim-metric-lbl">FAILURE RISK PROBABILITY</span>
+                            <span class="sim-metric-val" style="color: var(--accent-rose);" id="sim-res-risk">38.4%</span>
+                        </div>
+                        <div class="sim-metric">
+                            <span class="sim-metric-lbl">ESTIMATED AVOIDED LOSS</span>
+                            <span class="sim-metric-val" style="color: #ffffff;" id="sim-res-savings">$580,240</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ENTERPRISE STANDARDS & COMPLIANCE -->
+        <section class="section-wrap" style="padding-top: 0;">
+            <div class="section-header">
+                <div class="section-tag" data-i18n="tag_compliance">STANDARDS & GOVERNANCE</div>
+                <h2 class="section-heading" data-i18n="comp_heading">Architected for Critical Infrastructure</h2>
+                <p class="section-subtext" data-i18n="comp_sub">
+                    Engineered in strict alignment with international cybersecurity, explainability, and carbon accounting protocols.
+                </p>
+            </div>
+
+            <div class="compliance-grid">
+                <div class="comp-card">
+                    <div class="comp-name">ISO 27001</div>
+                    <div class="comp-status">SECURITY ALIGNED</div>
+                </div>
+                <div class="comp-card">
+                    <div class="comp-name">IEEE 1232</div>
+                    <div class="comp-status">AI DIAGNOSTIC PROTOCOL</div>
+                </div>
+                <div class="comp-card">
+                    <div class="comp-name">ISO 14064-3</div>
+                    <div class="comp-status">ESG QUANTIFICATION</div>
+                </div>
+                <div class="comp-card">
+                    <div class="comp-name">SDAIA AI ETHICS</div>
+                    <div class="comp-status">EXPLAINABLE AI</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer>
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="brand-wrapper">
+                        <div class="brand-emblem"></div>
+                        <div class="brand-text">SAHARYN <span>AI CORE</span></div>
+                    </div>
+                    <p data-i18n="footer_desc">
+                        Sovereign Predictive Intelligence platform protecting critical energy, water, and industrial assets in high-consequence desert environments.
+                    </p>
+                </div>
+
+                <div class="footer-col">
+                    <h4 data-i18n="f_platform">PLATFORM</h4>
+                    <ul class="footer-links">
+                        <li><a href="console.html">Mission Control</a></li>
+                        <li><a href="about.html">Technical Whitepaper</a></li>
+                        <li><a href="/v2/docs">Swagger REST API</a></li>
+                        <li><a href="/v2/system/health">System Health</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4 data-i18n="f_space">SPACE FEEDS</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://earthdata.nasa.gov" target="_blank">NASA Earthdata (MODIS)</a></li>
+                        <li><a href="https://cds.climate.copernicus.eu" target="_blank">Copernicus CDS (ERA5)</a></li>
+                        <li><a href="https://dataspace.copernicus.eu" target="_blank">Copernicus Data Space (S2)</a></li>
+                        <li><a href="https://ads.atmosphere.copernicus.eu" target="_blank">Copernicus ADS (CAMS)</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4 data-i18n="f_compliance">COMPLIANCE</h4>
+                    <ul class="footer-links">
+                        <li><a href="about.html#diligence">ISO 27001 Controls</a></li>
+                        <li><a href="about.html#diligence">IEEE 1232 Diagnostics</a></li>
+                        <li><a href="about.html#diligence">GHG Protocol Scope 3</a></li>
+                        <li><a href="about.html#diligence">SDAIA AI Ethics</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <div>&copy; 2026 SAHARYN AI CORE. All Rights Reserved. Riyadh &bull; Eastern Province &bull; NEOM.</div>
+                <div>AUTONOMOUS SATELLITE-TO-PLANT CAUSAL RESILIENCE ENGINE</div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- ── THREE.JS 3D PARTICLE & ASSET ENGINE ── -->
+    <script>
+        // Initialize Ambient Background Particle Network
+        (function initBgCanvas() {
+            const canvas = document.getElementById('bg-canvas');
+            const ctx = canvas.getContext('2d');
+            let w, h;
+            let particles = [];
+
+            function resize() {
+                w = canvas.width = window.innerWidth;
+                h = canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            for (let i = 0; i < 70; i++) {
+                particles.push({
+                    x: Math.random() * w,
+                    y: Math.random() * h,
+                    vx: (Math.random() - 0.5) * 0.4,
+                    vy: (Math.random() - 0.5) * 0.4,
+                    radius: Math.random() * 1.5 + 0.5,
+                    color: Math.random() > 0.4 ? 'rgba(16, 185, 129, 0.4)' : 'rgba(6, 182, 212, 0.3)'
+                });
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, w, h);
+                for (let i = 0; i < particles.length; i++) {
+                    let p = particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    if (p.x < 0) p.x = w;
+                    if (p.x > w) p.x = 0;
+                    if (p.y < 0) p.y = h;
+                    if (p.y > h) p.y = 0;
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.fill();
+
+                    for (let j = i + 1; j < particles.length; j++) {
+                        let p2 = particles[j];
+                        let dx = p.x - p2.x;
+                        let dy = p.y - p2.y;
+                        let dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 120) {
+                            ctx.beginPath();
+                            ctx.moveTo(p.x, p.y);
+                            ctx.lineTo(p2.x, p2.y);
+                            ctx.strokeStyle = `rgba(16, 185, 129, ${0.15 * (1 - dist / 120)})`;
+                            ctx.lineWidth = 0.6;
+                            ctx.stroke();
+                        }
+                    }
+                }
+                requestAnimationFrame(animate);
+            }
+            animate();
         })();
-        window.addEventListener('resize', () => {
-            camera.aspect = innerWidth / innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(innerWidth, innerHeight);
-        });
 
-        // ── Live Telemetry Feed ──
-        const API = ''; // Relative path for multi-domain support (Railway / saharyn.com)
+        // Initialize 3D Rotating Asset Wireframe in Hero
+        (function initTwinView() {
+            const container = document.getElementById('twin-viewport');
+            if (!container) return;
 
-        async function fetchLiveData() {
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.set(0, 0, 7);
+
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(renderer.domElement);
+
+            // Create High-Tech Industrial Compressor Geometry
+            const group = new THREE.Group();
+
+            // Central Core Cylinder
+            const cylinderGeo = new THREE.CylinderGeometry(1.2, 1.2, 3.2, 32, 8, true);
+            const wireMat = new THREE.MeshBasicMaterial({ color: 0x10b981, wireframe: true, transparent: true, opacity: 0.35 });
+            const cylinder = new THREE.Mesh(cylinderGeo, wireMat);
+            group.add(cylinder);
+
+            // Internal Rotating Impeller Rings
+            const ringGeo = new THREE.TorusGeometry(1.6, 0.04, 16, 64);
+            const ringMat = new THREE.MeshBasicMaterial({ color: 0x06b6d4, wireframe: true, transparent: true, opacity: 0.7 });
+            
+            const ring1 = new THREE.Mesh(ringGeo, ringMat);
+            ring1.rotation.x = Math.PI / 2;
+            group.add(ring1);
+
+            const ring2 = new THREE.Mesh(ringGeo, ringMat);
+            ring2.rotation.x = Math.PI / 3;
+            group.add(ring2);
+
+            // Stress Hotspot Points
+            const particleGeo = new THREE.BufferGeometry();
+            const particleCount = 180;
+            const positions = new Float32Array(particleCount * 3);
+            for (let i = 0; i < particleCount * 3; i += 3) {
+                positions[i] = (Math.random() - 0.5) * 3.2;
+                positions[i + 1] = (Math.random() - 0.5) * 3.2;
+                positions[i + 2] = (Math.random() - 0.5) * 3.2;
+            }
+            particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            const particleMat = new THREE.PointsMaterial({ color: 0x34d399, size: 0.06, transparent: true, opacity: 0.8 });
+            const particles = new THREE.Points(particleGeo, particleMat);
+            group.add(particles);
+
+            scene.add(group);
+
+            function animateTwin() {
+                requestAnimationFrame(animateTwin);
+                group.rotation.y += 0.008;
+                group.rotation.x += 0.003;
+                renderer.render(scene, camera);
+            }
+            animateTwin();
+
+            window.addEventListener('resize', () => {
+                if (!container) return;
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            });
+        })();
+
+        // ── LIVE PHYSICS SIMULATOR LOGIC ──
+        function runLivePhysicsSim() {
+            const aod = parseFloat(document.getElementById('sim-aod').value);
+            const wind = parseFloat(document.getElementById('sim-wind').value);
+            const vib = parseFloat(document.getElementById('sim-vib').value);
+
+            document.getElementById('sim-aod-val').innerText = aod.toFixed(2);
+            document.getElementById('sim-wind-val').innerText = `${wind} m/s`;
+            document.getElementById('sim-vib-val').innerText = `${vib.toFixed(1)} mm/s`;
+
+            // Physics Calculations
+            const dsi = Math.min(1.0, (aod * 0.55) + (wind / 50.0 * 0.3) + (vib / 10.0 * 0.15));
+            const abrasion = (aod * 1.42 * (wind / 15.0)).toFixed(2);
+            const risk = Math.min(99.4, ((dsi * 60) + (vib * 4.2))).toFixed(1);
+            const baseLoss = 1510000;
+            const savings = Math.round((risk / 100) * baseLoss * 0.95);
+
+            document.getElementById('sim-res-dsi').innerText = dsi.toFixed(2);
+            document.getElementById('sim-res-abr').innerText = `${abrasion} x`;
+            document.getElementById('sim-res-risk').innerText = `${risk}%`;
+            document.getElementById('sim-res-savings').innerText = `$${savings.toLocaleString()}`;
+        }
+
+        // ── LIVE SATELLITE TELEMETRY SYNC ──
+        async function fetchLiveSatelliteFeed() {
             try {
-                const r = await fetch(`${API}/v2/telemetry/stream`);
-                const d = await r.json();
-                const feeds = d.feeds || [];
+                const res = await fetch('/v2/telemetry/stream');
+                if (!res.ok) return;
+                const data = await res.json();
+                const feeds = data.feeds || [];
+
                 const aod = feeds.find(f => f.source === 'NASA_TERRA');
                 const ddi = feeds.find(f => f.source === 'ESA_SENTINEL_2');
 
-                const aodEl = document.getElementById('aod-live');
-                if (aodEl && aod) {
-                    aodEl.innerText = aod.value;
+                if (aod) {
+                    const el1 = document.getElementById('ticker-aod');
+                    const el2 = document.getElementById('card-aod');
+                    if (el1) el1.innerText = aod.value;
+                    if (el2) el2.innerText = `${aod.value} AOD`;
                 }
-                const ddiEl = document.getElementById('ddi-live');
-                if (ddiEl && ddi) {
-                    ddiEl.innerText = ddi.value;
-                }
-
-                const hash = d.integrity_hash || '';
-                const auditEl = document.getElementById('live-audit-id');
-                if (auditEl) {
-                    auditEl.innerText = `HASH: ${hash.slice(0, 20)}...`;
+                if (ddi) {
+                    const el = document.getElementById('ticker-ddi');
+                    if (el) el.innerText = ddi.value;
                 }
             } catch (e) {
-                const auditEl = document.getElementById('live-audit-id');
-                if (auditEl) {
-                    auditEl.innerText = 'AWAITING LIVE SYNC...';
-                }
+                // Fallback maintains smooth display
             }
         }
+        fetchLiveSatelliteFeed();
+        setInterval(fetchLiveSatelliteFeed, 10000);
 
-        async function fetchSystemStatus() {
-            try {
-                const r = await fetch(`${API}/v2/system/health`);
-                const d = await r.json();
-                const statusEl = document.getElementById('system-status');
-                if (statusEl) {
-                    statusEl.innerText = d.status === 'OPERATIONAL' ? 'OPERATIONAL ✓' : 'DEGRADED';
-                    statusEl.style.color = d.status === 'OPERATIONAL' ? 'var(--accent)' : '#f43f5e';
-                }
-            } catch (e) {
-                const statusEl = document.getElementById('system-status');
-                if (statusEl) {
-                    statusEl.innerText = 'PRODUCTION';
-                }
-            }
-        }
-
-        function updateClock() {
-            const n = new Date();
-            const t = n.getUTCHours().toString().padStart(2, '0') + ':' +
-                n.getUTCMinutes().toString().padStart(2, '0') + ':' +
-                n.getUTCSeconds().toString().padStart(2, '0') + ' UTC';
-            document.getElementById('footer-clock').innerText = t;
-        }
-
-        // ── i18n (Bilingual) ──
+        // ── BILINGUAL LANGUAGE SWITCHER (EN / AR) ──
         const translations = {
             en: {
-                nav_home: 'HOME', nav_how: 'HOW IT WORKS', nav_cap: 'CAPABILITIES',
-                nav_impact: 'IMPACT', nav_sec: 'SECTORS', nav_tech: 'TECHNOLOGY',
-                nav_cta: 'Sign In / Sign Up',
-                hero_h1: 'Predict Failures<br><span class="dim">before they happen.</span>',
-                hero_sub: '<strong>SAHARYN AI</strong> combines <strong>satellite intelligence</strong> with <strong>industrial telemetry</strong> to detect <strong>environmental stress</strong> and predict equipment failures before they occur. By monitoring dust, wind, temperature, vibration, and pressure signals, the platform alerts operators up to <strong>48 hours</strong> before a potential failure.',
-                hero_cta: 'Open Mission Control',
-                stat_warning: 'Average Early Warning',
-                stat_sat: 'Satellite Data Sources',
-                stat_prev: 'Model Confidence (Pilot Simulation)',
-                stat_uptime: 'System Uptime',
-                stat_sync: 'Sovereign Link',
-                sat_label: 'Real-Time Data Sources',
-                sat_title: 'We watch your assets<br>from space.',
-                sat_intro: 'We don\'t rely on local weather reports or ground sensors alone. SAHARYN maintains three continuously active uplinks to the world\'s most trusted satellite agencies — giving you environmental intelligence that simply cannot be gathered any other way.',
-                bridge_01_name: 'Bridge 01 — NASA MODIS',
-                bridge_01_title: 'Aerosol Tracking',
-                bridge_01_desc: 'Tracks Aerosol Optical Depth (AOD) to measure dust concentration above industrial sites.',
-                data_product: 'DATA PRODUCT',
-                bridge_02_name: 'Bridge 02 — ESA Sentinel-2',
-                bridge_02_title: 'Plume Detection',
-                bridge_02_desc: 'Detects dust plumes and land surface signatures using multi-spectral imaging.',
-                resolution: 'RESOLUTION',
-                bridge_03_name: 'Bridge 03 — Copernicus CAMS',
-                bridge_03_title: 'Atmospheric Forecasts',
-                bridge_03_desc: 'Provides atmospheric forecasts including wind speed, humidity, and temperature used to model environmental stress.',
-                standard: 'STANDARD',
-                live_proof: 'These data streams are fused to produce the Dust Severity Index (DSI) for operational intelligence.',
-                bridge_status_live: 'BRIDGE STATUS: LIVE',
-                how_title: 'From satellite to action<br>in real-time.',
-                how_intro: 'SAHARYN does not just collect data — it makes decisions. Our process ensures that satellite intelligence is converted into actionable operational recommendations.',
-                cap_title: 'Core AI Modules<br>for Industrial Performance.',
-                footer_desc: 'SAHARYN AI provides industrial environmental intelligence and predictive maintenance for large-scale energy and infrastructure sites in harsh desert environments.',
-                copyright: '© 2026 SAHARYN AI INDUSTRIAL SYSTEMS — ALL RIGHTS RESERVED',
-                how_label: 'The Process',
-                step_01_title: 'Satellite Observation',
-                step_01_desc: 'NASA and ESA satellites record atmospheric conditions — AOD, wind, temperature, and dust plume signatures across your site.',
-                step_02_title: 'Environmental Stress Modeling',
-                step_02_desc: 'Individual streams are fused using physics-based modeling to create a localized Dust Severity Index (DSI).',
-                step_03_title: 'Industrial Telemetry Analysis',
-                step_03_desc: 'Causal models map environmental stressors against real-time mechanical vibration and performance telemetry.',
-                step_04_title: 'Predictive Failure Detection',
-                step_04_desc: 'The system identifies risk patterns and generates precise operational recommendations for maintenance teams.',
-                cap_intro: 'Each module is independently validated and can be deployed individually or as an integrated stack.',
-                cap_01_title: 'Satellite Data Fusion',
-                cap_01_desc: 'Continuous integration of NASA MODIS, ESA Sentinel-2, and Copernicus CAMS into a unified environmental intelligence layer.',
-                cap_02_title: '3D Asset Stress Mapping',
-                cap_02_desc: 'Real-time structural health analysis visualizing thermal, vibration, and abrasive stress across all documented assets.',
-                cap_03_title: 'Causal Failure Tracking',
-                cap_03_desc: 'Bayesian networks identify root causes across dependency chains, filtering noise from true mechanical degradation.',
-                cap_04_title: 'Prescriptive Optimizer',
-                cap_04_desc: 'Generates ranked maintenance actions with ROI estimates and averted downtime cost analysis.',
-                cap_05_title: 'Carbon Impact Ledger',
-                cap_05_desc: 'Efficiency improvements are recorded as measurable emission reductions, aligned with standard environmental accounting frameworks.',
-                cap_06_title: 'Sovereign Edge Mode',
-                cap_06_desc: 'High-security mode for sensitive sites, operating entirely on local encrypted edge clusters without cloud reliance.',
-                cap_label: 'AI Modules',
-                label_aod: 'Live AOD (NASA MODIS)',
-                label_ddi: 'Dust Detection Index (ESA)',
-                label_uptime: 'Reliability Commitment',
-                label_conf: 'Confidence Score',
-                impact_label: 'Operational Impact',
-                impact_title: 'Intelligence that<br>Pays for Itself.',
-                impact_desc_01: 'Operational efficiency improvements may contribute to measurable emission reductions, which can be reported under standard environmental accounting frameworks.',
-                impact_desc_02: 'Designed in alignment with GHG Protocol and ISO 14064-3.',
-                sectors_label: 'Industries We Serve',
-                sectors_title: 'Engineered for the<br>World\'s Harshest Sites.',
-                sectors_intro: 'SAHARYN is designed for large-scale energy and industrial operations where extreme heat and abrasive dust are constant operational risks.',
-                sector_01_title: 'Energy and Power Infrastructure',
-                sector_01_desc: 'Protecting transmission lines, turbines, and solar arrays from thermal stress and salt corrosion.',
-                sector_02_title: 'Oil and Gas Operations',
-                sector_02_desc: 'Monitoring structural integrity for compressors, pumps, and drilling infrastructure in real-time.',
-                sector_03_title: 'Mining and Heavy Industry',
-                sector_03_desc: 'Predictive maintenance for deep mine ventilation and heavy machinery in high-dust environments.',
-                comp_label: 'Compliance and Standards',
-                comp_title: 'Enterprise Grade.<br>Pilot Ready.',
-                comp_intro: 'Designed in alignment with:',
-                comp_01_status: 'ISO 27001 (Information Security)',
-                comp_02_status: 'SOC 2 Type II (Data Security)',
-                comp_03_status: 'GHG Protocol (Env Accounting)',
-                comp_04_status: 'ISO 14064-3 (Carbon Tracking)',
-                comp_05_status: 'Data Privacy Alignment',
-                comp_06_status: 'ESG Compliance Framework',
+                nav_how: "HOW IT WORKS", nav_cap: "CAPABILITIES", nav_sim: "PHYSICS SIMULATOR", nav_tech: "TECHNICAL WHITEPAPER", nav_cta: "MISSION CONTROL",
+                live_stream_status: "LIVE SPACE AGENCY FUSION: ACTIVE",
+                hero_badge: "NASA & ESA COPERNICUS ATMOSPHERIC BRIDGE",
+                hero_h1_lead: "Predict High-Consequence Failures", hero_h1_sub: "before harsh desert impacts occur.",
+                hero_desc: "SAHARYN AI combines space-borne satellite intelligence with physics-informed causal mechanics to monitor sandstorms, thermal decay, and abrasion—predicting industrial asset failures up to 48 hours in advance across Saudi Arabia and the Middle East.",
+                hero_cta_primary: "Launch Mission Control", hero_cta_secondary: "View Architecture Proof",
+                m_lead: "Early Warning Window", m_latency: "Causal Inference Cycle", m_savings: "Avg Avoided Downtime Loss",
+                tag_capabilities: "ENGINEERING ADVANTAGE", pillars_heading: "5 Sovereign Mechanisms of Action",
+                pillars_sub: "Eliminating the 'black-box' dilemma of standard machine learning through verifiable physics and mathematical proof.",
+                p1_title: "Satellite Atmospheric Fusion", p1_body: "Direct programmatic ingestion of NASA MODIS and Copernicus Sentinel-2/CAMS. Real-time mapping of particle diameter, AOD, and kinetic dust momentum before contact.",
+                p2_title: "Physics-Informed Digital Twins", p2_body: "Solving boundary condition Navier-Stokes and Arrhenius chemical degradation equations in real time. Accurately modeling abrasion kinetics and structural thermal stress.",
+                p3_title: "Explainable Causal Manifold", p3_body: "A strict 11-node Directed Acyclic Graph (DAG) enforcing anti-hallucination. Every failure forecast generates a step-by-step cryptographic causal chain from weather trigger to asset outcome.",
+                p4_title: "Prescriptive Financial Optimizer", p4_body: "Calculates financial ROI and avoided loss metrics for every condition. Generates clear, advisory operational directives (e.g. backflush HEPA filtration, dynamic load modulation).",
+                p5_title: "Cryptographic Sovereign ESG Ledger", p5_body: "Quantifies Scope 3 lifecycle manufacturing carbon avoided by extending asset useful life. Every claim is cryptographically chained with SHA-256 Merkle proofs for ESG audit defensibility.",
+                p6_title: "Air-Gapped Sovereign Edge", p6_body: "Critical national infrastructure requires absolute data sovereignty. Instantly sever cloud uplinks and execute 100% of causal inference locally inside Riyadh or NEOM industrial boundaries.",
+                tag_sim: "INTERACTIVE STRESS LABORATORY", sim_heading: "Simulate Real-Time Desert Stress",
+                sim_sub: "Adjust aerosol particle density and kinetic wind speed to observe how SAHARYN's Causal Engine computes asset degradation in real time.",
+                slider_aod: "AEROSOL OPTICAL DEPTH (AOD)", slider_wind: "KINETIC WIND VELOCITY", slider_vib: "ASSET VIBRATION (RMS)",
+                tag_compliance: "STANDARDS & GOVERNANCE", comp_heading: "Architected for Critical Infrastructure",
+                comp_sub: "Engineered in strict alignment with international cybersecurity, explainability, and carbon accounting protocols.",
+                footer_desc: "Sovereign Predictive Intelligence platform protecting critical energy, water, and industrial assets in high-consequence desert environments."
             },
             ar: {
-                nav_home: 'الرئيسية', nav_how: 'آلية العمل', nav_cap: 'القدرات',
-                nav_impact: 'الأثر', nav_sec: 'القطاعات', nav_tech: 'التكنولوجيا',
-                nav_cta: 'تسجيل الدخول / الاشتراك',
-                hero_h1: 'توقع الأعطال<br><span class="dim">قبل حدوثها.</span>',
-                hero_sub: 'تدمج <strong>صحارين AI</strong> بين <strong>ذكاء الأقمار الصناعية</strong> و<strong>القياس الصناعي عن بعد</strong> للكشف عن <strong>الإجهاد البيئي</strong> والتنبؤ بأعطال المعدات قبل حدوثها. ومن خلال مراقبة إشارات الغبار والرياح ودرجة الحرارة والاهتزاز والضغط، تنبه المنصة المشغلين قبل <strong>48 ساعة</strong> من وقوع عطل محتمل.',
-                hero_cta: 'فتح مركز العمليات',
-                stat_warning: 'متوسط الإنذار المبكر',
-                stat_sat: 'مصادر بيانات الأقمار الصناعية',
-                stat_prev: 'ثقة النموذج (محاكاة تجريبية)',
-                stat_uptime: 'وقت تشغيل النظام',
-                stat_sync: 'الارتباط السيادي',
-                sat_label: 'مصادر البيانات في الوقت الفعلي',
-                sat_title: 'نراقب أصولك<br>من الفضاء.',
-                sat_intro: 'نحن لا نعتمد على تقارير الطقس المحلية أو أجهزة الاستشعار الأرضية وحدها. تحتفظ صحارين بثلاثة روابط نشطة باستمرار مع الوكالات الأكثر ثقة في العالم.',
-                bridge_01_name: 'جسر 01 — ناسا MODIS',
-                bridge_01_title: 'تتبع الهباء الجوي',
-                bridge_01_desc: 'يتتبع العمق البصري للهباء الجوي (AOD) لقياس تركيز الغبار فوق المواقع الصناعية.',
-                data_product: 'منتج البيانات',
-                bridge_02_name: 'جسر 02 — وكالة الفضاء الأوروبية Sentinel-2',
-                bridge_02_title: 'كشف أعمدة الغبار',
-                bridge_02_desc: 'يكتشف أعمدة الغبار وبصمات سطح الأرض باستخدام التصوير متعدد الأطياف.',
-                resolution: 'الدقة',
-                bridge_03_name: 'جسر 03 — كوبرنيكوس CAMS',
-                bridge_03_title: 'توقعات الغلاف الجوي',
-                bridge_03_desc: 'يوفر توقعات الغلاف الجوي بما في ذلك سرعة الرياح والرطوبة ودرجة الحرارة المستخدمة لنمذجة الإجهاد البيئي.',
-                standard: 'المعيار',
-                live_proof: 'يتم دمج تدفقات البيانات هذه لإنتاج مؤشر شدة الغبار (DSI) للذكاء التشغيلي.',
-                bridge_status_live: 'حالة الجسر: مباشر',
-                how_title: 'من القمر الصناعي إلى القرار<br>في الوقت الفعلي.',
-                how_intro: 'صحارين لا تجمع البيانات فحسب — بل تتخذ قرارات. تضمن عمليتنا تحويل ذكاء الأقمار الصناعية إلى توصيات تشغيلية قابلة للتنفيذ.',
-                cap_title: 'وحدات الذكاء الاصطناعي<br>للأداء الصناعي.',
-                footer_desc: 'توفر صحارين AI الاستخبارات البيئية الصناعية والصيانة التنبؤية لمواقع الطاقة والبنية التحتية واسعة النطاق في البيئات القاسية.',
-                copyright: '© 2026 صحارين لنظم الذكاء الاصطناعي الصناعية — جميع الحقوق محفوظة',
-                how_label: 'العملية',
-                step_01_title: 'المراقبة عبر الأقمار الصناعية',
-                step_01_desc: 'تسجل أقمار ناسا ووكالة الفضاء الأوروبية الظوث الجوية - Aود، والرياح، وبصمات أعمدة الغبار عبر موقعك.',
-                step_02_title: 'نمذجة الإجهاد البيئي',
-                step_02_desc: 'يتم دمج التدفقات الفردية باستخدام النمذجة القائمة على الفيزياء لإنشاء مؤشر شدة الغبار (DSI) المحلي.',
-                step_03_title: 'تحليل البيانات الصناعية',
-                step_03_desc: 'ترسم النماذج السببية خرائط الضغوط البيئية مقابل اهتزاز الآلات الميكانيكية وأداء الموقع في الوقت الفعلي.',
-                step_04_title: 'التنبؤ المسبق بالأعطال',
-                step_04_desc: 'يحدد النظام أنماط المخاطر ويولد توصيات تشغيلية دقيقة لفرق الصيانة.',
-                cap_intro: 'يتم التحقق من كل وحدة بشكل مستقل ويمكن نشرها بشكل فردي أو كحزمة متكاملة.',
-                cap_01_title: 'دمج بيانات الأقمار الصناعية',
-                cap_01_desc: 'تكامل مستمر لبيانات ناسا MODIS ووكالة الفضاء الأوروبية Sentinel-2 وكوبرنيكوس CAMS في طبقة استخبارات بيئية موحدة.',
-                cap_02_title: 'رسم خرائط إجهاد الأصول ثلاثية الأبعاد',
-                cap_02_desc: 'تحليل صحة الهيكل في الوقت الفعلي وتصور ضغوط الحرارة والاهتزاز والتآكل عبر جميع الأصول.',
-                cap_03_title: 'تتبع الأعطال السببية',
-                cap_03_desc: 'تحدد شبكات بايزي الأسباب الجذرية عبر سلاسل التبعية، وفلترة الضجيج عن التدهور الميكانيكي الحقيقي.',
-                cap_04_title: 'المحسن التوجيهي',
-                cap_04_desc: 'يولد إجراءات صيانة مرتبة مع تقديرات العائد على الاستثمار وتحليل تكلفة وقت التوقف المتفادى.',
-                cap_05_title: 'سجل الأثر الكربوني',
-                cap_05_desc: 'يتم تسجيل تحسينات الكفاءة كتقليل للانبعاثات القابلة للقياس، بما يتوافق مع أطر المحاسبة البيئية القياسية.',
-                cap_06_title: 'وضع الحافة السيادية',
-                cap_06_desc: 'وضع عالي الأمان للمواقع الحساسة، يعمل بالكامل على مجموعات الحافة المحلية المشفرة دون الاعتماد على السحابة.',
-                cap_label: 'وحدات الذكاء الاصطناعي',
-                impact_label: 'الأثر التشغيلي',
-                impact_title: 'ذكاء يمول<br>نفسه بنفسه.',
-                impact_desc_01: 'قد تساهم تحسينات الكفاءة التشغيلية في تقليل الانبعاثات القابلة للقياس، والتي يمكن الإبلاغ عنها بموجب أطر المحاسبة البيئية القياسية.',
-                impact_desc_02: 'صُمم بالتوافق مع بروتوكول GHG ومعايير ISO 14064-3.',
-                sectors_label: 'القطاعات التي نخدمها',
-                sectors_title: 'هندسة مخصصة<br>لأقسى المواقع.',
-                sectors_intro: 'تم تصميم صحارين للعمليات الصناعية والطاقة واسعة النطاق حيث تشكل الحرارة الشديدة والغبار الكاشط مخاطر تشغيلية ثابتة.',
-                sector_01_title: 'البنية التحتية للطاقة والقوى',
-                sector_01_desc: 'حماية خطوط النقل والتوربينات والمصفوفات الشمسية من الإجهاد الحراري وتآكل الأملاح.',
-                sector_02_title: 'عمليات النفط والغاز',
-                sector_02_desc: 'مراقبة سلامة الهيكل للضواغط والمضخات والبنية التحتية للحفر في الوقت الفعلي.',
-                sector_03_title: 'التعدين والصناعات الثقيلة',
-                sector_03_desc: 'الصيانة التنبؤية لتهوية المناجم العميقة والآلات الثقيلة في بيئات الغبار الكثيف.',
-                comp_label: 'الامتثال والمعايير',
-                comp_title: 'درجة مؤسسية.<br>جاهز للتجربة.',
-                comp_01_status: 'ISO 27001 (أمن المعلومات)',
-                comp_02_status: 'SOC 2 Type II (أمن البيانات)',
-                comp_03_status: 'GHG Protocol (المحاسبة البيئية)',
-                comp_04_status: 'ISO 14064-3 (تتبع الكربون)',
-                comp_05_status: 'التوافق مع خصوصية البيانات',
-                comp_06_status: 'إطار امتثال ESG',
+                nav_how: "كيف يعمل", nav_cap: "القدرات", nav_sim: "محاكي الفيزياء", nav_tech: "ورقة العمل التقنية", nav_cta: "مركز العمليات",
+                live_stream_status: "دمج الأقمار الصناعية المباشر: نشط",
+                hero_badge: "جسر وكالة ناسا وإيسا كوبرنيكوس للغلاف الجوي",
+                hero_h1_lead: "التنبؤ بالأعطال الحرجة", hero_h1_sub: "قبل وقوع أضرار البيئة الصحراوية القاسية.",
+                hero_desc: "تجمع منصة سحارين (SAHARYN AI) بين استخبارات الأقمار الصناعية الفضائية والميكانيكا السببية الفيزيائية لرصد العواصف الرملية والتآكل الحراري، متنبئة بأعطال المعدات الصناعية حتى 48 ساعة مسبقاً في المملكة العربية السعودية والشرق الأوسط.",
+                hero_cta_primary: "فتح مركز العمليات", hero_cta_secondary: "عرض الإثبات التقني",
+                m_lead: "نافذة الإنذار المبكر", m_latency: "دورة الاستدلال السببي", m_savings: "متوسط الخسائر المتجنبة",
+                tag_capabilities: "الميزة الهندسية", pillars_heading: "5 آليات عمل سيادية",
+                pillars_sub: "القضاء على معضلة 'الصندوق الأسود' في الذكاء الاصطناعي التقليدي عبر البراهين الفيزيائية والرياضية القابلة للتحقق.",
+                p1_title: "دمج الأقمار الصناعية الفضائية", p1_body: "استيعاب مباشر لبيانات ناسا موديس وسنتينل-2 وكوبرنيكوس CAMS، مع رسم خرائط حية لحجم الجسيمات وكثافة الغبار والزخم الحركي قبل ملامسة المنشأة.",
+                p2_title: "التوائم الرقمية المستندة للفيزياء", p2_body: "حل معادلات نافييه-ستوكس ومعادلات التحلل الكيميائي الحراري (أرينيوس) في الوقت الفعلي، لنمذجة معدلات التآكل والإجهاد الميكانيكي بدقة متناهية.",
+                p3_title: "المنظومة السببية الشفافة", p3_body: "مخطط سببي صارم من 11 عقدة يمنع هلوسة الذكاء الاصطناعي، وينتج سلسلة سببية مشفرة خطوة بخطوة من المحفز الجوي وحتى النتيجة الميكانيكية.",
+                p4_title: "المُحسِّن المالي التوجيهي", p4_body: "حساب العائد المالي على الاستثمار والخسائر المتجنبة لكل حالة، وتقديم توجيهات تشغيلية استشارية واضحة (مثل الغسيل العكسي للفلاتر، وتخفيف الحمل الديناميكي).",
+                p5_title: "سجل الاستدامة الكربوني المشفر", p5_body: "قياس الانبعاثات المصنعية المتجنبة (النطاق 3) عبر إطالة العمر التشغيلي للمعدات الثقيلة، موثقة ببراهين ميركل ورمز SHA-256 للتدقيق البيئي.",
+                p6_title: "حوسبة الحافة السيادية المعزولة", p6_body: "حماية البنية التحتية الحيوية عبر عزل الاتصال السحابي بالكامل وتشغيل الاستدلال السببي محلياً بنسبة 100% داخل حدود الرياض أو نيوم الصناعية.",
+                tag_sim: "مختبر الإجهاد التفاعلي", sim_heading: "محاكاة الإجهاد الصحراوي الفوري",
+                sim_sub: "عدّل كثافة جزيئات الغبار وسرعة الرياح الحركية لمراقبة كيفية حساب محرك سحارين السببي لتدهور الأصول في الوقت الفعلي.",
+                slider_aod: "العمق البصري للهباء الجوي (AOD)", slider_wind: "سرعة الرياح الحركية", slider_vib: "اهتزاز المعدة (RMS)",
+                tag_compliance: "المعايير والحوكمة", comp_heading: "مصممة للبنية التحتية الحيوية",
+                comp_sub: "مبنية بتوافق دقيق مع معايير الأمن السيبراني الدولية، وتفسير الذكاء الاصطناعي، ومحاسبة الكربون المعتمدة.",
+                footer_desc: "منصة ذكاء اصطناعي سيادي تحمي أصول الطاقة والمياه والصناعة الحيوية في البيئات الصحراوية القاسية."
             }
         };
 
-        window.lang = 'en';
-        window.toggleLanguage = function () {
-            window.lang = window.lang === 'en' ? 'ar' : 'en';
-            document.body.dir = window.lang === 'ar' ? 'rtl' : 'ltr';
+        let currentLang = 'en';
+        function toggleLang() {
+            currentLang = currentLang === 'en' ? 'ar' : 'en';
+            document.body.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+            document.getElementById('lang-btn').innerText = currentLang === 'ar' ? 'English / عربي' : 'عربي / EN';
+
+            const t = translations[currentLang];
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const k = el.getAttribute('data-i18n');
-                if (translations[window.lang][k]) el.innerHTML = translations[window.lang][k];
+                if (t[k]) el.innerHTML = t[k];
             });
 
-            // Update toggle button text
-            const btn = document.getElementById('lang-toggle-btn');
-            if (btn) btn.innerText = window.lang === 'en' ? 'EN / عربي' : 'عربي / EN';
-
-            // Re-render icons for RTL alignment
             if (typeof lucide !== 'undefined') lucide.createIcons();
-            console.log(`Language switched to: ${window.lang}`);
-        };
-
-        lucide.createIcons();
-        fetchLiveData();
-        fetchSystemStatus();
-        updateClock();
-        setInterval(fetchLiveData, 8000);
-        setInterval(updateClock, 1000);
-
-
-        // -- Firebase Auth Integration --
-        import { login, logout, auth } from "./firebase-init.js";
-        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-
-        const loginBtn = document.getElementById('login-btn');
-        const userProfile = document.getElementById('user-profile');
-        const profileMenu = document.getElementById('landing-menu');
-
-        loginBtn.addEventListener('click', async () => {
-            await login();
-        });
-
-        userProfile.addEventListener('click', (e) => {
-            e.stopPropagation();
-            profileMenu.classList.toggle('active');
-        });
-
-        document.addEventListener('click', () => {
-            profileMenu.classList.remove('active');
-        });
-
-        document.getElementById('landing-logout-btn').addEventListener('click', async () => {
-            await logout();
-        });
-
-        if (auth) {
-            onAuthStateChanged(auth, (user) => {
-                const systemStatus = document.getElementById('system-status');
-                const i18nButtons = document.querySelectorAll('[data-i18n="nav_cta"]');
-                const heroCta = document.querySelector('[data-i18n="hero_cta"]');
-
-                if (user) {
-                    loginBtn.style.display = 'none';
-                    userProfile.style.display = 'flex';
-                    if (systemStatus) systemStatus.innerText = "AUTHENTICATED";
-
-                    // Update all buttons that used to say "Sign In"
-                    i18nButtons.forEach(btn => {
-                        btn.innerText = window.lang === 'ar' ? "فتح مركز العمليات" : "Open Mission Control";
-                        if (btn.tagName === 'A') btn.href = 'console.html';
-                    });
-
-                    document.getElementById('landing-user-name').innerText = user.displayName || "Mission Control User";
-                    document.getElementById('landing-user-email').innerText = user.email;
-                    if (user.photoURL) {
-                        document.getElementById('landing-avatar').innerHTML = `<img src="${user.photoURL}" alt="${user.displayName}" style="width:100%; height:100%; border-radius:50%;">`;
-                    }
-                    lucide.createIcons();
-                } else {
-                    loginBtn.style.display = 'block';
-                    userProfile.style.display = 'none';
-                    if (systemStatus) systemStatus.innerText = "GUEST_MODE";
-
-                    i18nButtons.forEach(btn => {
-                        btn.innerText = translations[window.lang]['nav_cta'];
-                        if (btn.tagName === 'A') btn.href = '#';
-                    });
-                }
-            });
         }
 
+        // Initialize Lucide Icons
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+            runLivePhysicsSim();
+        });
     </script>
 </body>
 
