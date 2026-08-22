@@ -253,41 +253,26 @@
             z-index: 2;
         }
 
-        /* Capsule Badge */
+        /* Capsule Badge (Clean 2-Color: Orange Accent + Crisp White) */
         .capsule-badge {
             display: inline-flex;
             align-items: center;
-            gap: 10px;
-            background: rgba(20, 22, 30, 0.85);
-            border: 1px solid var(--border-medium);
-            padding: 4px 5px 4px 12px;
+            gap: 8px;
+            background: rgba(255, 107, 44, 0.08);
+            border: 1px solid rgba(255, 107, 44, 0.35);
+            padding: 5px 14px;
             border-radius: 100px;
-            margin-bottom: 20px;
+            margin-bottom: 22px;
             backdrop-filter: blur(10px);
         }
 
         .capsule-text {
-            font-size: 12px;
-            font-weight: 500;
-            color: var(--text-secondary);
-        }
-
-        .capsule-btn {
-            background: linear-gradient(135deg, var(--accent-orange) 0%, #e65100 100%);
-            color: #ffffff;
+            font-family: var(--font-mono);
             font-size: 11px;
             font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 100px;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            transition: opacity 0.2s;
-        }
-
-        .capsule-btn:hover {
-            opacity: 0.9;
+            color: #ffffff;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
         /* Section Subhead Label with Line */
@@ -295,7 +280,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 16px;
+            margin-bottom: 18px;
         }
 
         .hero-subhead-num {
@@ -311,106 +296,76 @@
             font-size: 11px;
             font-weight: 700;
             letter-spacing: 1.5px;
-            color: var(--text-secondary);
+            color: #ffffff;
             text-transform: uppercase;
         }
 
         .hero-subhead-line {
             width: 35px;
             height: 1px;
-            background: var(--border-medium);
+            background: rgba(255, 255, 255, 0.2);
         }
 
-        /* Modern Crisp Typography */
+        /* Pure Crisp White Display Headline */
         .hero-title {
             font-family: var(--font-sans);
-            font-size: clamp(34px, 3.8vw, 54px);
+            font-size: clamp(38px, 4.4vw, 58px);
             font-weight: 800;
-            line-height: 1.12;
+            line-height: 1.1;
             letter-spacing: -0.03em;
-            margin-bottom: 20px;
+            color: #ffffff;
+            margin-bottom: 22px;
             hyphens: none;
             word-break: keep-all;
         }
 
-        .hero-title .title-gradient {
-            background: linear-gradient(135deg, #ffffff 30%, #ff8a4c 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .hero-title span {
             display: block;
         }
 
         .hero-title .title-sub {
-            color: var(--text-secondary);
-            font-weight: 500;
-            font-size: 0.88em;
-            display: block;
-            margin-top: 6px;
-            letter-spacing: -0.02em;
+            color: #ffffff;
+            font-weight: 800;
+            margin-top: 4px;
         }
 
         .hero-desc {
-            font-size: 15px;
-            color: var(--text-secondary);
+            font-size: 15.5px;
+            color: #cbd5e1;
             line-height: 1.65;
-            margin-bottom: 32px;
-            max-width: 480px;
+            margin-bottom: 34px;
+            max-width: 490px;
         }
 
-        /* Dual CTA Buttons */
+        /* Solid Orange Hero CTA Button */
         .hero-btn-row {
             display: flex;
             align-items: center;
-            gap: 12px;
             margin-bottom: 36px;
         }
 
-        .btn-cta-primary {
-            background: transparent;
-            color: #ff6b2c;
-            border: 1.5px solid #ff6b2c;
-            padding: 12px 28px;
+        .btn-hero-primary {
+            background: linear-gradient(135deg, #ff6b2c 0%, #ea580c 100%);
+            color: #ffffff !important;
+            padding: 14px 34px;
             border-radius: 100px;
-            font-family: var(--font-mono);
-            font-size: 13px;
+            font-size: 14.5px;
             font-weight: 700;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
+            box-shadow: 0 6px 25px rgba(255, 107, 44, 0.45);
             transition: all 0.25s ease;
+            border: none;
             cursor: pointer;
         }
 
-        .btn-cta-primary:hover {
-            background: rgba(255, 107, 44, 0.12);
-            color: #ff8a4c;
-            border-color: #ff8a4c;
-            box-shadow: 0 0 20px rgba(255, 107, 44, 0.4);
-            transform: translateY(-1px);
-        }
-
-        .btn-cta-secondary {
-            background: rgba(20, 22, 30, 0.8);
-            border: 1px solid var(--border-medium);
-            color: var(--text-primary);
-            padding: 13px 22px;
-            border-radius: 8px;
-            font-size: 13.5px;
-            font-weight: 600;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            backdrop-filter: blur(10px);
-            transition: all 0.25s ease;
-        }
-
-        .btn-cta-secondary:hover {
-            background: rgba(30, 34, 46, 0.9);
-            border-color: rgba(255, 255, 255, 0.25);
+        .btn-hero-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(255, 107, 44, 0.65);
+            filter: brightness(1.08);
         }
 
         .orange-dot {
@@ -858,10 +813,10 @@
         <header class="hero">
             <div class="hero-grid-wrap">
                 <div class="hero-left-content">
-                    <!-- Capsule Badge -->
+                    <!-- Capsule Badge (Clean 2-Color: Orange Accent + Crisp White, No Console ->) -->
                     <div class="capsule-badge">
-                        <span class="capsule-text" data-i18n="badge_text">NASA & ESA Live Feeds</span>
-                        <a href="console.html" class="capsule-btn" data-i18n="badge_action">Console →</a>
+                        <span class="orange-dot"></span>
+                        <span class="capsule-text" data-i18n="badge_text">NASA & ESA LIVE FEEDS</span>
                     </div>
 
                     <!-- Numbered Subsection Header with Line -->
@@ -871,10 +826,10 @@
                         <div class="hero-subhead-line"></div>
                     </div>
 
-                    <!-- High-Impact Crisp Headline -->
+                    <!-- High-Impact Pure White Display Headline -->
                     <h1 class="hero-title">
-                        <span class="title-gradient" data-i18n="hero_h1_lead">Predict High-Consequence Failures</span>
-                        <span class="title-sub" data-i18n="hero_h1_sub">Before harsh desert impacts occur.</span>
+                        <span data-i18n="hero_h1_lead">Predict High-Consequence Failures</span>
+                        <span class="title-sub" data-i18n="hero_h1_sub">before desert impacts occur.</span>
                     </h1>
 
                     <!-- Concise Description -->
@@ -882,15 +837,10 @@
                         SAHARYN fuses live space-borne satellite feeds with physics-informed causal mechanics to predict heavy equipment breakdowns up to 48 hours in advance across desert operations.
                     </p>
 
-                    <!-- Dual CTA Buttons -->
+                    <!-- Solid Orange Hero Button -->
                     <div class="hero-btn-row">
-                        <a href="console.html" class="btn-cta-primary">
+                        <a href="console.html" class="btn-hero-primary" id="hero-start-btn">
                             <span data-i18n="cta_primary">Start Free</span>
-                            <span>›</span>
-                        </a>
-                        <a href="about.html" class="btn-cta-secondary">
-                            <span class="orange-dot"></span>
-                            <span data-i18n="cta_secondary">Architecture Proof</span>
                         </a>
                     </div>
                 </div>
@@ -1368,7 +1318,7 @@
         window.handleStartFree = handleStartFree;
 
         document.addEventListener("DOMContentLoaded", () => {
-            const startButtons = document.querySelectorAll(".btn-start-free, .btn-cta-primary");
+            const startButtons = document.querySelectorAll(".btn-start-free, .btn-hero-primary");
             startButtons.forEach(btn => {
                 btn.addEventListener("click", handleStartFree);
             });
