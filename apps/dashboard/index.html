@@ -4,48 +4,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAHARYN AI | Sovereign Industrial Intelligence for Critical Desert Infrastructure</title>
+    <title>SAHARYN AI | Predictive Industrial Intelligence for Harsh Desert Infrastructure</title>
     <meta name="description"
-        content="SAHARYN AI fuses live NASA and ESA Copernicus satellite feeds with plant SCADA physics to predict high-consequence asset failures 48 hours in advance.">
+        content="SAHARYN AI fuses live NASA and ESA Copernicus satellite feeds with plant SCADA telemetry to predict heavy machinery failures 48 hours in advance across desert operations.">
     
-    <!-- Premium Google Fonts -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800;900&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800;900&display=swap"
         rel="stylesheet">
     
-    <!-- Lucide Icons & Three.js (including OrbitControls) -->
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <style>
         :root {
-            --bg-void: #020612;
-            --bg-surface: #060d1f;
-            --bg-card: rgba(10, 20, 42, 0.72);
-            --bg-card-hover: rgba(16, 32, 66, 0.88);
-            --bg-glass: rgba(8, 16, 36, 0.6);
+            --bg-void: #030816;
+            --bg-surface: #071026;
+            --bg-card: rgba(11, 22, 46, 0.75);
+            --bg-card-hover: rgba(16, 32, 66, 0.9);
             
             --accent-emerald: #10b981;
             --accent-emerald-bright: #34d399;
             --accent-emerald-glow: rgba(16, 185, 129, 0.35);
             --accent-cyan: #06b6d4;
-            --accent-cyan-glow: rgba(6, 182, 212, 0.35);
-            --accent-indigo: #6366f1;
+            --accent-cyan-glow: rgba(6, 182, 212, 0.3);
             --accent-amber: #f59e0b;
             --accent-rose: #f43f5e;
             
             --border-subtle: rgba(255, 255, 255, 0.08);
-            --border-medium: rgba(255, 255, 255, 0.14);
-            --border-glow: rgba(16, 185, 129, 0.45);
+            --border-medium: rgba(255, 255, 255, 0.15);
+            --border-bright: rgba(16, 185, 129, 0.4);
             
             --text-primary: #ffffff;
             --text-secondary: #94a3b8;
             --text-muted: #64748b;
             
-            --font-display: 'Outfit', 'Plus Jakarta Sans', sans-serif;
-            --font-body: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            --font-sans: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
             --font-ar: 'Tajawal', sans-serif;
         }
@@ -64,11 +60,11 @@
         body {
             background-color: var(--bg-void);
             background-image: 
-                radial-gradient(circle at 50% -10%, rgba(16, 185, 129, 0.15) 0%, transparent 55%),
-                radial-gradient(circle at 90% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 45%),
-                radial-gradient(circle at 10% 60%, rgba(99, 102, 241, 0.08) 0%, transparent 45%);
+                radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.12) 0%, transparent 60%),
+                radial-gradient(circle at 85% 25%, rgba(6, 182, 212, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 15% 65%, rgba(99, 102, 241, 0.06) 0%, transparent 50%);
             color: var(--text-primary);
-            font-family: var(--font-body);
+            font-family: var(--font-sans);
             line-height: 1.6;
             overflow-x: hidden;
             min-height: 100vh;
@@ -77,9 +73,10 @@
 
         body[dir="rtl"] {
             font-family: var(--font-ar);
+            text-align: right;
         }
 
-        /* ── AMBIENT CANVAS BACKGROUND ── */
+        /* ── BACKGROUND CANVAS ── */
         #bg-canvas {
             position: fixed;
             top: 0;
@@ -88,7 +85,7 @@
             height: 100vh;
             pointer-events: none;
             z-index: 0;
-            opacity: 0.6;
+            opacity: 0.5;
         }
 
         .content-layer {
@@ -96,7 +93,7 @@
             z-index: 1;
         }
 
-        /* ── ULTRA-PREMIUM NAVIGATION BAR ── */
+        /* ── CLEAN, BALANCED ENTERPRISE NAVIGATION ── */
         nav {
             position: fixed;
             top: 0;
@@ -106,12 +103,12 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 14px 4vw;
-            background: rgba(2, 6, 18, 0.85);
-            backdrop-filter: blur(28px) saturate(190%);
-            -webkit-backdrop-filter: blur(28px) saturate(190%);
+            padding: 18px 5vw;
+            background: rgba(3, 8, 22, 0.88);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
             border-bottom: 1px solid var(--border-subtle);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
         }
 
         .brand-wrapper {
@@ -123,67 +120,57 @@
         }
 
         .brand-emblem {
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             background: linear-gradient(135deg, var(--accent-emerald) 0%, var(--accent-cyan) 100%);
             clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 0 25px var(--accent-emerald-glow);
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .brand-wrapper:hover .brand-emblem {
-            transform: rotate(30deg) scale(1.05);
+            box-shadow: 0 0 15px var(--accent-emerald-glow);
         }
 
         .brand-text {
-            font-family: var(--font-display);
-            font-size: 21px;
+            font-size: 20px;
             font-weight: 800;
             letter-spacing: -0.5px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .brand-text span {
             font-size: 11px;
             font-weight: 700;
             color: var(--accent-emerald-bright);
-            background: rgba(16, 185, 129, 0.12);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            padding: 3px 8px;
-            border-radius: 4px;
             font-family: var(--font-mono);
             letter-spacing: 0.5px;
         }
 
+        /* Uniform Navigation Links with Same Size & Styling */
         .nav-menu {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             list-style: none;
         }
 
         .nav-link {
-            font-size: 13.5px;
+            font-size: 14px;
             font-weight: 500;
             color: var(--text-secondary);
             text-decoration: none;
-            padding: 8px 14px;
+            padding: 8px 16px;
             border-radius: 8px;
             transition: all 0.2s ease;
             white-space: nowrap;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
         }
 
         .nav-link:hover {
             color: #ffffff;
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.06);
         }
 
         .nav-actions {
@@ -196,15 +183,16 @@
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid var(--border-medium);
             color: var(--text-primary);
-            padding: 8px 14px;
+            padding: 9px 16px;
             border-radius: 8px;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
+            white-space: nowrap;
         }
 
         .btn-lang:hover {
@@ -215,16 +203,16 @@
         .btn-launch {
             background: linear-gradient(135deg, var(--accent-emerald) 0%, #059669 100%);
             color: #020612 !important;
-            padding: 9px 20px;
+            padding: 10px 22px;
             border-radius: 8px;
-            font-size: 12.5px;
+            font-size: 13.5px;
             font-weight: 700;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            box-shadow: 0 4px 20px var(--accent-emerald-glow);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 18px var(--accent-emerald-glow);
+            transition: all 0.25s ease;
             border: none;
             cursor: pointer;
             white-space: nowrap;
@@ -232,20 +220,20 @@
 
         .btn-launch:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5);
+            box-shadow: 0 6px 25px rgba(16, 185, 129, 0.5);
             filter: brightness(1.1);
         }
 
         /* ── HERO SECTION ── */
         .hero {
-            padding: 130px 4vw 80px;
+            padding: 125px 5vw 80px;
             max-width: 1440px;
             margin: 0 auto;
             display: grid;
             grid-template-columns: 1.15fr 0.85fr;
             gap: 50px;
             align-items: center;
-            min-height: 100vh;
+            min-height: calc(100vh - 40px);
         }
 
         .hero-badge {
@@ -260,20 +248,18 @@
             font-weight: 600;
             color: var(--accent-emerald-bright);
             margin-bottom: 24px;
-            backdrop-filter: blur(10px);
         }
 
         .hero-title {
-            font-family: var(--font-display);
-            font-size: clamp(40px, 4.8vw, 68px);
+            font-size: clamp(38px, 4.5vw, 62px);
             font-weight: 800;
-            line-height: 1.06;
+            line-height: 1.08;
             letter-spacing: -1.5px;
             margin-bottom: 22px;
         }
 
         .hero-title .gradient-text {
-            background: linear-gradient(135deg, #ffffff 10%, #e2e8f0 50%, var(--accent-emerald-bright) 100%);
+            background: linear-gradient(135deg, #ffffff 15%, #cbd5e1 50%, var(--accent-emerald-bright) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -301,7 +287,7 @@
             align-items: center;
             gap: 16px;
             flex-wrap: wrap;
-            margin-bottom: 44px;
+            margin-bottom: 40px;
         }
 
         .btn-primary-large {
@@ -316,12 +302,12 @@
             align-items: center;
             gap: 10px;
             box-shadow: 0 10px 30px var(--accent-emerald-glow);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.25s ease;
         }
 
         .btn-primary-large:hover {
             transform: translateY(-2px);
-            box-shadow: 0 15px 40px rgba(16, 185, 129, 0.5);
+            box-shadow: 0 14px 35px rgba(16, 185, 129, 0.5);
             filter: brightness(1.1);
         }
 
@@ -337,8 +323,7 @@
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
+            transition: all 0.25s ease;
         }
 
         .btn-secondary-large:hover {
@@ -362,11 +347,11 @@
         }
 
         .metric-num {
-            font-family: var(--font-display);
             font-size: 32px;
             font-weight: 800;
             color: var(--accent-emerald-bright);
             letter-spacing: -0.5px;
+            font-family: var(--font-mono);
         }
 
         .metric-lbl {
@@ -375,133 +360,94 @@
             font-weight: 500;
         }
 
-        /* ── INTERACTIVE 3D DIGITAL TWIN TURBINE STAGE ── */
-        .twin-card {
+        /* ── DUAL IMAGE SATELLITE FACILITY CARDS ── */
+        .hero-image-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .facility-card {
             background: var(--bg-card);
             border: 1px solid var(--border-medium);
-            border-radius: 20px;
-            padding: 24px;
-            backdrop-filter: blur(24px);
-            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+            border-radius: 16px;
+            padding: 18px;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
         }
 
-        .twin-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--accent-emerald), transparent);
+        .facility-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-emerald);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 25px rgba(16, 185, 129, 0.15);
         }
 
-        .twin-header {
+        .facility-badge-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 14px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid var(--border-subtle);
+            margin-bottom: 12px;
         }
 
-        .twin-title-box {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .twin-title {
-            font-size: 14px;
-            font-weight: 700;
-            letter-spacing: -0.2px;
-        }
-
-        .twin-site {
+        .facility-badge {
             font-family: var(--font-mono);
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-
-        .twin-badge {
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--accent-cyan);
-            background: rgba(6, 182, 212, 0.1);
+            font-size: 10.5px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            background: rgba(255, 255, 255, 0.05);
             padding: 4px 10px;
             border-radius: 6px;
-            border: 1px solid rgba(6, 182, 212, 0.25);
+            letter-spacing: 0.5px;
             display: inline-flex;
             align-items: center;
             gap: 6px;
         }
 
-        #twin-viewport {
-            width: 100%;
-            height: 380px;
-            border-radius: 12px;
-            background: radial-gradient(circle at center, #0c1a36 0%, #030814 100%);
+        .facility-badge.active {
+            color: var(--accent-emerald-bright);
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .facility-img-box {
             position: relative;
+            border-radius: 10px;
             overflow: hidden;
-            cursor: grab;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 12px;
         }
 
-        #twin-viewport:active {
-            cursor: grabbing;
+        .facility-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.4s ease;
         }
 
-        .twin-hint {
-            position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 11px;
-            color: var(--text-muted);
-            background: rgba(2, 6, 18, 0.7);
-            padding: 4px 12px;
-            border-radius: 100px;
-            border: 1px solid var(--border-subtle);
-            pointer-events: none;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+        .facility-card:hover .facility-img {
+            transform: scale(1.03);
         }
 
-        .twin-overlay-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-top: 16px;
-        }
-
-        .stat-pill {
-            background: rgba(2, 6, 18, 0.6);
-            border: 1px solid var(--border-subtle);
-            border-radius: 8px;
-            padding: 10px 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .stat-pill-lbl {
-            font-size: 10px;
-            color: var(--text-muted);
-            font-weight: 500;
-            text-transform: uppercase;
-        }
-
-        .stat-pill-val {
-            font-family: var(--font-mono);
-            font-size: 14px;
+        .facility-title {
+            font-size: 15px;
             font-weight: 700;
             color: #ffffff;
+            margin-bottom: 4px;
+        }
+
+        .facility-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
         }
 
         /* ── SECTION ARCHITECTURE ── */
         .section-wrap {
-            padding: 90px 4vw;
+            padding: 90px 5vw;
             max-width: 1440px;
             margin: 0 auto;
         }
@@ -509,7 +455,7 @@
         .section-header {
             text-align: center;
             max-width: 720px;
-            margin: 0 auto 56px;
+            margin: 0 auto 50px;
         }
 
         .section-tag {
@@ -523,8 +469,7 @@
         }
 
         .section-heading {
-            font-family: var(--font-display);
-            font-size: clamp(32px, 3.6vw, 48px);
+            font-size: clamp(30px, 3.5vw, 46px);
             font-weight: 800;
             letter-spacing: -1px;
             line-height: 1.15;
@@ -537,35 +482,30 @@
             line-height: 1.6;
         }
 
-        /* ── 5 PILLARS OF INDUSTRIAL RESILIENCE ── */
-        .pillars-grid {
+        /* ── SOLUTIONS & SECTORS GRID ── */
+        .solutions-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 24px;
         }
 
-        .pillar-card {
+        .solution-card {
             background: var(--bg-card);
             border: 1px solid var(--border-subtle);
             border-radius: 16px;
             padding: 32px 28px;
-            backdrop-filter: blur(20px);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
             position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
         }
 
-        .pillar-card:hover {
+        .solution-card:hover {
             transform: translateY(-6px);
             background: var(--bg-card-hover);
             border-color: var(--accent-emerald);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(16, 185, 129, 0.12);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 25px rgba(16, 185, 129, 0.12);
         }
 
-        .pillar-icon-box {
+        .solution-icon-box {
             width: 48px;
             height: 48px;
             border-radius: 12px;
@@ -575,128 +515,35 @@
             align-items: center;
             justify-content: center;
             color: var(--accent-emerald);
-            margin-bottom: 22px;
+            margin-bottom: 20px;
         }
 
-        .pillar-num {
-            position: absolute;
-            top: 24px;
-            right: 28px;
-            font-family: var(--font-mono);
-            font-size: 15px;
-            font-weight: 700;
-            color: var(--text-muted);
-            opacity: 0.4;
-        }
-
-        .pillar-title {
-            font-family: var(--font-display);
-            font-size: 20px;
+        .solution-title {
+            font-size: 19px;
             font-weight: 700;
             letter-spacing: -0.3px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
-        .pillar-body {
+        .solution-body {
             font-size: 14.5px;
             color: var(--text-secondary);
             line-height: 1.6;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
-        .pillar-tag {
+        .solution-tag {
             font-family: var(--font-mono);
-            font-size: 10.5px;
+            font-size: 11px;
             font-weight: 700;
             color: var(--accent-emerald-bright);
             background: rgba(16, 185, 129, 0.08);
             padding: 4px 10px;
             border-radius: 6px;
-            align-self: flex-start;
+            display: inline-block;
         }
 
-        /* ── INTERACTIVE DUST & PHYSICS SIMULATOR ── */
-        .simulator-box {
-            background: linear-gradient(135deg, rgba(8, 18, 38, 0.85) 0%, rgba(3, 9, 20, 0.95) 100%);
-            border: 1px solid var(--border-medium);
-            border-radius: 20px;
-            padding: 40px;
-            backdrop-filter: blur(24px);
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-            align-items: center;
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
-        }
-
-        .sim-control-group {
-            margin-bottom: 24px;
-        }
-
-        .sim-control-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .sim-slider {
-            width: 100%;
-            height: 6px;
-            -webkit-appearance: none;
-            background: rgba(255, 255, 255, 0.12);
-            border-radius: 3px;
-            outline: none;
-        }
-
-        .sim-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: var(--accent-emerald);
-            box-shadow: 0 0 12px var(--accent-emerald);
-            cursor: pointer;
-            transition: transform 0.1s;
-        }
-
-        .sim-slider::-webkit-slider-thumb:hover {
-            transform: scale(1.2);
-        }
-
-        .sim-output-card {
-            background: rgba(2, 6, 18, 0.75);
-            border: 1px solid var(--border-subtle);
-            border-radius: 16px;
-            padding: 28px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .sim-metric {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .sim-metric-lbl {
-            font-size: 11px;
-            color: var(--text-muted);
-            font-weight: 500;
-            text-transform: uppercase;
-        }
-
-        .sim-metric-val {
-            font-family: var(--font-display);
-            font-size: 28px;
-            font-weight: 800;
-            color: #ffffff;
-        }
-
-        /* ── ENTERPRISE COMPLIANCE & STANDARDS ── */
+        /* ── COMPLIANCE BADGES ── */
         .compliance-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -719,7 +566,6 @@
         }
 
         .comp-name {
-            font-family: var(--font-display);
             font-size: 16px;
             font-weight: 700;
             color: #ffffff;
@@ -728,7 +574,7 @@
 
         .comp-status {
             font-family: var(--font-mono);
-            font-size: 10px;
+            font-size: 10.5px;
             font-weight: 700;
             color: var(--accent-emerald);
             background: rgba(16, 185, 129, 0.08);
@@ -741,8 +587,8 @@
         footer {
             background: #01040b;
             border-top: 1px solid var(--border-subtle);
-            padding: 60px 4vw 40px;
-            margin-top: 100px;
+            padding: 60px 5vw 40px;
+            margin-top: 80px;
         }
 
         .footer-grid {
@@ -751,7 +597,7 @@
             display: grid;
             grid-template-columns: 2fr 1fr 1fr 1fr;
             gap: 60px;
-            margin-bottom: 50px;
+            margin-bottom: 40px;
         }
 
         .footer-brand p {
@@ -807,16 +653,15 @@
             .hero-description { margin: 0 auto 36px; }
             .hero-ctas { justify-content: center; }
             .hero-metrics { justify-content: center; }
-            .pillars-grid { grid-template-columns: repeat(2, 1fr); }
-            .simulator-box { grid-template-columns: 1fr; }
+            .solutions-grid { grid-template-columns: repeat(2, 1fr); }
             .compliance-grid { grid-template-columns: repeat(2, 1fr); }
             .footer-grid { grid-template-columns: 1fr 1fr; }
         }
 
         @media (max-width: 768px) {
-            nav { padding: 12px 4vw; }
+            nav { padding: 14px 4vw; }
             .nav-menu { display: none; }
-            .pillars-grid { grid-template-columns: 1fr; }
+            .solutions-grid { grid-template-columns: 1fr; }
             .compliance-grid { grid-template-columns: 1fr; }
             .footer-grid { grid-template-columns: 1fr; }
             .footer-bottom { flex-direction: column; gap: 14px; text-align: center; }
@@ -825,29 +670,30 @@
 </head>
 
 <body>
-    <!-- Ambient Particle Canvas -->
+    <!-- Ambient Background Canvas -->
     <canvas id="bg-canvas"></canvas>
 
     <div class="content-layer">
-        <!-- Main Navigation Bar -->
+        <!-- Main Enterprise Header & Navigation -->
         <nav id="main-nav">
             <a href="index.html" class="brand-wrapper">
                 <div class="brand-emblem"></div>
-                <div class="brand-text">SAHARYN <span>AI CORE</span></div>
+                <div class="brand-text">SAHARYN <span>AI</span></div>
             </a>
 
+            <!-- Organized, Uniform Navigation Menu -->
             <ul class="nav-menu">
-                <li><a href="#how-it-works" class="nav-link" data-i18n="nav_how">Platform</a></li>
-                <li><a href="#pillars" class="nav-link" data-i18n="nav_cap">Capabilities</a></li>
-                <li><a href="#simulator" class="nav-link" data-i18n="nav_sim">Physics Simulator</a></li>
-                <li><a href="about.html" class="nav-link" data-i18n="nav_tech">Architecture Whitepaper</a></li>
-                <li><a href="/v2/docs" class="nav-link" target="_blank">API Docs</a></li>
+                <li><a href="#solutions" class="nav-link" data-i18n="nav_solutions">Solutions</a></li>
+                <li><a href="#platform" class="nav-link" data-i18n="nav_platform">Platform</a></li>
+                <li><a href="#capabilities" class="nav-link" data-i18n="nav_capabilities">Capabilities</a></li>
+                <li><a href="about.html" class="nav-link" data-i18n="nav_technology">Technology</a></li>
+                <li><a href="/v2/docs" class="nav-link" target="_blank" data-i18n="nav_api">API Docs</a></li>
             </ul>
 
             <div class="nav-actions">
                 <button onclick="toggleLang()" class="btn-lang" id="lang-btn">
                     <i data-lucide="globe" size="14"></i>
-                    <span>عربي / EN</span>
+                    <span>العربية / English</span>
                 </button>
                 <a href="console.html" class="btn-launch" id="nav-cta-btn">
                     <i data-lucide="shield" size="14"></i>
@@ -887,7 +733,7 @@
                 <div class="hero-metrics">
                     <div class="metric-card">
                         <div class="metric-num">48h</div>
-                        <div class="metric-lbl" data-i18n="m_lead">Early Warning Horizon</div>
+                        <div class="metric-lbl" data-i18n="m_lead">Early Warning Window</div>
                     </div>
                     <div class="metric-card">
                         <div class="metric-num">0.42ms</div>
@@ -900,193 +746,140 @@
                 </div>
             </div>
 
-            <!-- Interactive 3D Digital Twin Turbine Stage -->
-            <div class="twin-card">
-                <div class="twin-header">
-                    <div class="twin-title-box">
-                        <div class="twin-title">DIGITAL TWIN RESILIENCE STAGE</div>
-                        <div class="twin-site">ASSET: GAS_COMPRESSOR_RU_01 (RUB' AL KHALI)</div>
+            <!-- Original Dual Satellite Visual Cards -->
+            <div class="hero-image-cards">
+                <!-- Card 1: Raw Optical Facility -->
+                <div class="facility-card">
+                    <div class="facility-badge-row">
+                        <div class="facility-badge">
+                            <i data-lucide="camera" size="12"></i>
+                            <span>RAW OPTICAL BASELINE</span>
+                        </div>
+                        <div style="font-family: var(--font-mono); font-size: 10px; color: var(--text-muted);">10m RESOLUTION</div>
                     </div>
-                    <div class="twin-badge">
-                        <i data-lucide="activity" size="12"></i>
-                        <span>PINN ACTIVE</span>
+                    <div class="facility-img-box">
+                        <img src="images/facility_base.jpg" class="facility-img" alt="Base Industrial Facility">
+                    </div>
+                    <div class="facility-title" data-i18n="fac_base_title">Surface Infrastructure Layer</div>
+                    <div class="facility-desc" data-i18n="fac_base_desc">
+                        High-resolution visual telemetry captures ground operations across gas compressors, water injection pumps, and refinery turbines.
                     </div>
                 </div>
 
-                <div id="twin-viewport">
-                    <div class="twin-hint">
-                        <i data-lucide="move-3d" size="12"></i>
-                        <span>Drag to rotate 3D turbine model</span>
+                <!-- Card 2: Scanned Multi-Spectral Overlay -->
+                <div class="facility-card">
+                    <div class="facility-badge-row">
+                        <div class="facility-badge active">
+                            <i data-lucide="zap" size="12"></i>
+                            <span>MULTI-SPECTRAL STRESS SCAN</span>
+                        </div>
+                        <div style="font-family: var(--font-mono); font-size: 10px; color: var(--accent-emerald-bright);">LIVE SATELLITE OVERLAY</div>
                     </div>
-                </div>
-
-                <div class="twin-overlay-stats">
-                    <div class="stat-pill">
-                        <span class="stat-pill-lbl">AEROSOL OPTICAL DEPTH</span>
-                        <span class="stat-pill-val" style="color: var(--accent-emerald-bright);" id="card-aod">0.82 AOD</span>
+                    <div class="facility-img-box">
+                        <img src="images/facility_scanned.jpg" class="facility-img" alt="Multi-Spectral Stress Scan">
                     </div>
-                    <div class="stat-pill">
-                        <span class="stat-pill-lbl">BEARING TEMPERATURE</span>
-                        <span class="stat-pill-val" style="color: var(--accent-amber);" id="card-temp">58.4 °C</span>
-                    </div>
-                    <div class="stat-pill">
-                        <span class="stat-pill-lbl">RUL PREDICTION</span>
-                        <span class="stat-pill-val" style="color: #60a5fa;" id="card-rul">919 HRS</span>
+                    <div class="facility-title" data-i18n="fac_scan_title">Environmental Stress Manifold</div>
+                    <div class="facility-desc" data-i18n="fac_scan_desc">
+                        Multi-spectral data fusion reveals invisible stressors: thermal decay gradients, particulate dust density, and vibration shockwaves in real-time.
                     </div>
                 </div>
             </div>
         </header>
 
-        <!-- 5 SOVEREIGN PILLARS OF INDUSTRIAL RESILIENCE -->
-        <section class="section-wrap" id="pillars">
+        <!-- INDUSTRIAL SOLUTIONS & SECTORS -->
+        <section class="section-wrap" id="solutions">
             <div class="section-header">
-                <div class="section-tag" data-i18n="tag_capabilities">ENGINEERING ADVANTAGE</div>
+                <div class="section-tag" data-i18n="tag_solutions">INDUSTRY APPLICATIONS</div>
+                <h2 class="section-heading" data-i18n="sol_heading">Built for High-Consequence Desert Assets</h2>
+                <p class="section-subtext" data-i18n="sol_sub">
+                    Protecting national critical infrastructure against extreme sandstorms, high ambient heat, and abrasive dust cycles.
+                </p>
+            </div>
+
+            <div class="solutions-grid">
+                <!-- Oil & Gas -->
+                <div class="solution-card">
+                    <div class="solution-icon-box"><i data-lucide="flame" size="22"></i></div>
+                    <h3 class="solution-title" data-i18n="s1_title">Oil & Gas Upstream & Refining</h3>
+                    <p class="solution-body" data-i18n="s1_body">Preventing compressor surge, gas turbine blade erosion, and seal failures in desert production facilities across the Eastern Province and Rub' Al Khali.</p>
+                    <span class="solution-tag">GAS COMPRESSORS & PUMPS</span>
+                </div>
+
+                <!-- Power Generation -->
+                <div class="solution-card">
+                    <div class="solution-icon-box"><i data-lucide="zap" size="22"></i></div>
+                    <h3 class="solution-title" data-i18n="s2_title">Power & Utilities Grids</h3>
+                    <p class="solution-body" data-i18n="s2_body">Forecasting turbine intake filter clogging and transformer thermal breakdown during regional dust storm events.</p>
+                    <span class="solution-tag">COMBINED CYCLE TURBINES</span>
+                </div>
+
+                <!-- Water Desalination -->
+                <div class="solution-card">
+                    <div class="solution-icon-box"><i data-lucide="droplet" size="22"></i></div>
+                    <h3 class="solution-title" data-i18n="s3_title">Water & Desalination Plants</h3>
+                    <p class="solution-body" data-i18n="s3_body">Monitoring high-pressure intake pumps and reverse osmosis filtration membranes subject to high particulate loads and salinity.</p>
+                    <span class="solution-tag">HIGH-PRESSURE RO PUMPS</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5 SOVEREIGN MECHANISMS (PLATFORM & CAPABILITIES) -->
+        <section class="section-wrap" id="platform" style="padding-top: 0;">
+            <div class="section-header">
+                <div class="section-tag" data-i18n="tag_capabilities">PLATFORM ARCHITECTURE</div>
                 <h2 class="section-heading" data-i18n="pillars_heading">5 Sovereign Mechanisms of Action</h2>
                 <p class="section-subtext" data-i18n="pillars_sub">
                     Eliminating the "black-box" dilemma of standard machine learning through verifiable physics and mathematical proof.
                 </p>
             </div>
 
-            <div class="pillars-grid">
+            <div class="solutions-grid" id="capabilities">
                 <!-- Pillar 1 -->
-                <div class="pillar-card">
-                    <div>
-                        <span class="pillar-num">01</span>
-                        <div class="pillar-icon-box"><i data-lucide="satellite" size="22"></i></div>
-                        <h3 class="pillar-title" data-i18n="p1_title">Satellite Atmospheric Fusion</h3>
-                        <p class="pillar-body" data-i18n="p1_body">Direct programmatic ingestion of NASA MODIS (MOD04_L2) and Copernicus Sentinel-2/CAMS. Real-time mapping of particle diameter, AOD, and kinetic dust momentum before contact.</p>
-                    </div>
-                    <div class="pillar-tag">NASA & ESA LIVE INGESTION</div>
+                <div class="solution-card">
+                    <div class="solution-icon-box"><i data-lucide="satellite" size="22"></i></div>
+                    <h3 class="solution-title" data-i18n="p1_title">Satellite Atmospheric Fusion</h3>
+                    <p class="solution-body" data-i18n="p1_body">Direct programmatic ingestion of NASA MODIS (MOD04_L2) and Copernicus Sentinel-2/CAMS. Real-time mapping of particle diameter, AOD, and kinetic dust momentum.</p>
+                    <span class="solution-tag">NASA & ESA LIVE INGESTION</span>
                 </div>
 
                 <!-- Pillar 2 -->
-                <div class="pillar-card">
-                    <div>
-                        <span class="pillar-num">02</span>
-                        <div class="pillar-icon-box"><i data-lucide="cpu" size="22"></i></div>
-                        <h3 class="pillar-title" data-i18n="p2_title">Physics-Informed Digital Twins</h3>
-                        <p class="pillar-body" data-i18n="p2_body">Solving boundary condition Navier-Stokes and Arrhenius chemical degradation equations in real time. Accurately modeling abrasion kinetics and structural thermal stress.</p>
-                    </div>
-                    <div class="pillar-tag">PINNs & ARRHENIUS DECAY</div>
+                <div class="solution-card">
+                    <div class="solution-icon-box"><i data-lucide="cpu" size="22"></i></div>
+                    <h3 class="solution-title" data-i18n="p2_title">Physics-Informed Digital Twins</h3>
+                    <p class="solution-body" data-i18n="p2_body">Solving boundary condition Navier-Stokes and Arrhenius chemical degradation equations in real time to model abrasion kinetics and thermal stress.</p>
+                    <span class="solution-tag">PINNs & ARRHENIUS DECAY</span>
                 </div>
 
                 <!-- Pillar 3 -->
-                <div class="pillar-card">
-                    <div>
-                        <span class="pillar-num">03</span>
-                        <div class="pillar-icon-box"><i data-lucide="git-branch" size="22"></i></div>
-                        <h3 class="pillar-title" data-i18n="p3_title">Explainable Causal Manifold</h3>
-                        <p class="pillar-body" data-i18n="p3_body">A strict 11-node Directed Acyclic Graph (DAG) enforcing anti-hallucination. Every failure forecast generates a step-by-step cryptographic causal chain from weather trigger to asset outcome.</p>
-                    </div>
-                    <div class="pillar-tag">IEEE 1232 COMPLIANT</div>
+                <div class="solution-card">
+                    <div class="solution-icon-box"><i data-lucide="git-branch" size="22"></i></div>
+                    <h3 class="solution-title" data-i18n="p3_title">Explainable Causal Manifold</h3>
+                    <p class="solution-body" data-i18n="p3_body">A strict 11-node Directed Acyclic Graph (DAG) enforcing anti-hallucination. Generates step-by-step cryptographic causal chains from weather triggers to mechanical outcomes.</p>
+                    <span class="solution-tag">IEEE 1232 COMPLIANT</span>
                 </div>
 
                 <!-- Pillar 4 -->
-                <div class="pillar-card">
-                    <div>
-                        <span class="pillar-num">04</span>
-                        <div class="pillar-icon-box"><i data-lucide="calculator" size="22"></i></div>
-                        <h3 class="pillar-title" data-i18n="p4_title">Prescriptive Financial Optimizer</h3>
-                        <p class="pillar-body" data-i18n="p4_body">Calculates financial ROI and avoided loss metrics for every condition. Generates clear, advisory operational directives (e.g. backflush HEPA filtration, dynamic load modulation).</p>
-                    </div>
-                    <div class="pillar-tag">ROI-DRIVEN PRESCRIPTIONS</div>
+                <div class="solution-card">
+                    <div class="solution-icon-box"><i data-lucide="calculator" size="22"></i></div>
+                    <h3 class="solution-title" data-i18n="p4_title">Prescriptive Financial Optimizer</h3>
+                    <p class="solution-body" data-i18n="p4_body">Calculates financial ROI and avoided loss metrics for every condition. Generates clear, advisory operational directives (e.g. backflush HEPA filtration, dynamic load modulation).</p>
+                    <span class="solution-tag">ROI-DRIVEN PRESCRIPTIONS</span>
                 </div>
 
                 <!-- Pillar 5 -->
-                <div class="pillar-card">
-                    <div>
-                        <span class="pillar-num">05</span>
-                        <div class="pillar-icon-box"><i data-lucide="shield-check" size="22"></i></div>
-                        <h3 class="pillar-title" data-i18n="p5_title">Cryptographic Sovereign ESG Ledger</h3>
-                        <p class="pillar-body" data-i18n="p5_body">Quantifies Scope 3 lifecycle manufacturing carbon avoided by extending asset useful life. Every claim is cryptographically chained with SHA-256 Merkle proofs for ESG audit defensibility.</p>
-                    </div>
-                    <div class="pillar-tag">ISO 14064-3 ALIGNED</div>
+                <div class="solution-card">
+                    <div class="solution-icon-box"><i data-lucide="shield-check" size="22"></i></div>
+                    <h3 class="solution-title" data-i18n="p5_title">Cryptographic Sovereign ESG Ledger</h3>
+                    <p class="solution-body" data-i18n="p5_body">Quantifies Scope 3 lifecycle manufacturing carbon avoided by extending asset useful life. Every claim is cryptographically chained with SHA-256 Merkle proofs for audit defensibility.</p>
+                    <span class="solution-tag">ISO 14064-3 ALIGNED</span>
                 </div>
 
-                <!-- Pillar 6 (Sovereign Edge) -->
-                <div class="pillar-card">
-                    <div>
-                        <span class="pillar-num">06</span>
-                        <div class="pillar-icon-box"><i data-lucide="lock" size="22"></i></div>
-                        <h3 class="pillar-title" data-i18n="p6_title">Air-Gapped Sovereign Edge</h3>
-                        <p class="pillar-body" data-i18n="p6_body">Critical national infrastructure requires absolute data sovereignty. Instantly sever cloud uplinks and execute 100% of causal inference locally inside Riyadh or NEOM industrial boundaries.</p>
-                    </div>
-                    <div class="pillar-tag">ZERO DATA EGRESS</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- INTERACTIVE CAUSAL PHYSICS SIMULATOR -->
-        <section class="section-wrap" id="simulator">
-            <div class="section-header">
-                <div class="section-tag" data-i18n="tag_sim">INTERACTIVE STRESS LABORATORY</div>
-                <h2 class="section-heading" data-i18n="sim_heading">Simulate Real-Time Desert Stress</h2>
-                <p class="section-subtext" data-i18n="sim_sub">
-                    Adjust aerosol particle density and kinetic wind speed to observe how SAHARYN's Causal Engine computes asset degradation in real time.
-                </p>
-            </div>
-
-            <div class="simulator-box">
-                <div class="sim-controls">
-                    <div class="sim-control-group">
-                        <div class="sim-control-header">
-                            <span data-i18n="slider_aod">AEROSOL OPTICAL DEPTH (AOD)</span>
-                            <span style="color: var(--accent-emerald-bright);" id="sim-aod-val">0.85</span>
-                        </div>
-                        <input type="range" min="0.05" max="2.5" step="0.05" value="0.85" class="sim-slider" id="sim-aod" oninput="runLivePhysicsSim()">
-                        <div style="display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); margin-top: 4px;">
-                            <span>Clear (0.05)</span>
-                            <span>Standard Arid (0.85)</span>
-                            <span>Severe Sandstorm (2.50)</span>
-                        </div>
-                    </div>
-
-                    <div class="sim-control-group">
-                        <div class="sim-control-header">
-                            <span data-i18n="slider_wind">KINETIC WIND VELOCITY</span>
-                            <span style="color: var(--accent-cyan);" id="sim-wind-val">22 m/s</span>
-                        </div>
-                        <input type="range" min="2" max="45" step="1" value="22" class="sim-slider" id="sim-wind" oninput="runLivePhysicsSim()">
-                        <div style="display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); margin-top: 4px;">
-                            <span>Calm (2 m/s)</span>
-                            <span>Moderate (22 m/s)</span>
-                            <span>Gale Storm (45 m/s)</span>
-                        </div>
-                    </div>
-
-                    <div class="sim-control-group">
-                        <div class="sim-control-header">
-                            <span data-i18n="slider_vib">ASSET VIBRATION (RMS)</span>
-                            <span style="color: var(--accent-amber);" id="sim-vib-val">2.4 mm/s</span>
-                        </div>
-                        <input type="range" min="0.5" max="10.0" step="0.1" value="2.4" class="sim-slider" id="sim-vib" oninput="runLivePhysicsSim()">
-                        <div style="display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); margin-top: 4px;">
-                            <span>ISO Zone A (&lt;1.5)</span>
-                            <span>ISO Zone B (2.4)</span>
-                            <span>ISO Zone D (&gt;7.0)</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="sim-outputs">
-                    <div class="sim-output-card">
-                        <div class="sim-metric">
-                            <span class="sim-metric-lbl">DUST SEVERITY INDEX</span>
-                            <span class="sim-metric-val" style="color: var(--accent-emerald-bright);" id="sim-res-dsi">0.68</span>
-                        </div>
-                        <div class="sim-metric">
-                            <span class="sim-metric-lbl">ABRASION MOMENTUM</span>
-                            <span class="sim-metric-val" style="color: var(--accent-cyan);" id="sim-res-abr">1.82 x</span>
-                        </div>
-                        <div class="sim-metric">
-                            <span class="sim-metric-lbl">FAILURE RISK PROBABILITY</span>
-                            <span class="sim-metric-val" style="color: var(--accent-rose);" id="sim-res-risk">38.4%</span>
-                        </div>
-                        <div class="sim-metric">
-                            <span class="sim-metric-lbl">ESTIMATED AVOIDED LOSS</span>
-                            <span class="sim-metric-val" style="color: #ffffff;" id="sim-res-savings">$580,240</span>
-                        </div>
-                    </div>
+                <!-- Pillar 6 -->
+                <div class="solution-card">
+                    <div class="solution-icon-box"><i data-lucide="lock" size="22"></i></div>
+                    <h3 class="solution-title" data-i18n="p6_title">Air-Gapped Sovereign Edge</h3>
+                    <p class="solution-body" data-i18n="p6_body">Critical national infrastructure requires absolute data sovereignty. Instantly sever cloud uplinks and execute 100% of causal inference locally inside Riyadh or NEOM industrial boundaries.</p>
+                    <span class="solution-tag">ZERO DATA EGRESS</span>
                 </div>
             </div>
         </section>
@@ -1127,7 +920,7 @@
                 <div class="footer-brand">
                     <div class="brand-wrapper">
                         <div class="brand-emblem"></div>
-                        <div class="brand-text">SAHARYN <span>AI CORE</span></div>
+                        <div class="brand-text">SAHARYN <span>AI</span></div>
                     </div>
                     <p data-i18n="footer_desc">
                         Sovereign Predictive Intelligence platform protecting critical energy, water, and industrial assets in high-consequence desert environments.
@@ -1166,15 +959,15 @@
             </div>
 
             <div class="footer-bottom">
-                <div>&copy; 2026 SAHARYN AI CORE. All Rights Reserved. Riyadh &bull; Eastern Province &bull; NEOM.</div>
+                <div>&copy; 2026 SAHARYN AI. All Rights Reserved. Riyadh &bull; Eastern Province &bull; NEOM.</div>
                 <div>AUTONOMOUS SATELLITE-TO-PLANT CAUSAL RESILIENCE ENGINE</div>
             </div>
         </footer>
     </div>
 
-    <!-- ── THREE.JS HIGH-END 3D INDUSTRIAL TURBINE ENGINE ── -->
+    <!-- Background Particle Network & Translation Script -->
     <script>
-        // 1. Initialize Ambient Particle Network
+        // 1. Ambient Background Particles
         (function initBgCanvas() {
             const canvas = document.getElementById('bg-canvas');
             const ctx = canvas.getContext('2d');
@@ -1188,14 +981,14 @@
             window.addEventListener('resize', resize);
             resize();
 
-            for (let i = 0; i < 60; i++) {
+            for (let i = 0; i < 50; i++) {
                 particles.push({
                     x: Math.random() * w,
                     y: Math.random() * h,
-                    vx: (Math.random() - 0.5) * 0.35,
-                    vy: (Math.random() - 0.5) * 0.35,
+                    vx: (Math.random() - 0.5) * 0.3,
+                    vy: (Math.random() - 0.5) * 0.3,
                     radius: Math.random() * 1.5 + 0.5,
-                    color: Math.random() > 0.4 ? 'rgba(16, 185, 129, 0.35)' : 'rgba(6, 182, 212, 0.25)'
+                    color: Math.random() > 0.4 ? 'rgba(16, 185, 129, 0.3)' : 'rgba(6, 182, 212, 0.2)'
                 });
             }
 
@@ -1224,7 +1017,7 @@
                             ctx.beginPath();
                             ctx.moveTo(p.x, p.y);
                             ctx.lineTo(p2.x, p2.y);
-                            ctx.strokeStyle = `rgba(16, 185, 129, ${0.12 * (1 - dist / 110)})`;
+                            ctx.strokeStyle = `rgba(16, 185, 129, ${0.1 * (1 - dist / 110)})`;
                             ctx.lineWidth = 0.5;
                             ctx.stroke();
                         }
@@ -1235,321 +1028,103 @@
             animate();
         })();
 
-        // 2. High-Tech Multi-Stage Industrial Turbine Digital Twin
-        (function initTwinView() {
-            const container = document.getElementById('twin-viewport');
-            if (!container) return;
-
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-            camera.position.set(0, 1.2, 7.5);
-
-            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-            renderer.setSize(container.clientWidth, container.clientHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            renderer.shadowMap.enabled = true;
-            container.appendChild(renderer.domElement);
-
-            // Lighting Setup
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
-            scene.add(ambientLight);
-
-            const emeraldLight = new THREE.PointLight(0x10b981, 3, 20);
-            emeraldLight.position.set(3, 4, 3);
-            scene.add(emeraldLight);
-
-            const cyanLight = new THREE.PointLight(0x06b6d4, 3, 20);
-            cyanLight.position.set(-3, -3, 3);
-            scene.add(cyanLight);
-
-            // Root Group
-            const turbineGroup = new THREE.Group();
-            scene.add(turbineGroup);
-
-            // A. Central Drive Shaft
-            const shaftGeo = new THREE.CylinderGeometry(0.32, 0.32, 4.8, 32);
-            const shaftMat = new THREE.MeshStandardMaterial({
-                color: 0x1e293b,
-                metalness: 0.85,
-                roughness: 0.2,
-                wireframe: false
-            });
-            const shaft = new THREE.Mesh(shaftGeo, shaftMat);
-            shaft.rotation.z = Math.PI / 2;
-            turbineGroup.add(shaft);
-
-            // B. Turbine Stages (3 Distinct Rotor Blisk Rings)
-            const rotorBlades = [];
-            const stagePositions = [-1.4, -0.2, 1.0];
-            const stageRadii = [1.5, 1.25, 1.0];
-
-            stagePositions.forEach((posX, stageIdx) => {
-                const stageGroup = new THREE.Group();
-                stageGroup.position.x = posX;
-
-                // Central Hub
-                const hubGeo = new THREE.CylinderGeometry(0.5, 0.5, 0.25, 24);
-                const hubMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.9, roughness: 0.1 });
-                const hub = new THREE.Mesh(hubGeo, hubMat);
-                hub.rotation.z = Math.PI / 2;
-                stageGroup.add(hub);
-
-                // Extruded Aerodynamic Blades
-                const bladeCount = 14 + (stageIdx * 4);
-                const maxR = stageRadii[stageIdx];
-
-                for (let b = 0; b < bladeCount; b++) {
-                    const angle = (b / bladeCount) * Math.PI * 2;
-                    const bladeGeo = new THREE.BoxGeometry(0.06, maxR * 0.75, 0.22);
-                    const bladeMat = new THREE.MeshStandardMaterial({
-                        color: stageIdx === 0 ? 0x10b981 : (stageIdx === 1 ? 0x06b6d4 : 0x6366f1),
-                        metalness: 0.8,
-                        roughness: 0.3,
-                        emissive: stageIdx === 0 ? 0x047857 : 0x0e7490,
-                        emissiveIntensity: 0.25
-                    });
-                    const blade = new THREE.Mesh(bladeGeo, bladeMat);
-                    blade.position.y = Math.cos(angle) * (maxR * 0.55 + 0.2);
-                    blade.position.z = Math.sin(angle) * (maxR * 0.55 + 0.2);
-                    blade.rotation.x = -angle + 0.35;
-                    stageGroup.add(blade);
-                }
-
-                // Outer Protective Ring
-                const ringGeo = new THREE.TorusGeometry(maxR, 0.03, 16, 64);
-                const ringMat = new THREE.MeshBasicMaterial({ color: 0x34d399, wireframe: true, transparent: true, opacity: 0.4 });
-                const ring = new THREE.Mesh(ringGeo, ringMat);
-                ring.rotation.y = Math.PI / 2;
-                stageGroup.add(ring);
-
-                turbineGroup.add(stageGroup);
-                rotorBlades.push(stageGroup);
-            });
-
-            // C. Translucent Outer Casing Housing (Cutaway View)
-            const housingGeo = new THREE.CylinderGeometry(1.65, 1.35, 4.4, 32, 1, true, 0, Math.PI * 1.5);
-            const housingMat = new THREE.MeshStandardMaterial({
-                color: 0x0f2547,
-                metalness: 0.5,
-                roughness: 0.1,
-                transparent: true,
-                opacity: 0.3,
-                side: THREE.DoubleSide
-            });
-            const housing = new THREE.Mesh(housingGeo, housingMat);
-            housing.rotation.z = Math.PI / 2;
-            housing.position.x = -0.2;
-            turbineGroup.add(housing);
-
-            // D. Intake Dust & Airflow Stream Particles
-            const particleCount = 240;
-            const particleGeo = new THREE.BufferGeometry();
-            const positions = new Float32Array(particleCount * 3);
-            const velocities = [];
-
-            for (let i = 0; i < particleCount; i++) {
-                positions[i * 3] = (Math.random() - 0.5) * 5.0 - 1.0;
-                positions[i * 3 + 1] = (Math.random() - 0.5) * 2.4;
-                positions[i * 3 + 2] = (Math.random() - 0.5) * 2.4;
-                velocities.push({
-                    vx: 0.04 + Math.random() * 0.04,
-                    vy: (Math.random() - 0.5) * 0.008,
-                    vz: (Math.random() - 0.5) * 0.008
-                });
-            }
-            particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-            const particleMat = new THREE.PointsMaterial({
-                color: 0x38bdf8,
-                size: 0.05,
-                transparent: true,
-                opacity: 0.75
-            });
-            const streamParticles = new THREE.Points(particleGeo, particleMat);
-            turbineGroup.add(streamParticles);
-
-            // E. Interactive Mouse Drag & Parallax Orbit
-            let isDragging = false;
-            let prevMouseX = 0;
-            let prevMouseY = 0;
-            let targetRotY = -0.4;
-            let targetRotX = 0.2;
-
-            container.addEventListener('mousedown', (e) => {
-                isDragging = true;
-                prevMouseX = e.clientX;
-                prevMouseY = e.clientY;
-            });
-
-            window.addEventListener('mouseup', () => { isDragging = false; });
-
-            window.addEventListener('mousemove', (e) => {
-                if (isDragging) {
-                    const deltaX = e.clientX - prevMouseX;
-                    const deltaY = e.clientY - prevMouseY;
-                    targetRotY += deltaX * 0.008;
-                    targetRotX += deltaY * 0.008;
-                    prevMouseX = e.clientX;
-                    prevMouseY = e.clientY;
-                }
-            });
-
-            // Touch support for mobile
-            container.addEventListener('touchstart', (e) => {
-                if (e.touches.length === 1) {
-                    isDragging = true;
-                    prevMouseX = e.touches[0].clientX;
-                    prevMouseY = e.touches[0].clientY;
-                }
-            });
-            window.addEventListener('touchend', () => { isDragging = false; });
-            window.addEventListener('touchmove', (e) => {
-                if (isDragging && e.touches.length === 1) {
-                    const deltaX = e.touches[0].clientX - prevMouseX;
-                    const deltaY = e.touches[0].clientY - prevMouseY;
-                    targetRotY += deltaX * 0.008;
-                    targetRotX += deltaY * 0.008;
-                    prevMouseX = e.touches[0].clientX;
-                    prevMouseY = e.touches[0].clientY;
-                }
-            });
-
-            // Animation Render Loop
-            function animateTwin() {
-                requestAnimationFrame(animateTwin);
-
-                // Smooth Rotation Interpolation
-                turbineGroup.rotation.y += (targetRotY - turbineGroup.rotation.y) * 0.06;
-                turbineGroup.rotation.x += (targetRotX - turbineGroup.rotation.x) * 0.06;
-                if (!isDragging) {
-                    targetRotY += 0.003; // Gentle continuous autorotation
-                }
-
-                // Spin Individual Rotor Stages at High Industrial Velocity
-                rotorBlades.forEach((stage, idx) => {
-                    stage.rotation.x += (idx % 2 === 0 ? 0.08 : -0.07);
-                });
-
-                // Animate Dust Airflow Stream Through Compressor
-                const posArray = streamParticles.geometry.attributes.position.array;
-                for (let i = 0; i < particleCount; i++) {
-                    posArray[i * 3] += velocities[i].vx;
-                    posArray[i * 3 + 1] += velocities[i].vy;
-                    posArray[i * 3 + 2] += velocities[i].vz;
-
-                    // Reset particle when it exits downstream
-                    if (posArray[i * 3] > 2.5) {
-                        posArray[i * 3] = -2.8;
-                        posArray[i * 3 + 1] = (Math.random() - 0.5) * 2.2;
-                        posArray[i * 3 + 2] = (Math.random() - 0.5) * 2.2;
-                    }
-                }
-                streamParticles.geometry.attributes.position.needsUpdate = true;
-
-                renderer.render(scene, camera);
-            }
-            animateTwin();
-
-            window.addEventListener('resize', () => {
-                if (!container) return;
-                camera.aspect = container.clientWidth / container.clientHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(container.clientWidth, container.clientHeight);
-            });
-        })();
-
-        // 3. Live Physics Stress Laboratory Calculations
-        function runLivePhysicsSim() {
-            const aod = parseFloat(document.getElementById('sim-aod').value);
-            const wind = parseFloat(document.getElementById('sim-wind').value);
-            const vib = parseFloat(document.getElementById('sim-vib').value);
-
-            document.getElementById('sim-aod-val').innerText = aod.toFixed(2);
-            document.getElementById('sim-wind-val').innerText = `${wind} m/s`;
-            document.getElementById('sim-vib-val').innerText = `${vib.toFixed(1)} mm/s`;
-
-            // Causal Engine Math Derivations
-            const dsi = Math.min(1.0, (aod * 0.55) + (wind / 50.0 * 0.3) + (vib / 10.0 * 0.15));
-            const abrasion = (aod * 1.42 * (wind / 15.0)).toFixed(2);
-            const risk = Math.min(99.4, ((dsi * 60) + (vib * 4.2))).toFixed(1);
-            const baseLoss = 1510000;
-            const savings = Math.round((risk / 100) * baseLoss * 0.95);
-
-            document.getElementById('sim-res-dsi').innerText = dsi.toFixed(2);
-            document.getElementById('sim-res-abr').innerText = `${abrasion} x`;
-            document.getElementById('sim-res-risk').innerText = `${risk}%`;
-            document.getElementById('sim-res-savings').innerText = `$${savings.toLocaleString()}`;
-        }
-
-        // 4. Live Satellite Telemetry Stream Sync with Proper Formatting
-        async function fetchLiveSatelliteFeed() {
-            try {
-                const res = await fetch('/v2/telemetry/stream');
-                if (!res.ok) return;
-                const data = await res.json();
-                const feeds = data.feeds || [];
-
-                const aodFeed = feeds.find(f => f.source === 'NASA_TERRA');
-                const ddiFeed = feeds.find(f => f.source === 'ESA_SENTINEL_2');
-
-                if (aodFeed) {
-                    // Safe numeric formatting for AOD (0.05 to 2.50)
-                    let aodVal = parseFloat(aodFeed.value);
-                    if (aodVal > 10.0) aodVal = (aodVal / 200.0); // Normalize if raw scalar
-                    const formattedAod = aodVal.toFixed(3);
-
-                    const el2 = document.getElementById('card-aod');
-                    if (el2) el2.innerText = `${formattedAod} AOD`;
-                }
-            } catch (e) {
-                // Fallback maintains smooth display
-            }
-        }
-        fetchLiveSatelliteFeed();
-        setInterval(fetchLiveSatelliteFeed, 10000);
-
-        // 5. Bilingual English / Arabic Language Switcher
+        // 2. Bilingual English / Arabic Language Switcher
         const translations = {
             en: {
-                nav_how: "Platform", nav_cap: "Capabilities", nav_sim: "Physics Simulator", nav_tech: "Architecture Whitepaper", nav_cta: "Mission Control",
+                nav_solutions: "Solutions",
+                nav_platform: "Platform",
+                nav_capabilities: "Capabilities",
+                nav_technology: "Technology",
+                nav_api: "API Docs",
+                nav_cta: "Mission Control",
                 hero_badge: "NASA & ESA COPERNICUS ATMOSPHERIC BRIDGE",
-                hero_h1_lead: "Predict High-Consequence Failures", hero_h1_sub: "before harsh desert impacts occur.",
+                hero_h1_lead: "Predict High-Consequence Failures",
+                hero_h1_sub: "before harsh desert impacts occur.",
                 hero_desc: "SAHARYN AI combines space-borne satellite intelligence with physics-informed causal mechanics to monitor sandstorms, thermal decay, and abrasion—predicting industrial asset failures up to 48 hours in advance across Saudi Arabia and the Middle East.",
-                hero_cta_primary: "Launch Mission Control", hero_cta_secondary: "View Architecture Proof",
-                m_lead: "Early Warning Horizon", m_latency: "Causal Inference Cycle", m_savings: "Avg Avoided Downtime Loss",
-                tag_capabilities: "ENGINEERING ADVANTAGE", pillars_heading: "5 Sovereign Mechanisms of Action",
+                hero_cta_primary: "Launch Mission Control",
+                hero_cta_secondary: "View Architecture Proof",
+                m_lead: "Early Warning Window",
+                m_latency: "Causal Inference Cycle",
+                m_savings: "Avg Avoided Downtime Loss",
+                fac_base_title: "Surface Infrastructure Layer",
+                fac_base_desc: "High-resolution visual telemetry captures ground operations across gas compressors, water injection pumps, and refinery turbines.",
+                fac_scan_title: "Environmental Stress Manifold",
+                fac_scan_desc: "Multi-spectral data fusion reveals invisible stressors: thermal decay gradients, particulate dust density, and vibration shockwaves in real-time.",
+                tag_solutions: "INDUSTRY APPLICATIONS",
+                sol_heading: "Built for High-Consequence Desert Assets",
+                sol_sub: "Protecting national critical infrastructure against extreme sandstorms, high ambient heat, and abrasive dust cycles.",
+                s1_title: "Oil & Gas Upstream & Refining",
+                s1_body: "Preventing compressor surge, gas turbine blade erosion, and seal failures in desert production facilities across the Eastern Province and Rub' Al Khali.",
+                s2_title: "Power & Utilities Grids",
+                s2_body: "Forecasting turbine intake filter clogging and transformer thermal breakdown during regional dust storm events.",
+                s3_title: "Water & Desalination Plants",
+                s3_body: "Monitoring high-pressure intake pumps and reverse osmosis filtration membranes subject to high particulate loads and salinity.",
+                tag_capabilities: "PLATFORM ARCHITECTURE",
+                pillars_heading: "5 Sovereign Mechanisms of Action",
                 pillars_sub: "Eliminating the 'black-box' dilemma of standard machine learning through verifiable physics and mathematical proof.",
-                p1_title: "Satellite Atmospheric Fusion", p1_body: "Direct programmatic ingestion of NASA MODIS and Copernicus Sentinel-2/CAMS. Real-time mapping of particle diameter, AOD, and kinetic dust momentum before contact.",
-                p2_title: "Physics-Informed Digital Twins", p2_body: "Solving boundary condition Navier-Stokes and Arrhenius chemical degradation equations in real time. Accurately modeling abrasion kinetics and structural thermal stress.",
-                p3_title: "Explainable Causal Manifold", p3_body: "A strict 11-node Directed Acyclic Graph (DAG) enforcing anti-hallucination. Every failure forecast generates a step-by-step cryptographic causal chain from weather trigger to asset outcome.",
-                p4_title: "Prescriptive Financial Optimizer", p4_body: "Calculates financial ROI and avoided loss metrics for every condition. Generates clear, advisory operational directives (e.g. backflush HEPA filtration, dynamic load modulation).",
-                p5_title: "Cryptographic Sovereign ESG Ledger", p5_body: "Quantifies Scope 3 lifecycle manufacturing carbon avoided by extending asset useful life. Every claim is cryptographically chained with SHA-256 Merkle proofs for ESG audit defensibility.",
-                p6_title: "Air-Gapped Sovereign Edge", p6_body: "Critical national infrastructure requires absolute data sovereignty. Instantly sever cloud uplinks and execute 100% of causal inference locally inside Riyadh or NEOM industrial boundaries.",
-                tag_sim: "INTERACTIVE STRESS LABORATORY", sim_heading: "Simulate Real-Time Desert Stress",
-                sim_sub: "Adjust aerosol particle density and kinetic wind speed to observe how SAHARYN's Causal Engine computes asset degradation in real time.",
-                slider_aod: "AEROSOL OPTICAL DEPTH (AOD)", slider_wind: "KINETIC WIND VELOCITY", slider_vib: "ASSET VIBRATION (RMS)",
-                tag_compliance: "STANDARDS & GOVERNANCE", comp_heading: "Architected for Critical Infrastructure",
+                p1_title: "Satellite Atmospheric Fusion",
+                p1_body: "Direct programmatic ingestion of NASA MODIS (MOD04_L2) and Copernicus Sentinel-2/CAMS. Real-time mapping of particle diameter, AOD, and kinetic dust momentum.",
+                p2_title: "Physics-Informed Digital Twins",
+                p2_body: "Solving boundary condition Navier-Stokes and Arrhenius chemical degradation equations in real time to model abrasion kinetics and thermal stress.",
+                p3_title: "Explainable Causal Manifold",
+                p3_body: "A strict 11-node Directed Acyclic Graph (DAG) enforcing anti-hallucination. Generates step-by-step cryptographic causal chains from weather triggers to mechanical outcomes.",
+                p4_title: "Prescriptive Financial Optimizer",
+                p4_body: "Calculates financial ROI and avoided loss metrics for every condition. Generates clear, advisory operational directives (e.g. backflush HEPA filtration, dynamic load modulation).",
+                p5_title: "Cryptographic Sovereign ESG Ledger",
+                p5_body: "Quantifies Scope 3 lifecycle manufacturing carbon avoided by extending asset useful life. Every claim is cryptographically chained with SHA-256 Merkle proofs for audit defensibility.",
+                p6_title: "Air-Gapped Sovereign Edge",
+                p6_body: "Critical national infrastructure requires absolute data sovereignty. Instantly sever cloud uplinks and execute 100% of causal inference locally inside Riyadh or NEOM industrial boundaries.",
+                tag_compliance: "STANDARDS & GOVERNANCE",
+                comp_heading: "Architected for Critical Infrastructure",
                 comp_sub: "Engineered in strict alignment with international cybersecurity, explainability, and carbon accounting protocols.",
                 footer_desc: "Sovereign Predictive Intelligence platform protecting critical energy, water, and industrial assets in high-consequence desert environments."
             },
             ar: {
-                nav_how: "المنصة", nav_cap: "القدرات", nav_sim: "محاكي الفيزياء", nav_tech: "ورقة العمل التقنية", nav_cta: "مركز العمليات",
+                nav_solutions: "الحلول",
+                nav_platform: "المنصة",
+                nav_capabilities: "القدرات",
+                nav_technology: "التقنية",
+                nav_api: "واجهة البرمجة",
+                nav_cta: "مركز العمليات",
                 hero_badge: "جسر وكالة ناسا وإيسا كوبرنيكوس للغلاف الجوي",
-                hero_h1_lead: "التنبؤ بالأعطال الحرجة", hero_h1_sub: "قبل وقوع أضرار البيئة الصحراوية القاسية.",
+                hero_h1_lead: "التنبؤ بالأعطال الحرجة",
+                hero_h1_sub: "قبل وقوع أضرار البيئة الصحراوية القاسية.",
                 hero_desc: "تجمع منصة سحارين (SAHARYN AI) بين استخبارات الأقمار الصناعية الفضائية والميكانيكا السببية الفيزيائية لرصد العواصف الرملية والتآكل الحراري، متنبئة بأعطال المعدات الصناعية حتى 48 ساعة مسبقاً في المملكة العربية السعودية والشرق الأوسط.",
-                hero_cta_primary: "فتح مركز العمليات", hero_cta_secondary: "عرض الإثبات التقني",
-                m_lead: "أفق الإنذار المبكر", m_latency: "دورة الاستدلال السببي", m_savings: "متوسط الخسائر المتجنبة",
-                tag_capabilities: "الميزة الهندسية", pillars_heading: "5 آليات عمل سيادية",
+                hero_cta_primary: "فتح مركز العمليات",
+                hero_cta_secondary: "عرض الإثبات التقني",
+                m_lead: "نافذة الإنذار المبكر",
+                m_latency: "دورة الاستدلال السببي",
+                m_savings: "متوسط الخسائر المتجنبة",
+                fac_base_title: "طبقة البنية التحتية السطحية",
+                fac_base_desc: "الاستشعار البصري عالي الدقة يرصد العمليات التشغيلية على الأرض لضواغط الغاز ومضخات حقن المياه وتوربينات التكرير.",
+                fac_scan_title: "منظومة الإجهاد البيئي",
+                fac_scan_desc: "دمج البيانات متعددة الأطياف يكشف المؤثرات غير المرئية: التدرج الحراري، كثافة الغبار، وموجات الاهتزاز في الوقت الفعلي.",
+                tag_solutions: "التطبيقات الصناعية",
+                sol_heading: "مصممة لأصول البيئة الصحراوية القاسية",
+                sol_sub: "حماية البنية التحتية الوطنية الحيوية من العواصف الرملية الشديدة والحرارة المرتفعة ودورات الغبار التآكلية.",
+                s1_title: "استكشاف وتكرير النفط والغاز",
+                s1_body: "منع اندفاع الضواغط وتآكل شفرات التوربينات وتلف السدادات في منشآت الإنتاج بالمنطقة الشرقية والربع الخالي.",
+                s2_title: "شبكات توليد الطاقة والمرافق",
+                s2_body: "التنبؤ بانسداد فلاتر سحب التوربينات والانهيار الحراري للمحولات أثناء العواصف الرملية الإقليمية.",
+                s3_title: "محطات تحلية وضخ المياه",
+                s3_body: "مراقبة مضخات السحب عالية الضغط وأغشية التناضح العكسي المعرضة للترسبات الجزيئية العالية والملوحة.",
+                tag_capabilities: "هندسة المنصة",
+                pillars_heading: "5 آليات عمل سيادية",
                 pillars_sub: "القضاء على معضلة 'الصندوق الأسود' في الذكاء الاصطناعي التقليدي عبر البراهين الفيزيائية والرياضية القابلة للتحقق.",
-                p1_title: "دمج الأقمار الصناعية الفضائية", p1_body: "استيعاب مباشر لبيانات ناسا موديس وسنتينل-2 وكوبرنيكوس CAMS، مع رسم خرائط حية لحجم الجسيمات وكثافة الغبار والزخم الحركي قبل ملامسة المنشأة.",
-                p2_title: "التوائم الرقمية المستندة للفيزياء", p2_body: "حل معادلات نافييه-ستوكس ومعادلات التحلل الكيميائي الحراري (أرينيوس) في الوقت الفعلي، لنمذجة معدلات التآكل والإجهاد الميكانيكي بدقة متناهية.",
-                p3_title: "المنظومة السببية الشفافة", p3_body: "مخطط سببي صارم من 11 عقدة يمنع هلوسة الذكاء الاصطناعي، وينتج سلسلة سببية مشفرة خطوة بخطوة من المحفز الجوي وحتى النتيجة الميكانيكية.",
-                p4_title: "المُحسِّن المالي التوجيهي", p4_body: "حساب العائد المالي على الاستثمار والخسائر المتجنبة لكل حالة، وتقديم توجيهات تشغيلية استشارية واضحة (مثل الغسيل العكسي للفلاتر، وتخفيف الحمل الديناميكي).",
-                p5_title: "سجل الاستدامة الكربوني المشفر", p5_body: "قياس الانبعاثات المصنعية المتجنبة (النطاق 3) عبر إطالة العمر التشغيلي للمعدات الثقيلة، موثقة ببراهين ميركل ورمز SHA-256 للتدقيق البيئي.",
-                p6_title: "حوسبة الحافة السيادية المعزولة", p6_body: "حماية البنية التحتية الحيوية عبر عزل الاتصال السحابي بالكامل وتشغيل الاستدلال السببي محلياً بنسبة 100% داخل حدود الرياض أو نيوم الصناعية.",
-                tag_sim: "مختبر الإجهاد التفاعلي", sim_heading: "محاكاة الإجهاد الصحراوي الفوري",
-                sim_sub: "عدّل كثافة جزيئات الغبار وسرعة الرياح الحركية لمراقبة كيفية حساب محرك سحارين السببي لتدهور الأصول في الوقت الفعلي.",
-                slider_aod: "العمق البصري للهباء الجوي (AOD)", slider_wind: "سرعة الرياح الحركية", slider_vib: "اهتزاز المعدة (RMS)",
-                tag_compliance: "المعايير والحوكمة", comp_heading: "مصممة للبنية التحتية الحيوية",
+                p1_title: "دمج الأقمار الصناعية الفضائية",
+                p1_body: "استيعاب مباشر لبيانات ناسا موديس وسنتينل-2 وكوبرنيكوس CAMS، مع رسم خرائط حية لحجم الجسيمات وكثافة الغبار والزخم الحركي.",
+                p2_title: "التوائم الرقمية المستندة للفيزياء",
+                p2_body: "حل معادلات نافييه-ستوكس ومعادلات التحلل الكيميائي الحراري (أرينيوس) في الوقت الفعلي لنمذجة معدلات التآكل والإجهاد.",
+                p3_title: "المنظومة السببية الشفافة",
+                p3_body: "مخطط سببي صارم من 11 عقدة يمنع هلوسة الذكاء الاصطناعي، وينتج سلاسل سببية مشفرة خطوة بخطوة من المحفز الجوي وحتى النتيجة.",
+                p4_title: "المُحسِّن المالي التوجيهي",
+                p4_body: "حساب العائد المالي على الاستثمار والخسائر المتجنبة لكل حالة، وتقديم توجيهات تشغيلية واضحة (مثل الغسيل العكسي للفلاتر).",
+                p5_title: "سجل الاستدامة الكربوني المشفر",
+                p5_body: "قياس الانبعاثات المصنعية المتجنبة (النطاق 3) عبر إطالة العمر التشغيلي للمعدات الثقيلة، موثقة ببراهين ميركل ورمز SHA-256.",
+                p6_title: "حوسبة الحافة السيادية المعزولة",
+                p6_body: "حماية البنية التحتية الحيوية عبر عزل الاتصال السحابي بالكامل وتشغيل الاستدلال السببي محلياً داخل الرياض أو نيوم.",
+                tag_compliance: "المعايير والحوكمة",
+                comp_heading: "مصممة للبنية التحتية الحيوية",
                 comp_sub: "مبنية بتوافق دقيق مع معايير الأمن السيبراني الدولية، وتفسير الذكاء الاصطناعي، ومحاسبة الكربون المعتمدة.",
                 footer_desc: "منصة ذكاء اصطناعي سيادي تحمي أصول الطاقة والمياه والصناعة الحيوية في البيئات الصحراوية القاسية."
             }
@@ -1559,7 +1134,7 @@
         function toggleLang() {
             currentLang = currentLang === 'en' ? 'ar' : 'en';
             document.body.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
-            document.getElementById('lang-btn').querySelector('span').innerText = currentLang === 'ar' ? 'English / عربي' : 'عربي / EN';
+            document.getElementById('lang-btn').querySelector('span').innerText = currentLang === 'ar' ? 'English / العربية' : 'العربية / English';
 
             const t = translations[currentLang];
             document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -1570,10 +1145,9 @@
             if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
-        // Initialize Lucide Icons & Initial Sim on Load
+        // Initialize Lucide Icons
         document.addEventListener('DOMContentLoaded', () => {
             if (typeof lucide !== 'undefined') lucide.createIcons();
-            runLivePhysicsSim();
         });
     </script>
 </body>
