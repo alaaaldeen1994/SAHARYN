@@ -28,15 +28,20 @@ if (auth) {
 
 // Helper for Google Sign-In
 export async function login() {
-    if (!auth) {
-        alert("Firebase is not configured. Please add your credentials in firebase-config.js first.");
+    if (!auth || !provider) {
+        console.warn("Firebase Auth is not initialized.");
         return null;
     }
     try {
         const result = await signInWithPopup(auth, provider);
         return result.user;
     } catch (error) {
-        console.error("Auth error:", error);
+        if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
+            console.log("Sign-in popup closed by user.");
+        } else {
+            console.error("Authentication error:", error);
+        }
+        return null;
     }
 }
 

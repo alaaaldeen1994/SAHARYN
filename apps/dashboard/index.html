@@ -800,7 +800,7 @@
                 <button onclick="toggleLang()" class="btn-lang" id="lang-btn">
                     <span>AR / EN</span>
                 </button>
-                <a href="console.html" class="btn-start-free" id="nav-cta-btn">
+                <a href="javascript:void(0)" class="btn-start-free" id="nav-cta-btn" onclick="handleAuthAction(event)">
                     <span data-i18n="nav_cta">Log in</span>
                 </a>
             </div>
@@ -823,7 +823,7 @@
 
                     <!-- Solid Orange Hero Button -->
                     <div class="hero-btn-row">
-                        <a href="console.html" class="btn-hero-primary" id="hero-start-btn">
+                        <a href="javascript:void(0)" class="btn-hero-primary" id="hero-start-btn" onclick="handleAuthAction(event)">
                             <span data-i18n="cta_primary">Start Free</span>
                         </a>
                     </div>
@@ -1293,12 +1293,15 @@
         });
     </script>
 
-    <!-- Firebase Authentication & Login Interceptor -->
+    <!-- Firebase Authentication & Login Flow -->
     <script type="module">
         import { login, auth } from "./firebase-init.js";
 
-        async function handleStartFree(e) {
-            if (e) e.preventDefault();
+        async function handleAuthAction(e) {
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
 
             // If user is already authenticated in Firebase, go directly to console
             if (auth && auth.currentUser) {
@@ -1306,23 +1309,26 @@
                 return;
             }
 
-            // Trigger Google Firebase authentication popup
+            // Always open the Google Firebase Authentication popup first
             try {
                 const user = await login();
                 if (user) {
+                    // Only redirect IF login was successful!
                     window.location.href = "console.html";
                 }
+                // If user closes or cancels the login popup, DO NOT redirect! Stay on current page.
             } catch (err) {
-                window.location.href = "console.html";
+                console.error("Auth flow error:", err);
             }
         }
 
-        window.handleStartFree = handleStartFree;
+        window.handleAuthAction = handleAuthAction;
+        window.handleStartFree = handleAuthAction;
 
         document.addEventListener("DOMContentLoaded", () => {
-            const startButtons = document.querySelectorAll(".btn-start-free, .btn-hero-primary");
-            startButtons.forEach(btn => {
-                btn.addEventListener("click", handleStartFree);
+            const authButtons = document.querySelectorAll(".btn-start-free, .btn-hero-primary, #nav-cta-btn, #hero-start-btn");
+            authButtons.forEach(btn => {
+                btn.addEventListener("click", handleAuthAction);
             });
         });
     </script>
