@@ -1704,19 +1704,26 @@
                 const feeds = d.feeds || [];
                 const aod = feeds.find(f => f.source === 'NASA_TERRA');
                 const ddi = feeds.find(f => f.source === 'ESA_SENTINEL_2');
-                const cams = feeds.find(f => f.source === 'COPERNICUS_L2A');
 
-                if (aod) {
-                    document.getElementById('aod-live').innerText = aod.value;
+                const aodEl = document.getElementById('aod-live');
+                if (aodEl && aod) {
+                    aodEl.innerText = aod.value;
                 }
-                if (ddi) {
-                    document.getElementById('ddi-live').innerText = ddi.value;
+                const ddiEl = document.getElementById('ddi-live');
+                if (ddiEl && ddi) {
+                    ddiEl.innerText = ddi.value;
                 }
 
                 const hash = d.integrity_hash || '';
-                document.getElementById('live-audit-id').innerText = `HASH: ${hash.slice(0, 20)}...`;
+                const auditEl = document.getElementById('live-audit-id');
+                if (auditEl) {
+                    auditEl.innerText = `HASH: ${hash.slice(0, 20)}...`;
+                }
             } catch (e) {
-                document.getElementById('live-audit-id').innerText = 'AWAITING LIVE SYNC...';
+                const auditEl = document.getElementById('live-audit-id');
+                if (auditEl) {
+                    auditEl.innerText = 'AWAITING LIVE SYNC...';
+                }
             }
         }
 
@@ -1724,10 +1731,16 @@
             try {
                 const r = await fetch(`${API}/v2/system/health`);
                 const d = await r.json();
-                document.getElementById('system-status').innerText = d.status === 'OPERATIONAL' ? 'OPERATIONAL ✓' : 'DEGRADED';
-                document.getElementById('system-status').style.color = d.status === 'OPERATIONAL' ? 'var(--accent)' : '#f43f5e';
+                const statusEl = document.getElementById('system-status');
+                if (statusEl) {
+                    statusEl.innerText = d.status === 'OPERATIONAL' ? 'OPERATIONAL ✓' : 'DEGRADED';
+                    statusEl.style.color = d.status === 'OPERATIONAL' ? 'var(--accent)' : '#f43f5e';
+                }
             } catch (e) {
-                document.getElementById('system-status').innerText = 'PRODUCTION';
+                const statusEl = document.getElementById('system-status');
+                if (statusEl) {
+                    statusEl.innerText = 'PRODUCTION';
+                }
             }
         }
 

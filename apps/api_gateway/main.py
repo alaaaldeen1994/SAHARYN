@@ -150,6 +150,10 @@ async def root_redirect():
     """Enterprise Redirect to Operational Dashboard."""
     return RedirectResponse(url="/dashboard/index.html")
 
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon():
+    return Response(status_code=204)
+
 app.mount("/dashboard", StaticFiles(directory="apps/dashboard"), name="dashboard")
 
 
