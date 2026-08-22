@@ -70,13 +70,18 @@ class Sentinel2Connector:
             config = SHConfig()
             config.sh_client_id     = SH_CLIENT_ID
             config.sh_client_secret = SH_CLIENT_SECRET
-            config.sh_token_url     = "https://services.sentinel-hub.com/oauth/token"
-            config.sh_base_url      = "https://services.sentinel-hub.com"
+            
+            # Use Copernicus Data Space Ecosystem (CDSE) URLs if configured, with auto-fallback
+            token_url = os.getenv("SENTINELHUB_TOKEN_URL", "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token")
+            base_url  = os.getenv("SENTINELHUB_BASE_URL", "https://sh.dataspace.copernicus.eu")
+            config.sh_token_url     = token_url
+            config.sh_base_url      = base_url
+
             if SH_INSTANCE_ID:
                 config.instance_id = SH_INSTANCE_ID
             self._sh_config = config
             self._available = True
-            logger.info(f"Sentinel Hub OAuth connected: client_id={SH_CLIENT_ID[:8]}...")
+            logger.info(f"Sentinel Hub OAuth connected: client_id={SH_CLIENT_ID[:8]}... (Endpoint: {base_url})")
         except ImportError:
             logger.warning("sentinelhub not installed. pip install sentinelhub")
         except Exception as e:
