@@ -1786,7 +1786,7 @@
                         </div>
                         <div
                             style="text-align: right; color: var(--text-secondary); font-family: 'JetBrains Mono'; font-size: 11px;">
-                            DATE: 2024-Q3<br>AUTH: IONIZED_GRAVITY_LABS
+                            DATE: 2026-Q3<br>AUTH: IONIZED_GRAVITY_LABS
                         </div>
                     </div>
 
@@ -3381,7 +3381,18 @@
         document.addEventListener('DOMContentLoaded', () => {
             initChart();
             renderCausalGraph('SA_EAST_RU_01');
-            setTimeout(triggerAnalysis, 500); // initial fetch
+            setTimeout(triggerAnalysis, 300); // initial fetch
+
+            // Preload all operational tabs in background for instant responsiveness
+            setTimeout(() => {
+                updateTelemetryData();
+                updatePhysicsManifoldData();
+                updateAssetStressMap();
+                updateESGImpactData();
+                updateESGLedgerData();
+                updateEnergyMissionsData();
+                updateAuditLedgerData();
+            }, 800);
 
             // Industrial Multi-Sector Sync (5s Heartbeat)
             setInterval(() => {
@@ -3392,6 +3403,7 @@
                 if (activeView.id === 'physics-view') updatePhysicsManifoldData();
                 if (activeView.id === 'audit-view') updateAuditLedgerData();
                 if (activeView.id === 'energy-view') updateEnergyMissionsData();
+                if (activeView.id === 'stress-view') updateAssetStressMap();
                 if (activeView.id === 'esg-view') {
                     updateESGImpactData();
                     updateESGLedgerData();

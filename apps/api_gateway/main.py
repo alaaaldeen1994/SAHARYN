@@ -222,7 +222,7 @@ async def verify_enterprise_access(request: Request, x_api_key: str = Header(...
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
-    logger.error(f"SYSTEM_EXCPETION: {str(exc)}")
+    logger.error(f"SYSTEM_EXCEPTION: {str(exc)}")
     logger.error(traceback.format_exc())
     return JSONResponse(
         status_code=500,
@@ -408,6 +408,14 @@ async def execute_resilience_inference(
         },
         verification_checksum=validated_block.verification_hash
     )
+
+@app.post("/v2/inference/predict", response_model=InferenceResponse, tags=["Inference"], include_in_schema=False)
+async def execute_predict_alias(
+    payload: InferenceRequest,
+    auth_key: str = Depends(verify_enterprise_access)
+):
+    """Standardized alias for /v2/inference/resilience."""
+    return await execute_resilience_inference(payload, auth_key)
 
 @app.get("/v2/telemetry/stream", tags=["Telemetry"])
 async def get_telemetry_stream(site_id: str = "SA_EAST_RU_01"):
