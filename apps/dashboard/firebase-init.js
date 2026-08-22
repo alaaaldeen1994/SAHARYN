@@ -1,6 +1,6 @@
 // Firebase Initialization for Saharyn AI - Tech Uplink Verified
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import firebaseConfig from "./firebase-config.js";
 
 // Initialize Firebase
@@ -10,6 +10,7 @@ try {
         app = initializeApp(firebaseConfig);
         auth = getAuth(app);
         provider = new GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' });
     } else {
         console.warn("Firebase Not Configured: Using local guest mode. Please update firebase-config.js.");
     }
@@ -26,7 +27,7 @@ if (auth) {
     });
 }
 
-// Helper for Google Sign-In
+// Helper for Google Sign-In with popup + fallback
 export async function login() {
     if (!auth || !provider) {
         console.warn("Firebase Auth is not initialized.");
@@ -34,14 +35,27 @@ export async function login() {
     }
     try {
         const result = await signInWithPopup(auth, provider);
-        return result.user;
+        if (result && result.user) {
+            return result.user;
+        }
     } catch (error) {
-        if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
-            console.log("Sign-in popup closed by user.");
+        if (error.code === 'auth/popup-blocked' || error.code === 'auth/popup-closed-by-user' && error.message.includes('blocked')) {
+            console.log("Popup blocked, falling back to redirect...");
+            await signInWithRedirect(auth, provider);
+            return null;
+        } else if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
+            console.log("Sign-in cancelled or popup closed by user.");
+            return null;
         } else {
             console.error("Authentication error:", error);
+            // Attempt redirect on any popup communication failure
+            try {
+                await signInWithRedirect(auth, provider);
+            } catch (e) {
+                console.error("Redirect fallback failed:", e);
+            }
+            return null;
         }
-        return null;
     }
 }
 

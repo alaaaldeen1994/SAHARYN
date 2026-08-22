@@ -1296,6 +1296,34 @@
     <!-- Firebase Authentication & Login Flow -->
     <script type="module">
         import { login, auth } from "./firebase-init.js";
+        import { onAuthStateChanged, getRedirectResult } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        let isAuthenticating = false;
+
+        // 1. Check if user arrived back from a Google Redirect
+        if (auth) {
+            getRedirectResult(auth).then(result => {
+                if (result && result.user) {
+                    window.location.href = "console.html";
+                }
+            }).catch(e => console.warn(e));
+
+            // 2. Continuous Auth State Listener: if authenticated while waiting, redirect to console immediately
+            onAuthStateChanged(auth, (user) => {
+                if (user && isAuthenticating) {
+                    isAuthenticating = false;
+                    window.location.href = "console.html";
+                }
+            });
+        }
+
+        // 3. Custom Event Listener from firebase-init.js
+        window.addEventListener('saharyn-auth-changed', (e) => {
+            if (e.detail && isAuthenticating) {
+                isAuthenticating = false;
+                window.location.href = "console.html";
+            }
+        });
 
         async function handleAuthAction(e) {
             if (e) {
@@ -1309,14 +1337,15 @@
                 return;
             }
 
-            // Always open the Google Firebase Authentication popup first
+            isAuthenticating = true;
+
+            // Trigger Google Firebase Authentication popup
             try {
                 const user = await login();
                 if (user) {
-                    // Only redirect IF login was successful!
+                    isAuthenticating = false;
                     window.location.href = "console.html";
                 }
-                // If user closes or cancels the login popup, DO NOT redirect! Stay on current page.
             } catch (err) {
                 console.error("Auth flow error:", err);
             }
