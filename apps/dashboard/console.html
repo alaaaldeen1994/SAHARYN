@@ -2594,19 +2594,19 @@
                 if (activationVal) activationVal.innerText = c.activation_energy + " kJ";
 
                 const youngsVal = document.querySelector('[data-i18n="phys_youngs"]')?.nextElementSibling;
-                if (youngsVal) youngsVal.innerText = c.youngs_modulus + " GPa";
+                if (youngsVal && c.youngs_modulus !== undefined) youngsVal.innerText = c.youngs_modulus + " GPa";
 
                 // Update Diligence Hub Live Derivations
                 const reHub = document.getElementById('hub-reynolds');
-                if (reHub) reHub.innerText = c.reynolds_number.toLocaleString();
+                if (reHub && c.reynolds_number !== undefined) reHub.innerText = typeof c.reynolds_number === 'number' ? c.reynolds_number.toLocaleString() : c.reynolds_number;
 
                 const kiHub = document.getElementById('hub-ki');
-                if (kiHub) kiHub.innerText = c.stress_intensity.toFixed(4);
+                if (kiHub && c.stress_intensity !== undefined && c.stress_intensity !== null) kiHub.innerText = typeof c.stress_intensity === 'number' ? c.stress_intensity.toFixed(4) : c.stress_intensity;
 
                 const corrHub = document.getElementById('hub-corrosion');
-                if (corrHub) corrHub.innerText = c.corrosion_kinetic.toFixed(6);
+                if (corrHub && c.corrosion_kinetic !== undefined && c.corrosion_kinetic !== null) corrHub.innerText = typeof c.corrosion_kinetic === 'number' ? c.corrosion_kinetic.toFixed(6) : c.corrosion_kinetic;
 
-            } catch (e) { console.error("Physics Link Failure", e); }
+            } catch (e) { }
         }
 
         async function updateAuditLedgerData() {

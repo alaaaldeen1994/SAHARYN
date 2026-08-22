@@ -21,10 +21,7 @@ try {
 if (auth) {
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            console.log("Authenticated as:", user.email);
             window.dispatchEvent(new CustomEvent('saharyn-auth-changed', { detail: user }));
-        } else {
-            console.log("No user authenticated.");
         }
     });
 }

@@ -203,18 +203,18 @@
             background: transparent;
             color: #ff6b2c !important;
             border: 1.5px solid #ff6b2c;
-            padding: 8px 24px;
+            padding: 6px 16px;
             border-radius: 100px;
             font-family: var(--font-mono);
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
-            letter-spacing: 1.5px;
+            letter-spacing: 1px;
             text-transform: uppercase;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 5px;
             transition: all 0.25s ease;
             cursor: pointer;
         }
@@ -223,7 +223,7 @@
             background: rgba(255, 107, 44, 0.12);
             color: #ff8a4c !important;
             border-color: #ff8a4c;
-            box-shadow: 0 0 18px rgba(255, 107, 44, 0.35);
+            box-shadow: 0 0 14px rgba(255, 107, 44, 0.35);
             transform: translateY(-1px);
         }
 
@@ -1358,11 +1358,9 @@
             try {
                 const user = await login();
                 if (user) {
-                    console.log("Firebase authenticated as:", user.email);
                     window.location.href = "console.html";
                 }
             } catch (err) {
-                console.error("Sign-in popup error:", err);
                 window.location.href = "console.html";
             }
         }
