@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAHARYN | Team &amp; Leadership</title>
+    <meta name="description" content="Meet the founder and lead architect behind SAHARYN — Alaa Aldeen, Lead AI Engineer, Generative Biology Architect, and multi-award-winning innovator.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Outfit:wght@300;600;800&family=JetBrains+Mono:wght@400;700&family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg: #030712;
+            --panel-bg: #0a0f1a;
+            --accent-green: #10b981;
+            --accent-green-dim: rgba(16, 185, 129, 0.1);
+            --border-color: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --font-main: 'Inter', sans-serif;
+            --font-tech: 'JetBrains Mono', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--bg);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        body[dir="rtl"] { font-family: 'Tajawal', sans-serif; }
+
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(16,185,129,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(16,185,129,0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+        }
+
+        .content-layer { position: relative; z-index: 1; }
+
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 70px;
+            background: rgba(3, 7, 18, 0.88);
+            backdrop-filter: blur(18px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 48px;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: #fff;
+        }
+
+        .logo-hex {
+            width: 24px; height: 24px;
+            background: var(--accent-green);
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+        }
+
+        .nav-links { display: flex; gap: 24px; align-items: center; }
+
+        .btn-simple {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .btn-simple:hover, .btn-simple.active { color: var(--accent-green); }
+
+        .lang-switch {
+            background: var(--accent-green-dim);
+            border: 1px solid var(--accent-green);
+            color: var(--accent-green);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: var(--font-tech);
+            font-weight: 700;
+            font-size: 12px;
+            transition: 0.3s;
+        }
+
+        .lang-switch:hover { background: var(--accent-green); color: var(--bg); }
+
+        .container {
+            max-width: 1040px;
+            margin: 0 auto;
+            padding: 110px 24px 80px;
+        }
+
+        .page-hero {
+            text-align: center;
+            margin-bottom: 64px;
+        }
+
+        .subtitle {
+            color: var(--accent-green);
+            font-family: var(--font-tech);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-size: 13px;
+            display: block;
+            margin-bottom: 18px;
+        }
+
+        h1 {
+            font-size: clamp(38px, 7vw, 64px);
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            letter-spacing: -2.5px;
+            line-height: 1;
+            background: linear-gradient(135deg, #fff 40%, #64748b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+
+        .hero-desc {
+            color: var(--text-secondary);
+            font-size: 17px;
+            max-width: 580px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* Registration Banner */
+        .reg-banner {
+            background: linear-gradient(135deg, rgba(16,185,129,0.06), rgba(16,185,129,0.02));
+            border: 1px solid rgba(16,185,129,0.25);
+            border-radius: 14px;
+            padding: 28px 36px;
+            margin-bottom: 60px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .reg-banner::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-green), transparent);
+        }
+
+        .reg-label {
+            font-family: var(--font-tech);
+            font-size: 10px;
+            color: var(--accent-green);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .reg-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+            font-family: var(--font-tech);
+        }
+
+        .reg-badge {
+            display: flex;
+            align-items: center;
+        }
+
+        .reg-badge span {
+            background: rgba(16,185,129,0.12);
+            border: 1px solid rgba(16,185,129,0.4);
+            color: var(--accent-green);
+            font-family: var(--font-tech);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 6px;
+            letter-spacing: 1px;
+        }
+
+        /* Founder Card */
+        .founder-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 56px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .founder-card:hover {
+            border-color: rgba(16,185,129,0.35);
+            box-shadow: 0 40px 100px rgba(0,0,0,0.7), 0 0 60px rgba(16,185,129,0.06);
+        }
+
+        .founder-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-green) 0%, rgba(16,185,129,0.3) 60%, transparent 100%);
+        }
+
+        .founder-top {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 40px;
+            align-items: start;
+            margin-bottom: 44px;
+        }
+
+        .founder-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-green) 0%, #047857 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            font-weight: 800;
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            flex-shrink: 0;
+            box-shadow: 0 0 0 3px rgba(16,185,129,0.15), 0 0 0 6px rgba(16,185,129,0.07), 0 0 40px rgba(16,185,129,0.3);
+        }
+
+        .founder-name {
+            font-size: 34px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -0.8px;
+            margin-bottom: 6px;
+        }
+
+        .founder-title {
+            color: var(--accent-green);
+            font-family: var(--font-tech);
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .founder-location {
+            color: var(--text-secondary);
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 20px;
+        }
+
+        .founder-bio {
+            color: var(--text-secondary);
+            font-size: 15.5px;
+            line-height: 1.8;
+        }
+
+        .block-section {
+            margin-top: 44px;
+            padding-top: 36px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .block-label {
+            font-family: var(--font-tech);
+            font-size: 10.5px;
+            color: var(--accent-green);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            display: block;
+            opacity: 0.85;
+        }
+
+        .capability-list { display: flex; flex-direction: column; gap: 12px; }
+
+        .cap-item {
+            padding: 16px 20px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            transition: border-color 0.25s, background 0.25s;
+        }
+
+        .cap-item:hover {
+            border-color: rgba(16,185,129,0.3);
+            background: rgba(16,185,129,0.03);
+        }
+
+        .cap-title {
+            color: var(--accent-green);
+            font-family: var(--font-tech);
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .cap-desc {
+            color: var(--text-secondary);
+            font-size: 13.5px;
+            line-height: 1.65;
+        }
+
+        .academic-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 14px;
+        }
+
+        .edu-card {
+            padding: 16px 20px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+        }
+
+        .edu-degree { font-size: 13.5px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+        .edu-school { font-size: 12px; color: var(--text-secondary); }
+
+        .badge-strip { display: flex; flex-wrap: wrap; gap: 10px; }
+
+        .badge {
+            background: rgba(16,185,129,0.07);
+            border: 1px solid rgba(16,185,129,0.22);
+            color: var(--accent-green);
+            font-family: var(--font-tech);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 6px 13px;
+            border-radius: 7px;
+            letter-spacing: 0.5px;
+            transition: 0.2s;
+        }
+
+        .badge:hover { background: rgba(16,185,129,0.15); border-color: var(--accent-green); }
+
+        .contact-links { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
+
+        .contact-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 10px 18px;
+            border: 1px solid var(--border-color);
+            border-radius: 9px;
+            transition: 0.25s;
+        }
+
+        .contact-btn:hover {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+            background: rgba(16,185,129,0.05);
+            transform: translateY(-2px);
+        }
+
+        footer {
+            padding: 50px 0 36px;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+            margin-top: 80px;
+        }
+
+        .footer-reg { font-size: 11.5px; color: var(--text-secondary); line-height: 2; margin-bottom: 10px; }
+        .footer-copy { font-size: 11px; color: #475569; }
+
+        @media (max-width: 700px) {
+            nav { padding: 0 20px; }
+            .container { padding: 100px 16px 60px; }
+            .founder-card { padding: 32px 24px; }
+            .founder-top { grid-template-columns: 1fr; }
+            .founder-avatar { width: 80px; height: 80px; font-size: 28px; }
+            .nav-links a:not(.lang-switch) { display: none; }
+        }
+    </style>
+</head>
+
+<body dir="ltr">
+    <div class="bg-grid"></div>
+    <div class="content-layer">
+
+        <nav>
+            <a href="index.html" class="brand">
+                <div class="logo-hex"></div>
+                <span style="font-weight:800;font-family:'Outfit';">SAHARYN</span>
+            </a>
+            <div class="nav-links">
+                <a href="index.html" class="btn-simple">Home</a>
+                <a href="about.html" class="btn-simple">Technology</a>
+                <a href="console.html" class="btn-simple">Mission Control</a>
+                <a href="team.html" class="btn-simple active">Team</a>
+                <button class="lang-switch" onclick="toggleLanguage()">EN / &#x0639;&#x0631;&#x0628;&#x064a;</button>
+            </div>
+        </nav>
+
+        <div class="container">
+
+            <!-- PAGE HERO -->
+            <div class="page-hero">
+                <div id="hero-en">
+                    <span class="subtitle">The People Behind the Platform</span>
+                    <h1>Our Team</h1>
+                    <p class="hero-desc">SAHARYN is engineered by a world-class founder combining cutting-edge AI, clinical science, and industrial architecture into a single sovereign intelligence platform.</p>
+                </div>
+                <div id="hero-ar" style="display:none; direction:rtl; font-family:'Tajawal',sans-serif;">
+                    <span class="subtitle">&#x0627;&#x0644;&#x0623;&#x0634;&#x062E;&#x0627;&#x0635; &#x0648;&#x0631;&#x0627;&#x0621; &#x0627;&#x0644;&#x0645;&#x0646;&#x0635;&#x0629;</span>
+                    <h1>&#x0641;&#x0631;&#x064A;&#x0642;&#x0646;&#x0627;</h1>
+                    <p class="hero-desc">&#x0635;&#x064F;&#x0645;&#x0650;&#x0651;&#x0645;&#x062A; &#x0635;&#x062D;&#x0627;&#x0631;&#x064A;&#x0646; &#x0639;&#x0644;&#x0649; &#x064A;&#x062F; &#x0645;&#x0624;&#x0633;&#x0633; &#x0645;&#x0646; &#x0627;&#x0644;&#x0637;&#x0631;&#x0627;&#x0632; &#x0627;&#x0644;&#x0639;&#x0627;&#x0644;&#x0645;&#x064A; &#x064A;&#x062C;&#x0645;&#x0639; &#x0628;&#x064A;&#x0646; &#x0627;&#x0644;&#x0630;&#x0643;&#x0627;&#x0621; &#x0627;&#x0644;&#x0627;&#x0635;&#x0637;&#x0646;&#x0627;&#x0639;&#x064A; &#x0648;&#x0627;&#x0644;&#x0639;&#x0644;&#x0648;&#x0645; &#x0627;&#x0644;&#x0633;&#x0631;&#x064A;&#x0631;&#x064A;&#x0629; &#x0648;&#x0627;&#x0644;&#x0647;&#x0646;&#x062F;&#x0633;&#x0629; &#x0627;&#x0644;&#x0635;&#x0646;&#x0627;&#x0639;&#x064A;&#x0629;.</p>
+                </div>
+            </div>
+
+            <!-- COMPANIES HOUSE REGISTRATION BANNER -->
+            <div class="reg-banner">
+                <div>
+                    <span class="reg-label">Company Name</span>
+                    <div class="reg-value">NILUS LAB LTD</div>
+                </div>
+                <div>
+                    <span class="reg-label">Company Number</span>
+                    <div class="reg-value">17427807</div>
+                </div>
+                <div>
+                    <span class="reg-label">Company Type</span>
+                    <div class="reg-value">Private Limited by Shares</div>
+                </div>
+                <div>
+                    <span class="reg-label">CH Submission No.</span>
+                    <div class="reg-value">118-507239</div>
+                </div>
+                <div class="reg-badge">
+                    <span>&#x2713; REGISTERED</span>
+                </div>
+            </div>
+
+            <!-- FOUNDER CARD ENGLISH -->
+            <div id="card-en">
+                <div class="founder-card">
+                    <div class="founder-top">
+                        <div class="founder-avatar">AA</div>
+                        <div>
+                            <div class="founder-name">Alaa Aldeen</div>
+                            <div class="founder-title">Lead AI Engineer &amp; Generative Biology Architect &middot; Founder &amp; CEO</div>
+                            <div class="founder-location">
+                                <i data-lucide="map-pin" size="14"></i>
+                                London, United Kingdom &amp; San Diego, California, USA
+                            </div>
+                            <p class="founder-bio">
+                                Multi-award-winning Life Sciences Innovator, AI Engineer, and Biotechnology Founder with a cross-disciplinary background spanning Medicine &amp; Surgery (University of Al Fasher), Medical Sciences BSc Hons (Swansea University), Deep Neural Networks, and Medical Device Invention. Architect of <strong style="color:#fff">Zenith v31.0 GOLD</strong> &mdash; a 5,009-dimensional latent space single-cell foundation model trained on 2.42 million human cardiac cells &mdash; and lead designer of <strong style="color:#fff">NL-101</strong>, reversing biological heart cell age by &minus;13.0 years with zero arrhythmia risk. Silver Medalist at the <strong style="color:#fff">50th International Exhibition of Inventions Geneva</strong> for inventing the RTAAD diagnostic device. Granted patent holder and UK IPO design rights holder.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="block-section">
+                        <span class="block-label">// Generative AI &amp; Neural Architecture</span>
+                        <div class="capability-list">
+                            <div class="cap-item">
+                                <span class="cap-title">Deep Neural Network Training</span>
+                                <span class="cap-desc">Trained Zenith v31.0 GOLD &mdash; a 5,009D latent space scVI/PyTorch variational autoencoder across 2.42M human cardiac single-cell transcriptomes.</span>
+                            </div>
+                            <div class="cap-item">
+                                <span class="cap-title">Large Language Models &amp; Bio-Transformers</span>
+                                <span class="cap-desc">Integrated bio-LLM and transformer architectures for zero-shot gene perturbation prediction, mRNA sequence generation, and algorithmic codon optimisation.</span>
+                            </div>
+                            <div class="cap-item">
+                                <span class="cap-title">Multi-Agent AI &amp; Workflow Engines</span>
+                                <span class="cap-desc">Architected Promatly.com &mdash; an enterprise multi-agent task orchestration platform running parallel LLM API jobs, webhooks, and RESTful microservices.</span>
+                            </div>
+                            <div class="cap-item">
+                                <span class="cap-title">Biophysical Safety Controls</span>
+                                <span class="cap-desc">Custom neural loss functions enforcing &gt;94% Connexin-43/GJA1 &amp; Troponin T retention &mdash; 0% arrhythmia risk.</span>
+                            </div>
+                            <div class="cap-item">
+                                <span class="cap-title">Robotics Automation</span>
+                                <span class="cap-desc">Automated CSV/Python protocol engines for Opentrons OT-2 liquid-handling robots, translating AI outputs into 1-click executable scripts.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="block-section">
+                        <span class="block-label">// Academic Background &amp; Clinical Accreditations</span>
+                        <div class="academic-grid">
+                            <div class="edu-card">
+                                <div class="edu-degree">BSc (Hons) Medical Sciences</div>
+                                <div class="edu-school">Swansea University, UK &middot; 2020&ndash;2023</div>
+                            </div>
+                            <div class="edu-card">
+                                <div class="edu-degree">Medicine &amp; Surgery Medical Studies</div>
+                                <div class="edu-school">University of Al Fasher &middot; 2013&ndash;2018</div>
+                            </div>
+                            <div class="edu-card">
+                                <div class="edu-degree">Good Clinical Practice (GCP)</div>
+                                <div class="edu-school">NIHR Certified &middot; Swansea Bay NHS Health Board</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="block-section">
+                        <span class="block-label">// International Medals, Patents &amp; Honours</span>
+                        <div class="badge-strip">
+                            <span class="badge">&#x1F948; Geneva Inventions Silver Medal</span>
+                            <span class="badge">&#x1F3C5; UK Patent Pending (UK IPO)</span>
+                            <span class="badge">&#x1F4DC; UK Registered Design Rights</span>
+                            <span class="badge">&#x1F3C6; Granted Patent Holder 2018</span>
+                            <span class="badge">&#x1F948;&#x1F948;&#x1F948; NRCT Thailand &middot; 3&times; Silver</span>
+                            <span class="badge">&#x1F949;&#x1F949; IPITEX &middot; 2&times; Bronze</span>
+                            <span class="badge">&#x1F1EC;&#x1F1E7; British Council Entrepreneurship Award</span>
+                            <span class="badge">&#x2B50; Stars of Science Qatar &middot; Top 30</span>
+                            <span class="badge">&#x1F30D; UNESCO Nominee &middot; African Week Paris</span>
+                            <span class="badge">&#x1F680; HomeLab Deep Science Accelerator &middot; Cohort 5</span>
+                        </div>
+                    </div>
+
+                    <div class="block-section">
+                        <span class="block-label">// Connect</span>
+                        <div class="contact-links">
+                            <a href="https://www.linkedin.com/in/alaa199439/" target="_blank" class="contact-btn">
+                                <i data-lucide="linkedin" size="15"></i> Founder LinkedIn
+                            </a>
+                            <a href="https://www.linkedin.com/in/nilus-lab-0816333b8" target="_blank" class="contact-btn">
+                                <i data-lucide="building-2" size="15"></i> Nilus Lab LinkedIn
+                            </a>
+                            <a href="mailto:alaa.aldeen@niluslab.com" class="contact-btn">
+                                <i data-lucide="mail" size="15"></i> Direct Contact
+                            </a>
+                            <a href="https://www.niluslab.com" target="_blank" class="contact-btn">
+                                <i data-lucide="globe" size="15"></i> niluslab.com
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FOUNDER CARD ARABIC -->
+            <div id="card-ar" style="display:none;">
+                <div class="founder-card" style="direction:rtl;font-family:'Tajawal',sans-serif;">
+                    <div class="founder-top">
+                        <div class="founder-avatar">AA</div>
+                        <div>
+                            <div class="founder-name">&#x0639;&#x0644;&#x0627;&#x0621; &#x0627;&#x0644;&#x062F;&#x064A;&#x0646;</div>
+                            <div class="founder-title">&#x0645;&#x0647;&#x0646;&#x062F;&#x0633; &#x0627;&#x0644;&#x0630;&#x0643;&#x0627;&#x0621; &#x0627;&#x0644;&#x0627;&#x0635;&#x0637;&#x0646;&#x0627;&#x0639;&#x064A; &#x0627;&#x0644;&#x0631;&#x0626;&#x064A;&#x0633;&#x064A; &middot; &#x0645;&#x0624;&#x0633;&#x0633; &#x0648;&#x0631;&#x0626;&#x064A;&#x0633; &#x062A;&#x0646;&#x0641;&#x064A;&#x0630;&#x064A;</div>
+                            <div class="founder-location">
+                                <i data-lucide="map-pin" size="14"></i>
+                                &#x0644;&#x0646;&#x062F;&#x0646;&#x060C; &#x0627;&#x0644;&#x0645;&#x0645;&#x0644;&#x0643;&#x0629; &#x0627;&#x0644;&#x0645;&#x062A;&#x062D;&#x062F;&#x0629; &amp; &#x0633;&#x0627;&#x0646; &#x062F;&#x064A;&#x064A;&#x063A;&#x0648;&#x060C; &#x0643;&#x0627;&#x0644;&#x064A;&#x0641;&#x0648;&#x0631;&#x0646;&#x064A;&#x0627;
+                            </div>
+                            <p class="founder-bio">
+                                &#x0645;&#x0628;&#x062A;&#x0643;&#x0631; &#x0645;&#x062A;&#x0639;&#x062F;&#x062F; &#x0627;&#x0644;&#x062C;&#x0648;&#x0627;&#x0626;&#x0632; &#x0641;&#x064A; &#x0639;&#x0644;&#x0648;&#x0645; &#x0627;&#x0644;&#x062D;&#x064A;&#x0627;&#x0629;&#x060C; &#x0645;&#x0647;&#x0646;&#x062F;&#x0633; &#x0630;&#x0643;&#x0627;&#x0621; &#x0627;&#x0635;&#x0637;&#x0646;&#x0627;&#x0639;&#x064A;&#x060C; &#x0648;&#x0645;&#x0624;&#x0633;&#x0633; &#x062A;&#x0642;&#x0646;&#x064A;&#x0629; &#x062D;&#x064A;&#x0648;&#x064A;&#x0629;. &#x0645;&#x0635;&#x0645;&#x0651;&#x0645; &#x0646;&#x0645;&#x0648;&#x0630;&#x062C; <strong style="color:#fff">Zenith v31.0 GOLD</strong> &#x2014; &#x0628;&#x0641;&#x0636;&#x0627;&#x0621; &#x0643;&#x0627;&#x0645;&#x0646; 5,009 &#x0628;&#x064F;&#x0639;&#x062F;&#x064B;&#x0627; &#x0645;&#x062F;&#x0631;&#x0651;&#x0628; &#x0639;&#x0644;&#x0649; 2.42 &#x0645;&#x0644;&#x064A;&#x0648;&#x0646; &#x062E;&#x0644;&#x064A;&#x0629; &#x0642;&#x0644;&#x0628;&#x064A;&#x0629;. &#x062D;&#x0627;&#x0635;&#x0644; &#x0639;&#x0644;&#x0649; &#x0627;&#x0644;&#x0645;&#x064A;&#x062F;&#x0627;&#x0644;&#x064A;&#x0629; &#x0627;&#x0644;&#x0641;&#x0636;&#x064A;&#x0629; &#x0641;&#x064A; <strong style="color:#fff">&#x0645;&#x0639;&#x0631;&#x0636; &#x062C;&#x0646;&#x064A;&#x0641; &#x0627;&#x0644;&#x062F;&#x0648;&#x0644;&#x064A; &#x0644;&#x0644;&#x0627;&#x062E;&#x062A;&#x0631;&#x0627;&#x0639;&#x0627;&#x062A;</strong>.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="block-section">
+                        <span class="block-label">// &#x0627;&#x0644;&#x0630;&#x0643;&#x0627;&#x0621; &#x0627;&#x0644;&#x0627;&#x0635;&#x0637;&#x0646;&#x0627;&#x0639;&#x064A; &#x0648;&#x0627;&#x0644;&#x0628;&#x0646;&#x064A;&#x0629; &#x0627;&#x0644;&#x0639;&#x0635;&#x0628;&#x064A;&#x0629;</span>
+                        <div class="capability-list">
+                            <div class="cap-item">
+                                <span class="cap-title">&#x062A;&#x062F;&#x0631;&#x064A;&#x0628; &#x0627;&#x0644;&#x0634;&#x0628;&#x0643;&#x0627;&#x062A; &#x0627;&#x0644;&#x0639;&#x0635;&#x0628;&#x064A;&#x0629; &#x0627;&#x0644;&#x0639;&#x0645;&#x064A;&#x0642;&#x0629;</span>
+                                <span class="cap-desc">&#x062A;&#x062F;&#x0631;&#x064A;&#x0628; Zenith v31.0 GOLD &#x2014; &#x0645;&#x0634;&#x0641;&#x0651;&#x0631; &#x062A;&#x0644;&#x0642;&#x0627;&#x0626;&#x064A; &#x0645;&#x062A;&#x063A;&#x064A;&#x0651;&#x0631; (scVI/PyTorch) &#x0639;&#x0628;&#x0631; 2.42 &#x0645;&#x0644;&#x064A;&#x0648;&#x0646; &#x062E;&#x0644;&#x064A;&#x0629; &#x0642;&#x0644;&#x0628;&#x064A;&#x0629; &#x0628;&#x0634;&#x0631;&#x064A;&#x0629;.</span>
+                            </div>
+                            <div class="cap-item">
+                                <span class="cap-title">&#x0646;&#x0645;&#x0627;&#x0630;&#x062C; &#x0627;&#x0644;&#x0644;&#x063A;&#x0629; &#x0627;&#x0644;&#x0643;&#x0628;&#x064A;&#x0631;&#x0629; &#x0648;&#x0627;&#x0644;&#x0645;&#x062D;&#x0648;&#x0644;&#x0627;&#x062A; &#x0627;&#x0644;&#x062D;&#x064A;&#x0648;&#x064A;&#x0629;</span>
+                                <span class="cap-desc">&#x062F;&#x0645;&#x062C; &#x0628;&#x064F;&#x0646;&#x0649; bio-LLM &#x0644;&#x0644;&#x062A;&#x0646;&#x0628;&#x0624; &#x0628;&#x0627;&#x0644;&#x0627;&#x0636;&#x0637;&#x0631;&#x0627;&#x0628;&#x0627;&#x062A; &#x0627;&#x0644;&#x062C;&#x064A;&#x0646;&#x064A;&#x0629;&#x060C; &#x0648;&#x062A;&#x0648;&#x0644;&#x064A;&#x062F; &#x062A;&#x0633;&#x0644;&#x0633;&#x0644;&#x0627;&#x062A; mRNA&#x060C; &#x0648;&#x062A;&#x062D;&#x0633;&#x064A;&#x0646; &#x0627;&#x0644;&#x0643;&#x0648;&#x062F;&#x0648;&#x0646;&#x0627;&#x062A;.</span>
+                            </div>
+                            <div class="cap-item">
+                                <span class="cap-title">&#x0623;&#x0646;&#x0638;&#x0645;&#x0629; &#x0627;&#x0644;&#x0630;&#x0643;&#x0627;&#x0621; &#x0627;&#x0644;&#x0627;&#x0635;&#x0637;&#x0646;&#x0627;&#x0639;&#x064A; &#x0645;&#x062A;&#x0639;&#x062F;&#x062F;&#x0629; &#x0627;&#x0644;&#x0648;&#x0643;&#x0644;&#x0627;&#x0621;</span>
+                                <span class="cap-desc">&#x0628;&#x0646;&#x0627;&#x0621; Promatly.com &#x2014; &#x0645;&#x0646;&#x0635;&#x0629; &#x062A;&#x0646;&#x0633;&#x064A;&#x0642; &#x0645;&#x0647;&#x0627;&#x0645; &#x0644;&#x0644;&#x0645;&#x0624;&#x0633;&#x0633;&#x0627;&#x062A; &#x062A;&#x0639;&#x0645;&#x0644; &#x0628;&#x0648;&#x0638;&#x0627;&#x0626;&#x0641; LLM API &#x0645;&#x062A;&#x0648;&#x0627;&#x0632;&#x064A;&#x0629; &#x0648;&#x062E;&#x062F;&#x0645;&#x0627;&#x062A; RESTful.</span>
+                            </div>
+                            <div class="cap-item">
+                                <span class="cap-title">&#x0636;&#x0648;&#x0627;&#x0628;&#x0637; &#x0627;&#x0644;&#x0633;&#x0644;&#x0627;&#x0645;&#x0629; &#x0627;&#x0644;&#x0641;&#x064A;&#x0632;&#x064A;&#x0627;&#x0626;&#x064A;&#x0629; &#x0627;&#x0644;&#x062D;&#x064A;&#x0648;&#x064A;&#x0629;</span>
+                                <span class="cap-desc">&#x062F;&#x0648;&#x0627;&#x0644; &#x062E;&#x0633;&#x0627;&#x0631;&#x0629; &#x0639;&#x0635;&#x0628;&#x064A;&#x0629; &#x0645;&#x062E;&#x0635;&#x0635;&#x0629; &#x062A;&#x0641;&#x0631;&#x0636; &#x0627;&#x0644;&#x0627;&#x062D;&#x062A;&#x0641;&#x0627;&#x0638; &#x0628;&#x0640; Connexin-43 &#x0648; Troponin T &#x0628;&#x0646;&#x0633;&#x0628;&#x0629; &gt;94&#x25;.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="block-section">
+                        <span class="block-label">// &#x0627;&#x0644;&#x062C;&#x0648;&#x0627;&#x0626;&#x0632; &#x0648;&#x0627;&#x0644;&#x0628;&#x0631;&#x0627;&#x0621;&#x0627;&#x062A; &#x0648;&#x0627;&#x0644;&#x062A;&#x0643;&#x0631;&#x064A;&#x0645;&#x0627;&#x062A;</span>
+                        <div class="badge-strip">
+                            <span class="badge">&#x1F948; &#x0645;&#x064A;&#x062F;&#x0627;&#x0644;&#x064A;&#x0629; &#x0641;&#x0636;&#x064A;&#x0629; &middot; &#x062C;&#x0646;&#x064A;&#x0641;</span>
+                            <span class="badge">&#x0628;&#x0631;&#x0627;&#x0621;&#x0629; &#x0627;&#x062E;&#x062A;&#x0631;&#x0627;&#x0639; &#x0628;&#x0631;&#x064A;&#x0637;&#x0627;&#x0646;&#x064A;&#x0629;</span>
+                            <span class="badge">3 &#x0645;&#x064A;&#x062F;&#x0627;&#x0644;&#x064A;&#x0627;&#x062A; &#x0641;&#x0636;&#x064A;&#x0629; NRCT</span>
+                            <span class="badge">2 &#x0645;&#x064A;&#x062F;&#x0627;&#x0644;&#x064A;&#x0627;&#x062A; &#x0628;&#x0631;&#x0648;&#x0646;&#x0632;&#x064A;&#x0629; IPITEX</span>
+                            <span class="badge">&#x062C;&#x0627;&#x0626;&#x0632;&#x0629; &#x0627;&#x0644;&#x0645;&#x062C;&#x0644;&#x0633; &#x0627;&#x0644;&#x062B;&#x0642;&#x0627;&#x0641;&#x064A; &#x0627;&#x0644;&#x0628;&#x0631;&#x064A;&#x0637;&#x0627;&#x0646;&#x064A;</span>
+                            <span class="badge">&#x2B50; &#x0646;&#x062C;&#x0648;&#x0645; &#x0627;&#x0644;&#x0639;&#x0644;&#x0648;&#x0645; &middot; &#x0623;&#x0641;&#x0636;&#x0644; 30</span>
+                            <span class="badge">&#x1F30D; &#x0645;&#x0631;&#x0634;&#x062D; &#x064A;&#x0648;&#x0646;&#x0633;&#x0643;&#x0648;</span>
+                            <span class="badge">&#x1F680; HomeLab &middot; &#x0627;&#x0644;&#x062F;&#x0641;&#x0639;&#x0629; 5</span>
+                        </div>
+                    </div>
+
+                    <div class="block-section">
+                        <span class="block-label">// &#x062A;&#x0648;&#x0627;&#x0635;&#x0644;</span>
+                        <div class="contact-links">
+                            <a href="https://www.linkedin.com/in/alaa199439/" target="_blank" class="contact-btn">
+                                <i data-lucide="linkedin" size="15"></i> LinkedIn &#x0627;&#x0644;&#x0645;&#x0624;&#x0633;&#x0633;
+                            </a>
+                            <a href="https://www.linkedin.com/in/nilus-lab-0816333b8" target="_blank" class="contact-btn">
+                                <i data-lucide="building-2" size="15"></i> LinkedIn &#x0646;&#x064A;&#x0644;&#x0648;&#x0633; &#x0644;&#x0627;&#x0628;
+                            </a>
+                            <a href="mailto:alaa.aldeen@niluslab.com" class="contact-btn">
+                                <i data-lucide="mail" size="15"></i> &#x062A;&#x0648;&#x0627;&#x0635;&#x0644; &#x0645;&#x0628;&#x0627;&#x0634;&#x0631;
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <footer>
+            <div class="footer-reg">
+                <strong style="color:#94a3b8;">NILUS LAB LTD</strong> &nbsp;&middot;&nbsp;
+                Company No. <span style="color:#94a3b8;">17427807</span> &nbsp;&middot;&nbsp;
+                Private Limited by Shares &nbsp;&middot;&nbsp;
+                Companies House Submission: <span style="color:#94a3b8;">118-507239</span>
+            </div>
+            <div class="footer-copy">&copy; 2026 SAHARYN AI &middot; Powered by NILUS LAB LTD</div>
+        </footer>
+
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        function toggleLanguage() {
+            const isEn = document.getElementById('card-en').style.display !== 'none';
+            document.getElementById('card-en').style.display = isEn ? 'none' : 'block';
+            document.getElementById('card-ar').style.display = isEn ? 'block' : 'none';
+            document.getElementById('hero-en').style.display = isEn ? 'none' : 'block';
+            document.getElementById('hero-ar').style.display = isEn ? 'block' : 'none';
+            document.body.setAttribute('dir', isEn ? 'rtl' : 'ltr');
+            document.querySelector('.lang-switch').innerText = isEn ? 'AR / EN' : 'EN / \u0639\u0631\u0628\u064a';
+        }
+    </script>
+</body>
+</html>
