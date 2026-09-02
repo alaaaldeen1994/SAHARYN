@@ -1653,10 +1653,13 @@
             const hh = String(hour).padStart(2, '0');
             document.getElementById('disp-hour-label').innerText = `T + ${hh}:00 HOURS (FORECAST)`;
 
+            const apiBase = (window.location.port === '8000') ? '' : 
+                            (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:8000' : '';
+
             try {
                 const [stateRes, vecRes] = await Promise.all([
-                    fetch(`/v2/twin/state?forecast_hour=${hour}`).then(r => r.ok ? r.json() : null),
-                    fetch(`/v2/twin/vectors?forecast_hour=${hour}`).then(r => r.ok ? r.json() : null)
+                    fetch(`${apiBase}/v2/twin/state?forecast_hour=${hour}`).then(r => r.ok ? r.json() : null),
+                    fetch(`${apiBase}/v2/twin/vectors?forecast_hour=${hour}`).then(r => r.ok ? r.json() : null)
                 ]);
 
                 if (stateRes && stateRes.assets && stateRes.assets.length > 0) {
@@ -1930,7 +1933,9 @@
             btn.style.color = "#fbbf24";
 
             try {
-                const res = await fetch('/v2/twin/actuate', {
+                const apiBase = (window.location.port === '8000') ? '' : 
+                                (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:8000' : '';
+                const res = await fetch(`${apiBase}/v2/twin/actuate`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
