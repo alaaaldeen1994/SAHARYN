@@ -4,8 +4,12 @@ import datetime
 from typing import List
 import numpy as np
 from tenacity import retry, stop_after_attempt, wait_exponential
-import cdsapi
 from pydantic_settings import BaseSettings
+
+try:
+    import cdsapi
+except ImportError:
+    cdsapi = None
 
 logger = logging.getLogger("WeatherIngestor")
 
@@ -26,7 +30,11 @@ class ECMWFWeatherIngestor:
     """
 
     def __init__(self):
-        self.client = cdsapi.Client(url=config.ECMWF_API_URL, key=config.ECMWF_API_KEY)
+        try:
+            self.client = cdsapi.Client(url=config.ECMWF_API_URL, key=config.ECMWF_API_KEY) if cdsapi else None
+        except Exception as e:
+            logger.warning(f"ECMWF cdsapi client init skipped: {e}")
+            self.client = None
 
     @retry(stop=stop_after_attempt(2), wait=wait_exponential(multiplier=1, min=1, max=5))
     def ingest_forecast(self, area: List[float]):
