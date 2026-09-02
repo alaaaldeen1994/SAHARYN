@@ -19,7 +19,7 @@
 
     <style>
         :root {
-            --bg-void: #020305;
+            --bg-void: #010204;
             --panel-bg: rgba(6, 9, 15, 0.88);
             --panel-border: rgba(255, 255, 255, 0.08);
             --panel-border-active: rgba(255, 107, 44, 0.5);
@@ -71,17 +71,17 @@
             z-index: 1;
         }
 
-        /* ── TACTICAL HUD GRID OVERLAYS ── */
+        /* ── TACTICAL HUD GRID ── */
         .hud-grid-overlay {
             position: absolute;
             inset: 0;
             pointer-events: none;
             z-index: 2;
             background-image: 
-                radial-gradient(circle at 50% 50%, transparent 40%, rgba(2, 3, 5, 0.6) 90%),
+                radial-gradient(circle at 50% 50%, transparent 45%, rgba(1, 2, 4, 0.65) 90%),
                 linear-gradient(rgba(56, 189, 248, 0.015) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(56, 189, 248, 0.015) 1px, transparent 1px);
-            background-size: 100% 100%, 40px 40px, 40px 40px;
+            background-size: 100% 100%, 48px 48px, 48px 48px;
         }
 
         /* ── TOP MISSION BAR ── */
@@ -91,7 +91,7 @@
             left: 0;
             right: 0;
             height: 60px;
-            background: rgba(4, 6, 10, 0.88);
+            background: rgba(3, 5, 8, 0.88);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--panel-border);
             display: flex;
@@ -554,8 +554,8 @@
                 <span class="top-telemetry-val" style="color:var(--accent-cyan);">MODIS-AQUA & SENTINEL-5P</span>
             </div>
             <div>
-                <span>DOMINANT AEROSOL: </span>
-                <span class="top-telemetry-val" style="color:var(--accent-orange-bright);">COARSE MINERAL QUARTZ</span>
+                <span>AEROSOL SPECIES: </span>
+                <span class="top-telemetry-val" style="color:var(--accent-orange-bright);">MINERAL SILICA & CALCITE</span>
             </div>
         </div>
 
@@ -687,8 +687,10 @@
     <!-- ── 3D PHOTOREALISTIC ENGINE JAVASCRIPT ── -->
     <script>
         let scene, camera, renderer, controls;
-        let earthMesh, cloudsMesh, atmosphereMesh, sandPlumeMesh, streamlineMesh;
-        let assetAnchors = {};
+        let earthGroup; // Root group that rotates together
+        let earthMesh, cloudsMesh, atmosphereMesh;
+        let dustPlumeCanvas, dustPlumeTexture, dustPlumeMesh;
+        let streamParticles;
         let currentSelected = 'asset-sudair-pv';
         let currentForecastHour = 0;
         let isPlaying = false;
@@ -697,7 +699,10 @@
 
         const GLOBE_RADIUS = 50;
 
-        // WGS84 Geodetic to Cartesian Conversion (Centered on Saudi Arabia)
+        // ACCURATE WGS84 to Three.js Sphere Coordinates
+        // In Three.js SphereGeometry:
+        // lon = -180 is at u=0, lon = 0 is at u=0.5, lon = +180 is at u=1.0
+        // lat = +90 is north pole (v=0), lat = -90 is south pole (v=1)
         function geoToVector3(lat, lon, alt = 0) {
             const phi = (90 - lat) * (Math.PI / 180);
             const theta = (lon + 180) * (Math.PI / 180);
@@ -713,74 +718,75 @@
         function initScene() {
             const container = document.getElementById('viewport-3d');
             scene = new THREE.Scene();
-            scene.fog = new THREE.FogExp2(0x020305, 0.0006);
+            scene.fog = new THREE.FogExp2(0x010204, 0.0006);
 
-            camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 2500);
-            camera.position.set(0, 35, 115);
+            camera = new THREE.PerspectiveCamera(38, window.innerWidth / window.innerHeight, 1, 3000);
+            
+            // Set initial camera directly viewing the Arabian Peninsula
+            const arabianCenter = geoToVector3(24.5, 44.5, 0);
+            const initialCamPos = arabianCenter.clone().normalize().multiplyScalar(125);
+            camera.position.copy(initialCamPos);
 
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             renderer.toneMapping = THREE.ACESFilmicToneMapping;
-            renderer.toneMappingExposure = 1.2;
+            renderer.toneMappingExposure = 1.25;
             container.appendChild(renderer.domElement);
 
             controls = new THREE.OrbitControls(camera, renderer.domElement);
             controls.enableDamping = true;
-            controls.dampingFactor = 0.05;
-            controls.minDistance = 53;
+            controls.dampingFactor = 0.06;
+            controls.minDistance = 52.5;
             controls.maxDistance = 280;
             controls.rotateSpeed = 0.5;
+            controls.target.set(0, 0, 0);
 
-            // Lights
-            const ambient = new THREE.AmbientLight(0x334455, 1.2);
+            // Lighting
+            const ambient = new THREE.AmbientLight(0x445566, 1.4);
             scene.add(ambient);
 
-            // Sun Vector (calibrated to light up Arabian Peninsula)
-            const sunLight = new THREE.DirectionalLight(0xfff3e0, 2.5);
-            sunLight.position.set(120, 60, 90);
+            // Sun Vector (shining on Middle East)
+            const sunLight = new THREE.DirectionalLight(0xfff6ea, 2.6);
+            sunLight.position.set(130, 80, 100);
             scene.add(sunLight);
 
-            // Backfill space blue rim light
-            const rimLight = new THREE.DirectionalLight(0x0ea5e9, 1.0);
-            rimLight.position.set(-120, -40, -100);
-            scene.add(rimLight);
+            // Earth Root Group — everything pinned to Earth goes inside here!
+            earthGroup = new THREE.Group();
+            scene.add(earthGroup);
 
             buildPhotorealisticEarth();
             buildAtmosphericRayleighGlow();
-            buildStreamlineWindPlume();
-            build3DAssetTargets();
+            buildPhotorealisticAODPlume();
+            buildWindFlowParticles();
+            buildTacticalAssetTargets();
 
             window.addEventListener('resize', onResize);
             startClock();
             animate();
 
-            // Initial view over Saudi Arabia
-            flyTo('sudair');
+            // Default selection
+            syncHUD('asset-sudair-pv');
         }
 
-        // 1. Photorealistic Earth Sphere using Real NASA Textures
+        // 1. Photorealistic Earth using NASA Blue Marble Textures
         function buildPhotorealisticEarth() {
-            const textureLoader = new THREE.TextureLoader();
+            const loader = new THREE.TextureLoader();
             
-            // Primary path: Local downloaded NASA texture; Fallback: unpkg CDN
-            const dayMap = textureLoader.load(
+            const dayMap = loader.load(
                 './assets/textures/earth_day.jpg',
-                () => { console.log('✓ NASA Blue Marble Texture Loaded Locally'); },
+                () => console.log('✓ NASA Satellite Texture Loaded'),
                 undefined,
-                () => {
-                    console.warn('Fallback to remote CDN Blue Marble...');
-                    dayMap.image.src = 'https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg';
-                }
+                () => { dayMap.image.src = 'https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg'; }
             );
 
-            const normalMap = textureLoader.load(
+            const normalMap = loader.load(
                 './assets/textures/earth_normal.jpg',
                 undefined, undefined,
                 () => { normalMap.image.src = 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_normal_2048.jpg'; }
             );
 
-            const specularMap = textureLoader.load(
+            const specularMap = loader.load(
                 './assets/textures/earth_specular.jpg',
                 undefined, undefined,
                 () => { specularMap.image.src = 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_specular_2048.jpg'; }
@@ -792,16 +798,16 @@
                 normalMap: normalMap,
                 normalScale: new THREE.Vector2(0.85, 0.85),
                 roughnessMap: specularMap,
-                roughness: 0.65,
-                metalness: 0.15
+                roughness: 0.62,
+                metalness: 0.12
             });
 
             earthMesh = new THREE.Mesh(earthGeo, earthMat);
-            scene.add(earthMesh);
+            earthGroup.add(earthMesh);
 
             // Cloud Layer
             const cloudGeo = new THREE.SphereGeometry(GLOBE_RADIUS * 1.008, 96, 96);
-            const cloudMap = textureLoader.load(
+            const cloudMap = loader.load(
                 './assets/textures/earth_clouds.png',
                 undefined, undefined,
                 () => { cloudMap.image.src = 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_clouds_1024.png'; }
@@ -810,17 +816,17 @@
             const cloudMat = new THREE.MeshStandardMaterial({
                 map: cloudMap,
                 transparent: true,
-                opacity: 0.35,
+                opacity: 0.32,
                 blending: THREE.NormalBlending,
                 depthWrite: false
             });
             cloudsMesh = new THREE.Mesh(cloudGeo, cloudMat);
-            scene.add(cloudsMesh);
+            earthGroup.add(cloudsMesh);
         }
 
-        // 2. Physical Rayleigh & Mie Atmospheric Scattering Glow
+        // 2. Physical Rayleigh Scattering Atmosphere
         function buildAtmosphericRayleighGlow() {
-            const atmoGeo = new THREE.SphereGeometry(GLOBE_RADIUS * 1.028, 64, 64);
+            const atmoGeo = new THREE.SphereGeometry(GLOBE_RADIUS * 1.026, 64, 64);
             const atmoMat = new THREE.ShaderMaterial({
                 vertexShader: `
                     varying vec3 vNormal;
@@ -832,9 +838,9 @@
                 fragmentShader: `
                     varying vec3 vNormal;
                     void main() {
-                        float intensity = pow(0.68 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.0);
-                        vec3 skyColor = vec3(0.15, 0.55, 0.95);
-                        gl_FragColor = vec4(skyColor, 1.0) * intensity * 0.65;
+                        float intensity = pow(0.68 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.2);
+                        vec3 skyColor = vec3(0.18, 0.58, 0.98);
+                        gl_FragColor = vec4(skyColor, 1.0) * intensity * 0.7;
                     }
                 `,
                 side: THREE.BackSide,
@@ -842,52 +848,132 @@
                 transparent: true
             });
             atmosphereMesh = new THREE.Mesh(atmoGeo, atmoMat);
-            scene.add(atmosphereMesh);
+            scene.add(atmosphereMesh); // Outside earthGroup so halo stays aligned with view
         }
 
-        // 3. Fluid Dynamic Wind Streamlines & Dust Advection Plume
-        function buildStreamlineWindPlume() {
-            const curveCount = 180;
-            const pointsPerCurve = 35;
-            const group = new THREE.Group();
+        // 3. PHOTOREALISTIC ATMOSPHERIC DUST PLUME (NASA MODIS DEEP BLUE STYLE)
+        // Eliminates the noodles! Replaced with true continuous radiative transfer opacity.
+        function buildPhotorealisticAODPlume() {
+            dustPlumeCanvas = document.createElement('canvas');
+            dustPlumeCanvas.width = 1024;
+            dustPlumeCanvas.height = 512;
+            renderPlumeTexture(0); // Forecast T+0
 
-            const stormCenterLat = 27.5;
-            const stormCenterLon = 44.0;
+            dustPlumeTexture = new THREE.CanvasTexture(dustPlumeCanvas);
+            dustPlumeTexture.wrapS = THREE.ClampToEdgeWrapping;
+            dustPlumeTexture.wrapT = THREE.ClampToEdgeWrapping;
 
-            for (let i = 0; i < curveCount; i++) {
-                const points = [];
-                // Start from northern desert
-                const startLat = 31.5 + (Math.random() - 0.5) * 3.5;
-                const startLon = 39.0 + (Math.random() - 0.5) * 6.0;
+            const plumeGeo = new THREE.SphereGeometry(GLOBE_RADIUS + 0.18, 96, 96);
+            const plumeMat = new THREE.MeshBasicMaterial({
+                map: dustPlumeTexture,
+                transparent: true,
+                opacity: 0.88,
+                depthWrite: false,
+                blending: THREE.NormalBlending
+            });
 
-                for (let j = 0; j < pointsPerCurve; j++) {
-                    const progress = j / pointsPerCurve;
-                    // Advect southeast across Eastern Province / Riyadh
-                    const lat = startLat - progress * 8.5 + (Math.sin(j * 0.3) * 0.4);
-                    const lon = startLon + progress * 7.0 + (Math.cos(j * 0.3) * 0.4);
-                    const altitude = 0.4 + Math.sin(progress * Math.PI) * 1.8;
-                    points.push(geoToVector3(lat, lon, altitude));
-                }
+            dustPlumeMesh = new THREE.Mesh(plumeGeo, plumeMat);
+            earthGroup.add(dustPlumeMesh);
+        }
 
-                const curve = new THREE.CatmullRomCurve3(points);
-                const geom = new THREE.TubeGeometry(curve, 24, 0.08 + Math.random() * 0.06, 6, false);
-                
-                // Color gradient from fiery ochre to dusty amber
-                const mat = new THREE.MeshBasicMaterial({
-                    color: i % 2 === 0 ? 0xff7a33 : 0xf59e0b,
-                    transparent: true,
-                    opacity: 0.4 + Math.random() * 0.35,
-                    blending: THREE.AdditiveBlending
+        // Draws the true Gaussian/fractal Aerosol Optical Depth plume onto the 2D equirectangular texture
+        function renderPlumeTexture(hour) {
+            const ctx = dustPlumeCanvas.getContext('2d');
+            ctx.clearRect(0, 0, dustPlumeCanvas.width, dustPlumeCanvas.height);
+
+            // Longitude & Latitude conversion to texture pixels
+            // x: lon [-180, 180] -> [0, 1024]
+            // y: lat [90, -90]   -> [0, 512]
+            const lonToX = lon => ((lon + 180) / 360) * dustPlumeCanvas.width;
+            const latToY = lat => ((90 - lat) / 180) * dustPlumeCanvas.height;
+
+            const progress = hour / 72.0;
+            // Storm advects from North (Nafud desert 29.5°N, 41.5°E) to South-East (Riyadh/Dhahran 24°N, 48°E)
+            const centerLat = 29.5 - (progress * 6.5);
+            const centerLon = 41.5 + (progress * 6.8);
+            const cx = lonToX(centerLon);
+            const cy = latToY(centerLat);
+
+            const rx = (18 + progress * 8) * (dustPlumeCanvas.width / 360);
+            const ry = (12 + progress * 5) * (dustPlumeCanvas.height / 180);
+
+            // Layer 1: Diffuse Atmospheric Haze (Low AOD τ = 0.5 - 1.2)
+            const gradOuter = ctx.createRadialGradient(cx, cy, 5, cx, cy, rx * 1.6);
+            gradOuter.addColorStop(0, 'rgba(212, 160, 94, 0.45)');
+            gradOuter.addColorStop(0.5, 'rgba(194, 142, 80, 0.28)');
+            gradOuter.addColorStop(0.85, 'rgba(180, 130, 70, 0.10)');
+            gradOuter.addColorStop(1, 'rgba(180, 130, 70, 0.0)');
+
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(-0.35); // Shamal wind angle (NW to SE)
+            ctx.scale(1.4, 0.85);
+            ctx.fillStyle = gradOuter;
+            ctx.beginPath();
+            ctx.arc(0, 0, rx * 1.6, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+
+            // Layer 2: Dense Convective Mineral Dust Core (High AOD τ = 2.5 - 4.5)
+            const gradCore = ctx.createRadialGradient(cx, cy, 2, cx, cy, rx * 0.9);
+            gradCore.addColorStop(0, 'rgba(235, 178, 105, 0.75)');
+            gradCore.addColorStop(0.45, 'rgba(215, 155, 88, 0.60)');
+            gradCore.addColorStop(0.8, 'rgba(195, 135, 70, 0.25)');
+            gradCore.addColorStop(1, 'rgba(180, 120, 60, 0.0)');
+
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(-0.35);
+            ctx.scale(1.3, 0.8);
+            ctx.fillStyle = gradCore;
+            ctx.beginPath();
+            ctx.arc(0, 0, rx * 0.9, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
+
+        // 4. ELEGANT FLOWING WIND VECTOR PARTICLES (Windy / Earth Nullschool Style)
+        // 2,500 microscopic 1.2px flowing points instead of thick noodles!
+        function buildWindFlowParticles() {
+            const count = 3200;
+            const geo = new THREE.BufferGeometry();
+            const pos = new Float32Array(count * 3);
+            const particleData = [];
+
+            for (let i = 0; i < count; i++) {
+                // Initialize within Arabian Peninsula box: Lat [18, 32], Lon [36, 52]
+                const lat = 18 + Math.random() * 14;
+                const lon = 36 + Math.random() * 16;
+                const p = geoToVector3(lat, lon, 0.25);
+                pos[i * 3] = p.x;
+                pos[i * 3 + 1] = p.y;
+                pos[i * 3 + 2] = p.z;
+
+                particleData.push({
+                    lat: lat,
+                    lon: lon,
+                    speed: 0.045 + Math.random() * 0.035,
+                    life: Math.random()
                 });
-
-                group.add(new THREE.Mesh(geom, mat));
             }
 
-            streamlineMesh = group;
-            scene.add(streamlineMesh);
+            geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+
+            const mat = new THREE.PointsMaterial({
+                color: 0xffd188,
+                size: 1.2,
+                transparent: true,
+                opacity: 0.7,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false
+            });
+
+            streamParticles = new THREE.Points(geo, mat);
+            streamParticles.userData = particleData;
+            earthGroup.add(streamParticles);
         }
 
-        // 4. Tactical Asset 3D Targeting Anchors
+        // 5. TACTICAL MILITARY / DEFENSE ASSET ANCHORS
         const ASSETS = {
             'asset-sudair-pv': {
                 name: 'Sudair Solar PV Complex (1.5 GW)',
@@ -939,37 +1025,44 @@
             }
         };
 
-        function build3DAssetTargets() {
+        function buildTacticalAssetTargets() {
             Object.keys(ASSETS).forEach(key => {
                 const asset = ASSETS[key];
-                const pos = geoToVector3(asset.lat, asset.lon, 0.2);
+                const pos = geoToVector3(asset.lat, asset.lon, 0.15);
 
                 const group = new THREE.Group();
                 group.position.copy(pos);
-                group.lookAt(0, 0, 0);
+                group.lookAt(0, 0, 0); // Orient to ground surface normal
 
-                // Target Circle Pulse
-                const ringGeo = new THREE.RingGeometry(0.6, 0.9, 32);
-                const ringMat = new THREE.MeshBasicMaterial({
-                    color: key === 'asset-neom-telecom' ? 0x10b981 : 0xff6b2c,
-                    side: THREE.DoubleSide
-                });
+                // Tactical Reticle Rings
+                const color = key === 'asset-neom-telecom' ? 0x10b981 : 0xff6b2c;
+                
+                const ringGeo = new THREE.RingGeometry(0.35, 0.45, 32);
+                const ringMat = new THREE.MeshBasicMaterial({ color: color, side: THREE.DoubleSide });
                 group.add(new THREE.Mesh(ringGeo, ringMat));
 
-                // High-Intensity Vertical Laser Beacon
-                const lineGeo = new THREE.CylinderGeometry(0.08, 0.08, 4.0, 16);
-                const lineMat = new THREE.MeshBasicMaterial({
-                    color: key === 'asset-neom-telecom' ? 0x34d399 : 0xff8a4c,
-                    transparent: true,
-                    opacity: 0.8
-                });
-                const lineMesh = new THREE.Mesh(lineGeo, lineMat);
-                lineMesh.position.z = 2.0;
-                lineMesh.rotation.x = Math.PI / 2;
-                group.add(lineMesh);
+                // Pulsing outer sonar ring
+                const outerGeo = new THREE.RingGeometry(0.7, 0.78, 32);
+                const outerMat = new THREE.MeshBasicMaterial({ color: color, side: THREE.DoubleSide, transparent: true, opacity: 0.4 });
+                const outerMesh = new THREE.Mesh(outerGeo, outerMat);
+                group.add(outerMesh);
 
-                scene.add(group);
-                assetAnchors[key] = group;
+                // Thin Precision Laser Pillar
+                const pinGeo = new THREE.CylinderGeometry(0.04, 0.04, 2.5, 12);
+                const pinMat = new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: 0.85 });
+                const pinMesh = new THREE.Mesh(pinGeo, pinMat);
+                pinMesh.position.z = 1.25;
+                pinMesh.rotation.x = Math.PI / 2;
+                group.add(pinMesh);
+
+                // Target Beacon Head
+                const beaconGeo = new THREE.SphereGeometry(0.18, 16, 16);
+                const beaconMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+                const beaconMesh = new THREE.Mesh(beaconGeo, beaconMat);
+                beaconMesh.position.z = 2.5;
+                group.add(beaconMesh);
+
+                earthGroup.add(group); // MOUNTED ON EARTHGROUP SO IT NEVER DRIFTS!
             });
         }
 
@@ -979,7 +1072,9 @@
 
             if (targetKey === 'orbit') {
                 document.getElementById('card-orbit').classList.add('active');
-                cameraTween(new THREE.Vector3(0, 35, 115), new THREE.Vector3(0, 0, 0));
+                const arabianCenter = geoToVector3(24.5, 44.5, 0);
+                const camPos = arabianCenter.clone().normalize().multiplyScalar(125);
+                cameraTween(camPos, new THREE.Vector3(0, 0, 0));
                 return;
             }
 
@@ -990,9 +1085,15 @@
             currentSelected = assetKey;
             syncHUD(assetKey);
 
-            const pos = geoToVector3(ASSETS[assetKey].lat, ASSETS[assetKey].lon, 0);
-            const camTarget = pos.clone().multiplyScalar(1.26); // Zoom closely
-            cameraTween(camTarget, pos);
+            // Compute target position in world space
+            const asset = ASSETS[assetKey];
+            const localPos = geoToVector3(asset.lat, asset.lon, 0);
+            
+            // Get world position including Earth group rotation
+            const worldPos = localPos.clone().applyMatrix4(earthGroup.matrixWorld);
+            const camTarget = worldPos.clone().normalize().multiplyScalar(78); // Precision close-up
+
+            cameraTween(camTarget, worldPos);
         }
 
         function cameraTween(targetPos, lookAtTarget) {
@@ -1001,7 +1102,7 @@
             let p = 0;
 
             function step() {
-                p += 0.038;
+                p += 0.04;
                 if (p <= 1.0) {
                     const ease = p < 0.5 ? 2 * p * p : -1 + (4 - 2 * p) * p;
                     camera.position.lerpVectors(startPos, targetPos, ease);
@@ -1038,12 +1139,11 @@
             const hh = String(currentForecastHour).padStart(2, '0');
             document.getElementById('timeline-label').innerText = `T + ${hh}:00 HOURS (FORECAST)`;
 
-            const progress = currentForecastHour / 72.0;
+            // Re-render true AOD plume for current forecast step
+            renderPlumeTexture(currentForecastHour);
+            if (dustPlumeTexture) dustPlumeTexture.needsUpdate = true;
 
-            // Rotate streamlines slightly to simulate shifting wind vector
-            if (streamlineMesh) {
-                streamlineMesh.rotation.y = progress * 0.15;
-            }
+            const progress = currentForecastHour / 72.0;
 
             // Update Sudair DDI based on storm arrival
             const sudairIntensity = Math.sin(progress * Math.PI);
@@ -1073,7 +1173,7 @@
                     if (next > 72) next = 0;
                     slider.value = next;
                     onTimelineInput(next);
-                }, 180);
+                }, 160);
             } else {
                 clearInterval(playInterval);
             }
@@ -1140,17 +1240,37 @@
             }, 1000);
         }
 
+        // Animation Loop
         function animate() {
             requestAnimationFrame(animate);
 
-            // Subtle Earth rotation
-            if (earthMesh) {
-                // Keep Arabian Peninsula in focus, very gentle drift
-                earthMesh.rotation.y += 0.00015;
+            // Animate delicate wind streamline particles along Shamal trajectory
+            if (streamParticles) {
+                const pos = streamParticles.geometry.attributes.position.array;
+                const data = streamParticles.userData;
+                for (let i = 0; i < data.length; i++) {
+                    const p = data[i];
+                    // Shamal wind: moves NW to SE (lat decreases, lon increases)
+                    p.lat -= p.speed * 0.45;
+                    p.lon += p.speed * 0.35;
+
+                    // Recycle if boundary reached
+                    if (p.lat < 16.5 || p.lon > 54.0) {
+                        p.lat = 29.0 + Math.random() * 3.5;
+                        p.lon = 38.0 + Math.random() * 8.0;
+                    }
+
+                    const v = geoToVector3(p.lat, p.lon, 0.25);
+                    pos[i * 3] = v.x;
+                    pos[i * 3 + 1] = v.y;
+                    pos[i * 3 + 2] = v.z;
+                }
+                streamParticles.geometry.attributes.position.needsUpdate = true;
             }
 
+            // Gentle cloud rotation relative to earth
             if (cloudsMesh) {
-                cloudsMesh.rotation.y += 0.00022; // Clouds drift faster than land
+                cloudsMesh.rotation.y += 0.00018;
             }
 
             controls.update();
