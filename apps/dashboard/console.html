@@ -3033,6 +3033,13 @@
 
         async function triggerScenario(id) {
             logEvent(`DEMO_ENGINE: Activating scenario [${id.toUpperCase()}]`, 'info');
+
+            // Synchronize with embedded 3D Digital Twin
+            const twinIframe = document.getElementById('twin-iframe');
+            if (twinIframe && twinIframe.contentWindow) {
+                twinIframe.contentWindow.postMessage({ type: 'SAHARYN_SCENARIO', action: id }, '*');
+            }
+
             try {
                 const response = await fetch(`/v2/demo/scenario?scenario_id=${id}`, { method: 'POST' });
                 const data = await response.json();

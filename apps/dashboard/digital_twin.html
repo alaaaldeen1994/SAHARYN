@@ -2022,6 +2022,24 @@
             }
             init();
             if (typeof lucide !== 'undefined') lucide.createIcons();
+
+            // Synchronize scenarios from parent Mission Control
+            window.addEventListener('message', (event) => {
+                if (event.data && event.data.type === 'SAHARYN_SCENARIO') {
+                    const action = event.data.action;
+                    if (action === 'sandstorm') {
+                        onTimelineScrub(36);
+                        document.getElementById('timeline-range').value = 36;
+                        selectAsset('asset-sudair-pv', true);
+                    } else if (action === 'heat' || action === 'filter') {
+                        selectAsset('asset-yanbu-turbine', true);
+                    } else if (action === 'reset') {
+                        resetCamera();
+                        onTimelineScrub(0);
+                        document.getElementById('timeline-range').value = 0;
+                    }
+                }
+            });
         });
     </script>
 </body>
