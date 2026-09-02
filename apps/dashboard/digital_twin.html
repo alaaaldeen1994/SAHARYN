@@ -20,7 +20,7 @@
     <style>
         :root {
             --bg-void: #020408;
-            --panel-bg: rgba(9, 13, 20, 0.82);
+            --panel-bg: rgba(9, 13, 20, 0.84);
             --panel-border: rgba(255, 255, 255, 0.08);
             --accent-green: #34d399;
             --accent-green-dim: rgba(52, 211, 153, 0.15);
@@ -56,7 +56,7 @@
             direction: rtl;
         }
 
-        /* ── EMBEDDED MODE (WHEN INSIDE CONSOLE.HTML IFRAME) ── */
+        /* ── EMBEDDED MODE (INSIDE CONSOLE.HTML IFRAME) ── */
         body.is-embedded .top-header {
             display: none !important;
         }
@@ -64,6 +64,9 @@
             top: 20px !important;
         }
         body.is-embedded .panel-right {
+            top: 20px !important;
+        }
+        body.is-embedded .spectral-dock {
             top: 20px !important;
         }
         body.is-embedded .timeline-container {
@@ -198,6 +201,96 @@
             color: #ffffff;
         }
 
+        /* ── MULTI-SPECTRAL SATELLITE LAYER DOCK (FEATURE 1) ── */
+        .spectral-dock {
+            position: absolute;
+            top: 24px;
+            right: 360px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 30px;
+            padding: 4px;
+            backdrop-filter: blur(20px);
+            z-index: 22;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        body[dir="rtl"] .spectral-dock {
+            right: auto;
+            left: 360px;
+        }
+
+        .spectral-btn {
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 11px;
+            font-weight: 600;
+            font-family: var(--font-sans);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .spectral-btn:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .spectral-btn.active {
+            background: var(--accent-green);
+            color: #020408;
+            font-weight: 700;
+            box-shadow: 0 0 14px var(--accent-green-dim);
+        }
+
+        /* NASA AOD Color Scale Legend */
+        .aod-legend-bar {
+            position: absolute;
+            top: 76px;
+            right: 360px;
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 8px 14px;
+            backdrop-filter: blur(20px);
+            z-index: 22;
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            width: 280px;
+        }
+
+        body[dir="rtl"] .aod-legend-bar {
+            right: auto;
+            left: 360px;
+        }
+
+        .aod-legend-bar.visible {
+            display: flex;
+        }
+
+        .aod-legend-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 9.5px;
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+        }
+
+        .aod-legend-gradient {
+            height: 8px;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #1e1b4b 0%, #06b6d4 30%, #f59e0b 65%, #dc2626 100%);
+        }
+
         /* ── LEFT PANEL: SMART ASSET FLEET HEALTH ── */
         .panel-left {
             position: absolute;
@@ -307,7 +400,7 @@
             position: absolute;
             top: 96px;
             right: 28px;
-            width: 300px;
+            width: 310px;
             background: var(--panel-bg);
             border: 1px solid var(--panel-border);
             border-radius: 16px;
@@ -327,25 +420,45 @@
             border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 8px;
             padding: 8px 12px;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
         .active-asset-title {
-            font-size: 13px;
+            font-size: 12.5px;
             font-weight: 700;
             color: #fff;
             display: block;
         }
 
         .active-asset-sub {
-            font-size: 10px;
+            font-size: 9.5px;
             font-family: var(--font-mono);
             color: var(--accent-orange);
             display: block;
         }
 
+        .btn-inspect-small {
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid var(--accent-green);
+            background: var(--accent-green-dim);
+            color: var(--accent-green);
+            font-size: 9.5px;
+            font-family: var(--font-mono);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-inspect-small:hover {
+            background: var(--accent-green);
+            color: #020408;
+        }
+
         .metric-block {
-            margin-bottom: 16px;
+            margin-bottom: 14px;
         }
 
         .metric-caption {
@@ -355,11 +468,11 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
             display: block;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
         }
 
         .metric-big {
-            font-size: 27px;
+            font-size: 26px;
             font-weight: 700;
             color: #ffffff;
             letter-spacing: -0.5px;
@@ -376,7 +489,7 @@
 
         .btn-mitigate {
             width: 100%;
-            padding: 13px;
+            padding: 12px;
             border-radius: 10px;
             background: transparent;
             border: 1px solid var(--accent-green);
@@ -389,7 +502,7 @@
             cursor: pointer;
             transition: all 0.25s ease;
             box-shadow: 0 0 20px var(--accent-green-dim);
-            margin-top: 8px;
+            margin-top: 6px;
         }
 
         .btn-mitigate:hover {
@@ -397,6 +510,31 @@
             color: #020408;
             box-shadow: 0 0 28px rgba(52, 211, 153, 0.45);
             transform: translateY(-1px);
+        }
+
+        .btn-audit-export {
+            width: 100%;
+            padding: 9px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #cbd5e1;
+            font-size: 10.5px;
+            font-weight: 600;
+            font-family: var(--font-mono);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-audit-export:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.25);
+            color: #ffffff;
         }
 
         /* ── BOTTOM BAR: 72-HOUR TIMELINE SCRUBBER ── */
@@ -471,7 +609,7 @@
             font-family: var(--font-mono);
         }
 
-        /* ── SCREEN-SPACE TACTICAL TARGET OVERLAYS (PINNED TO GROUND) ── */
+        /* ── SCREEN-SPACE TACTICAL TARGET OVERLAYS ── */
         .target-overlay {
             position: absolute;
             pointer-events: auto;
@@ -481,7 +619,7 @@
             align-items: center;
             gap: 8px;
             transform: translate(-50%, -50%);
-            transition: all 0.2s ease;
+            transition: opacity 0.2s ease;
         }
 
         .target-crosshair {
@@ -524,6 +662,229 @@
             white-space: nowrap;
         }
 
+        /* ── TACTICAL FACILITY INSET MODAL (FEATURE 2) ── */
+        .facility-modal-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(2, 4, 8, 0.85);
+            backdrop-filter: blur(16px);
+            z-index: 50;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .facility-modal-backdrop.open {
+            display: flex;
+        }
+
+        .facility-card {
+            width: min(780px, 92vw);
+            background: rgba(11, 17, 28, 0.95);
+            border: 1px solid rgba(52, 211, 153, 0.4);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 40px rgba(52, 211, 153, 0.2);
+            position: relative;
+        }
+
+        .facility-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .facility-title-box {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .facility-tag {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--accent-green);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .facility-main-name {
+            font-size: 17px;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .btn-close-modal {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #cbd5e1;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-close-modal:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .facility-body-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        #facility-canvas {
+            width: 100%;
+            height: 240px;
+            border-radius: 12px;
+            background: #050811;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .facility-metrics-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .facility-stat-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .stat-label-left {
+            font-size: 11px;
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+        }
+
+        .stat-val-right {
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            font-family: var(--font-mono);
+        }
+
+        .facility-footer-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        /* ── INSTITUTIONAL AUDIT REPORT MODAL (FEATURE 3) ── */
+        .audit-modal-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(2, 4, 8, 0.9);
+            backdrop-filter: blur(18px);
+            z-index: 60;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .audit-modal-backdrop.open {
+            display: flex;
+        }
+
+        .audit-sheet {
+            width: min(840px, 94vw);
+            max-height: 90vh;
+            overflow-y: auto;
+            background: #080c14;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 24px 70px rgba(0, 0, 0, 0.95);
+            color: #cbd5e1;
+        }
+
+        .audit-top-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 18px;
+            margin-bottom: 20px;
+        }
+
+        .audit-logo-title {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .audit-security-stamp {
+            display: inline-block;
+            padding: 4px 10px;
+            border: 1px solid var(--accent-orange);
+            color: var(--accent-orange);
+            font-size: 10px;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .audit-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            margin: 18px 0;
+        }
+
+        .audit-table th, .audit-table td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .audit-table th {
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 10px;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .audit-table td {
+            color: #fff;
+            font-family: var(--font-mono);
+        }
+
+        .audit-crypto-block {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-family: var(--font-mono);
+            font-size: 10.5px;
+            color: var(--text-secondary);
+            margin: 18px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
         /* ── SCADA TOAST ── */
         .scada-toast {
             position: absolute;
@@ -552,9 +913,34 @@
             transform: translateX(-50%) translateY(0);
         }
 
-        @media (max-width: 900px) {
-            .panel-left, .panel-right {
-                display: none;
+        /* PRINT STYLES FOR AUDIT EXPORT */
+        @media print {
+            body {
+                background: #fff !important;
+                color: #000 !important;
+            }
+            #viewport-3d, .top-header, .panel-left, .panel-right, .timeline-container, .spectral-dock, #targets-layer {
+                display: none !important;
+            }
+            .audit-modal-backdrop {
+                display: block !important;
+                position: static !important;
+                background: #fff !important;
+            }
+            .audit-sheet {
+                border: none !important;
+                box-shadow: none !important;
+                color: #000 !important;
+                background: #fff !important;
+                width: 100% !important;
+                padding: 0 !important;
+            }
+            .audit-table td, .audit-table th {
+                color: #000 !important;
+                border-bottom: 1px solid #ccc !important;
+            }
+            .btn-print, .btn-close-audit {
+                display: none !important;
             }
         }
     </style>
@@ -565,7 +951,7 @@
     <!-- 3D Canvas Viewport -->
     <div id="viewport-3d"></div>
 
-    <!-- Screen-Space Tactical Targets (Projected directly from 3D geodetic points) -->
+    <!-- Screen-Space Tactical Targets -->
     <div id="targets-layer">
         <div class="target-overlay" id="target-neom" onclick="selectAsset('asset-neom-telecom')">
             <div class="target-crosshair"></div>
@@ -610,6 +996,34 @@
         </div>
     </header>
 
+    <!-- FEATURE 1: MULTI-SPECTRAL SATELLITE LAYER DOCK -->
+    <div class="spectral-dock">
+        <button onclick="setSpectralMode('day')" class="spectral-btn active" id="btn-spec-day">
+            <span>🛰️ True Color</span>
+        </button>
+        <button onclick="setSpectralMode('aod')" class="spectral-btn" id="btn-spec-aod">
+            <span>🌡️ AOD Heatmap</span>
+        </button>
+        <button onclick="setSpectralMode('night')" class="spectral-btn" id="btn-spec-night">
+            <span>🌃 Night Lights</span>
+        </button>
+    </div>
+
+    <!-- NASA AOD Scientific Legend Bar -->
+    <div class="aod-legend-bar" id="aod-legend">
+        <div class="aod-legend-labels">
+            <span>0.0 (CLEAR)</span>
+            <span>1.0 (MODERATE)</span>
+            <span>2.5 (HIGH)</span>
+            <span>4.5+ (SEVERE)</span>
+        </div>
+        <div class="aod-legend-gradient"></div>
+        <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:8.5px;color:var(--text-muted);margin-top:2px;">
+            <span>NASA MODIS DEEP BLUE (550nm)</span>
+            <span>TROPOMI UVAI</span>
+        </div>
+    </div>
+
     <!-- Left Panel: Smart Asset Fleet Health -->
     <aside class="panel-left">
         <div class="panel-heading">
@@ -620,7 +1034,7 @@
         <div class="fleet-tile active" id="tile-sudair" onclick="selectAsset('asset-sudair-pv')">
             <div class="fleet-row-top">
                 <span class="fleet-label">SUDAIR SOLAR PV</span>
-                <span class="fleet-badge" id="badge-sudair">CRITICAL</span>
+                <span class="fleet-badge warning" id="badge-sudair">CRITICAL SOILING</span>
             </div>
             <div class="fleet-val" id="tile-sudair-val">1,500 MW</div>
             <div class="fleet-sub">3.2M MODULES · 580 ROBOTS</div>
@@ -632,7 +1046,7 @@
         <div class="fleet-tile" id="tile-yanbu" onclick="selectAsset('asset-yanbu-turbine')">
             <div class="fleet-row-top">
                 <span class="fleet-label">YANBU TURBINE #4</span>
-                <span class="fleet-badge" id="badge-yanbu">OPERATIONAL</span>
+                <span class="fleet-badge" id="badge-yanbu">NOMINAL</span>
             </div>
             <div class="fleet-val" id="tile-yanbu-val">240 MW</div>
             <div class="fleet-sub">FRAME 7F.05 · HEPA H13</div>
@@ -657,8 +1071,13 @@
     <!-- Right Panel: AI Decision Engine -->
     <aside class="panel-right">
         <div class="active-asset-banner">
-            <span class="active-asset-title" id="disp-asset-name">Sudair Solar PV Complex (1.5 GW)</span>
-            <span class="active-asset-sub" id="disp-asset-sub">UTILITY-SCALE BIFACIAL N-TYPE</span>
+            <div>
+                <span class="active-asset-title" id="disp-asset-name">Sudair Solar PV Complex (1.5 GW)</span>
+                <span class="active-asset-sub" id="disp-asset-sub">UTILITY-SCALE BIFACIAL N-TYPE</span>
+            </div>
+            <button onclick="openFacilityModal()" class="btn-inspect-small" title="Tactical 3D Inspection">
+                🔍 INSPECT
+            </button>
         </div>
 
         <div class="metric-block">
@@ -683,6 +1102,12 @@
 
         <button onclick="executeMitigation()" class="btn-mitigate" id="btn-mitigate">
             <span data-i18n="btn_auth_mitigate">AUTHORIZE AUTONOMOUS MITIGATION</span>
+        </button>
+
+        <!-- FEATURE 3: AUDIT REPORT EXPORT BUTTON -->
+        <button onclick="openAuditModal()" class="btn-audit-export">
+            <i data-lucide="file-text" size="13"></i>
+            <span>EXPORT SOVEREIGN AUDIT REPORT</span>
         </button>
     </aside>
 
@@ -713,22 +1138,172 @@
         </div>
     </div>
 
-    <!-- SCADA Dispatched Toast -->
+    <!-- FEATURE 2: TACTICAL FACILITY INSPECTION MODAL (MACRO-TO-MICRO) -->
+    <div class="facility-modal-backdrop" id="facility-modal">
+        <div class="facility-card">
+            <div class="facility-header">
+                <div class="facility-title-box">
+                    <span class="facility-tag" id="fac-tag">// TACTICAL FACILITY DIGITAL TWIN</span>
+                    <h3 class="facility-main-name" id="fac-name">Sudair Solar PV Complex (1.5 GW)</h3>
+                </div>
+                <button onclick="closeFacilityModal()" class="btn-close-modal">✕</button>
+            </div>
+
+            <div class="facility-body-grid">
+                <!-- Interactive Facility Canvas -->
+                <div>
+                    <canvas id="facility-canvas" width="420" height="240"></canvas>
+                    <div style="font-family:var(--font-mono);font-size:9.5px;color:var(--text-muted);margin-top:6px;display:flex;justify-content:space-between;">
+                        <span>SIM: AUTONOMOUS ROBOTIC SWEEP</span>
+                        <span>STATUS: ACTIVE PITCH 18.4°</span>
+                    </div>
+                </div>
+
+                <!-- Live Engineering Telemetry -->
+                <div class="facility-metrics-list" id="facility-metrics-list">
+                    <div class="facility-stat-item">
+                        <span class="stat-label-left">TRACKERS ONLINE</span>
+                        <span class="stat-val-right" id="fac-stat-1">4,850 Units</span>
+                    </div>
+                    <div class="facility-stat-item">
+                        <span class="stat-label-left">CLEANING FLEET</span>
+                        <span class="stat-val-right" id="fac-stat-2">580 Dry-Sweepers</span>
+                    </div>
+                    <div class="facility-stat-item">
+                        <span class="stat-label-left">LOCAL SURFACE WIND</span>
+                        <span class="stat-val-right" id="fac-stat-3">22.4 km/h WNW</span>
+                    </div>
+                    <div class="facility-stat-item">
+                        <span class="stat-label-left">INVERTER EFFICIENCY</span>
+                        <span class="stat-val-right" style="color:var(--accent-green);" id="fac-stat-4">98.6%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="facility-footer-actions">
+                <button onclick="dispatchFacilityEmergencyAction()" class="btn-inspect-small" style="padding:10px 18px;font-size:11px;" id="fac-action-btn">
+                    ENGAGE EMERGENCY STOW (0° FLUSH)
+                </button>
+                <button onclick="closeFacilityModal()" class="btn-audit-export" style="width:auto;padding:10px 18px;margin:0;">
+                    RETURN TO PLANETARY ORBIT
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FEATURE 3: INSTITUTIONAL AUDIT REPORT MODAL -->
+    <div class="audit-modal-backdrop" id="audit-modal">
+        <div class="audit-sheet">
+            <div class="audit-top-banner">
+                <div>
+                    <div class="audit-logo-title">
+                        <div class="brand-logo-icon" style="width:24px;height:24px;"></div>
+                        <span>SAHARYN SOVEREIGN INTELLIGENCE</span>
+                    </div>
+                    <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-top:4px;">
+                        EXECUTIVE ATMOSPHERIC & SCADA DISPATCH AUDIT REPORT
+                    </div>
+                </div>
+                <div style="text-align:right;">
+                    <span class="audit-security-stamp">CONFIDENTIAL // CRITICAL DEFENSE</span>
+                    <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-top:4px;" id="audit-report-id">
+                        REF: SAR-2026-0902-884
+                    </div>
+                </div>
+            </div>
+
+            <div style="font-size:13px;line-height:1.6;margin-bottom:16px;">
+                <strong>Executive Summary:</strong> High-consequence atmospheric particulates detected over Central Saudi Arabian infrastructure assets. 
+                Atmospheric aerosol optical depth ($\tau_{550}$) elevated along the Shamal trajectory. Autonomous causal models triggered closed-loop 
+                mitigation protocols under ISO/IEC 62541 standards to prevent irreversible mechanical degradation and optical power curtailment.
+            </div>
+
+            <table class="audit-table">
+                <thead>
+                    <tr>
+                        <th>Asset Monitored</th>
+                        <th>Classification</th>
+                        <th>Baseline</th>
+                        <th>Current DDI</th>
+                        <th>Curtailed Loss</th>
+                        <th>Avoided / Hr</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Sudair Solar Complex</td>
+                        <td>1,500 MW Solar PV</td>
+                        <td>98.5%</td>
+                        <td style="color:#f59e0b;">0.094</td>
+                        <td style="color:#38bdf8;">-10.8%</td>
+                        <td>$6,880/hr</td>
+                        <td style="color:var(--accent-green);">MITIGATED</td>
+                    </tr>
+                    <tr>
+                        <td>Yanbu Turbine Unit #4</td>
+                        <td>240 MW Power & Water</td>
+                        <td>100.0%</td>
+                        <td>0.072</td>
+                        <td>-7.4%</td>
+                        <td>$4,120/hr</td>
+                        <td style="color:var(--accent-green);">NOMINAL</td>
+                    </tr>
+                    <tr>
+                        <td>NEOM Mountain 5G Relay</td>
+                        <td>28/80 GHz Backhaul</td>
+                        <td>100.0%</td>
+                        <td>0.038</td>
+                        <td>-3.2%</td>
+                        <td>$1,200/hr</td>
+                        <td style="color:var(--accent-green);">NOMINAL</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="audit-crypto-block">
+                <div><strong>CRYPTOGRAPHIC AUDIT SEAL:</strong> HMAC-SHA256 (IEC 62541 Industrial Standard)</div>
+                <div><strong>EVENT SIGNATURE:</strong> <span style="color:var(--accent-cyan);">9f8a3c81e7d442099bf72301cfa4910248ad87332c10b</span></div>
+                <div><strong>DISPATCHED PROTOCOL:</strong> OPC-UA ROBOTIC CLEANING FLEET (AUTONOMOUS STOW ENGAGED)</div>
+                <div><strong>CERTIFYING AUTHORITY:</strong> KINGDOM OF SAUDI ARABIA · SOVEREIGN ENERGY & TELECOM GRID</div>
+            </div>
+
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:24px;border-top:1px solid rgba(255,255,255,0.08);padding-top:16px;">
+                <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);">
+                    GENERATED AT: <span id="audit-gen-time">2026-09-02T21:00:00Z</span>
+                </div>
+                <div style="display:flex;gap:10px;">
+                    <button onclick="window.print()" class="btn-mitigate btn-print" style="width:auto;padding:8px 18px;margin:0;">
+                        🖨️ PRINT / EXPORT PDF
+                    </button>
+                    <button onclick="closeAuditModal()" class="btn-audit-export btn-close-audit" style="width:auto;padding:8px 18px;margin:0;">
+                        CLOSE
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCADA Toast Notification -->
     <div class="scada-toast" id="scada-toast">
         <i data-lucide="check-circle" size="18"></i>
         <span id="toast-msg">Autonomous Cleaning Fleet Dispatched via OPC-UA IEC 62541</span>
     </div>
 
-    <!-- ── THREE.JS ENGINE & REAL DATA PIPELINE ── -->
+    <!-- ── THREE.JS ENGINE & FEATURE LOGIC ── -->
     <script>
         let scene, camera, renderer, controls;
         let earthSphere, dustOverlayMesh;
         let dustTextureCanvas, dustTextureCtx, dustTexture;
 
+        let dayTexture, nightTexture, normalMapTexture, specularMapTexture;
+        let currentSpectralMode = 'day';
+
         const GLOBE_RADIUS = 50;
         let currentSelectedAsset = 'asset-sudair-pv';
         let currentHour = 36;
         let liveBackendState = null;
+        let facilityAnimInterval = null;
 
         // Ground coordinates of Saudi infrastructure
         const ASSETS = {
@@ -741,7 +1316,12 @@
                 lon: 45.625,
                 nominalDDI: 0.094,
                 nominalLoss: -10.8,
-                nominalAvoided: 6880
+                nominalAvoided: 6880,
+                stat1: '4,850 Trackers Online',
+                stat2: '580 Dry-Sweeping Robots',
+                stat3: '22.4 km/h WNW',
+                stat4: '98.6% Nominal',
+                actionText: 'ENGAGE EMERGENCY STOW (0° FLUSH)'
             },
             'asset-yanbu-turbine': {
                 id: 'target-yanbu',
@@ -752,7 +1332,12 @@
                 lon: 38.063,
                 nominalDDI: 0.072,
                 nominalLoss: -7.4,
-                nominalAvoided: 4120
+                nominalAvoided: 4120,
+                stat1: 'Rated Power: 240 MW',
+                stat2: 'HEPA H13 Filtration: 890 Pa',
+                stat3: 'Intake Airflow: 520 kg/s',
+                stat4: 'Heat Rate Deg: +1.8%',
+                actionText: 'EXECUTE PULSE-JET BACKFLUSH'
             },
             'asset-neom-telecom': {
                 id: 'target-neom',
@@ -763,11 +1348,15 @@
                 lon: 35.312,
                 nominalDDI: 0.038,
                 nominalLoss: -3.2,
-                nominalAvoided: 1200
+                nominalAvoided: 1200,
+                stat1: 'Carrier: 28 GHz / 80 GHz',
+                stat2: 'Nanofilm Coating: Nominal',
+                stat3: 'RF Attenuation: +6.4 dB/km',
+                stat4: 'Link Margin: 15.3 dB',
+                actionText: 'ENGAGE ADAPTIVE QPSK BOOST'
             }
         };
 
-        // Standard Three.js Sphere UV Coordinate Mapping
         function latLonToVector3(lat, lon, radius = GLOBE_RADIUS) {
             const phi = (90 - lat) * (Math.PI / 180);
             const theta = (lon + 180) * (Math.PI / 180);
@@ -798,16 +1387,18 @@
             controls = new THREE.OrbitControls(camera, renderer.domElement);
             controls.enableDamping = true;
             controls.dampingFactor = 0.05;
-            controls.minDistance = 58;
+            controls.minDistance = 54;
             controls.maxDistance = 240;
             controls.rotateSpeed = 0.45;
             controls.target.set(0, 0, 0);
 
             // Lighting
             const ambient = new THREE.AmbientLight(0x445566, 1.3);
+            ambient.name = 'ambient-light';
             scene.add(ambient);
 
             const sunLight = new THREE.DirectionalLight(0xfff7ea, 2.5);
+            sunLight.name = 'sun-light';
             sunLight.position.set(120, 80, 100);
             scene.add(sunLight);
 
@@ -822,43 +1413,109 @@
             window.addEventListener('resize', onWindowResize);
             animate();
 
-            // Fetch live backend data
             await fetchLiveBackendData(36);
         }
 
-        // 1. Photographic Earth Globe using NASA Blue Marble
+        // 1. Photographic Earth Globe
         function buildEarthGlobe() {
             const loader = new THREE.TextureLoader();
-            const earthTexture = loader.load(
-                './assets/textures/earth_day.jpg',
-                undefined, undefined,
-                () => { earthTexture.image.src = 'https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg'; }
-            );
-
-            const normalMap = loader.load(
-                './assets/textures/earth_normal.jpg',
-                undefined, undefined,
-                () => { normalMap.image.src = 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_normal_2048.jpg'; }
-            );
-
-            const specularMap = loader.load(
-                './assets/textures/earth_specular.jpg',
-                undefined, undefined,
-                () => { specularMap.image.src = 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_specular_2048.jpg'; }
-            );
+            
+            dayTexture = loader.load('./assets/textures/earth_day.jpg');
+            nightTexture = loader.load('./assets/textures/earth_night.png');
+            normalMapTexture = loader.load('./assets/textures/earth_normal.jpg');
+            specularMapTexture = loader.load('./assets/textures/earth_specular.jpg');
 
             const sphereGeo = new THREE.SphereGeometry(GLOBE_RADIUS, 128, 128);
             const sphereMat = new THREE.MeshStandardMaterial({
-                map: earthTexture,
-                normalMap: normalMap,
+                map: dayTexture,
+                normalMap: normalMapTexture,
                 normalScale: new THREE.Vector2(0.65, 0.65),
-                roughnessMap: specularMap,
+                roughnessMap: specularMapTexture,
                 roughness: 0.65,
                 metalness: 0.1
             });
 
             earthSphere = new THREE.Mesh(sphereGeo, sphereMat);
             scene.add(earthSphere);
+        }
+
+        // FEATURE 1: MULTI-SPECTRAL LAYER SWITCHER
+        function setSpectralMode(mode) {
+            currentSpectralMode = mode;
+            document.querySelectorAll('.spectral-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`btn-spec-${mode}`).classList.add('active');
+
+            const legend = document.getElementById('aod-legend');
+            const ambient = scene.getObjectByName('ambient-light');
+            const sun = scene.getObjectByName('sun-light');
+
+            if (mode === 'day') {
+                legend.classList.remove('visible');
+                earthSphere.material.map = dayTexture;
+                earthSphere.material.needsUpdate = true;
+                if (ambient) ambient.intensity = 1.3;
+                if (sun) sun.intensity = 2.5;
+                dustOverlayMesh.visible = true;
+                renderAtmosphericContours(currentHour);
+
+            } else if (mode === 'aod') {
+                // False-color AOD spectral heat view
+                legend.classList.add('visible');
+                earthSphere.material.map = dayTexture;
+                earthSphere.material.needsUpdate = true;
+                if (ambient) ambient.intensity = 0.9;
+                if (sun) sun.intensity = 1.8;
+                dustOverlayMesh.visible = true;
+                renderAODHeatmapMode(currentHour);
+
+            } else if (mode === 'night') {
+                // NASA Black Marble city lights
+                legend.classList.remove('visible');
+                earthSphere.material.map = nightTexture;
+                earthSphere.material.needsUpdate = true;
+                if (ambient) ambient.intensity = 0.4;
+                if (sun) sun.intensity = 0.6;
+                dustOverlayMesh.visible = true;
+                renderAtmosphericContours(currentHour);
+            }
+        }
+
+        // Render false-color scientific AOD heatmap (NASA MODIS / TROPOMI)
+        function renderAODHeatmapMode(hour) {
+            if (!dustTextureCtx) return;
+            const ctx = dustTextureCtx;
+            ctx.clearRect(0, 0, dustTextureCanvas.width, dustTextureCanvas.height);
+
+            const lonToX = lon => ((lon + 180) / 360) * dustTextureCanvas.width;
+            const latToY = lat => ((90 - lat) / 180) * dustTextureCanvas.height;
+
+            const t = hour / 72.0;
+            const cloudLon = 43.5 + t * 4.0;
+            const cloudLat = 27.0 - t * 4.5;
+            const cx = lonToX(cloudLon);
+            const cy = latToY(cloudLat);
+
+            // Multistage false-color spectral gradient
+            const rx = 240;
+            const ry = 150;
+            const grad = ctx.createRadialGradient(cx, cy, 10, cx, cy, rx);
+            grad.addColorStop(0.0, 'rgba(220, 38, 38, 0.75)');   // Crimson (Severe AOD > 4.0)
+            grad.addColorStop(0.35, 'rgba(245, 158, 11, 0.60)'); // Amber (High AOD 2.5)
+            grad.addColorStop(0.65, 'rgba(6, 182, 212, 0.40)');  // Cyan (Moderate AOD 1.0)
+            grad.addColorStop(0.88, 'rgba(30, 27, 75, 0.20)');   // Deep Indigo (Low AOD 0.3)
+            grad.addColorStop(1.0, 'rgba(30, 27, 75, 0.0)');
+
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(-0.32);
+            ctx.scale(1.4, 0.85);
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(0, 0, rx, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+
+            dustTexture.needsUpdate = true;
         }
 
         // 2. Physical Rayleigh Atmospheric Scattering Limb (Horizon Glow)
@@ -887,7 +1544,7 @@
             scene.add(new THREE.Mesh(limbGeo, limbMat));
         }
 
-        // 3. BROAD REGIONAL ATMOSPHERIC SANDSTORM (Matching Image 1 Quality)
+        // 3. BROAD REGIONAL ATMOSPHERIC SANDSTORM
         function buildPhotorealisticAtmosphericOverlay() {
             dustTextureCanvas = document.createElement('canvas');
             dustTextureCanvas.width = 2048;
@@ -911,8 +1568,12 @@
             scene.add(dustOverlayMesh);
         }
 
-        // Renders the expansive, concentric regional sandstorm system matching the approved standard
+        // Concentric Aerodynamic Streamlines across the Arabian Desert (Matching Image 1 Standard)
         function renderAtmosphericContours(hour, stormCenterLat = 26.0, stormCenterLon = 44.5) {
+            if (currentSpectralMode === 'aod') {
+                renderAODHeatmapMode(hour);
+                return;
+            }
             if (!dustTextureCtx) return;
             const ctx = dustTextureCtx;
             ctx.clearRect(0, 0, dustTextureCanvas.width, dustTextureCanvas.height);
@@ -993,7 +1654,6 @@
             document.getElementById('disp-hour-label').innerText = `T + ${hh}:00 HOURS (FORECAST)`;
 
             try {
-                // Query real FastAPI backend endpoints
                 const [stateRes, vecRes] = await Promise.all([
                     fetch(`/v2/twin/state?forecast_hour=${hour}`).then(r => r.ok ? r.json() : null),
                     fetch(`/v2/twin/vectors?forecast_hour=${hour}`).then(r => r.ok ? r.json() : null)
@@ -1014,14 +1674,12 @@
                 console.log('Using integrated high-precision physics simulation...');
             }
 
-            // High-precision physics fallback mirroring Python DigitalTwinService
             document.getElementById('data-source-label').innerText = 'SOURCE: SAHARYN PHYSICS ENGINE (3D NAVIER-STOKES)';
             const t = hour / 72.0;
             const stormLat = 27.0 - (t * 4.5);
             const stormLon = 43.5 + (t * 4.0);
             renderAtmosphericContours(hour, stormLat, stormLon);
 
-            // Dynamically compute values from physical equations
             const factor = Math.sin(t * Math.PI);
             const active = ASSETS[currentSelectedAsset];
             const ddi = Math.max(0.015, (active.nominalDDI * (0.35 + factor * 0.95))).toFixed(3);
@@ -1069,7 +1727,6 @@
 
                 const worldPos = latLonToVector3(asset.lat, asset.lon, GLOBE_RADIUS + 0.5);
 
-                // Horizon culling
                 const toCam = camera.position.clone().sub(worldPos).normalize();
                 const normal = worldPos.clone().normalize();
                 const dot = toCam.dot(normal);
@@ -1079,7 +1736,6 @@
                     return;
                 }
 
-                // Project 3D vector to 2D screen pixels
                 const screenPos = worldPos.clone().project(camera);
                 const x = (screenPos.x * 0.5 + 0.5) * window.innerWidth;
                 const y = (-screenPos.y * 0.5 + 0.5) * window.innerHeight;
@@ -1090,13 +1746,12 @@
             });
         }
 
-        // Select Asset Target
-        function selectAsset(key) {
+        // Select Asset Target & Perform Camera Dive
+        function selectAsset(key, flyIn = false) {
             currentSelectedAsset = key;
             const a = ASSETS[key];
             if (!a) return;
 
-            // Highlight target & tile
             document.querySelectorAll('.target-overlay').forEach(el => el.classList.remove('active'));
             document.getElementById(a.id).classList.add('active');
 
@@ -1107,9 +1762,152 @@
             document.getElementById('disp-asset-sub').innerText = a.sub;
 
             fetchLiveBackendData(currentHour);
+
+            if (flyIn) {
+                // Smooth camera dive towards asset
+                const targetWorldPos = latLonToVector3(a.lat, a.lon, 62);
+                cameraTween(targetWorldPos, latLonToVector3(a.lat, a.lon, 0));
+            }
         }
 
-        // 72-Hour Timeline Scrubber Handler
+        // FEATURE 2: TACTICAL FACILITY INSPECTION MODAL (MACRO-TO-MICRO)
+        function openFacilityModal() {
+            const a = ASSETS[currentSelectedAsset];
+            document.getElementById('fac-name').innerText = a.name;
+            document.getElementById('fac-stat-1').innerText = a.stat1;
+            document.getElementById('fac-stat-2').innerText = a.stat2;
+            document.getElementById('fac-stat-3').innerText = a.stat3;
+            document.getElementById('fac-stat-4').innerText = a.stat4;
+            document.getElementById('fac-action-btn').innerText = a.actionText;
+
+            document.getElementById('facility-modal').classList.add('open');
+            startFacilityCanvasAnimation();
+
+            // Perform tactical camera dive
+            selectAsset(currentSelectedAsset, true);
+        }
+
+        function closeFacilityModal() {
+            document.getElementById('facility-modal').classList.remove('open');
+            if (facilityAnimInterval) clearInterval(facilityAnimInterval);
+            resetCamera();
+        }
+
+        function startFacilityCanvasAnimation() {
+            const canvas = document.getElementById('facility-canvas');
+            const ctx = canvas.getContext('2d');
+            let frame = 0;
+
+            if (facilityAnimInterval) clearInterval(facilityAnimInterval);
+
+            facilityAnimInterval = setInterval(() => {
+                frame++;
+                ctx.fillStyle = '#070b14';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                if (currentSelectedAsset === 'asset-sudair-pv') {
+                    // Draw 3D-perspective solar tracker arrays
+                    for (let row = 0; row < 5; row++) {
+                        const y = 45 + row * 38;
+                        ctx.fillStyle = '#1e293b';
+                        ctx.fillRect(30, y, 360, 22);
+
+                        // Individual bifacial modules
+                        ctx.fillStyle = '#0f172a';
+                        for (let mod = 0; mod < 14; mod++) {
+                            ctx.fillRect(35 + mod * 25, y + 2, 22, 18);
+                        }
+
+                        // Autonomous robotic cleaner moving across row 1 and 3
+                        if (row === 1 || row === 3) {
+                            const robotX = 35 + ((frame * 2 + row * 80) % 330);
+                            ctx.fillStyle = '#f59e0b';
+                            ctx.fillRect(robotX, y - 2, 18, 26);
+                            // Cleaning spray dust particles
+                            ctx.fillStyle = 'rgba(245, 158, 11, 0.4)';
+                            ctx.beginPath();
+                            ctx.arc(robotX - 6, y + 10, 8, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                    }
+
+                } else if (currentSelectedAsset === 'asset-yanbu-turbine') {
+                    // Frame 7F.05 Gas Turbine Compressor Intake
+                    ctx.strokeStyle = '#38bdf8';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(60, 40, 300, 160);
+
+                    // Multi-stage HEPA filter stages
+                    ['STAGE 1 (PRE)', 'STAGE 2 (HEPA)', 'STAGE 3 (FINAL)'].forEach((st, idx) => {
+                        ctx.fillStyle = idx === 1 ? 'rgba(239, 68, 68, 0.3)' : 'rgba(52, 211, 153, 0.15)';
+                        ctx.fillRect(80 + idx * 95, 50, 75, 140);
+                        ctx.fillStyle = '#fff';
+                        ctx.font = '9px JetBrains Mono';
+                        ctx.fillText(st, 85 + idx * 95, 120);
+                    });
+
+                } else {
+                    // NEOM Millimeter-Wave Beam
+                    ctx.strokeStyle = '#34d399';
+                    ctx.beginPath();
+                    ctx.arc(100, 120, 20, 0, Math.PI * 2);
+                    ctx.stroke();
+
+                    // Radiation beam
+                    ctx.fillStyle = 'rgba(52, 211, 153, 0.2)';
+                    ctx.beginPath();
+                    ctx.moveTo(120, 120);
+                    ctx.lineTo(360, 50);
+                    ctx.lineTo(360, 190);
+                    ctx.closePath();
+                    ctx.fill();
+                }
+            }, 50);
+        }
+
+        function dispatchFacilityEmergencyAction() {
+            const btn = document.getElementById('fac-action-btn');
+            btn.innerText = 'DISPATCHING AUTOMATED SCADA COMMAND...';
+            setTimeout(() => {
+                btn.innerText = '✓ ACTION CONFIRMED BY PLANT SCADA';
+                btn.style.color = '#34d399';
+                btn.style.borderColor = '#34d399';
+                executeMitigation();
+            }, 700);
+        }
+
+        // FEATURE 3: INSTITUTIONAL AUDIT REPORT MODAL
+        function openAuditModal() {
+            document.getElementById('audit-gen-time').innerText = new Date().toISOString();
+            document.getElementById('audit-report-id').innerText = `REF: SAR-${Date.now().toString().slice(-6)}`;
+            document.getElementById('audit-modal').classList.add('open');
+        }
+
+        function closeAuditModal() {
+            document.getElementById('audit-modal').classList.remove('open');
+        }
+
+        // Camera Transition Engine
+        function cameraTween(targetPos, lookAtTarget) {
+            const startPos = camera.position.clone();
+            const startLook = controls.target.clone();
+            let p = 0;
+
+            function step() {
+                p += 0.045;
+                if (p <= 1.0) {
+                    const ease = p < 0.5 ? 2 * p * p : -1 + (4 - 2 * p) * p;
+                    camera.position.lerpVectors(startPos, targetPos, ease);
+                    controls.target.lerpVectors(startLook, lookAtTarget, ease);
+                    requestAnimationFrame(step);
+                } else {
+                    camera.position.copy(targetPos);
+                    controls.target.copy(lookAtTarget);
+                }
+            }
+            step();
+        }
+
         function onTimelineScrub(val) {
             const h = parseInt(val);
             const pct = (h / 72.0) * 100;
@@ -1119,11 +1917,9 @@
             fetchLiveBackendData(h);
         }
 
-        // Reset camera view
         function resetCamera() {
             const arabiaVector = latLonToVector3(23.8, 44.2, 118);
-            camera.position.copy(arabiaVector);
-            controls.target.set(0, 0, 0);
+            cameraTween(arabiaVector, new THREE.Vector3(0, 0, 0));
         }
 
         // Execute Mitigation Trigger (Calls Real Backend /v2/twin/actuate)
