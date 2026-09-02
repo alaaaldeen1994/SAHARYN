@@ -780,10 +780,9 @@
                 data-lucide="zap" size="20"></i></div>
         <div class="nav-item" data-i18n-title="nav_stress" title="Asset Stress Map" onclick="switchTab('stress')"><i
                 data-lucide="activity" size="20"></i></div>
-        <a href="digital_twin.html" class="nav-item" data-i18n-title="nav_digital_twin" title="3D Volumetric Digital Twin"
-            style="color: inherit; text-decoration: none;">
+        <div class="nav-item" data-i18n-title="nav_digital_twin" title="3D Volumetric Digital Twin" onclick="switchTab('twin')">
             <i data-lucide="globe-2" size="20" style="color: #ff8a4c;"></i>
-        </a>
+        </div>
         <div class="nav-item" data-i18n-title="nav_esg" title="ESG & Carbon" onclick="switchTab('esg')"><i
                 data-lucide="leaf" size="20"></i></div>
         <a href="about.html" class="nav-item" data-i18n-title="nav_diligence" title="Diligence Hub"
@@ -1611,6 +1610,11 @@
             </div>
         </div>
 
+
+        <!-- 3D VOLUMETRIC DIGITAL TWIN VIEW -->
+        <div id="twin-view" class="view-content" style="grid-template-columns: 1fr; gap: 0; padding: 0; height: calc(100vh - 70px); position: relative; overflow: hidden; border-radius: 12px; border: 1px solid var(--border-color);">
+            <iframe src="digital_twin.html" style="width: 100%; height: 100%; border: none; background: #030508;" title="3D Volumetric Digital Twin"></iframe>
+        </div>
 
         <!-- ASSET STRESS MAP VIEW (PREDICTIVE INTEGRITY AI) -->
         <div id="stress-view" class="view-content" style="grid-template-columns: 1fr; gap: 24px;">
