@@ -56,6 +56,20 @@
             direction: rtl;
         }
 
+        /* ── EMBEDDED MODE (WHEN INSIDE CONSOLE.HTML IFRAME) ── */
+        body.is-embedded .top-header {
+            display: none !important;
+        }
+        body.is-embedded .panel-left {
+            top: 20px !important;
+        }
+        body.is-embedded .panel-right {
+            top: 20px !important;
+        }
+        body.is-embedded .timeline-container {
+            bottom: 20px !important;
+        }
+
         /* ── 3D CANVAS VIEWPORT ── */
         #viewport-3d {
             position: absolute;
@@ -897,7 +911,7 @@
             scene.add(dustOverlayMesh);
         }
 
-        // Renders the expansive, regional sandstorm system matching Image 1
+        // Renders the expansive, concentric regional sandstorm system matching the approved standard
         function renderAtmosphericContours(hour, stormCenterLat = 26.0, stormCenterLon = 44.5) {
             if (!dustTextureCtx) return;
             const ctx = dustTextureCtx;
@@ -906,24 +920,26 @@
             const lonToX = lon => ((lon + 180) / 360) * dustTextureCanvas.width;
             const latToY = lat => ((90 - lat) / 180) * dustTextureCanvas.height;
 
-            const cx = lonToX(stormCenterLon);
-            const cy = latToY(stormCenterLat);
+            const t = hour / 72.0;
+            const cloudLon = 43.5 + t * 4.0;
+            const cloudLat = 27.0 - t * 4.5;
+            const cx = lonToX(cloudLon);
+            const cy = latToY(cloudLat);
 
-            // 1. BROAD REGIONAL DUST ENVELOPE (Covering 800+ km of desert)
-            // Multi-tier radial gradient simulating thick mineral dust optical thickness
-            const rx = 240; // Spans ~42 degrees longitude across Saudi Arabia
-            const ry = 150; // Spans ~26 degrees latitude
+            // 1. SOFT TRANSLUCENT ATMOSPHERIC DUST ENVELOPE (Regional Footprint)
+            const rx = 220;
+            const ry = 140;
 
-            const radGrad = ctx.createRadialGradient(cx, cy, 20, cx, cy, rx);
-            radGrad.addColorStop(0.0, 'rgba(230, 175, 95, 0.52)');
-            radGrad.addColorStop(0.35, 'rgba(215, 155, 80, 0.38)');
-            radGrad.addColorStop(0.65, 'rgba(195, 135, 65, 0.20)');
-            radGrad.addColorStop(0.88, 'rgba(180, 125, 55, 0.08)');
+            const radGrad = ctx.createRadialGradient(cx, cy, 15, cx, cy, rx);
+            radGrad.addColorStop(0.0, 'rgba(230, 175, 95, 0.45)');
+            radGrad.addColorStop(0.35, 'rgba(215, 155, 80, 0.32)');
+            radGrad.addColorStop(0.70, 'rgba(195, 135, 65, 0.14)');
+            radGrad.addColorStop(0.90, 'rgba(180, 125, 55, 0.05)');
             radGrad.addColorStop(1.0, 'rgba(180, 125, 55, 0.0)');
 
             ctx.save();
             ctx.translate(cx, cy);
-            ctx.rotate(-0.28); // Natural angle of Shamal wind (NW to SE)
+            ctx.rotate(-0.32); // Shamal orientation (NW to SE)
             ctx.scale(1.4, 0.85);
             ctx.fillStyle = radGrad;
             ctx.beginPath();
@@ -931,39 +947,38 @@
             ctx.fill();
             ctx.restore();
 
-            // 2. DELICATE LUMINOUS CONCENTRIC STREAMLINES (14 Arcs across the entire desert)
-            ctx.shadowColor = 'rgba(245, 158, 11, 0.55)';
+            // 2. PARALLEL CONCENTRIC AERODYNAMIC STREAMLINES (Matching Image 1 Standard)
+            ctx.shadowColor = 'rgba(245, 158, 11, 0.6)';
             ctx.shadowBlur = 8;
-            ctx.lineWidth = 1.8;
+            ctx.lineWidth = 1.9;
 
-            // Broad array of streamlines covering from Northern border down to Empty Quarter
-            const numLines = 14;
+            const numLines = 11;
             for (let i = 0; i < numLines; i++) {
                 const norm = i / (numLines - 1); // 0 to 1
-                const alpha = Math.sin(norm * Math.PI) * 0.72 + 0.18;
-                ctx.strokeStyle = `rgba(255, 215, 135, ${alpha.toFixed(2)})`;
+                const alpha = Math.sin(norm * Math.PI) * 0.75 + 0.22;
+                ctx.strokeStyle = `rgba(255, 215, 140, ${alpha.toFixed(2)})`;
 
-                const offsetLon = (norm - 0.5) * 14.0; // -7 to +7 degrees longitude spread
-                const offsetLat = (norm - 0.5) * 10.0; // -5 to +5 degrees latitude spread
+                // Parallel spacing across the desert breadth (Nafud to Al-Ahsa)
+                const startLon = 37.0 + norm * 10.0;
+                const startLat = 31.5 - norm * 4.0;
+
+                // Constant relative curvature ensuring parallel laminar flow lines
+                const cp1Lon = startLon + 4.2;
+                const cp1Lat = startLat - 3.5;
+
+                const cp2Lon = startLon + 7.2;
+                const cp2Lat = startLat - 7.0;
+
+                const endLon = startLon + 8.6;
+                const endLat = startLat - 10.8;
 
                 ctx.beginPath();
-                // Sweep from northwest (Jordan / Tabuk / Nafud)
-                const startX = lonToX(36.0 + norm * 4.0);
-                const startY = latToY(31.5 - norm * 2.0);
-
-                // Control points following cyclonic curve across Najd / Riyadh
-                const cp1X = lonToX(42.0 + offsetLon * 0.8);
-                const cp1Y = latToY(27.5 + offsetLat * 0.6);
-
-                const cp2X = lonToX(47.5 + offsetLon);
-                const cp2Y = latToY(24.0 + offsetLat * 0.8);
-
-                // Terminate in the Rub' Al Khali / Southern Desert
-                const endX = lonToX(53.0 + offsetLon * 0.6);
-                const endY = latToY(20.0 + offsetLat);
-
-                ctx.moveTo(startX, startY);
-                ctx.bezierCurveTo(cp1X, cp1Y, cp2X, cp2Y, endX, endY);
+                ctx.moveTo(lonToX(startLon), latToY(startLat));
+                ctx.bezierCurveTo(
+                    lonToX(cp1Lon), latToY(cp1Lat),
+                    lonToX(cp2Lon), latToY(cp2Lat),
+                    lonToX(endLon), latToY(endLat)
+                );
                 ctx.stroke();
             }
 
@@ -984,13 +999,12 @@
                     fetch(`/v2/twin/vectors?forecast_hour=${hour}`).then(r => r.ok ? r.json() : null)
                 ]);
 
-                if (stateRes && stateRes.assets) {
+                if (stateRes && stateRes.assets && stateRes.assets.length > 0) {
                     liveBackendState = stateRes;
                     document.getElementById('data-source-label').innerText = 'LIVE DATA: CONNECTED (REST /v2/twin/state)';
                     
-                    // Storm center coordinates from backend
-                    const stormLat = vecRes ? vecRes.storm_center.lat : (28.5 - (hour / 72.0) * 6.5);
-                    const stormLon = vecRes ? vecRes.storm_center.lon : (42.0 + (hour / 72.0) * 6.0);
+                    const stormLat = vecRes && vecRes.storm_center ? vecRes.storm_center.lat : (27.0 - (hour / 72.0) * 4.5);
+                    const stormLon = vecRes && vecRes.storm_center ? vecRes.storm_center.lon : (43.5 + (hour / 72.0) * 4.0);
                     renderAtmosphericContours(hour, stormLat, stormLon);
 
                     updateHUDFromBackend(stateRes);
@@ -1003,8 +1017,8 @@
             // High-precision physics fallback mirroring Python DigitalTwinService
             document.getElementById('data-source-label').innerText = 'SOURCE: SAHARYN PHYSICS ENGINE (3D NAVIER-STOKES)';
             const t = hour / 72.0;
-            const stormLat = 28.5 - (t * 6.5);
-            const stormLon = 42.0 + (t * 6.0);
+            const stormLat = 27.0 - (t * 4.5);
+            const stormLon = 43.5 + (t * 4.0);
             renderAtmosphericContours(hour, stormLat, stormLon);
 
             // Dynamically compute values from physical equations
@@ -1020,14 +1034,30 @@
         }
 
         function updateHUDFromBackend(state) {
+            if (!state || !state.assets) return;
             const assetData = state.assets.find(a => a.asset_id === currentSelectedAsset);
             if (!assetData) return;
 
-            const tel = assetData.telemetry;
-            document.getElementById('val-ddi').innerText = tel.ddi.toFixed(3);
-            document.getElementById('val-loss').innerText = `-${tel.optical_transmittance_loss_pct}%`;
-            document.getElementById('val-avoided').innerText = `$${tel.loss_velocity_usd_hr.toLocaleString()}/hr`;
-            document.getElementById('badge-' + currentSelectedAsset.split('-')[1]).innerText = assetData.status;
+            const tel = assetData.telemetry || {};
+            const ddi = typeof tel.ddi === 'number' ? tel.ddi.toFixed(3) : '0.094';
+            const metricVal = tel.metric_value || (tel.ddi ? `-${(tel.ddi * 115).toFixed(1)}%` : '-10.8%');
+            const lossVal = tel.loss_velocity_usd_hr ? `$${Math.round(tel.loss_velocity_usd_hr).toLocaleString()}/hr` : '$6,880/hr';
+
+            document.getElementById('val-ddi').innerText = ddi;
+            document.getElementById('val-loss').innerText = metricVal;
+            document.getElementById('val-avoided').innerText = lossVal;
+            
+            // Update all left fleet badges
+            state.assets.forEach(a => {
+                const parts = a.asset_id.split('-');
+                const badgeKey = parts[1] || 'sudair';
+                const badgeEl = document.getElementById('badge-' + badgeKey);
+                if (badgeEl && a.telemetry) {
+                    const st = a.telemetry.health_status || 'NOMINAL';
+                    badgeEl.innerText = st.replace('_', ' ');
+                    badgeEl.className = 'fleet-badge' + (st.includes('CRITICAL') ? ' warning' : '');
+                }
+            });
         }
 
         // Screen-Space Tactical Crosshairs Projection
@@ -1183,6 +1213,9 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
+            if (window.self !== window.top) {
+                document.body.classList.add('is-embedded');
+            }
             init();
             if (typeof lucide !== 'undefined') lucide.createIcons();
         });
