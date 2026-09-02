@@ -16,7 +16,6 @@ from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeou
 from datetime import datetime
 from typing import Dict, Optional
 
-import xarray as xr
 from pydantic import BaseModel, Field, validator
 from core.database.session import SessionLocal
 from core.database.models import SatelliteTelemetry

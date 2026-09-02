@@ -8,7 +8,7 @@ near-surface saltation layers across the Arabian Peninsula.
 
 import math
 import numpy as np
-from typing import Dict, List, Any, Tuple
+from typing import Dict, Any
 
 class AtmosphericVectorField:
     """
@@ -28,10 +28,6 @@ class AtmosphericVectorField:
         Computes 3D wind vectors and aerosol optical density across the spatial grid
         for a given forecast horizon step (0 to 72 hours).
         """
-        n_lat = len(self.lats)
-        n_lon = len(self.lons)
-        n_alt = len(self.altitudes)
-
         # Simulation of a Shamal dust storm event emerging from the northern Arabian desert
         # and moving southeast across Eastern Province, Riyadh, and Rub' Al Khali
         t_phase = timestamp_hour / 72.0

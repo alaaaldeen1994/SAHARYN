@@ -38,7 +38,7 @@ from core.database.models import SatelliteTelemetry, SensorTelemetry, Prediction
 
 # --- Security Layer ---
 from core.security.siem_forwarder import (
-    emit_auth_failure, emit_auth_success, emit_sovereign_change,
+    emit_auth_failure, emit_auth_success,
 )
 from core.security.rbac import get_role_capabilities_json, Role
 

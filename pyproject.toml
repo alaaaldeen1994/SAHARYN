@@ -1,0 +1,32 @@
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+exclude = [
+    ".git",
+    "__pycache__",
+    ".pytest_cache",
+    "build",
+    "dist",
+    "data",
+    "node_modules",
+    "data_pipeline",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]
+ignore = [
+    "E501",  # line too long
+    "E402",  # module level import not at top of file
+    "W291",  # trailing whitespace
+    "W293",  # blank line contains whitespace
+    "E722",  # bare except
+    "UP035", # typing.List is deprecated
+    "UP006", # use dict instead of Dict
+    "RUF013",# implicit optional
+    "I001",  # import block un-sorted
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+asyncio_mode = "strict"

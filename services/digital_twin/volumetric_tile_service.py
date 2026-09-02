@@ -6,7 +6,7 @@ computes dynamic surface degradation (optical loss, kinetic blade erosion),
 and handles closed-loop SCADA robotic actuation triggers.
 """
 
-from typing import Dict, List, Any
+from typing import Dict, Any
 import time
 
 class DigitalTwinService:
