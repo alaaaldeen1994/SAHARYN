@@ -4,650 +4,956 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAHARYN | Team &amp; Leadership</title>
-    <meta name="description" content="Meet the founder and lead architect behind SAHARYN — Alaa Aldeen, Lead AI Engineer, Generative Biology Architect, and multi-award-winning innovator.">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Outfit:wght@300;600;800&family=JetBrains+Mono:wght@400;700&family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
+    <title>Leadership & Team — SAHARYN | Sovereign AI Earth Intelligence</title>
+    <meta name="description" content="Meet the leadership and system architects behind SAHARYN — Sovereign AI Sand & Dust Storm Early Warning & Environmental Intelligence Platform.">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌪️</text></svg>">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+
     <style>
         :root {
-            --bg: #030712;
-            --panel-bg: #0a0f1a;
-            --accent-green: #10b981;
-            --accent-green-dim: rgba(16, 185, 129, 0.1);
-            --border-color: #1e293b;
-            --text-primary: #f8fafc;
+            --bg-void: #060608;
+            --bg-card: rgba(13, 14, 18, 0.75);
+            --bg-card-hover: rgba(22, 24, 31, 0.85);
+            --bg-card-border: rgba(255, 255, 255, 0.08);
+            --bg-card-border-glow: rgba(255, 107, 44, 0.4);
+            
+            --accent-orange: #ff6b2c;
+            --accent-orange-bright: #ff8a4c;
+            --accent-orange-glow: rgba(255, 107, 44, 0.35);
+            --accent-amber: #f59e0b;
+            --accent-emerald: #10b981;
+            --accent-emerald-glow: rgba(16, 185, 129, 0.25);
+            
+            --text-primary: #ffffff;
             --text-secondary: #94a3b8;
-            --font-main: 'Inter', sans-serif;
-            --font-tech: 'JetBrains Mono', monospace;
+            --text-muted: #64748b;
+            
+            --font-sans: 'Plus Jakarta Sans', 'Outfit', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --font-ar: 'Tajawal', sans-serif;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            color-scheme: dark;
+        }
 
         body {
-            background: var(--bg);
+            background-color: var(--bg-void);
             color: var(--text-primary);
-            font-family: var(--font-main);
-            line-height: 1.8;
+            font-family: var(--font-sans);
+            line-height: 1.6;
             overflow-x: hidden;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
         }
 
-        body[dir="rtl"] { font-family: 'Tajawal', sans-serif; }
+        body[dir="rtl"] {
+            font-family: var(--font-ar);
+            text-align: right;
+        }
 
-        .bg-grid {
+        /* ── ANIMATED STARFIELD ── */
+        .stars {
             position: fixed;
             inset: 0;
             z-index: 0;
             pointer-events: none;
             background-image:
-                linear-gradient(rgba(16,185,129,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(16,185,129,0.03) 1px, transparent 1px);
-            background-size: 60px 60px;
-            mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+                radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,.8) 50%, transparent 50%),
+                radial-gradient(1px 1px at 40% 70%, rgba(255,255,255,.6) 50%, transparent 50%),
+                radial-gradient(1.5px 1.5px at 60% 20%, rgba(255,255,255,.9) 50%, transparent 50%),
+                radial-gradient(1px 1px at 80% 50%, rgba(255,255,255,.5) 50%, transparent 50%),
+                radial-gradient(1px 1px at 10% 80%, rgba(255,255,255,.7) 50%, transparent 50%),
+                radial-gradient(1.5px 1.5px at 90% 15%, rgba(255,255,255,.8) 50%, transparent 50%),
+                radial-gradient(1px 1px at 30% 90%, rgba(255,255,255,.4) 50%, transparent 50%),
+                radial-gradient(1px 1px at 70% 85%, rgba(255,255,255,.6) 50%, transparent 50%),
+                radial-gradient(1px 1px at 50% 45%, rgba(255,255,255,.5) 50%, transparent 50%),
+                radial-gradient(1.5px 1.5px at 15% 55%, rgba(255,255,255,.7) 50%, transparent 50%);
+            background-size: 600px 600px, 800px 800px, 900px 900px, 700px 700px,
+                             1000px 1000px, 850px 850px, 750px 750px, 950px 950px, 650px 650px, 880px 880px;
+            animation: drift 140s linear infinite;
         }
 
-        .content-layer { position: relative; z-index: 1; }
+        @keyframes drift {
+            from { background-position: 0 0; }
+            to   { background-position: 0 600px; }
+        }
 
+        .ambient-glow {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,107,44,0.06) 0%, transparent 70%);
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .content-layer {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ── LUXURY MINIMAL NAVBAR ── */
         nav {
             position: fixed;
-            top: 0; left: 0; right: 0;
-            height: 70px;
-            background: rgba(3, 7, 18, 0.88);
-            backdrop-filter: blur(18px);
-            border-bottom: 1px solid var(--border-color);
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            padding: 0 48px;
-            z-index: 100;
+            align-items: center;
+            padding: 20px 6vw;
+            background: rgba(6, 6, 8, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .brand {
+        .brand-wrapper {
             display: flex;
             align-items: center;
             gap: 12px;
             text-decoration: none;
-            color: #fff;
         }
 
-        .logo-hex {
-            width: 24px; height: 24px;
-            background: var(--accent-green);
-            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+        .brand-icon {
+            width: 22px;
+            height: 22px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
-        .nav-links { display: flex; gap: 24px; align-items: center; }
+        .brand-bar {
+            height: 2.5px;
+            background: #ffffff;
+            border-radius: 2px;
+        }
 
-        .btn-simple {
+        .brand-bar:nth-child(1) { width: 100%; }
+        .brand-bar:nth-child(2) { width: 65%; }
+        .brand-bar:nth-child(3) { width: 85%; }
+
+        .brand-text {
+            font-family: var(--font-sans);
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #ffffff;
+        }
+
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-link {
+            font-size: 13.5px;
+            font-weight: 500;
             color: var(--text-secondary);
             text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
-            transition: 0.2s;
+            transition: color 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
-        .btn-simple:hover, .btn-simple.active { color: var(--accent-green); }
+        .nav-link:hover {
+            color: #ffffff;
+        }
 
-        .lang-switch {
-            background: var(--accent-green-dim);
-            border: 1px solid var(--accent-green);
-            color: var(--accent-green);
-            padding: 8px 16px;
+        .nav-link.active {
+            color: var(--accent-orange-bright);
+            font-weight: 600;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .btn-lang {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+            font-size: 11.5px;
+            padding: 8px 14px;
             border-radius: 6px;
             cursor: pointer;
-            font-family: var(--font-tech);
-            font-weight: 700;
-            font-size: 12px;
-            transition: 0.3s;
+            transition: all 0.2s ease;
         }
 
-        .lang-switch:hover { background: var(--accent-green); color: var(--bg); }
+        .btn-lang:hover {
+            border-color: rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+        }
 
+        .btn-login {
+            background: var(--accent-orange);
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 8px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 16px var(--accent-orange-glow);
+        }
+
+        .btn-login:hover {
+            background: var(--accent-orange-bright);
+            transform: translateY(-1px);
+        }
+
+        /* ── MAIN CONTAINER ── */
         .container {
-            max-width: 1040px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 110px 24px 80px;
+            padding: 130px 24px 80px;
         }
 
+        /* ── HERO SECTION ── */
         .page-hero {
             text-align: center;
-            margin-bottom: 64px;
+            margin-bottom: 50px;
         }
 
-        .subtitle {
-            color: var(--accent-green);
-            font-family: var(--font-tech);
-            font-weight: 700;
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            background: rgba(255, 107, 44, 0.08);
+            border: 1px solid rgba(255, 107, 44, 0.25);
+            border-radius: 9999px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            color: var(--accent-orange-bright);
             text-transform: uppercase;
-            letter-spacing: 3px;
-            font-size: 13px;
-            display: block;
-            margin-bottom: 18px;
-        }
-
-        h1 {
-            font-size: clamp(38px, 7vw, 64px);
-            font-family: 'Outfit', sans-serif;
-            font-weight: 800;
-            letter-spacing: -2.5px;
-            line-height: 1;
-            background: linear-gradient(135deg, #fff 40%, #64748b);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
             margin-bottom: 20px;
         }
 
-        .hero-desc {
+        .page-hero h1 {
+            font-size: clamp(34px, 5vw, 54px);
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            line-height: 1.15;
+            color: #ffffff;
+            margin-bottom: 16px;
+        }
+
+        .page-hero p {
+            font-size: clamp(15px, 2vw, 18px);
             color: var(--text-secondary);
-            font-size: 17px;
-            max-width: 580px;
+            max-width: 720px;
             margin: 0 auto;
             line-height: 1.7;
         }
 
-        /* Registration Banner */
+        /* ── CORPORATE REGISTRATION WIDGET ── */
         .reg-banner {
-            background: linear-gradient(135deg, rgba(16,185,129,0.06), rgba(16,185,129,0.02));
-            border: 1px solid rgba(16,185,129,0.25);
-            border-radius: 14px;
-            padding: 28px 36px;
-            margin-bottom: 60px;
+            background: linear-gradient(135deg, rgba(255,107,44,0.07), rgba(245,158,11,0.03));
+            border: 1px solid rgba(255,107,44,0.25);
+            border-radius: 16px;
+            padding: 22px 30px;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-            gap: 24px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .reg-banner::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, var(--accent-green), transparent);
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) auto;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 40px;
+            backdrop-filter: blur(16px);
         }
 
         .reg-label {
-            font-family: var(--font-tech);
-            font-size: 10px;
-            color: var(--accent-green);
+            font-size: 10.5px;
+            font-family: var(--font-mono);
+            letter-spacing: 1.2px;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 5px;
+            color: var(--text-muted);
             display: block;
+            margin-bottom: 4px;
         }
 
         .reg-value {
-            font-size: 14px;
+            font-size: 14.5px;
             font-weight: 700;
-            color: #fff;
-            font-family: var(--font-tech);
+            color: #ffffff;
         }
 
         .reg-badge {
-            display: flex;
+            display: inline-flex;
             align-items: center;
-        }
-
-        .reg-badge span {
-            background: rgba(16,185,129,0.12);
-            border: 1px solid rgba(16,185,129,0.4);
-            color: var(--accent-green);
-            font-family: var(--font-tech);
-            font-size: 11px;
+            gap: 8px;
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            color: #34d399;
+            font-size: 11.5px;
             font-weight: 700;
-            padding: 6px 14px;
-            border-radius: 6px;
+            padding: 8px 18px;
+            border-radius: 9999px;
             letter-spacing: 1px;
+            box-shadow: 0 0 16px var(--accent-emerald-glow);
         }
 
-        /* Founder Card */
+        /* ── FOUNDER MASTER CARD ── */
         .founder-card {
-            background: var(--panel-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 24px;
-            padding: 56px;
+            background: var(--bg-card);
+            border: 1px solid var(--bg-card-border);
+            border-radius: 20px;
+            padding: 44px;
+            backdrop-filter: blur(20px);
+            margin-bottom: 40px;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.6);
-            transition: border-color 0.3s, box-shadow 0.3s;
-        }
-
-        .founder-card:hover {
-            border-color: rgba(16,185,129,0.35);
-            box-shadow: 0 40px 100px rgba(0,0,0,0.7), 0 0 60px rgba(16,185,129,0.06);
+            transition: border-color 0.3s ease;
         }
 
         .founder-card::before {
             content: '';
             position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--accent-green) 0%, rgba(16,185,129,0.3) 60%, transparent 100%);
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-orange), var(--accent-amber), transparent);
         }
 
         .founder-top {
-            display: grid;
-            grid-template-columns: auto 1fr;
-            gap: 40px;
-            align-items: start;
-            margin-bottom: 44px;
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+            margin-bottom: 34px;
         }
 
         .founder-avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-green) 0%, #047857 100%);
+            width: 88px;
+            height: 88px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, var(--accent-orange), #b45309);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 40px;
+            font-size: 30px;
             font-weight: 800;
-            color: #fff;
-            font-family: 'Outfit', sans-serif;
+            color: #ffffff;
             flex-shrink: 0;
-            box-shadow: 0 0 0 3px rgba(16,185,129,0.15), 0 0 0 6px rgba(16,185,129,0.07), 0 0 40px rgba(16,185,129,0.3);
+            box-shadow: 0 0 30px var(--accent-orange-glow);
+            border: 2px solid rgba(255, 255, 255, 0.15);
         }
 
         .founder-name {
-            font-size: 34px;
-            font-family: 'Outfit', sans-serif;
+            font-size: 26px;
             font-weight: 800;
-            color: #fff;
-            letter-spacing: -0.8px;
+            color: #ffffff;
+            letter-spacing: -0.5px;
             margin-bottom: 6px;
         }
 
         .founder-title {
-            color: var(--accent-green);
-            font-family: var(--font-tech);
-            font-size: 12px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            font-weight: 700;
-            margin-bottom: 10px;
+            font-size: 14px;
+            color: var(--accent-orange-bright);
+            font-family: var(--font-mono);
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
         }
 
         .founder-location {
-            color: var(--text-secondary);
-            font-size: 13px;
+            font-size: 12.5px;
+            color: var(--text-muted);
             display: flex;
             align-items: center;
             gap: 6px;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
 
         .founder-bio {
+            font-size: 15px;
+            line-height: 1.75;
             color: var(--text-secondary);
-            font-size: 15.5px;
-            line-height: 1.8;
         }
 
-        .block-section {
-            margin-top: 44px;
-            padding-top: 36px;
-            border-top: 1px solid rgba(255,255,255,0.06);
+        .founder-bio strong {
+            color: #ffffff;
         }
 
-        .block-label {
-            font-family: var(--font-tech);
-            font-size: 10.5px;
-            color: var(--accent-green);
+        /* ── TECHNICAL CAPABILITIES ── */
+        .section-label {
+            font-family: var(--font-mono);
+            font-size: 11.5px;
+            letter-spacing: 1.2px;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 20px;
-            display: block;
-            opacity: 0.85;
-        }
-
-        .capability-list { display: flex; flex-direction: column; gap: 12px; }
-
-        .cap-item {
-            padding: 16px 20px;
-            background: rgba(255,255,255,0.02);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            transition: border-color 0.25s, background 0.25s;
-        }
-
-        .cap-item:hover {
-            border-color: rgba(16,185,129,0.3);
-            background: rgba(16,185,129,0.03);
-        }
-
-        .cap-title {
-            color: var(--accent-green);
-            font-family: var(--font-tech);
-            font-size: 11px;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            font-weight: 700;
-            margin-bottom: 5px;
+            color: var(--accent-orange-bright);
+            margin-bottom: 16px;
             display: block;
         }
 
-        .cap-desc {
-            color: var(--text-secondary);
-            font-size: 13.5px;
-            line-height: 1.65;
-        }
-
-        .academic-grid {
+        .capability-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 14px;
+            margin-bottom: 36px;
         }
 
-        .edu-card {
-            padding: 16px 20px;
-            background: rgba(255,255,255,0.02);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
+        .cap-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            padding: 20px 22px;
+            transition: all 0.25s ease;
         }
 
-        .edu-degree { font-size: 13.5px; font-weight: 700; color: #fff; margin-bottom: 4px; }
-        .edu-school { font-size: 12px; color: var(--text-secondary); }
-
-        .badge-strip { display: flex; flex-wrap: wrap; gap: 10px; }
-
-        .badge {
-            background: rgba(16,185,129,0.07);
-            border: 1px solid rgba(16,185,129,0.22);
-            color: var(--accent-green);
-            font-family: var(--font-tech);
-            font-size: 11px;
-            font-weight: 700;
-            padding: 6px 13px;
-            border-radius: 7px;
-            letter-spacing: 0.5px;
-            transition: 0.2s;
-        }
-
-        .badge:hover { background: rgba(16,185,129,0.15); border-color: var(--accent-green); }
-
-        .contact-links { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
-
-        .contact-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 600;
-            padding: 10px 18px;
-            border: 1px solid var(--border-color);
-            border-radius: 9px;
-            transition: 0.25s;
-        }
-
-        .contact-btn:hover {
-            border-color: var(--accent-green);
-            color: var(--accent-green);
-            background: rgba(16,185,129,0.05);
+        .cap-card:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 107, 44, 0.3);
             transform: translateY(-2px);
         }
 
-        footer {
-            padding: 50px 0 36px;
-            text-align: center;
-            border-top: 1px solid var(--border-color);
-            margin-top: 80px;
+        .cap-icon {
+            color: var(--accent-orange);
+            margin-bottom: 10px;
         }
 
-        .footer-reg { font-size: 11.5px; color: var(--text-secondary); line-height: 2; margin-bottom: 10px; }
-        .footer-copy { font-size: 11px; color: #475569; }
+        .cap-title {
+            font-size: 14.5px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 6px;
+        }
 
-        @media (max-width: 700px) {
-            nav { padding: 0 20px; }
-            .container { padding: 100px 16px 60px; }
-            .founder-card { padding: 32px 24px; }
-            .founder-top { grid-template-columns: 1fr; }
-            .founder-avatar { width: 80px; height: 80px; font-size: 28px; }
-            .nav-links a:not(.lang-switch) { display: none; }
+        .cap-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* ── HONOURS & BADGES ── */
+        .badge-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 36px;
+        }
+
+        .badge-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 12px;
+            color: #cbd5e1;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .badge-item:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.06);
+            color: #ffffff;
+        }
+
+        /* ── ACTION & CONNECT BUTTONS ── */
+        .action-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            padding-top: 10px;
+        }
+
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            padding: 12px 22px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-action-primary {
+            background: var(--accent-orange);
+            color: #ffffff;
+            box-shadow: 0 0 20px var(--accent-orange-glow);
+        }
+
+        .btn-action-primary:hover {
+            background: var(--accent-orange-bright);
+            transform: translateY(-2px);
+        }
+
+        .btn-action-outline {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+        }
+
+        .btn-action-outline:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.07);
+            padding: 60px 6vw 36px;
+            background: #060608;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-grid {
+            max-width: 1440px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 36px;
+        }
+
+        .footer-brand p {
+            font-size: 13.5px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-top: 12px;
+            max-width: 360px;
+        }
+
+        .footer-col h4 {
+            font-size: 11.5px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #ffffff;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .footer-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-orange);
+        }
+
+        .footer-bottom {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding-top: 22px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            text-align: center;
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 1024px) {
+            .nav-menu { display: none; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            nav { padding: 16px 5vw; }
+            .container { padding: 110px 18px 60px; }
+            .founder-card { padding: 26px; }
+            .founder-top { flex-direction: column; gap: 18px; }
+            .reg-banner { grid-template-columns: 1fr; }
+            .capability-grid { grid-template-columns: 1fr; }
+            .footer-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 
 <body dir="ltr">
-    <div class="bg-grid"></div>
+    <!-- Starfield Background -->
+    <div class="stars"></div>
+    <div class="ambient-glow"></div>
+
     <div class="content-layer">
 
-        <nav>
-            <a href="index.html" class="brand">
-                <div class="logo-hex"></div>
-                <span style="font-weight:800;font-family:'Outfit';">SAHARYN</span>
+        <!-- Luxury Navigation Bar -->
+        <nav id="main-nav">
+            <a href="index.html" class="brand-wrapper">
+                <div class="brand-icon">
+                    <div class="brand-bar"></div>
+                    <div class="brand-bar"></div>
+                    <div class="brand-bar"></div>
+                </div>
+                <div class="brand-text">saharyn</div>
             </a>
-            <div class="nav-links">
-                <a href="index.html" class="btn-simple">Home</a>
-                <a href="about.html" class="btn-simple">Technology</a>
-                <a href="console.html" class="btn-simple">Mission Control</a>
-                <a href="team.html" class="btn-simple active">Team</a>
-                <button class="lang-switch" onclick="toggleLanguage()">EN / &#x0639;&#x0631;&#x0628;&#x064a;</button>
+
+            <ul class="nav-menu">
+                <li><a href="index.html#solutions" class="nav-link" data-i18n="nav_solutions">Solutions</a></li>
+                <li><a href="index.html#platform" class="nav-link" data-i18n="nav_platform">Platform</a></li>
+                <li><a href="index.html#capabilities" class="nav-link" data-i18n="nav_capabilities">Capabilities</a></li>
+                <li><a href="about.html" class="nav-link" data-i18n="nav_technology">Technology</a></li>
+                <li><a href="team.html" class="nav-link active" data-i18n="nav_team">Team</a></li>
+                <li><a href="/v2/docs" class="nav-link" target="_blank" data-i18n="nav_api">API Docs</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <button onclick="toggleLang()" class="btn-lang" id="lang-btn">
+                    <span>AR / EN</span>
+                </button>
+                <a href="console.html" class="btn-login" id="nav-cta-btn">
+                    <span data-i18n="nav_cta">Mission Control</span>
+                </a>
             </div>
         </nav>
 
-        <div class="container">
+        <!-- Main Content -->
+        <main class="container">
 
             <!-- PAGE HERO -->
-            <div class="page-hero">
-                <div id="hero-en">
-                    <span class="subtitle">The People Behind the Platform</span>
-                    <h1>Our Team</h1>
-                    <p class="hero-desc">SAHARYN is engineered by a world-class AI systems architect combining physics-informed deep learning, satellite earth observation, and sovereign cloud infrastructure into a unified predictive intelligence engine.</p>
+            <header class="page-hero">
+                <div class="hero-badge" data-i18n="hero_badge">
+                    <i data-lucide="shield-check" size="14"></i>
+                    <span>Sovereign Earth Intelligence Architecture</span>
                 </div>
-                <div id="hero-ar" style="display:none; direction:rtl; font-family:'Tajawal',sans-serif;">
-                    <span class="subtitle">&#x0627;&#x0644;&#x0623;&#x0634;&#x062E;&#x0627;&#x0635; &#x0648;&#x0631;&#x0627;&#x0621; &#x0627;&#x0644;&#x0645;&#x0646;&#x0635;&#x0629;</span>
-                    <h1>&#x0641;&#x0631;&#x064A;&#x0642;&#x0646;&#x0627;</h1>
-                    <p class="hero-desc">&#x0635;&#x064F;&#x0645;&#x0650;&#x0651;&#x0645;&#x062A; &#x0635;&#x062D;&#x0627;&#x0631;&#x064A;&#x0646; &#x0648;&#x0647;&#x064F;&#x0646;&#x062F;&#x0650;&#x0633;&#x062A; &#x0639;&#x0644;&#x0649; &#x064A;&#x062F; &#x0645;&#x0647;&#x0646;&#x062F;&#x0633; &#x0630;&#x0643;&#x0627;&#x0621; &#x0627;&#x0635;&#x0637;&#x0646;&#x0627;&#x0639;&#x064A; &#x064A;&#x062C;&#x0645;&#x0639; &#x0628;&#x064A;&#x0646; &#x0627;&#x0644;&#x062A;&#x0639;&#x0644;&#x0645; &#x0627;&#x0644;&#x0639;&#x0645;&#x064A;&#x0642; &#x0627;&#x0644;&#x0641;&#x064A;&#x0632;&#x064A;&#x0627;&#x0626;&#x064A;&#x060C; &#x0648;&#x0627;&#x0633;&#x062A;&#x0634;&#x0639;&#x0627;&#x0631; &#x0627;&#x0644;&#x0623;&#x0642;&#x0645;&#x0627;&#x0631; &#x0627;&#x0644;&#x0635;&#x0646;&#x0627;&#x0639;&#x064A;&#x0629; &#x0639;&#x0646; &#x0628;&#x064F;&#x0639;&#x062F;&#x060C; &#x0648;&#x0627;&#x0644;&#x0628;&#x0646;&#x064A;&#x0629; &#x0627;&#x0644;&#x062A;&#x062D;&#x062A;&#x064A;&#x0629; &#x0627;&#x0644;&#x0633;&#x062D;&#x0627;&#x0628;&#x064A;&#x0629; &#x0627;&#x0644;&#x0633;&#x064A;&#x0627;&#x062F;&#x064A;&#x0629;.</p>
-                </div>
-            </div>
+                <h1 data-i18n="hero_title">The Minds Behind SAHARYN</h1>
+                <p data-i18n="hero_desc">
+                    SAHARYN is engineered by a world-class AI systems architect combining physics-informed deep learning, satellite earth observation, and sovereign cloud infrastructure into a unified predictive intelligence engine.
+                </p>
+            </header>
 
-            <!-- COMPANIES HOUSE REGISTRATION BANNER -->
-            <div class="reg-banner">
+            <!-- COMPANIES HOUSE UK REGISTRATION BANNER -->
+            <section class="reg-banner">
                 <div>
-                    <span class="reg-label">Company Name</span>
+                    <span class="reg-label" data-i18n="reg_company_name_lbl">Company Name</span>
                     <div class="reg-value">NILUS LAB LTD</div>
                 </div>
                 <div>
-                    <span class="reg-label">Company Number</span>
+                    <span class="reg-label" data-i18n="reg_company_no_lbl">Company Number</span>
                     <div class="reg-value">17427807</div>
                 </div>
                 <div>
-                    <span class="reg-label">Company Type</span>
-                    <div class="reg-value">Private Limited by Shares</div>
+                    <span class="reg-label" data-i18n="reg_company_type_lbl">Company Type</span>
+                    <div class="reg-value" data-i18n="reg_company_type_val">Private Limited by Shares</div>
                 </div>
                 <div>
-                    <span class="reg-label">CH Submission No.</span>
+                    <span class="reg-label" data-i18n="reg_ch_sub_lbl">CH Submission No.</span>
                     <div class="reg-value">118-507239</div>
                 </div>
                 <div class="reg-badge">
-                    <span>&#x2713; REGISTERED</span>
+                    <i data-lucide="check" size="14"></i>
+                    <span data-i18n="reg_status">REGISTERED &amp; ACTIVE</span>
                 </div>
-            </div>
+            </section>
 
-            <!-- FOUNDER CARD ENGLISH -->
-            <div id="card-en">
-                <div class="founder-card">
-                    <div class="founder-top">
-                        <div class="founder-avatar">AA</div>
-                        <div>
-                            <div class="founder-name">Alaa Aldeen</div>
-                            <div class="founder-title">Founder &amp; CEO &middot; Chief AI &amp; Systems Architect</div>
-                            <div class="founder-location">
-                                <i data-lucide="map-pin" size="14"></i>
-                                London, United Kingdom &amp; San Diego, California, USA
-                            </div>
-                            <p class="founder-bio">
-                                Multi-award-winning AI Systems Architect, Deep Learning Engineer, and Founder of NILUS LAB LTD with deep expertise in neural architectures, complex physical systems modeling, and sovereign enterprise technology. Architect of <strong style="color:#fff">SAHARYN™</strong> &mdash; a physics-informed deep learning platform integrating multi-spectral satellite remote sensing (MODIS, Sentinel, ECMWF) with spatio-temporal neural networks for high-precision sand and dust storm trajectory forecasting and critical infrastructure risk mitigation. Silver Medalist at the <strong style="color:#fff">50th International Exhibition of Inventions Geneva</strong>, granted patent holder, and UK IPO design rights holder.
-                            </p>
+            <!-- FOUNDER & CHIEF ARCHITECT CARD -->
+            <article class="founder-card">
+                <div class="founder-top">
+                    <div class="founder-avatar">AA</div>
+                    <div>
+                        <h2 class="founder-name" data-i18n="founder_name">Alaa Aldeen</h2>
+                        <div class="founder-title" data-i18n="founder_title">Founder &amp; CEO &middot; Chief AI &amp; Systems Architect</div>
+                        <div class="founder-location">
+                            <i data-lucide="map-pin" size="14"></i>
+                            <span data-i18n="founder_location">London, United Kingdom &amp; San Diego, California, USA</span>
                         </div>
+                        <p class="founder-bio" data-i18n="founder_bio">
+                            Multi-award-winning AI Systems Architect, Deep Learning Engineer, and Founder of NILUS LAB LTD with deep expertise in neural architectures, complex physical systems modeling, and sovereign enterprise technology. Architect of <strong style="color:#fff">SAHARYN™</strong> — a physics-informed deep learning platform integrating multi-spectral satellite remote sensing (MODIS, Sentinel, ECMWF) with spatio-temporal neural networks for high-precision sand and dust storm trajectory forecasting and critical infrastructure risk mitigation. Silver Medalist at the <strong style="color:#fff">50th International Exhibition of Inventions Geneva</strong>, granted patent holder, and UK IPO design rights holder.
+                        </p>
                     </div>
+                </div>
 
-                    <div class="block-section">
-                        <span class="block-label">// Core AI &amp; Atmospheric Architecture</span>
-                        <div class="capability-list">
-                            <div class="cap-item">
-                                <span class="cap-title">Spatio-Temporal Neural Networks &amp; PINNs</span>
-                                <span class="cap-desc">Architected spatio-temporal neural operators (ConvLSTM &amp; Graph Neural Networks) integrating Navier-Stokes atmospheric fluid dynamics with terrain elevation models for 72h dust plume trajectory and Aerosol Optical Depth (AOD) forecasting.</span>
-                            </div>
-                            <div class="cap-item">
-                                <span class="cap-title">Multi-Spectral Earth Observation Ingestion</span>
-                                <span class="cap-desc">Engineered automated real-time ingestion pipelines processing petabyte-scale multi-spectral imagery across NASA MODIS (Terra/Aqua MOD04_L2), ESA Sentinel-5P TROPOMI, Sentinel-2, and ECMWF ERA5/IFS reanalysis feeds.</span>
-                            </div>
-                            <div class="cap-item">
-                                <span class="cap-title">Critical Infrastructure Risk Indexing</span>
-                                <span class="cap-desc">Designed real-time risk scoring algorithms for solar PV panel dust accumulation, aviation runway visibility alerts, and millimeter-wave/5G telecom signal attenuation.</span>
-                            </div>
-                            <div class="cap-item">
-                                <span class="cap-title">Distributed Sovereign Cloud &amp; GPU Microservices</span>
-                                <span class="cap-desc">Architected cloud-native, sovereign data center microservices (FastAPI, Redis, PostGIS, GDAL/Rasterio) capable of sub-second geospatial tile generation and enterprise alerting SLAs.</span>
-                            </div>
-                            <div class="cap-item">
-                                <span class="cap-title">Autonomous Alerting &amp; Multi-Agent Dispatch</span>
-                                <span class="cap-desc">Built enterprise multi-agent task engines orchestrating automated civil defense warnings, API webhooks, and national emergency response workflows.</span>
-                            </div>
+                <!-- Technical Capabilities Grid -->
+                <div style="margin-bottom: 34px;">
+                    <span class="section-label" data-i18n="label_core_tech">// Core AI &amp; Atmospheric Architecture</span>
+                    <div class="capability-grid">
+                        <div class="cap-card">
+                            <div class="cap-icon"><i data-lucide="brain" size="22"></i></div>
+                            <div class="cap-title" data-i18n="cap1_title">Spatio-Temporal Neural Networks &amp; PINNs</div>
+                            <div class="cap-desc" data-i18n="cap1_desc">Architected spatio-temporal neural operators (ConvLSTM &amp; Graph Neural Networks) integrating Navier-Stokes atmospheric fluid dynamics with terrain elevation models for 72h dust plume trajectory and Aerosol Optical Depth (AOD) forecasting.</div>
                         </div>
-                    </div>
 
-                    <div class="block-section">
-                        <span class="block-label">// International Medals, Patents &amp; Honours</span>
-                        <div class="badge-strip">
-                            <span class="badge">&#x1F948; Geneva Inventions Silver Medal</span>
-                            <span class="badge">&#x1F3C5; UK Patent Pending (UK IPO)</span>
-                            <span class="badge">&#x1F4DC; UK Registered Design Rights</span>
-                            <span class="badge">&#x1F3C6; Granted Patent Holder 2018</span>
-                            <span class="badge">&#x1F948;&#x1F948;&#x1F948; NRCT Thailand &middot; 3&times; Silver</span>
-                            <span class="badge">&#x1F949;&#x1F949; IPITEX &middot; 2&times; Bronze</span>
-                            <span class="badge">&#x1F1EC;&#x1F1E7; British Council Entrepreneurship Award</span>
-                            <span class="badge">&#x2B50; Stars of Science Qatar &middot; Top 30</span>
-                            <span class="badge">&#x1F30D; UNESCO Nominee &middot; African Week Paris</span>
-                            <span class="badge">&#x1F680; HomeLab Deep Science Accelerator &middot; Cohort 5</span>
+                        <div class="cap-card">
+                            <div class="cap-icon"><i data-lucide="satellite" size="22"></i></div>
+                            <div class="cap-title" data-i18n="cap2_title">Multi-Spectral Earth Observation Ingestion</div>
+                            <div class="cap-desc" data-i18n="cap2_desc">Engineered automated real-time ingestion pipelines processing petabyte-scale multi-spectral imagery across NASA MODIS (Terra/Aqua MOD04_L2), ESA Sentinel-5P TROPOMI, Sentinel-2, and ECMWF ERA5/IFS reanalysis feeds.</div>
                         </div>
-                    </div>
 
-                    <div class="block-section">
-                        <span class="block-label">// Connect</span>
-                        <div class="contact-links">
-                            <a href="https://www.linkedin.com/in/alaa199439/" target="_blank" class="contact-btn">
-                                <i data-lucide="linkedin" size="15"></i> Founder LinkedIn
-                            </a>
-                            <a href="https://www.linkedin.com/in/nilus-lab-0816333b8" target="_blank" class="contact-btn">
-                                <i data-lucide="building-2" size="15"></i> Nilus Lab LinkedIn
-                            </a>
-                            <a href="mailto:alaa.aldeen@niluslab.com" class="contact-btn">
-                                <i data-lucide="mail" size="15"></i> Direct Contact
-                            </a>
-                            <a href="https://www.niluslab.com" target="_blank" class="contact-btn">
-                                <i data-lucide="globe" size="15"></i> niluslab.com
-                            </a>
+                        <div class="cap-card">
+                            <div class="cap-icon"><i data-lucide="sun" size="22"></i></div>
+                            <div class="cap-title" data-i18n="cap3_title">Critical Infrastructure Risk Indexing</div>
+                            <div class="cap-desc" data-i18n="cap3_desc">Designed real-time risk scoring algorithms for solar PV panel dust accumulation, aviation runway visibility alerts, and millimeter-wave/5G telecom signal attenuation.</div>
+                        </div>
+
+                        <div class="cap-card">
+                            <div class="cap-icon"><i data-lucide="server" size="22"></i></div>
+                            <div class="cap-title" data-i18n="cap4_title">Distributed Sovereign Cloud &amp; GPU Microservices</div>
+                            <div class="cap-desc" data-i18n="cap4_desc">Architected cloud-native, sovereign data center microservices (FastAPI, Redis, PostGIS, GDAL/Rasterio) capable of sub-second geospatial tile generation and enterprise alerting SLAs.</div>
+                        </div>
+
+                        <div class="cap-card">
+                            <div class="cap-icon"><i data-lucide="bell-ring" size="22"></i></div>
+                            <div class="cap-title" data-i18n="cap5_title">Autonomous Alerting &amp; Multi-Agent Dispatch</div>
+                            <div class="cap-desc" data-i18n="cap5_desc">Built enterprise multi-agent task engines orchestrating automated civil defense warnings, API webhooks, and national emergency response workflows.</div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- FOUNDER CARD ARABIC -->
-            <div id="card-ar" style="display:none;">
-                <div class="founder-card" style="direction:rtl;font-family:'Tajawal',sans-serif;">
-                    <div class="founder-top">
-                        <div class="founder-avatar">AA</div>
-                        <div>
-                            <div class="founder-name">&#x0639;&#x0644;&#x0627;&#x0621; &#x0627;&#x0644;&#x062F;&#x064A;&#x0646;</div>
-                            <div class="founder-title">&#x0627;&#x0644;&#x0645;&#x0624;&#x0633;&#x0633; &#x0648;&#x0627;&#x0644;&#x0631;&#x0626;&#x064A;&#x0633; &#x0627;&#x0644;&#x062A;&#x0646;&#x0641;&#x064A;&#x0630;&#x064A; &middot; &#x0645;&#x0647;&#x0646;&#x062F;&#x0633; &#x0627;&#x0644;&#x0630;&#x0643;&#x0627;&#x0621; &#x0627;&#x0644;&#x0627;&#x0635;&#x0637;&#x0646;&#x0627;&#x0639;&#x064A; &#x0648;&#x0647;&#x0646;&#x062F;&#x0633;&#x0629; &#x0627;&#x0644;&#x0646;&#x0638;&#x0645; &#x0627;&#x0644;&#x0633;&#x062D;&#x0627;&#x0628;&#x064A;&#x0629;</div>
-                            <div class="founder-location">
-                                <i data-lucide="map-pin" size="14"></i>
-                                &#x0644;&#x0646;&#x062F;&#x0646;&#x060C; &#x0627;&#x0644;&#x0645;&#x0645;&#x0644;&#x0643;&#x0629; &#x0627;&#x0644;&#x0645;&#x062A;&#x062D;&#x062F;&#x0629; &amp; &#x0633;&#x0627;&#x0646; &#x062F;&#x064A;&#x064A;&#x063A;&#x0648;&#x060C; &#x0643;&#x0627;&#x0644;&#x064A;&#x0641;&#x0648;&#x0631;&#x0646;&#x064A;&#x0627;
-                            </div>
-                            <p class="founder-bio">
-                                &#x0645;&#x0628;&#x062A;&#x0643;&#x0631; &#x0645;&#x062A;&#x0639;&#x062F;&#x062F; &#x0627;&#x0644;&#x062C;&#x0648;&#x0627;&#x0626;&#x0632;&#x060C; &#x0645;&#x0647;&#x0646;&#x062F;&#x0633; &#x0630;&#x0643;&#x0627;&#x0621; &#x0627;&#x0635;&#x0637;&#x0646;&#x0627;&#x0639;&#x064A;&#x060C; &#x0648;&#x0645;&#x0624;&#x0633;&#x0633; &#x0634;&#x0631;&#x0643;&#x0629; <strong style="color:#fff">NILUS LAB LTD</strong>&#x060C; &#x0645;&#x062A;&#x062E;&#x0635;&#x0635; &#x0641;&#x064A; &#x0647;&#x0646;&#x062F;&#x0633;&#x0629; &#x0627;&#x0644;&#x0634;&#x0628;&#x0643;&#x0627;&#x062A; &#x0627;&#x0644;&#x0639;&#x0635;&#x0628;&#x064A;&#x0629; &#x0627;&#x0644;&#x0639;&#x0645;&#x064A;&#x0642;&#x0629;&#x060C; &#x0648;&#x0646;&#x0645;&#x0630;&#x062C;&#x0629; &#x0627;&#x0644;&#x0623;&#x0646;&#x0638;&#x0645;&#x0629; &#x0627;&#x0644;&#x0641;&#x064A;&#x0632;&#x064A;&#x0627;&#x0626;&#x064A;&#x0629; &#x0627;&#x0644;&#x0645;&#x0639;&#x0642;&#x062F;&#x0629;&#x060C; &#x0648;&#x0627;&#x0644;&#x062D;&#x0644;&#x0648;&#x0644; &#x0627;&#x0644;&#x062A;&#x0642;&#x0646;&#x064A;&#x0629; &#x0627;&#x0644;&#x0633;&#x064A;&#x0627;&#x062F;&#x064A;&#x0629;. &#x0645;&#x0635;&#x0645;&#x0645; &#x0645;&#x0646;&#x0635;&#x0629; <strong style="color:#fff">SAHARYN&#x2122;</strong> &#x2014; &#x0648;&#x0647;&#x064A; &#x0645;&#x0646;&#x0635;&#x0629; &#x0630;&#x0643;&#x0627;&#x0621; &#x0627;&#x0635;&#x0637;&#x0646;&#x0627;&#x0639;&#x064A; &#x062A;&#x062C;&#x0645;&#x0639; &#x0628;&#x064A;&#x0646; &#x0628;&#x064A;&#x0627;&#x0646;&#x0627;&#x062A; &#x0627;&#x0644;&#x0627;&#x0633;&#x062A;&#x0634;&#x0639;&#x0627;&#x0631; &#x0639;&#x0646; &#x0628;&#x0639;&#x062F; &#x0639;&#x0628;&#x0631; &#x0627;&#x0644;&#x0623;&#x0642;&#x0645;&#x0627;&#x0631; &#x0627;&#x0644;&#x0635;&#x0646;&#x0627;&#x0639;&#x064A;&#x0629; &#x0627;&#x0644;&#x0645;&#x062A;&#x0639;&#x062F;&#x062F;&#x0629; &#x0627;&#x0644;&#x0623;&#x0637;&#x064A;&#x0627;&#x0641; (NASA MODIS, ESA Sentinel, ECMWF) &#x0648;&#x0627;&#x0644;&#x0634;&#x0628;&#x0643;&#x0627;&#x062A; &#x0627;&#x0644;&#x0639;&#x0635;&#x0628;&#x064A;&#x0629; &#x0627;&#x0644;&#x0645;&#x0643;&#x0627;&#x0646;&#x064A;&#x0629; &#x0648;&#x0627;&#x0644;&#x0632;&#x0645;&#x0627;&#x0646;&#x064A;&#x0629; &#x0644;&#x0644;&#x062A;&#x0646;&#x0628;&#x0624; &#x0627;&#x0644;&#x062F;&#x0642;&#x064A;&#x0642; &#x0628;&#x0645;&#x0633;&#x0627;&#x0631;&#x0627;&#x062A; &#x0627;&#x0644;&#x0639;&#x0648;&#x0627;&#x0635;&#x0641; &#x0627;&#x0644;&#x0631;&#x0645;&#x0644;&#x064A;&#x0629; &#x0648;&#x062D;&#x0645;&#x0627;&#x064A;&#x0629; &#x0627;&#x0644;&#x0628;&#x0646;&#x064A;&#x0629; &#x0627;&#x0644;&#x062A;&#x062D;&#x062A;&#x064A;&#x0629; &#x0627;&#x0644;&#x062D;&#x064A;&#x0648;&#x064A;&#x0629;. &#x062D;&#x0627;&#x0635;&#x0644; &#x0639;&#x0644;&#x0649; <strong style="color:#fff">&#x0627;&#x0644;&#x0645;&#x064A;&#x062F;&#x0627;&#x0644;&#x064A;&#x0629; &#x0627;&#x0644;&#x0641;&#x0636;&#x064A;&#x0629; &#x0641;&#x064A; &#x0645;&#x0639;&#x0631;&#x0636; &#x062C;&#x0646;&#x064A;&#x0641; &#x0627;&#x0644;&#x062F;&#x0648;&#x0644;&#x064A; &#x0644;&#x0644;&#x0627;&#x062E;&#x062A;&#x0631;&#x0627;&#x0639;&#x0627;&#x062A;</strong>&#x060C; &#x0648;&#x0635;&#x0627;&#x062D;&#x0628; &#x0628;&#x0631;&#x0627;&#x0621;&#x0627;&#x062A; &#x0627;&#x062E;&#x062A;&#x0631;&#x0627;&#x0639; &#x0648;&#x062D;&#x0642;&#x0648;&#x0642; &#x062A;&#x0635;&#x0627;&#x0645;&#x064A;&#x0645; &#x0645;&#x0633;&#x062C;&#x0644;&#x0629; &#x0641;&#x064A; &#x0628;&#x0631;&#x064A;&#x0637;&#x0627;&#x0646;&#x064A;&#x0629;.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="block-section">
-                        <span class="block-label">// &#x0627;&#x0644;&#x0630;&#x0643;&#x0627;&#x0621; &#x0627;&#x0644;&#x0627;&#x0635;&#x0637;&#x0646;&#x0627;&#x0639;&#x064A; &#x0648;&#x0647;&#x0646;&#x062F;&#x0633;&#x0629; &#x0627;&#x0644;&#x0646;&#x0638;&#x0645; &#x0627;&#x0644;&#x062C;&#x0648;&#x064A;&#x0629;</span>
-                        <div class="capability-list">
-                            <div class="cap-item">
-                                <span class="cap-title">&#x0627;&#x0644;&#x0634;&#x0628;&#x0643;&#x0627;&#x062A; &#x0627;&#x0644;&#x0639;&#x0635;&#x0628;&#x064A;&#x0629; &#x0627;&#x0644;&#x0645;&#x0643;&#x0627;&#x0646;&#x064A;&#x0629; &#x0648;&#x0627;&#x0644;&#x0632;&#x0645;&#x0627;&#x0646;&#x064A;&#x0629; (PINNs)</span>
-                                <span class="cap-desc">&#x062A;&#x0635;&#x0645;&#x064A;&#x0645; &#x0648;&#x062A;&#x062F;&#x0631;&#x064A;&#x0628; &#x0646;&#x0645;&#x0627;&#x0630;&#x062C; &#x0627;&#x0644;&#x062A;&#x0639;&#x0644;&#x0645; &#x0627;&#x0644;&#x0639;&#x0645;&#x064A;&#x0642; (ConvLSTM \u0026 GNN) &#x0627;&#x0644;&#x0645;&#x062F;&#x0645;&#x062C;&#x0629; &#x0628;&#x0645;&#x0639;&#x0627;&#x062F;&#x0644;&#x0627;&#x062A; &#x0646;&#x0627;&#x0641;&#x064A;&#x064A;&#x0647;-&#x0633;&#x062A;&#x0648;&#x0643;&#x0633; &#x0644;&#x0644;&#x062A;&#x0646;&#x0628;&#x0624; &#x0628;&#x0645;&#x0633;&#x0627;&#x0631;&#x0627;&#x062A; &#x0648;&#x0643;&#x062B;&#x0627;&#x0641;&#x0629; &#x0627;&#x0644;&#x0639;&#x0648;&#x0627;&#x0635;&#x0641; (AOD) &#x062D;&#x062A;&#x0649; 72 &#x0633;&#x0627;&#x0639;&#x0629;.</span>
-                            </div>
-                            <div class="cap-item">
-                                <span class="cap-title">&#x0627;&#x0633;&#x062A;&#x064A;&#x0639;&#x0627;&#x0628; &#x0628;&#x064A;&#x0627;&#x0646;&#x0627;&#x062A; &#x0627;&#x0644;&#x0623;&#x0642;&#x0645;&#x0627;&#x0631; &#x0627;&#x0644;&#x0635;&#x0646;&#x0627;&#x0639;&#x064A;&#x0629; &#x0627;&#x0644;&#x0645;&#x062A;&#x0639;&#x062F;&#x062F;&#x0629; &#x0627;&#x0644;&#x0623;&#x0637;&#x064A;&#x0627;&#x0641;</span>
-                                <span class="cap-desc">&#x0628;&#x0646;&#x0627;&#x0621; &#x062E;&#x0637;&#x0648;&#x0637; &#x0645;&#x0639;&#x0627;&#x0644;&#x062C;&#x0629; &#x0641;&#x0648;&#x0631;&#x064A;&#x0629; &#x0644;&#x0627;&#x0633;&#x062A;&#x0642;&#x0628;&#x0627;&#x0644; &#x0648;&#x062A;&#x062D;&#x0644;&#x064A;&#x0644; &#x0628;&#x064A;&#x0627;&#x0646;&#x0627;&#x062A; NASA MODIS (Terra/Aqua) \u0026 ESA Sentinel-5P \u0026 ECMWF ERA5.</span>
-                            </div>
-                            <div class="cap-item">
-                                <span class="cap-title">&#x0645;&#x0624;&#x0634;&#x0631;&#x0627;&#x062A; &#x0645;&#x062E;&#x0627;&#x0637;&#x0631; &#x0627;&#x0644;&#x0628;&#x0646;&#x064A;&#x0629; &#x0627;&#x0644;&#x062A;&#x062D;&#x062A;&#x064A;&#x0629; &#x0627;&#x0644;&#x062D;&#x064A;&#x0648;&#x064A;&#x0629;</span>
-                                <span class="cap-desc">&#x062E;&#x0648;&#x0627;&#x0631;&#x0632;&#x0645;&#x064A;&#x0627;&#x062A; &#x0641;&#x0648;&#x0631;&#x064A;&#x0629; &#x0644;&#x062A;&#x0642;&#x064A;&#x064A;&#x0645; &#x062A;&#x0631;&#x0633;&#x0628; &#x0627;&#x0644;&#x063A;&#x0628;&#x0627;&#x0631; &#x0639;&#x0644;&#x0649; &#x0627;&#x0644;&#x0623;&#x0644;&#x0648;&#x0627;&#x062D; &#x0627;&#x0644;&#x0634;&#x0645;&#x0633;&#x064A;&#x0629;&#x060C; &#x0648;&#x062A;&#x0623;&#x062B;&#x0631; &#x0627;&#x0644;&#x0631;&#x0624;&#x064A;&#x0629; &#x0641;&#x064A; &#x0627;&#x0644;&#x0645;&#x0637;&#x0627;&#x0631;&#x0627;&#x062A;&#x060C; &#x0648;&#x062A;&#x0634;&#x062A;&#x062A; &#x0625;&#x0634;&#x0627;&#x0631;&#x0627;&#x062A; &#x0623;&#x0628;&#x0631;&#x0627;&#x062C; 5G.</span>
-                            </div>
-                            <div class="cap-item">
-                                <span class="cap-title">&#x0627;&#x0644;&#x0628;&#x0646;&#x064A;&#x0629; &#x0627;&#x0644;&#x0633;&#x062D;&#x0627;&#x0628;&#x064A;&#x0629; &#x0627;&#x0644;&#x0633;&#x064A;&#x0627;&#x062F;&#x064A;&#x0629; &#x0648;&#x0645;&#x0639;&#x0627;&#x0644;&#x062C;&#x0629; GPU &#x0627;&#x0644;&#x0645;&#x0648;&#x0632;&#x0639;&#x0629;</span>
-                                <span class="cap-desc">&#x0628;&#x0646;&#x064A;&#x0629; &#x062A;&#x062D;&#x062A;&#x064A;&#x0629; &#x0633;&#x062D;&#x0627;&#x0628;&#x064A;&#x0629; &#x0645;&#x0648;&#x0632;&#x0639;&#x0629; (FastAPI, Redis, PostGIS) &#x062A;&#x062F;&#x0639;&#x0645; &#x062A;&#x0648;&#x0644;&#x064A;&#x062F; &#x0627;&#x0644;&#x062E;&#x0631;&#x0627;&#x0626;&#x0637; &#x0627;&#x0644;&#x062C;&#x063A;&#x0631;&#x0627;&#x0641;&#x064A;&#x0629; &#x0627;&#x0644;&#x0644;&#x062D;&#x0638;&#x064A;&#x0629; &#x0648;&#x0627;&#x0644;&#x062A;&#x0646;&#x0628;&#x064A;&#x0647;&#x0627;&#x062A; &#x0627;&#x0644;&#x0633;&#x0631;&#x064A;&#x0639;&#x0629;.</span>
-                            </div>
-                            <div class="cap-item">
-                                <span class="cap-title">&#x0645;&#x062D;&#x0631;&#x0643;&#x0627;&#x062A; &#x0627;&#x0644;&#x0625;&#x0646;&#x0630;&#x0627;&#x0631; &#x0627;&#x0644;&#x0630;&#x0627;&#x062A;&#x064A; &#x0648;&#x062A;&#x0646;&#x0633;&#x064A;&#x0642; &#x0627;&#x0644;&#x0648;&#x0643;&#x0644;&#x0621; &#x0627;&#x0644;&#x0623;&#x0630;&#x0643;&#x064A;&#x0621;</span>
-                                <span class="cap-desc">&#x0645;&#x062D;&#x0631;&#x0643;&#x0627;&#x062A; &#x0630;&#x0643;&#x0627;&#x0621; &#x0627;&#x0635;&#x0637;&#x0646;&#x0627;&#x0639;&#x064A; &#x0645;&#x062A;&#x0639;&#x062F;&#x062F;&#x0629; &#x0627;&#x0644;&#x0648;&#x0643;&#x0644;&#x0627;&#x0621; &#x0644;&#x0623;&#x062A;&#x0645;&#x062A;&#x0629; &#x062A;&#x062D;&#x0630;&#x064A;&#x0631;&#x0627;&#x062A; &#x0627;&#x0644;&#x062F;&#x0641;&#x0627;&#x0639; &#x0627;&#x0644;&#x0645;&#x062F;&#x0646;&#x064A; &#x0648;&#x0627;&#x0644;&#x0627;&#x0633;&#x062A;&#x062C;&#x0627;&#x0628;&#x0629; &#x0644;&#x0644;&#x0637;&#x0648;&#x0627;&#x0631;&#x0626;.</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="block-section">
-                        <span class="block-label">// &#x0627;&#x0644;&#x062C;&#x0648;&#x0627;&#x0626;&#x0632; &#x0648;&#x0627;&#x0644;&#x0628;&#x0631;&#x0627;&#x0621;&#x0627;&#x062A; &#x0648;&#x0627;&#x0644;&#x062A;&#x0643;&#x0631;&#x064A;&#x0645;&#x0627;&#x062A;</span>
-                        <div class="badge-strip">
-                            <span class="badge">&#x1F948; &#x0645;&#x064A;&#x062F;&#x0627;&#x0644;&#x064A;&#x0629; &#x0641;&#x0636;&#x064A;&#x0629; &middot; &#x062C;&#x0646;&#x064A;&#x0641;</span>
-                            <span class="badge">&#x0628;&#x0631;&#x0627;&#x0621;&#x0629; &#x0627;&#x062E;&#x062A;&#x0631;&#x0627;&#x0639; &#x0628;&#x0631;&#x064A;&#x0637;&#x0627;&#x0646;&#x064A;&#x0629;</span>
-                            <span class="badge">3 &#x0645;&#x064A;&#x062F;&#x0627;&#x0644;&#x064A;&#x0627;&#x062A; &#x0641;&#x0636;&#x064A;&#x0629; NRCT</span>
-                            <span class="badge">2 &#x0645;&#x064A;&#x062F;&#x0627;&#x0644;&#x064A;&#x0627;&#x062A; &#x0628;&#x0631;&#x0648;&#x0646;&#x0632;&#x064A;&#x0629; IPITEX</span>
-                            <span class="badge">&#x062C;&#x0627;&#x0626;&#x0632;&#x0629; &#x0627;&#x0644;&#x0645;&#x062C;&#x0644;&#x0633; &#x0627;&#x0644;&#x062B;&#x0642;&#x0627;&#x0641;&#x064A; &#x0627;&#x0644;&#x0628;&#x0631;&#x064A;&#x0637;&#x0627;&#x0646;&#x064A;</span>
-                            <span class="badge">&#x2B50; &#x0646;&#x062C;&#x0648;&#x0645; &#x0627;&#x0644;&#x0639;&#x0644;&#x0648;&#x0645; &middot; &#x0623;&#x0641;&#x0636;&#x0644; 30</span>
-                            <span class="badge">&#x1F30D; &#x0645;&#x0631;&#x0634;&#x062D; &#x064A;&#x0648;&#x0646;&#x0633;&#x0643;&#x0648;</span>
-                            <span class="badge">&#x1F680; HomeLab &middot; &#x0627;&#x0644;&#x062F;&#x0641;&#x0639;&#x0629; 5</span>
-                        </div>
-                    </div>
-
-                    <div class="block-section">
-                        <span class="block-label">// &#x062A;&#x0648;&#x0627;&#x0635;&#x0644;</span>
-                        <div class="contact-links">
-                            <a href="https://www.linkedin.com/in/alaa199439/" target="_blank" class="contact-btn">
-                                <i data-lucide="linkedin" size="15"></i> LinkedIn &#x0627;&#x0644;&#x0645;&#x0624;&#x0633;&#x0633;
-                            </a>
-                            <a href="https://www.linkedin.com/in/nilus-lab-0816333b8" target="_blank" class="contact-btn">
-                                <i data-lucide="building-2" size="15"></i> LinkedIn &#x0646;&#x064A;&#x0644;&#x0648;&#x0633; &#x0644;&#x0627;&#x0628;
-                            </a>
-                            <a href="mailto:alaa.aldeen@niluslab.com" class="contact-btn">
-                                <i data-lucide="mail" size="15"></i> &#x062A;&#x0648;&#x0627;&#x0635;&#x0644; &#x0645;&#x0628;&#x0627;&#x0634;&#x0631;
-                            </a>
-                        </div>
+                <!-- International Honours Strip -->
+                <div style="margin-bottom: 34px;">
+                    <span class="section-label" data-i18n="label_honours">// International Medals, Patents &amp; Honours</span>
+                    <div class="badge-grid">
+                        <span class="badge-item" data-i18n="h_geneva">🥈 Geneva Inventions Silver Medal</span>
+                        <span class="badge-item" data-i18n="h_uk_patent">🏅 UK Patent Pending (UK IPO)</span>
+                        <span class="badge-item" data-i18n="h_uk_design">📜 UK Registered Design Rights</span>
+                        <span class="badge-item" data-i18n="h_granted_patent">🏆 Granted Patent Holder 2018</span>
+                        <span class="badge-item" data-i18n="h_nrct">🥈🥈🥈 NRCT Thailand · 3× Silver</span>
+                        <span class="badge-item" data-i18n="h_ipitex">🥉🥉 IPITEX · 2× Bronze</span>
+                        <span class="badge-item" data-i18n="h_bc">🇬🇧 British Council Entrepreneurship Award</span>
+                        <span class="badge-item" data-i18n="h_sos">⭐ Stars of Science Qatar · Top 30</span>
+                        <span class="badge-item" data-i18n="h_unesco">🌍 UNESCO Nominee · African Week Paris</span>
+                        <span class="badge-item" data-i18n="h_homelab">🚀 HomeLab Deep Science Accelerator · Cohort 5</span>
                     </div>
                 </div>
-            </div>
 
-        </div>
+                <!-- Connect Hub -->
+                <div>
+                    <span class="section-label" data-i18n="label_connect">// Executive Verification &amp; Connect</span>
+                    <div class="action-row">
+                        <a href="https://www.linkedin.com/in/alaa199439/" target="_blank" class="btn-action btn-action-primary">
+                            <i data-lucide="linkedin" size="16"></i> <span data-i18n="btn_founder_li">Founder LinkedIn</span>
+                        </a>
+                        <a href="https://www.linkedin.com/in/nilus-lab-0816333b8" target="_blank" class="btn-action btn-action-outline">
+                            <i data-lucide="building-2" size="16"></i> <span data-i18n="btn_nilus_li">Nilus Lab LinkedIn</span>
+                        </a>
+                        <a href="about.html" class="btn-action btn-action-outline">
+                            <i data-lucide="file-text" size="16"></i> <span data-i18n="btn_whitepaper">Architecture Whitepaper</span>
+                        </a>
+                        <a href="mailto:alaa.aldeen@niluslab.com" class="btn-action btn-action-outline">
+                            <i data-lucide="mail" size="16"></i> <span data-i18n="btn_direct_contact">Direct Contact</span>
+                        </a>
+                    </div>
+                </div>
+            </article>
 
+        </main>
+
+        <!-- FOOTER -->
         <footer>
-            <div class="footer-reg">
-                <strong style="color:#94a3b8;">NILUS LAB LTD</strong> &nbsp;&middot;&nbsp;
-                Company No. <span style="color:#94a3b8;">17427807</span> &nbsp;&middot;&nbsp;
-                Private Limited by Shares &nbsp;&middot;&nbsp;
-                Companies House Submission: <span style="color:#94a3b8;">118-507239</span>
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="brand-wrapper">
+                        <div class="brand-icon">
+                            <div class="brand-bar"></div>
+                            <div class="brand-bar"></div>
+                            <div class="brand-bar"></div>
+                        </div>
+                        <div class="brand-text">saharyn</div>
+                    </div>
+                    <p data-i18n="footer_desc">
+                        Sovereign Predictive Intelligence platform protecting critical energy, water, and industrial assets in high-consequence desert environments.
+                    </p>
+                </div>
+
+                <div class="footer-col">
+                    <h4 data-i18n="f_platform">PLATFORM</h4>
+                    <ul class="footer-links">
+                        <li><a href="console.html">Mission Control</a></li>
+                        <li><a href="team.html">Leadership &amp; Team</a></li>
+                        <li><a href="about.html">Architecture Whitepaper</a></li>
+                        <li><a href="/v2/docs">Swagger REST API</a></li>
+                        <li><a href="/v2/system/health">System Health</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4 data-i18n="f_space">SPACE FEEDS</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://earthdata.nasa.gov" target="_blank">NASA Earthdata (MODIS)</a></li>
+                        <li><a href="https://cds.climate.copernicus.eu" target="_blank">Copernicus CDS (ERA5)</a></li>
+                        <li><a href="https://dataspace.copernicus.eu" target="_blank">Copernicus Data Space (S2)</a></li>
+                        <li><a href="https://ads.atmosphere.copernicus.eu" target="_blank">Copernicus ADS (CAMS)</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4 data-i18n="f_compliance">COMPLIANCE</h4>
+                    <ul class="footer-links">
+                        <li><a href="about.html#diligence">ISO 27001 Controls</a></li>
+                        <li><a href="about.html#diligence">IEEE 1232 Diagnostics</a></li>
+                        <li><a href="about.html#diligence">GHG Protocol Scope 3</a></li>
+                        <li><a href="about.html#diligence">SDAIA AI Ethics</a></li>
+                    </ul>
+                </div>
             </div>
-            <div class="footer-copy">&copy; 2026 SAHARYN AI &middot; Powered by NILUS LAB LTD</div>
+
+            <div class="footer-bottom">
+                <div style="font-size:11px;color:#64748b;line-height:1.8;">
+                    <span style="color:#94a3b8;font-weight:600;">NILUS LAB LTD</span> &nbsp;&middot;&nbsp;
+                    Company No. <span style="color:#94a3b8;">17427807</span> &nbsp;&middot;&nbsp;
+                    Private Limited by Shares &nbsp;&middot;&nbsp;
+                    Companies House Submission: <span style="color:#94a3b8;">118-507239</span>
+                </div>
+                <div style="font-size:10px;color:#475569;">&copy; 2026 SAHARYN AI &nbsp;&middot;&nbsp; AUTONOMOUS SATELLITE-TO-PLANT CAUSAL RESILIENCE ENGINE</div>
+            </div>
         </footer>
 
     </div>
 
+    <!-- ── BILINGUAL ENGLISH / ARABIC SCRIPT ── -->
     <script>
-        lucide.createIcons();
+        const translations = {
+            en: {
+                nav_solutions: "Solutions",
+                nav_platform: "Platform",
+                nav_capabilities: "Capabilities",
+                nav_technology: "Technology",
+                nav_team: "Team",
+                nav_api: "API Docs",
+                nav_cta: "Mission Control",
+                hero_badge: "Sovereign Earth Intelligence Architecture",
+                hero_title: "The Minds Behind SAHARYN",
+                hero_desc: "SAHARYN is engineered by a world-class AI systems architect combining physics-informed deep learning, satellite earth observation, and sovereign cloud infrastructure into a unified predictive intelligence engine.",
+                reg_company_name_lbl: "Company Name",
+                reg_company_no_lbl: "Company Number",
+                reg_company_type_lbl: "Company Type",
+                reg_company_type_val: "Private Limited by Shares",
+                reg_ch_sub_lbl: "CH Submission No.",
+                reg_status: "REGISTERED & ACTIVE",
+                founder_name: "Alaa Aldeen",
+                founder_title: "Founder & CEO · Chief AI & Systems Architect",
+                founder_location: "London, United Kingdom & San Diego, California, USA",
+                founder_bio: "Multi-award-winning AI Systems Architect, Deep Learning Engineer, and Founder of NILUS LAB LTD with deep expertise in neural architectures, complex physical systems modeling, and sovereign enterprise technology. Architect of <strong style=\"color:#fff\">SAHARYN™</strong> — a physics-informed deep learning platform integrating multi-spectral satellite remote sensing (MODIS, Sentinel, ECMWF) with spatio-temporal neural networks for high-precision sand and dust storm trajectory forecasting and critical infrastructure risk mitigation. Silver Medalist at the <strong style=\"color:#fff\">50th International Exhibition of Inventions Geneva</strong>, granted patent holder, and UK IPO design rights holder.",
+                label_core_tech: "// Core AI & Atmospheric Architecture",
+                cap1_title: "Spatio-Temporal Neural Networks & PINNs",
+                cap1_desc: "Architected spatio-temporal neural operators (ConvLSTM & Graph Neural Networks) integrating Navier-Stokes atmospheric fluid dynamics with terrain elevation models for 72h dust plume trajectory and Aerosol Optical Depth (AOD) forecasting.",
+                cap2_title: "Multi-Spectral Earth Observation Ingestion",
+                cap2_desc: "Engineered automated real-time ingestion pipelines processing petabyte-scale multi-spectral imagery across NASA MODIS (Terra/Aqua MOD04_L2), ESA Sentinel-5P TROPOMI, Sentinel-2, and ECMWF ERA5/IFS reanalysis feeds.",
+                cap3_title: "Critical Infrastructure Risk Indexing",
+                cap3_desc: "Designed real-time risk scoring algorithms for solar PV panel dust accumulation, aviation runway visibility alerts, and millimeter-wave/5G telecom signal attenuation.",
+                cap4_title: "Distributed Sovereign Cloud & GPU Microservices",
+                cap4_desc: "Architected cloud-native, sovereign data center microservices (FastAPI, Redis, PostGIS, GDAL/Rasterio) capable of sub-second geospatial tile generation and enterprise alerting SLAs.",
+                cap5_title: "Autonomous Alerting & Multi-Agent Dispatch",
+                cap5_desc: "Built enterprise multi-agent task engines orchestrating automated civil defense warnings, API webhooks, and national emergency response workflows.",
+                label_honours: "// International Medals, Patents & Honours",
+                h_geneva: "🥈 Geneva Inventions Silver Medal",
+                h_uk_patent: "🏅 UK Patent Pending (UK IPO)",
+                h_uk_design: "📜 UK Registered Design Rights",
+                h_granted_patent: "🏆 Granted Patent Holder 2018",
+                h_nrct: "🥈🥈🥈 NRCT Thailand · 3× Silver",
+                h_ipitex: "🥉🥉 IPITEX · 2× Bronze",
+                h_bc: "🇬🇧 British Council Entrepreneurship Award",
+                h_sos: "⭐ Stars of Science Qatar · Top 30",
+                h_unesco: "🌍 UNESCO Nominee · African Week Paris",
+                h_homelab: "🚀 HomeLab Deep Science Accelerator · Cohort 5",
+                label_connect: "// Executive Verification & Connect",
+                btn_founder_li: "Founder LinkedIn",
+                btn_nilus_li: "Nilus Lab LinkedIn",
+                btn_whitepaper: "Architecture Whitepaper",
+                btn_direct_contact: "Direct Contact",
+                footer_desc: "Sovereign Predictive Intelligence platform protecting critical energy, water, and industrial assets in high-consequence desert environments."
+            },
+            ar: {
+                nav_solutions: "الحلول",
+                nav_platform: "المنصة",
+                nav_capabilities: "القدرات",
+                nav_technology: "التقنية",
+                nav_team: "فريقنا",
+                nav_api: "واجهة البرمجة",
+                nav_cta: "وحدة التحكم",
+                hero_badge: "هندسة استخبارات الأرض والذكاء الاصطناعي السيادي",
+                hero_title: "العقول والقيادة وراء صحارين",
+                hero_desc: "صُمِّمت وهُندِست منصة صحارين على يد مهندس ذكاء اصطناعي يجمع بين التعلم العميق الفيزيائي، واستشعار الأقمار الصناعية عن بُعد، والبنية التحتية السحابية السيادية لحماية البنية التحتية الحيوية في البيئات الصحراوية.",
+                reg_company_name_lbl: "اسم الكيان التجاري",
+                reg_company_no_lbl: "رقم السجل البريطاني",
+                reg_company_type_lbl: "نوع الشركة",
+                reg_company_type_val: "شركة خاصة محدودة بالأسهم",
+                reg_ch_sub_lbl: "رقم إيداع السجل (CH)",
+                reg_status: "مسجلة ونشطة رسمياً",
+                founder_name: "علاء الدين",
+                founder_title: "المؤسس والرئيس التنفيذي · مهندس الذكاء الاصطناعي وهندسة النظم السحابية",
+                founder_location: "لندن، المملكة المتحدة & سان دييغو، كاليفورنيا",
+                founder_bio: "مبتكر متعدد الجوائز، مهندس ذكاء اصطناعي، ومؤسس شركة <strong style=\"color:#fff\">NILUS LAB LTD</strong>، متخصص في هندسة الشبكات العصبية العميقة، ونمذجة الأنظمة الفيزيائية المعقدة، والحلول التقنية السيادية. مصمم منصة <strong style=\"color:#fff\">SAHARYN™</strong> — وهي منصة ذكاء اصطناعي تجمع بين بيانات الاستشعار عن بعد عبر الأقمار الصناعية المتعددة الأطياف (NASA MODIS, ESA Sentinel, ECMWF) والشبكات العصبية المكانية والزمانية للتنبؤ الدقيق بمسارات العواصف الرملية وحماية البنية التحتية الحيوية. حاصل على <strong style=\"color:#fff\">الميدالية الفضية في معرض جنيف الدولي الخمسين للاختراعات</strong>، وصاحب براءات اختراع وحقوق تصاميم مسجلة في بريطانيا.",
+                label_core_tech: "// الذكاء الاصطناعي وهندسة النظم الجوية",
+                cap1_title: "الشبكات العصبية المكانية والزمانية (PINNs)",
+                cap1_desc: "تصميم وتدريب نماذج التعلم العميق (ConvLSTM & GNN) المدمجة بمعادلات نافييه-ستوكس للتنبؤ بمسارات وكثافة العواصف (AOD) حتى 72 ساعة.",
+                cap2_title: "استيعاب بيانات الأقمار الصناعية متعددة الأطياف",
+                cap2_desc: "بناء خطوط معالجة فورية لاستقبال وتحليل بيانات NASA MODIS (Terra/Aqua) & ESA Sentinel-5P & ECMWF ERA5.",
+                cap3_title: "مؤشرات مخاطر البنية التحتية الحيوية",
+                cap3_desc: "خوارزميات فورية لتقييم ترسب الغبار على الألواح الشمسية، وتأثر الرؤية في المطارات، وتشتت إشارات أبراج 5G.",
+                cap4_title: "البنية السحابية السيادية ومعالجة GPU الموزعة",
+                cap4_desc: "بنية تحتية سحابية موزعة (FastAPI, Redis, PostGIS) تدعم توليد الخرائط الجغرافية اللحظية والتنبيهات السريعة.",
+                cap5_title: "محركات الإنذار الذاتي وتنسيق الوكلاء الأذكياء",
+                cap5_desc: "محركات ذكاء اصطناعي متعددة الوكلاء لأتمتة تحذيرات الدفاع المدني والاستجابة للطوارئ.",
+                label_honours: "// الجوائز والبراءات والتكريمات الدولية",
+                h_geneva: "🥈 ميدالية فضية · جنيف للاختراعات",
+                h_uk_patent: "براءة اختراع بريطانية معلقة",
+                h_uk_design: "حقوق التصميم المسجلة UK IPO",
+                h_granted_patent: "صاحب براءة اختراع ممنوحة 2018",
+                h_nrct: "3 ميداليات فضية NRCT",
+                h_ipitex: "2 ميداليات برونزية IPITEX",
+                h_bc: "جائزة المجلس الثقافي البريطاني",
+                h_sos: "⭐ نجوم العلوم · أفضل 30",
+                h_unesco: "🌍 مرشح اليونسكو",
+                h_homelab: "🚀 مسرّع HomeLab · الدفعة 5",
+                label_connect: "// التوثيق الرسمي والتواصل التنفيذي",
+                btn_founder_li: "LinkedIn المؤسس",
+                btn_nilus_li: "LinkedIn نيلوس لاب",
+                btn_whitepaper: "ورقة العمل الهندسية",
+                btn_direct_contact: "تواصل مباشر",
+                footer_desc: "منصة ذكاء اصطناعي سيادي تحمي أصول الطاقة والمياه والصناعة الحيوية في البيئات الصحراوية القاسية."
+            }
+        };
 
-        function toggleLanguage() {
-            const isEn = document.getElementById('card-en').style.display !== 'none';
-            document.getElementById('card-en').style.display = isEn ? 'none' : 'block';
-            document.getElementById('card-ar').style.display = isEn ? 'block' : 'none';
-            document.getElementById('hero-en').style.display = isEn ? 'none' : 'block';
-            document.getElementById('hero-ar').style.display = isEn ? 'block' : 'none';
-            document.body.setAttribute('dir', isEn ? 'rtl' : 'ltr');
-            document.querySelector('.lang-switch').innerText = isEn ? 'AR / EN' : 'EN / \u0639\u0631\u0628\u064a';
+        let currentLang = 'en';
+        function toggleLang() {
+            currentLang = currentLang === 'en' ? 'ar' : 'en';
+            document.body.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+            document.getElementById('lang-btn').querySelector('span').innerText = currentLang === 'ar' ? 'EN / AR' : 'AR / EN';
+
+            const t = translations[currentLang];
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const k = el.getAttribute('data-i18n');
+                if (t[k]) el.innerHTML = t[k];
+            });
+
+            if (typeof lucide !== 'undefined') lucide.createIcons();
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        });
     </script>
 </body>
 </html>
