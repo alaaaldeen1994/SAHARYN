@@ -106,7 +106,7 @@ class MechanicalReliabilityModel(ScientificModel):
         """
         Calculates efficiency loss and failure probability using kinetic degradation models.
         """
-        temp_c = telemetry.get("temp_c", 25.0)
+        temp_c = telemetry.get("temp_c", telemetry.get("temp", 25.0))
         # Kinetic temperature penalty (Non-linear after 45°C - standard desert operational limit)
         # Activation energy style penalty: e^(-Ea/RT)
         temp_stress = np.exp(0.05 * (temp_c - 45.0)) if temp_c > 45 else 1.0
