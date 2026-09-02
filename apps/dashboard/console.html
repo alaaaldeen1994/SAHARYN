@@ -203,39 +203,43 @@
 
         /* Top Header */
         .header {
-            height: 56px;
+            height: 52px;
             border-bottom: 1px solid var(--border-color);
             background: #0a0f1a;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 24px;
+            padding: 0 16px;
             z-index: 40;
+            gap: 12px;
         }
 
         .header-left {
             display: flex;
             align-items: center;
-            gap: 24px;
+            gap: 12px;
+            flex-shrink: 0;
         }
 
         .header-right {
             display: flex;
             align-items: center;
-            gap: 24px;
+            gap: 8px;
+            flex-shrink: 0;
         }
 
         .site-selector {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
             color: #fff;
-            padding: 8px 16px;
-            border-radius: 8px;
+            padding: 6px 12px;
+            border-radius: 6px;
             font-family: 'JetBrains Mono';
-            font-size: 13px;
+            font-size: 11px;
             outline: none;
             cursor: pointer;
             transition: 0.2s;
+            white-space: nowrap;
         }
 
         .site-selector:hover {
@@ -257,25 +261,28 @@
             font-size: 12px;
             font-weight: 600;
             color: var(--accent-green);
+            white-space: nowrap;
         }
 
         /* Standardized Header Controls */
         .header-control {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--border-color);
-            padding: 4px 12px;
-            border-radius: 4px;
+            padding: 0 10px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
-            gap: 8px;
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            gap: 6px;
+            transition: 0.2s ease;
             height: 32px;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 10px;
-            letter-spacing: 0.5px;
+            font-size: 10.5px;
+            letter-spacing: 0.3px;
             color: var(--text-secondary);
             cursor: pointer;
             user-select: none;
+            white-space: nowrap !important;
+            flex-shrink: 0 !important;
         }
 
         .header-control:hover {
@@ -285,9 +292,19 @@
         }
 
         .header-control.active-green {
-            background: rgba(16, 185, 129, 0.05);
-            border-color: rgba(16, 185, 129, 0.3);
+            background: rgba(16, 185, 129, 0.08);
+            border-color: rgba(16, 185, 129, 0.35);
             color: var(--accent-green);
+        }
+
+        #api-status {
+            white-space: nowrap !important;
+            flex-shrink: 0 !important;
+        }
+
+        #api-status-text {
+            white-space: nowrap !important;
+            display: inline-block;
         }
 
         .status-dot {
@@ -828,13 +845,13 @@
                     <option value="EMEA_COAST_02" data-i18n="site_2">EMEA_COAST_02 (Corrosive Coastal)</option>
                 </select>
             </div>
-            <div class="header-right" style="display: flex; align-items: center; gap: 12px;">
+            <div class="header-right" style="display: flex; align-items: center; gap: 8px;">
                 <div onclick="toggleLanguage()" class="header-control" id="lang-toggle-container">
-                    <i data-lucide="languages" size="14"></i>
+                    <i data-lucide="languages" size="13"></i>
                     <span id="lang-display" style="font-weight: 800;">EN</span>
                 </div>
 
-                <div class="mono" style="font-size: 11px; color: var(--text-secondary); opacity: 0.8;" id="clock">
+                <div class="mono" style="font-size: 11px; color: var(--text-secondary); opacity: 0.8; white-space: nowrap;" id="clock">
                     00:00:00 UTC</div>
 
                 <div id="api-status" class="header-control active-green">
@@ -844,21 +861,21 @@
 
                 <div id="stability-control" title="Requires ADMIN role" onclick="toggleStabilityMode()"
                     aria-disabled="true" class="header-control" style="opacity: 0.4; pointer-events: none;">
-                    <i data-lucide="anchor" id="stab-icon" size="14"></i>
-                    <span id="stab-label" data-i18n="stability_off">STABILITY_LOCKED: OFF</span>
-                    <i data-lucide="lock" id="stab-lock-icon" size="11" style="margin-left: 2px;"></i>
+                    <i data-lucide="anchor" id="stab-icon" size="13"></i>
+                    <span id="stab-label" data-i18n="stability_off">STABILITY: OFF</span>
+                    <i data-lucide="lock" id="stab-lock-icon" size="10" style="margin-left: 2px;"></i>
                 </div>
 
                 <div id="sovereign-control" title="Requires ADMIN role" data-rbac-action="toggle_sovereign"
                     onclick="toggleSovereignMode()" aria-disabled="true" class="header-control"
                     style="opacity: 0.4; pointer-events: none;">
-                    <i data-lucide="shield-alert" id="sov-icon" size="14"></i>
-                    <span id="sov-label" data-i18n="sov_off">SOVEREIGN_MODE: OFF</span>
-                    <i data-lucide="lock" id="sov-lock-icon" size="11" style="margin-left: 2px;"></i>
+                    <i data-lucide="shield-alert" id="sov-icon" size="13"></i>
+                    <span id="sov-label" data-i18n="sov_off">SOVEREIGN: OFF</span>
+                    <i data-lucide="lock" id="sov-lock-icon" size="10" style="margin-left: 2px;"></i>
                 </div>
                 <a href="digital_twin.html" class="header-control" style="background: rgba(255, 107, 44, 0.15); border: 1px solid rgba(255, 107, 44, 0.35); color: #ff8a4c; text-decoration: none; font-weight: 700; display: flex; align-items: center; gap: 6px;">
-                    <i data-lucide="globe-2" size="14"></i>
-                    <span>3D DIGITAL TWIN</span>
+                    <i data-lucide="globe-2" size="13"></i>
+                    <span>3D TWIN</span>
                 </a>
                 <div class="user-dropdown" id="profile-dropdown">
                     <div class="user-avatar" id="user-avatar-container">
@@ -966,34 +983,31 @@
                 <div class="panel" style="flex: 1;">
                     <div class="panel-header">
                         <div class="panel-title"><i data-lucide="flask-conical" size="16" color="#f59e0b"></i> <span
-                                data-i18n="chem_diag">Deep
-                                Chemical Diagnostics</span></div>
+                                data-i18n="chem_diag">Deep Chemical Diagnostics</span></div>
                     </div>
-                    <div class="panel-body" style="padding-top: 10px;">
+                    <div class="panel-body" style="padding: 14px; overflow-y: visible;">
                         <p data-i18n="cams_payload"
-                            style="font-size: 11px; color: var(--text-secondary); margin-bottom: 16px; font-family: 'JetBrains Mono';">
+                            style="font-size: 10.5px; color: var(--text-secondary); margin-bottom: 10px; font-family: 'JetBrains Mono';">
                             Copernicus CAMS EAC4 Payload</p>
                         <ul class="stress-list">
                             <li class="stress-item"><span class="stress-label"><i data-lucide="trending-down" size="14"
                                         color="var(--accent-green)"></i> <span data-i18n="kinetic">Kinetic
                                         Abrasion</span></span><span class="stress-badge" id="metric-kinetic"
-                                    style="color: var(--accent-green);">--
-                                    x</span></li>
+                                    style="color: var(--accent-green);">-- x</span></li>
                             <li class="stress-item"><span class="stress-label"><i data-lucide="thermometer-sun"
                                         size="14" color="var(--accent-red)"></i> <span data-i18n="thermal">Thermal
                                         Stress</span></span><span class="stress-badge" id="metric-thermal"
-                                    style="color: var(--accent-red);">--
-                                    x</span></li>
+                                    style="color: var(--accent-red);">-- x</span></li>
                             <li class="stress-item"><span class="stress-label"><i data-lucide="droplets" size="14"
                                         color="#3b82f6"></i> <span data-i18n="salt">Salt Corrosion</span></span><span
                                     class="stress-badge" id="metric-salt" style="color: #3b82f6;">-- x</span></li>
                         </ul>
                         <div class="threat-box"
-                            style="margin-top: 24px; padding: 12px; background: rgba(0,0,0,0.3); border-radius: 8px; border-left: 3px solid var(--accent-amber);">
-                            <div style="font-size: 10px; font-family: 'JetBrains Mono'; color: var(--text-secondary); margin-bottom: 4px;"
+                            style="margin-top: 12px; padding: 10px 12px; background: rgba(0,0,0,0.3); border-radius: 8px; border-left: 3px solid var(--accent-amber);">
+                            <div style="font-size: 9.5px; font-family: 'JetBrains Mono'; color: var(--text-secondary); margin-bottom: 3px;"
                                 data-i18n="threat">
                                 DOMINANT DEGRADATION PATH:</div>
-                            <div style="font-size: 13px; font-weight: 600; color: #fff;" id="dominant-threat">
+                            <div style="font-size: 12.5px; font-weight: 600; color: #fff;" id="dominant-threat">
                                 Calculating...</div>
                         </div>
                     </div>
