@@ -3,40 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Volumetric Digital Twin — SAHARYN AI</title>
-    <meta name="description" content="Real-Time 3D Volumetric Digital Twin and Atmospheric Simulation War Room for High-Consequence Desert Infrastructure.">
+    <title>SAHARYN AI — Sovereign 3D Volumetric Digital Twin</title>
+    <meta name="description" content="Planetary-scale 3D Atmospheric Digital Twin & Radiative Transfer Simulation for Critical Infrastructure. NASA/JPL Class Defense Architecture.">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌪️</text></svg>">
 
-    <!-- Google Fonts -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
 
-    <!-- Lucide Icons & Three.js Engine -->
+    <!-- Three.js + OrbitControls + Lucide -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
     <style>
         :root {
-            --bg-base: #040507;
-            --panel-bg: rgba(10, 14, 22, 0.82);
+            --bg-void: #020305;
+            --panel-bg: rgba(6, 9, 15, 0.88);
             --panel-border: rgba(255, 255, 255, 0.08);
+            --panel-border-active: rgba(255, 107, 44, 0.5);
+            
             --accent-orange: #ff6b2c;
             --accent-orange-bright: #ff8a4c;
-            --accent-orange-glow: rgba(255, 107, 44, 0.4);
+            --accent-orange-glow: rgba(255, 107, 44, 0.45);
+            --accent-cyan: #38bdf8;
+            --accent-cyan-glow: rgba(56, 189, 248, 0.35);
             --accent-emerald: #10b981;
             --accent-amber: #f59e0b;
             --accent-red: #ef4444;
+            
             --text-primary: #ffffff;
             --text-secondary: #94a3b8;
             --text-muted: #64748b;
+            
             --font-sans: 'Plus Jakarta Sans', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
             --font-ar: 'Tajawal', sans-serif;
         }
 
-        * {
+        *, *::before, *::after {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
@@ -44,7 +50,7 @@
         }
 
         body {
-            background-color: var(--bg-base);
+            background-color: var(--bg-void);
             color: var(--text-primary);
             font-family: var(--font-sans);
             overflow: hidden;
@@ -57,7 +63,6 @@
             direction: rtl;
         }
 
-        /* ── 3D CANVAS VIEWPORT ── */
         #viewport-3d {
             position: absolute;
             inset: 0;
@@ -66,15 +71,28 @@
             z-index: 1;
         }
 
-        /* ── TOP MISSION CONTROL OVERLAY BAR ── */
+        /* ── TACTICAL HUD GRID OVERLAYS ── */
+        .hud-grid-overlay {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 2;
+            background-image: 
+                radial-gradient(circle at 50% 50%, transparent 40%, rgba(2, 3, 5, 0.6) 90%),
+                linear-gradient(rgba(56, 189, 248, 0.015) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(56, 189, 248, 0.015) 1px, transparent 1px);
+            background-size: 100% 100%, 40px 40px, 40px 40px;
+        }
+
+        /* ── TOP MISSION BAR ── */
         .top-bar {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
-            height: 64px;
-            background: rgba(4, 5, 7, 0.85);
-            backdrop-filter: blur(16px);
+            height: 60px;
+            background: rgba(4, 6, 10, 0.88);
+            backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--panel-border);
             display: flex;
             align-items: center;
@@ -86,57 +104,70 @@
         .brand-group {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 12px;
             text-decoration: none;
         }
 
-        .brand-icon {
+        .brand-hex {
             width: 28px;
             height: 28px;
             background: linear-gradient(135deg, var(--accent-orange), #b45309);
-            border-radius: 6px;
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #fff;
-            box-shadow: 0 0 14px var(--accent-orange-glow);
+            box-shadow: 0 0 16px var(--accent-orange-glow);
         }
 
-        .brand-name {
-            font-size: 17px;
+        .brand-title {
+            font-size: 16px;
             font-weight: 800;
-            letter-spacing: -0.5px;
-            color: #ffffff;
+            letter-spacing: -0.3px;
+            color: #fff;
         }
 
-        .classification-badge {
+        .classification-tag {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            padding: 4px 10px;
+            padding: 3px 10px;
             border-radius: 4px;
             background: rgba(255, 107, 44, 0.1);
             border: 1px solid rgba(255, 107, 44, 0.3);
             font-family: var(--font-mono);
-            font-size: 10.5px;
-            letter-spacing: 1px;
+            font-size: 10px;
+            letter-spacing: 1.2px;
             color: var(--accent-orange-bright);
             text-transform: uppercase;
+        }
+
+        .top-telemetry {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .top-telemetry-val {
+            color: #fff;
+            font-weight: 700;
         }
 
         .top-actions {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
-        .btn-ui {
+        .btn-action {
             display: inline-flex;
             align-items: center;
-            gap: 7px;
-            padding: 7px 14px;
+            gap: 6px;
+            padding: 6px 14px;
             border-radius: 6px;
-            font-size: 12px;
+            font-size: 11.5px;
             font-weight: 600;
             color: #e2e8f0;
             background: rgba(255, 255, 255, 0.04);
@@ -146,22 +177,22 @@
             transition: all 0.2s ease;
         }
 
-        .btn-ui:hover {
-            background: rgba(255, 255, 255, 0.09);
+        .btn-action:hover {
+            background: rgba(255, 255, 255, 0.08);
             border-color: rgba(255, 255, 255, 0.25);
-            color: #ffffff;
+            color: #fff;
         }
 
-        .btn-ui-active {
-            background: rgba(255, 107, 44, 0.18);
+        .btn-action-active {
+            background: rgba(255, 107, 44, 0.15);
             border-color: var(--accent-orange);
-            color: #ffffff;
+            color: var(--accent-orange-bright);
         }
 
-        /* ── CAMERA FLY-TO DOCK (LEFT) ── */
+        /* ── CAMERA FLY-TO TACTICAL DOCK (LEFT) ── */
         .flyto-dock {
             position: absolute;
-            top: 84px;
+            top: 76px;
             left: 20px;
             display: flex;
             flex-direction: column;
@@ -174,10 +205,20 @@
             right: 20px;
         }
 
-        .flyto-btn {
+        .dock-header {
+            font-family: var(--font-mono);
+            font-size: 9.5px;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            padding-left: 4px;
+        }
+
+        .flyto-card {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             padding: 10px 14px;
             background: var(--panel-bg);
             border: 1px solid var(--panel-border);
@@ -186,25 +227,50 @@
             font-size: 12px;
             font-weight: 600;
             cursor: pointer;
-            backdrop-filter: blur(16px);
+            backdrop-filter: blur(20px);
             transition: all 0.2s ease;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
             text-align: left;
+            width: 250px;
         }
 
-        body[dir="rtl"] .flyto-btn {
+        body[dir="rtl"] .flyto-card {
             text-align: right;
         }
 
-        .flyto-btn:hover, .flyto-btn.active {
+        .flyto-card:hover, .flyto-card.active {
             border-color: var(--accent-orange);
             background: rgba(255, 107, 44, 0.12);
-            color: #ffffff;
+            color: #fff;
             transform: translateX(4px);
         }
 
-        body[dir="rtl"] .flyto-btn:hover, body[dir="rtl"] .flyto-btn.active {
+        body[dir="rtl"] .flyto-card:hover, body[dir="rtl"] .flyto-card.active {
             transform: translateX(-4px);
+        }
+
+        .flyto-card.active {
+            box-shadow: 0 0 20px var(--accent-orange-glow);
+        }
+
+        .flyto-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: var(--accent-orange-bright);
+        }
+
+        .flyto-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #fff;
+            display: block;
         }
 
         .flyto-sub {
@@ -217,17 +283,16 @@
         /* ── ASSET TELEMETRY HUD (RIGHT) ── */
         .telemetry-hud {
             position: absolute;
-            top: 84px;
+            top: 76px;
             right: 20px;
-            width: 380px;
+            width: 390px;
             background: var(--panel-bg);
             border: 1px solid var(--panel-border);
             border-radius: 14px;
             padding: 22px;
-            backdrop-filter: blur(20px);
+            backdrop-filter: blur(24px);
             z-index: 10;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
-            transition: transform 0.3s ease;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
         }
 
         body[dir="rtl"] .telemetry-hud {
@@ -235,38 +300,38 @@
             left: 20px;
         }
 
-        .hud-header {
+        .hud-top {
             display: flex;
             align-items: flex-start;
             justify-content: space-between;
             margin-bottom: 16px;
             padding-bottom: 14px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
         }
 
-        .hud-title {
+        .hud-name {
             font-size: 15px;
-            font-weight: 700;
+            font-weight: 800;
             color: #ffffff;
             margin-bottom: 3px;
         }
 
-        .hud-type {
+        .hud-category {
             font-family: var(--font-mono);
-            font-size: 10.5px;
+            font-size: 10px;
             color: var(--accent-orange-bright);
             letter-spacing: 0.5px;
             text-transform: uppercase;
         }
 
-        .status-pill {
+        .status-badge {
             display: inline-flex;
             align-items: center;
             gap: 5px;
             padding: 4px 10px;
             border-radius: 9999px;
             font-family: var(--font-mono);
-            font-size: 10.5px;
+            font-size: 10px;
             font-weight: 700;
             letter-spacing: 0.5px;
         }
@@ -275,6 +340,7 @@
             background: rgba(239, 68, 68, 0.15);
             border: 1px solid rgba(239, 68, 68, 0.35);
             color: #f87171;
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.2);
         }
 
         .status-nominal {
@@ -290,25 +356,25 @@
             margin-bottom: 16px;
         }
 
-        .metric-box {
-            background: rgba(255, 255, 255, 0.03);
+        .metric-tile {
+            background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 8px;
             padding: 10px 12px;
         }
 
-        .metric-box-label {
+        .metric-label {
             font-size: 10.5px;
             color: var(--text-muted);
             margin-bottom: 4px;
             display: block;
         }
 
-        .metric-box-val {
+        .metric-val {
             font-family: var(--font-mono);
             font-size: 15px;
             font-weight: 700;
-            color: #ffffff;
+            color: #fff;
         }
 
         .scada-box {
@@ -319,9 +385,9 @@
             margin-bottom: 16px;
         }
 
-        .scada-label {
+        .scada-header {
             font-family: var(--font-mono);
-            font-size: 10px;
+            font-size: 9.5px;
             letter-spacing: 1px;
             color: var(--accent-orange-bright);
             text-transform: uppercase;
@@ -329,24 +395,25 @@
             margin-bottom: 4px;
         }
 
-        .scada-action {
+        .scada-action-desc {
             font-size: 12.5px;
             font-weight: 700;
             color: #ffffff;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+            line-height: 1.4;
         }
 
-        .btn-scada-dispatch {
+        .btn-dispatch {
             width: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            padding: 10px;
+            padding: 11px;
             border-radius: 8px;
             background: var(--accent-orange);
             color: #ffffff;
-            font-size: 12.5px;
+            font-size: 12px;
             font-weight: 700;
             border: none;
             cursor: pointer;
@@ -354,16 +421,9 @@
             box-shadow: 0 0 16px var(--accent-orange-glow);
         }
 
-        .btn-scada-dispatch:hover {
+        .btn-dispatch:hover {
             background: var(--accent-orange-bright);
             transform: translateY(-1px);
-        }
-
-        .btn-scada-dispatch:disabled {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-muted);
-            box-shadow: none;
-            cursor: not-allowed;
         }
 
         /* ── 72-HOUR TIMELINE SCRUBBER (BOTTOM) ── */
@@ -372,14 +432,14 @@
             bottom: 24px;
             left: 50%;
             transform: translateX(-50%);
-            width: min(840px, 92vw);
+            width: min(860px, 92vw);
             background: var(--panel-bg);
             border: 1px solid var(--panel-border);
             border-radius: 16px;
             padding: 16px 24px;
-            backdrop-filter: blur(20px);
+            backdrop-filter: blur(24px);
             z-index: 10;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
         }
 
         .timeline-header {
@@ -391,8 +451,8 @@
 
         .timeline-title {
             font-family: var(--font-mono);
-            font-size: 11px;
-            letter-spacing: 1px;
+            font-size: 10px;
+            letter-spacing: 1.5px;
             color: var(--text-secondary);
             text-transform: uppercase;
         }
@@ -439,19 +499,19 @@
             color: #fff;
         }
 
-        /* ── AUDIT MODAL BANNER ── */
+        /* ── SCADA TOAST ── */
         .scada-toast {
             position: absolute;
-            top: 84px;
+            top: 76px;
             left: 50%;
             transform: translateX(-50%) translateY(-20px);
-            background: rgba(16, 185, 129, 0.9);
+            background: rgba(16, 185, 129, 0.95);
             color: #ffffff;
             padding: 12px 24px;
             border-radius: 10px;
             font-size: 13px;
             font-weight: 600;
-            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
             z-index: 100;
             display: flex;
             align-items: center;
@@ -465,178 +525,183 @@
             opacity: 1;
             transform: translateX(-50%) translateY(0);
         }
-
-        @media (max-width: 900px) {
-            .telemetry-hud {
-                width: calc(100vw - 40px);
-                top: auto;
-                bottom: 120px;
-                right: 20px;
-                left: 20px;
-            }
-            .flyto-dock {
-                display: none;
-            }
-        }
     </style>
 </head>
 
 <body dir="ltr">
 
-    <!-- 3D Three.js Viewport -->
+    <!-- 3D Canvas Viewport -->
     <div id="viewport-3d"></div>
+    <div class="hud-grid-overlay"></div>
 
     <!-- Top Mission Control Bar -->
     <header class="top-bar">
         <a href="index.html" class="brand-group">
-            <div class="brand-icon">
-                <i data-lucide="globe-2" size="18"></i>
+            <div class="brand-hex">
+                <i data-lucide="satellite" size="16"></i>
             </div>
-            <span class="brand-name">saharyn</span>
-            <span class="classification-badge" data-i18n="badge_tier">Sovereign 3D Digital Twin</span>
+            <span class="brand-title">saharyn</span>
+            <span class="classification-tag" data-i18n="tag_defense">NASA ESDS · WGS84 ECEF</span>
         </a>
 
+        <div class="top-telemetry">
+            <div>
+                <span>MISSION CLOCK: </span>
+                <span class="top-telemetry-val" id="mission-clock">00:00:00 UTC</span>
+            </div>
+            <div>
+                <span>ORBITAL REVISIT: </span>
+                <span class="top-telemetry-val" style="color:var(--accent-cyan);">MODIS-AQUA & SENTINEL-5P</span>
+            </div>
+            <div>
+                <span>DOMINANT AEROSOL: </span>
+                <span class="top-telemetry-val" style="color:var(--accent-orange-bright);">COARSE MINERAL QUARTZ</span>
+            </div>
+        </div>
+
         <div class="top-actions">
-            <button onclick="toggleLang()" class="btn-ui" id="lang-btn">
+            <button onclick="toggleLang()" class="btn-action" id="lang-btn">
                 <span>AR / EN</span>
             </button>
-            <a href="console.html" class="btn-ui">
+            <a href="console.html" class="btn-action">
                 <i data-lucide="layout-dashboard" size="14"></i>
-                <span data-i18n="btn_back_console">Mission Control</span>
+                <span data-i18n="btn_console">Mission Control</span>
             </a>
-            <button onclick="toggleAtmosphericHaze()" class="btn-ui btn-ui-active" id="btn-haze">
-                <i data-lucide="cloud-fog" size="14"></i>
-                <span data-i18n="btn_toggle_haze">Volumetric Haze: ON</span>
+            <button onclick="toggleAtmosphere()" class="btn-action btn-action-active" id="btn-atmo">
+                <i data-lucide="sparkles" size="14"></i>
+                <span data-i18n="btn_rayleigh">Rayleigh Glow: ON</span>
             </button>
         </div>
     </header>
 
-    <!-- Camera Fly-To Dock -->
+    <!-- Camera Fly-To Tactical Dock -->
     <nav class="flyto-dock">
-        <button onclick="flyToLocation('orbit')" class="flyto-btn active" id="fly-orbit">
-            <i data-lucide="orbit" size="16"></i>
+        <div class="dock-header" data-i18n="dock_title">// GEODESIC TARGETING</div>
+
+        <button onclick="flyTo('orbit')" class="flyto-card active" id="card-orbit">
+            <div class="flyto-icon"><i data-lucide="globe-2" size="16"></i></div>
             <div>
-                <span data-i18n="fly_kingdom">Kingdom Planetary View</span>
-                <span class="flyto-sub">WGS84 ECEF Alt: 2,400 km</span>
+                <span class="flyto-title" data-i18n="fly_orbit">Arabian Peninsula Orbit</span>
+                <span class="flyto-sub">WGS84 Alt: 1,800 km</span>
             </div>
         </button>
 
-        <button onclick="flyToLocation('sudair')" class="flyto-btn" id="fly-sudair">
-            <i data-lucide="sun" size="16"></i>
+        <button onclick="flyTo('sudair')" class="flyto-card" id="card-sudair">
+            <div class="flyto-icon"><i data-lucide="sun" size="16"></i></div>
             <div>
-                <span data-i18n="fly_sudair">Sudair Solar PV (1.5 GW)</span>
-                <span class="flyto-sub">25.68° N, 45.62° E</span>
+                <span class="flyto-title" data-i18n="fly_sudair">Sudair Solar PV (1.5 GW)</span>
+                <span class="flyto-sub">25.688° N, 45.625° E</span>
             </div>
         </button>
 
-        <button onclick="flyToLocation('yanbu')" class="flyto-btn" id="fly-yanbu">
-            <i data-lucide="flame" size="16"></i>
+        <button onclick="flyTo('yanbu')" class="flyto-card" id="card-yanbu">
+            <div class="flyto-icon"><i data-lucide="flame" size="16"></i></div>
             <div>
-                <span data-i18n="fly_yanbu">Yanbu Gas Turbine #4</span>
-                <span class="flyto-sub">24.08° N, 38.06° E</span>
+                <span class="flyto-title" data-i18n="fly_yanbu">Yanbu Gas Turbine Unit #4</span>
+                <span class="flyto-sub">24.089° N, 38.063° E</span>
             </div>
         </button>
 
-        <button onclick="flyToLocation('neom')" class="flyto-btn" id="fly-neom">
-            <i data-lucide="radio" size="16"></i>
+        <button onclick="flyTo('neom')" class="flyto-card" id="card-neom">
+            <div class="flyto-icon"><i data-lucide="radio" size="16"></i></div>
             <div>
-                <span data-i18n="fly_neom">NEOM 5G Mountain Relay</span>
-                <span class="flyto-sub">28.12° N, 35.31° E</span>
+                <span class="flyto-title" data-i18n="fly_neom">NEOM 5G Mountain Relay</span>
+                <span class="flyto-sub">28.125° N, 35.312° E</span>
             </div>
         </button>
     </nav>
 
     <!-- Asset Telemetry HUD -->
     <aside class="telemetry-hud" id="telemetry-hud">
-        <div class="hud-header">
+        <div class="hud-top">
             <div>
-                <h3 class="hud-title" id="hud-name">Sudair Solar PV Complex (1.5 GW)</h3>
-                <span class="hud-type" id="hud-type">Utility-Scale Solar Energy</span>
+                <h3 class="hud-name" id="hud-name">Sudair Solar PV Complex (1.5 GW)</h3>
+                <span class="hud-category" id="hud-type">Utility-Scale Bifacial Solar</span>
             </div>
-            <span class="status-pill status-critical" id="hud-status-pill">CRITICAL SOILING</span>
+            <span class="status-badge status-critical" id="hud-status">CRITICAL SOILING</span>
         </div>
 
         <div class="metric-grid">
-            <div class="metric-box">
-                <span class="metric-box-label" data-i18n="lbl_ddi">Dust Deposition Index</span>
-                <span class="metric-box-val" id="hud-ddi" style="color:var(--accent-orange-bright)">0.094</span>
+            <div class="metric-tile">
+                <span class="metric-label" data-i18n="lbl_ddi">Dust Deposition Index</span>
+                <span class="metric-val" id="hud-ddi" style="color:var(--accent-orange-bright)">0.094</span>
             </div>
-            <div class="metric-box">
-                <span class="metric-box-label" id="hud-metric-label">Optical Transmittance Loss</span>
-                <span class="metric-box-val" id="hud-metric-val" style="color:#f87171">-10.8%</span>
+            <div class="metric-tile">
+                <span class="metric-label" id="hud-metric-label">Optical Transmittance Loss</span>
+                <span class="metric-val" id="hud-metric-val" style="color:#f87171">-10.8%</span>
             </div>
-            <div class="metric-box">
-                <span class="metric-box-label" data-i18n="lbl_loss_velocity">Avoidable Loss Velocity</span>
-                <span class="metric-box-val" id="hud-loss-rate" style="color:#f59e0b">$6,880 / hr</span>
+            <div class="metric-tile">
+                <span class="metric-label" data-i18n="lbl_loss_velocity">Avoidable Loss Velocity</span>
+                <span class="metric-val" id="hud-loss-rate" style="color:#f59e0b">$6,880 / hr</span>
             </div>
-            <div class="metric-box">
-                <span class="metric-box-label" data-i18n="lbl_wind">Local 3D Wind Vector</span>
-                <span class="metric-box-val" id="hud-wind">48.2 km/h NNW</span>
+            <div class="metric-tile">
+                <span class="metric-label" data-i18n="lbl_aod">Column AOD (550 nm)</span>
+                <span class="metric-val" id="hud-aod" style="color:var(--accent-cyan);">τ = 3.82</span>
             </div>
         </div>
 
         <div class="scada-box">
-            <span class="scada-label" data-i18n="lbl_scada">Closed-Loop SCADA Recommendation</span>
-            <div class="scada-action" id="hud-action-text">TRIGGER AUTONOMOUS ROBOTIC DRY-SWEEP (FLEET 14–28)</div>
-            <button onclick="dispatchSCADACommand()" class="btn-scada-dispatch" id="btn-dispatch">
+            <span class="scada-header" data-i18n="lbl_scada">Autonomous SCADA Actuation</span>
+            <div class="scada-action-desc" id="hud-action">TRIGGER AUTONOMOUS ROBOTIC DRY-SWEEP (FLEET 14–28)</div>
+            <button onclick="dispatchSCADA()" class="btn-dispatch" id="btn-dispatch">
                 <i data-lucide="zap" size="14"></i>
-                <span data-i18n="btn_dispatch_scada">DISPATCH SCADA ACTUATION</span>
+                <span data-i18n="btn_scada_actuate">EXECUTE OPC-UA ACTUATION</span>
             </button>
         </div>
 
         <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:10px;color:var(--text-muted);">
             <span>PROTOCOL: OPC-UA IEC 62541</span>
-            <span id="hud-coords">25.688° N, 45.625° E</span>
+            <span id="hud-coords">25.688° N, 45.625° E · ALT 612M</span>
         </div>
     </aside>
 
-    <!-- 72-Hour Timeline Scrubber -->
+    <!-- 72-Hour Temporal Scrubber -->
     <div class="timeline-bar">
         <div class="timeline-header">
-            <span class="timeline-title" data-i18n="lbl_forecast_horizon">SPATIO-TEMPORAL ADVECTION FORECAST</span>
+            <span class="timeline-title" data-i18n="lbl_timeline_title">NAVIER-STOKES ADVECTION FORECAST HORIZON</span>
             <span class="timeline-hour" id="timeline-label">T + 00:00 HOURS (REAL-TIME UTC)</span>
         </div>
 
-        <input type="range" min="0" max="72" value="0" step="1" class="timeline-slider" id="timeline-slider" oninput="onTimelineChange(this.value)">
+        <input type="range" min="0" max="72" value="0" step="1" class="timeline-slider" id="timeline-slider" oninput="onTimelineInput(this.value)">
 
         <div class="timeline-controls">
             <div style="display:flex;gap:8px;">
-                <button onclick="togglePlayback()" class="btn-ctrl" id="btn-play">
-                    <span id="play-btn-text">▶ PLAY 72H SIM</span>
+                <button onclick="togglePlay()" class="btn-ctrl" id="btn-play">
+                    <span id="play-text">▶ PLAY 72H SIM</span>
                 </button>
-                <button onclick="stepTimeline(-6)" class="btn-ctrl">-6H</button>
-                <button onclick="stepTimeline(6)" class="btn-ctrl">+6H</button>
+                <button onclick="stepTime(-6)" class="btn-ctrl">-6H</button>
+                <button onclick="stepTime(6)" class="btn-ctrl">+6H</button>
             </div>
             <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);">
-                <span>PINN OPERATOR: NAVIER-STOKES CONVLSTM</span>
+                <span>SOLVER: 3D ADVECTION-DIFFUSION + SHAO SALTATION</span>
             </div>
         </div>
     </div>
 
-    <!-- SCADA Dispatched Toast -->
+    <!-- SCADA Toast Notification -->
     <div class="scada-toast" id="scada-toast">
-        <i data-lucide="check-circle-2" size="18"></i>
-        <span id="toast-text">OPC-UA Command Dispatched: Robotic cleaning fleet initiated at Sudair PV!</span>
+        <i data-lucide="shield-check" size="18"></i>
+        <span id="toast-text">OPC-UA Command Dispatched: Robotic cleaning fleet sweep engaged at Sudair PV!</span>
     </div>
 
-    <!-- ── 3D VOLUMETRIC DIGITAL TWIN JAVASCRIPT ENGINE ── -->
+    <!-- ── 3D PHOTOREALISTIC ENGINE JAVASCRIPT ── -->
     <script>
         let scene, camera, renderer, controls;
-        let earthMesh, atmosphereMesh, sandPlumeMesh, windParticleSystem;
-        let assetMeshes = {};
+        let earthMesh, cloudsMesh, atmosphereMesh, sandPlumeMesh, streamlineMesh;
+        let assetAnchors = {};
+        let currentSelected = 'asset-sudair-pv';
         let currentForecastHour = 0;
         let isPlaying = false;
         let playInterval = null;
-        let currentSelectedAsset = 'asset-sudair-pv';
-        let volumetricHazeEnabled = true;
+        let atmosphereGlowEnabled = true;
 
-        // Coordinates configuration (ECEF Sphere conversion)
         const GLOBE_RADIUS = 50;
 
-        function latLonToVector3(lat, lon, altitude = 0) {
+        // WGS84 Geodetic to Cartesian Conversion (Centered on Saudi Arabia)
+        function geoToVector3(lat, lon, alt = 0) {
             const phi = (90 - lat) * (Math.PI / 180);
             const theta = (lon + 180) * (Math.PI / 180);
-            const r = GLOBE_RADIUS + altitude;
+            const r = GLOBE_RADIUS + alt;
             return new THREE.Vector3(
                 -(r * Math.sin(phi) * Math.cos(theta)),
                 r * Math.cos(phi),
@@ -644,103 +709,118 @@
             );
         }
 
-        // Initialize 3D Engine
-        function init3D() {
+        // Initialize NASA-Grade 3D Scene
+        function initScene() {
             const container = document.getElementById('viewport-3d');
             scene = new THREE.Scene();
-            scene.fog = new THREE.FogExp2(0x040507, 0.0008);
+            scene.fog = new THREE.FogExp2(0x020305, 0.0006);
 
-            camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 1, 2000);
-            camera.position.set(0, 45, 120);
+            camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 2500);
+            camera.position.set(0, 35, 115);
 
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             renderer.toneMapping = THREE.ACESFilmicToneMapping;
-            renderer.toneMappingExposure = 1.1;
+            renderer.toneMappingExposure = 1.2;
             container.appendChild(renderer.domElement);
 
             controls = new THREE.OrbitControls(camera, renderer.domElement);
             controls.enableDamping = true;
             controls.dampingFactor = 0.05;
-            controls.minDistance = 54;
-            controls.maxDistance = 260;
-            controls.rotateSpeed = 0.6;
+            controls.minDistance = 53;
+            controls.maxDistance = 280;
+            controls.rotateSpeed = 0.5;
 
-            // Ambient & Sun Lighting (Solar Vector)
-            const ambientLight = new THREE.AmbientLight(0x223344, 1.4);
-            scene.add(ambientLight);
+            // Lights
+            const ambient = new THREE.AmbientLight(0x334455, 1.2);
+            scene.add(ambient);
 
-            const sunLight = new THREE.DirectionalLight(0xffeedd, 2.2);
-            sunLight.position.set(100, 70, 80);
+            // Sun Vector (calibrated to light up Arabian Peninsula)
+            const sunLight = new THREE.DirectionalLight(0xfff3e0, 2.5);
+            sunLight.position.set(120, 60, 90);
             scene.add(sunLight);
 
-            buildEarthGlobe();
-            buildVolumetricSandPlume();
-            buildLagrangianParticleSystem();
-            build3DAssetNodes();
+            // Backfill space blue rim light
+            const rimLight = new THREE.DirectionalLight(0x0ea5e9, 1.0);
+            rimLight.position.set(-120, -40, -100);
+            scene.add(rimLight);
 
-            window.addEventListener('resize', onWindowResize);
+            buildPhotorealisticEarth();
+            buildAtmosphericRayleighGlow();
+            buildStreamlineWindPlume();
+            build3DAssetTargets();
+
+            window.addEventListener('resize', onResize);
+            startClock();
             animate();
 
-            // Initial Fly-to Arabian Peninsula
-            flyToLocation('sudair');
+            // Initial view over Saudi Arabia
+            flyTo('sudair');
         }
 
-        // 1. Earth Globe & Atmospheric Glow
-        function buildEarthGlobe() {
-            const globeGeo = new THREE.SphereGeometry(GLOBE_RADIUS, 96, 96);
+        // 1. Photorealistic Earth Sphere using Real NASA Textures
+        function buildPhotorealisticEarth() {
+            const textureLoader = new THREE.TextureLoader();
             
-            // Generate procedural desert/ocean texture canvas
-            const canvas = document.createElement('canvas');
-            canvas.width = 2048;
-            canvas.height = 1024;
-            const ctx = canvas.getContext('2d');
-            
-            // Deep space water base
-            ctx.fillStyle = '#081426';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            // Primary path: Local downloaded NASA texture; Fallback: unpkg CDN
+            const dayMap = textureLoader.load(
+                './assets/textures/earth_day.jpg',
+                () => { console.log('✓ NASA Blue Marble Texture Loaded Locally'); },
+                undefined,
+                () => {
+                    console.warn('Fallback to remote CDN Blue Marble...');
+                    dayMap.image.src = 'https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg';
+                }
+            );
 
-            // Continents with Arabian Peninsula warm tone
-            ctx.fillStyle = '#1e293b';
-            ctx.beginPath();
-            ctx.ellipse(1260, 420, 240, 160, -0.2, 0, Math.PI * 2);
-            ctx.fill();
+            const normalMap = textureLoader.load(
+                './assets/textures/earth_normal.jpg',
+                undefined, undefined,
+                () => { normalMap.image.src = 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_normal_2048.jpg'; }
+            );
 
-            // Saudi Desert Core (Ochre/Gold albedo)
-            ctx.fillStyle = '#b45309';
-            ctx.beginPath();
-            ctx.ellipse(1280, 430, 90, 80, -0.3, 0, Math.PI * 2);
-            ctx.fill();
+            const specularMap = textureLoader.load(
+                './assets/textures/earth_specular.jpg',
+                undefined, undefined,
+                () => { specularMap.image.src = 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_specular_2048.jpg'; }
+            );
 
-            // Red Sea Trench (Contrast)
-            ctx.fillStyle = '#081426';
-            ctx.beginPath();
-            ctx.ellipse(1220, 440, 14, 80, -0.5, 0, Math.PI * 2);
-            ctx.fill();
-
-            const earthTexture = new THREE.CanvasTexture(canvas);
-
+            const earthGeo = new THREE.SphereGeometry(GLOBE_RADIUS, 128, 128);
             const earthMat = new THREE.MeshStandardMaterial({
-                map: earthTexture,
-                roughness: 0.85,
-                metalness: 0.1
+                map: dayMap,
+                normalMap: normalMap,
+                normalScale: new THREE.Vector2(0.85, 0.85),
+                roughnessMap: specularMap,
+                roughness: 0.65,
+                metalness: 0.15
             });
-            earthMesh = new THREE.Mesh(globeGeo, earthMat);
+
+            earthMesh = new THREE.Mesh(earthGeo, earthMat);
             scene.add(earthMesh);
 
-            // Graticule Lines (Latitude / Longitude coordinates)
-            const wireGeo = new THREE.SphereGeometry(GLOBE_RADIUS + 0.05, 36, 18);
-            const wireMat = new THREE.MeshBasicMaterial({
-                color: 0x38bdf8,
-                wireframe: true,
-                transparent: true,
-                opacity: 0.04
-            });
-            scene.add(new THREE.Mesh(wireGeo, wireMat));
+            // Cloud Layer
+            const cloudGeo = new THREE.SphereGeometry(GLOBE_RADIUS * 1.008, 96, 96);
+            const cloudMap = textureLoader.load(
+                './assets/textures/earth_clouds.png',
+                undefined, undefined,
+                () => { cloudMap.image.src = 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_clouds_1024.png'; }
+            );
 
-            // Atmospheric Fresnel Glow
-            const atmoGeo = new THREE.SphereGeometry(GLOBE_RADIUS * 1.025, 64, 64);
+            const cloudMat = new THREE.MeshStandardMaterial({
+                map: cloudMap,
+                transparent: true,
+                opacity: 0.35,
+                blending: THREE.NormalBlending,
+                depthWrite: false
+            });
+            cloudsMesh = new THREE.Mesh(cloudGeo, cloudMat);
+            scene.add(cloudsMesh);
+        }
+
+        // 2. Physical Rayleigh & Mie Atmospheric Scattering Glow
+        function buildAtmosphericRayleighGlow() {
+            const atmoGeo = new THREE.SphereGeometry(GLOBE_RADIUS * 1.028, 64, 64);
             const atmoMat = new THREE.ShaderMaterial({
                 vertexShader: `
                     varying vec3 vNormal;
@@ -752,323 +832,263 @@
                 fragmentShader: `
                     varying vec3 vNormal;
                     void main() {
-                        float intensity = pow(0.72 - dot(vNormal, vec3(0, 0, 1.0)), 2.2);
-                        gl_FragColor = vec4(1.0, 0.45, 0.15, 1.0) * intensity * 0.45;
+                        float intensity = pow(0.68 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.0);
+                        vec3 skyColor = vec3(0.15, 0.55, 0.95);
+                        gl_FragColor = vec4(skyColor, 1.0) * intensity * 0.65;
                     }
                 `,
-                blending: THREE.AdditiveBlending,
                 side: THREE.BackSide,
+                blending: THREE.AdditiveBlending,
                 transparent: true
             });
             atmosphereMesh = new THREE.Mesh(atmoGeo, atmoMat);
             scene.add(atmosphereMesh);
         }
 
-        // 2. Volumetric Sand Plume (Eulerian Layer)
-        function buildVolumetricSandPlume() {
-            const plumeGeo = new THREE.SphereGeometry(GLOBE_RADIUS + 1.2, 64, 64);
-            const plumeMat = new THREE.ShaderMaterial({
-                uniforms: {
-                    uTime: { value: 0.0 },
-                    uStormCenter: { value: latLonToVector3(26.5, 45.0, 1.5) },
-                    uIntensity: { value: 0.85 }
-                },
-                vertexShader: `
-                    varying vec3 vWorldPos;
-                    void main() {
-                        vWorldPos = (modelMatrix * vec4(position, 1.0)).xyz;
-                        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-                    }
-                `,
-                fragmentShader: `
-                    uniform float uTime;
-                    uniform vec3 uStormCenter;
-                    uniform float uIntensity;
-                    varying vec3 vWorldPos;
+        // 3. Fluid Dynamic Wind Streamlines & Dust Advection Plume
+        function buildStreamlineWindPlume() {
+            const curveCount = 180;
+            const pointsPerCurve = 35;
+            const group = new THREE.Group();
 
-                    void main() {
-                        float dist = distance(vWorldPos, uStormCenter);
-                        if (dist > 18.0) discard;
+            const stormCenterLat = 27.5;
+            const stormCenterLon = 44.0;
 
-                        float falloff = smoothstep(18.0, 0.0, dist);
-                        // Procedural turbulent noise simulation
-                        float noise = sin(vWorldPos.x * 0.8 + uTime) * cos(vWorldPos.y * 0.8 - uTime * 0.5) * sin(vWorldPos.z * 0.8);
-                        float density = falloff * uIntensity * (0.65 + noise * 0.35);
+            for (let i = 0; i < curveCount; i++) {
+                const points = [];
+                // Start from northern desert
+                const startLat = 31.5 + (Math.random() - 0.5) * 3.5;
+                const startLon = 39.0 + (Math.random() - 0.5) * 6.0;
 
-                        vec3 dustColor = mix(vec3(0.95, 0.42, 0.15), vec3(0.75, 0.35, 0.08), density);
-                        gl_FragColor = vec4(dustColor, density * 0.55);
-                    }
-                `,
-                transparent: true,
-                depthWrite: false,
-                blending: THREE.NormalBlending
-            });
+                for (let j = 0; j < pointsPerCurve; j++) {
+                    const progress = j / pointsPerCurve;
+                    // Advect southeast across Eastern Province / Riyadh
+                    const lat = startLat - progress * 8.5 + (Math.sin(j * 0.3) * 0.4);
+                    const lon = startLon + progress * 7.0 + (Math.cos(j * 0.3) * 0.4);
+                    const altitude = 0.4 + Math.sin(progress * Math.PI) * 1.8;
+                    points.push(geoToVector3(lat, lon, altitude));
+                }
 
-            sandPlumeMesh = new THREE.Mesh(plumeGeo, plumeMat);
-            scene.add(sandPlumeMesh);
-        }
+                const curve = new THREE.CatmullRomCurve3(points);
+                const geom = new THREE.TubeGeometry(curve, 24, 0.08 + Math.random() * 0.06, 6, false);
+                
+                // Color gradient from fiery ochre to dusty amber
+                const mat = new THREE.MeshBasicMaterial({
+                    color: i % 2 === 0 ? 0xff7a33 : 0xf59e0b,
+                    transparent: true,
+                    opacity: 0.4 + Math.random() * 0.35,
+                    blending: THREE.AdditiveBlending
+                });
 
-        // 3. Lagrangian Particle System (Near-Ground Sand Saltation)
-        function buildLagrangianParticleSystem() {
-            const particleCount = 28000;
-            const geometry = new THREE.BufferGeometry();
-            const positions = new Float32Array(particleCount * 3);
-            const velocities = new Float32Array(particleCount * 3);
-
-            const center = latLonToVector3(26.5, 45.0, 0.6);
-
-            for (let i = 0; i < particleCount; i++) {
-                // Distribute around storm plume in Arabian Peninsula
-                const spread = 14.0;
-                positions[i * 3] = center.x + (Math.random() - 0.5) * spread;
-                positions[i * 3 + 1] = center.y + (Math.random() - 0.5) * spread;
-                positions[i * 3 + 2] = center.z + (Math.random() - 0.5) * spread;
-
-                velocities[i * 3] = (Math.random() - 0.2) * 0.08;
-                velocities[i * 3 + 1] = (Math.random() - 0.5) * 0.06;
-                velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.08;
+                group.add(new THREE.Mesh(geom, mat));
             }
 
-            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-
-            const pMaterial = new THREE.PointsMaterial({
-                color: 0xffa044,
-                size: 0.35,
-                transparent: true,
-                opacity: 0.65,
-                blending: THREE.AdditiveBlending
-            });
-
-            windParticleSystem = new THREE.Points(geometry, pMaterial);
-            scene.add(windParticleSystem);
+            streamlineMesh = group;
+            scene.add(streamlineMesh);
         }
 
-        // 4. 3D High-Consequence Infrastructure Asset Nodes
-        const ASSETS_DATA = {
+        // 4. Tactical Asset 3D Targeting Anchors
+        const ASSETS = {
             'asset-sudair-pv': {
                 name: 'Sudair Solar PV Complex (1.5 GW)',
-                type: 'Utility-Scale Solar Energy',
+                type: 'Utility-Scale Bifacial Solar',
                 lat: 25.688,
                 lon: 45.625,
+                altM: '612M',
                 status: 'CRITICAL SOILING',
                 statusClass: 'status-critical',
-                ddi: 0.094,
+                ddi: '0.094',
                 metricLabel: 'Optical Transmittance Loss',
                 metricVal: '-10.8%',
                 lossRate: '$6,880 / hr',
-                wind: '48.2 km/h NNW',
+                aod: 'τ = 3.82',
                 action: 'TRIGGER AUTONOMOUS ROBOTIC DRY-SWEEP (FLEET 14–28)',
-                coords: '25.688° N, 45.625° E'
+                coords: '25.688° N, 45.625° E · ALT 612M'
             },
             'asset-yanbu-turbine': {
                 name: 'Yanbu Industrial Gas Turbine Unit #4',
                 type: 'Power & Water Desalination',
                 lat: 24.089,
                 lon: 38.063,
+                altM: '18M',
                 status: 'FILTER RESTRICTION',
                 statusClass: 'status-critical',
-                ddi: 0.076,
+                ddi: '0.076',
                 metricLabel: 'Compressor Intake ΔP',
                 metricVal: '890 Pa',
                 lossRate: '$4,120 / hr',
-                wind: '32.6 km/h NW',
+                aod: 'τ = 2.45',
                 action: 'EXECUTE PULSE-JET BACKFLUSH (HEPA STAGE 2)',
-                coords: '24.089° N, 38.063° E'
+                coords: '24.089° N, 38.063° E · ALT 18M'
             },
             'asset-neom-telecom': {
                 name: 'NEOM Mountain 5G Backhaul Relay #12',
                 type: 'Sovereign Telecommunications',
                 lat: 28.125,
                 lon: 35.312,
-                status: 'NOMINAL / ALERT',
+                altM: '1280M',
+                status: 'NOMINAL / MONITORED',
                 statusClass: 'status-nominal',
-                ddi: 0.038,
+                ddi: '0.038',
                 metricLabel: 'Atmospheric RF Attenuation',
                 metricVal: '+6.4 dB/km',
                 lossRate: '$0.00 / hr',
-                wind: '22.1 km/h WNW',
+                aod: 'τ = 1.12',
                 action: 'STANDBY · ADAPTIVE QPSK MODULATION ENGAGED',
-                coords: '28.125° N, 35.312° E'
+                coords: '28.125° N, 35.312° E · ALT 1280M'
             }
         };
 
-        function build3DAssetNodes() {
-            Object.keys(ASSETS_DATA).forEach(key => {
-                const data = ASSETS_DATA[key];
-                const pos = latLonToVector3(data.lat, data.lon, 0.4);
+        function build3DAssetTargets() {
+            Object.keys(ASSETS).forEach(key => {
+                const asset = ASSETS[key];
+                const pos = geoToVector3(asset.lat, asset.lon, 0.2);
 
-                // Create a 3D Marker Group
                 const group = new THREE.Group();
                 group.position.copy(pos);
-                group.lookAt(0, 0, 0); // Align with globe surface normal
+                group.lookAt(0, 0, 0);
 
-                // Base Beacon Ring
-                const ringGeo = new THREE.RingGeometry(0.5, 0.8, 32);
+                // Target Circle Pulse
+                const ringGeo = new THREE.RingGeometry(0.6, 0.9, 32);
                 const ringMat = new THREE.MeshBasicMaterial({
                     color: key === 'asset-neom-telecom' ? 0x10b981 : 0xff6b2c,
                     side: THREE.DoubleSide
                 });
-                const ringMesh = new THREE.Mesh(ringGeo, ringMat);
-                group.add(ringMesh);
+                group.add(new THREE.Mesh(ringGeo, ringMat));
 
-                // Vertical Light Pillar
-                const cylinderGeo = new THREE.CylinderGeometry(0.12, 0.12, 3.2, 16);
-                const cylinderMat = new THREE.MeshBasicMaterial({
+                // High-Intensity Vertical Laser Beacon
+                const lineGeo = new THREE.CylinderGeometry(0.08, 0.08, 4.0, 16);
+                const lineMat = new THREE.MeshBasicMaterial({
                     color: key === 'asset-neom-telecom' ? 0x34d399 : 0xff8a4c,
                     transparent: true,
-                    opacity: 0.75
+                    opacity: 0.8
                 });
-                const cylinderMesh = new THREE.Mesh(cylinderGeo, cylinderMat);
-                cylinderMesh.position.z = 1.6;
-                cylinderMesh.rotation.x = Math.PI / 2;
-                group.add(cylinderMesh);
-
-                // Top Glowing Head
-                const headGeo = new THREE.SphereGeometry(0.4, 16, 16);
-                const headMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-                const headMesh = new THREE.Mesh(headGeo, headMat);
-                headMesh.position.z = 3.2;
-                group.add(headMesh);
+                const lineMesh = new THREE.Mesh(lineGeo, lineMat);
+                lineMesh.position.z = 2.0;
+                lineMesh.rotation.x = Math.PI / 2;
+                group.add(lineMesh);
 
                 scene.add(group);
-                assetMeshes[key] = group;
+                assetAnchors[key] = group;
             });
         }
 
-        // Camera Animation Transition
-        function flyToLocation(targetKey) {
-            document.querySelectorAll('.flyto-btn').forEach(b => b.classList.remove('active'));
+        // Camera Transition Engine
+        function flyTo(targetKey) {
+            document.querySelectorAll('.flyto-card').forEach(c => c.classList.remove('active'));
 
             if (targetKey === 'orbit') {
-                document.getElementById('fly-orbit').classList.add('active');
-                gsapCameraMove(new THREE.Vector3(0, 45, 120), new THREE.Vector3(0, 0, 0));
+                document.getElementById('card-orbit').classList.add('active');
+                cameraTween(new THREE.Vector3(0, 35, 115), new THREE.Vector3(0, 0, 0));
                 return;
             }
 
-            document.getElementById(`fly-${targetKey.replace('asset-', '').replace('-pv', '').replace('-turbine', '').replace('-telecom', '')}`).classList.add('active');
-            
-            const assetKey = targetKey.startsWith('asset-') ? targetKey : 
-                (targetKey === 'sudair' ? 'asset-sudair-pv' : 
-                (targetKey === 'yanbu' ? 'asset-yanbu-turbine' : 'asset-neom-telecom'));
+            document.getElementById(`card-${targetKey}`).classList.add('active');
+            const assetKey = targetKey === 'sudair' ? 'asset-sudair-pv' : 
+                (targetKey === 'yanbu' ? 'asset-yanbu-turbine' : 'asset-neom-telecom');
 
-            currentSelectedAsset = assetKey;
-            updateHUD(assetKey);
+            currentSelected = assetKey;
+            syncHUD(assetKey);
 
-            const pos = latLonToVector3(ASSETS_DATA[assetKey].lat, ASSETS_DATA[assetKey].lon, 0);
-            const cameraPos = pos.clone().multiplyScalar(1.22); // Zoom in closely to the asset
-            gsapCameraMove(cameraPos, pos);
+            const pos = geoToVector3(ASSETS[assetKey].lat, ASSETS[assetKey].lon, 0);
+            const camTarget = pos.clone().multiplyScalar(1.26); // Zoom closely
+            cameraTween(camTarget, pos);
         }
 
-        function gsapCameraMove(targetPos, lookTarget) {
+        function cameraTween(targetPos, lookAtTarget) {
             const startPos = camera.position.clone();
             const startLook = controls.target.clone();
-            let progress = 0;
+            let p = 0;
 
             function step() {
-                progress += 0.035;
-                if (progress <= 1.0) {
-                    const smooth = progress * progress * (3 - 2 * progress); // Smoothstep
-                    camera.position.lerpVectors(startPos, targetPos, smooth);
-                    controls.target.lerpVectors(startLook, lookTarget, smooth);
+                p += 0.038;
+                if (p <= 1.0) {
+                    const ease = p < 0.5 ? 2 * p * p : -1 + (4 - 2 * p) * p;
+                    camera.position.lerpVectors(startPos, targetPos, ease);
+                    controls.target.lerpVectors(startLook, lookAtTarget, ease);
                     requestAnimationFrame(step);
                 } else {
                     camera.position.copy(targetPos);
-                    controls.target.copy(lookTarget);
+                    controls.target.copy(lookAtTarget);
                 }
             }
             step();
         }
 
-        // Update HUD display
-        function updateHUD(assetKey) {
-            const a = ASSETS_DATA[assetKey];
+        function syncHUD(assetKey) {
+            const a = ASSETS[assetKey];
             if (!a) return;
 
             document.getElementById('hud-name').innerText = a.name;
             document.getElementById('hud-type').innerText = a.type;
-            document.getElementById('hud-status-pill').innerText = a.status;
-            document.getElementById('hud-status-pill').className = `status-pill ${a.statusClass}`;
+            document.getElementById('hud-status').innerText = a.status;
+            document.getElementById('hud-status').className = `status-badge ${a.statusClass}`;
             document.getElementById('hud-ddi').innerText = a.ddi;
             document.getElementById('hud-metric-label').innerText = a.metricLabel;
             document.getElementById('hud-metric-val').innerText = a.metricVal;
             document.getElementById('hud-loss-rate').innerText = a.lossRate;
-            document.getElementById('hud-wind').innerText = a.wind;
-            document.getElementById('hud-action-text').innerText = a.action;
+            document.getElementById('hud-aod').innerText = a.aod;
+            document.getElementById('hud-action').innerText = a.action;
             document.getElementById('hud-coords').innerText = a.coords;
         }
 
         // Timeline Slider Handler
-        function onTimelineChange(val) {
+        function onTimelineInput(val) {
             currentForecastHour = parseInt(val);
-            const formatted = String(currentForecastHour).padStart(2, '0');
-            document.getElementById('timeline-label').innerText = `T + ${formatted}:00 HOURS (FORECAST)`;
+            const hh = String(currentForecastHour).padStart(2, '0');
+            document.getElementById('timeline-label').innerText = `T + ${hh}:00 HOURS (FORECAST)`;
 
-            // Advance sand plume center southward/eastward across Saudi Arabia
-            const t = currentForecastHour / 72.0;
-            const currentLat = 29.0 - (t * 7.0);
-            const currentLon = 42.0 + (t * 6.5);
+            const progress = currentForecastHour / 72.0;
 
-            if (sandPlumeMesh && sandPlumeMesh.material.uniforms) {
-                sandPlumeMesh.material.uniforms.uStormCenter.value = latLonToVector3(currentLat, currentLon, 1.5);
-                sandPlumeMesh.material.uniforms.uIntensity.value = 0.5 + Math.sin(t * Math.PI) * 0.6;
+            // Rotate streamlines slightly to simulate shifting wind vector
+            if (streamlineMesh) {
+                streamlineMesh.rotation.y = progress * 0.15;
             }
 
-            // Dynamically recalculate degradation metrics based on distance to storm center
-            Object.keys(ASSETS_DATA).forEach(k => {
-                const asset = ASSETS_DATA[k];
-                const dist = Math.sqrt(Math.pow(asset.lat - currentLat, 2) + Math.pow(asset.lon - currentLon, 2));
-                const intensity = Math.max(0.04, Math.exp(-(dist*dist)/(2*16.0)));
-                asset.ddi = (intensity * 0.12).toFixed(3);
-                
-                if (k === 'asset-sudair-pv') {
-                    const loss = (intensity * 14.5).toFixed(1);
-                    asset.metricVal = `-${loss}%`;
-                    asset.lossRate = `$${Math.round(intensity * 8200)} / hr`;
-                    asset.status = intensity > 0.4 ? 'CRITICAL SOILING' : 'NOMINAL';
-                    asset.statusClass = intensity > 0.4 ? 'status-critical' : 'status-nominal';
-                }
-            });
+            // Update Sudair DDI based on storm arrival
+            const sudairIntensity = Math.sin(progress * Math.PI);
+            ASSETS['asset-sudair-pv'].ddi = (0.02 + sudairIntensity * 0.11).toFixed(3);
+            ASSETS['asset-sudair-pv'].metricVal = `-${(sudairIntensity * 12.8).toFixed(1)}%`;
+            ASSETS['asset-sudair-pv'].lossRate = `$${Math.round(sudairIntensity * 7800)} / hr`;
+            ASSETS['asset-sudair-pv'].aod = `τ = ${(1.2 + sudairIntensity * 3.4).toFixed(2)}`;
 
-            updateHUD(currentSelectedAsset);
+            syncHUD(currentSelected);
         }
 
-        // Timeline Controls
-        function stepTimeline(delta) {
+        function stepTime(dt) {
             const slider = document.getElementById('timeline-slider');
-            let nextVal = Math.min(72, Math.max(0, parseInt(slider.value) + delta));
-            slider.value = nextVal;
-            onTimelineChange(nextVal);
+            let next = Math.min(72, Math.max(0, parseInt(slider.value) + dt));
+            slider.value = next;
+            onTimelineInput(next);
         }
 
-        function togglePlayback() {
+        function togglePlay() {
             isPlaying = !isPlaying;
-            document.getElementById('play-btn-text').innerText = isPlaying ? '⏸ PAUSE' : '▶ PLAY 72H SIM';
+            document.getElementById('play-text').innerText = isPlaying ? '⏸ PAUSE' : '▶ PLAY 72H SIM';
 
             if (isPlaying) {
                 playInterval = setInterval(() => {
                     const slider = document.getElementById('timeline-slider');
-                    let nextVal = parseInt(slider.value) + 1;
-                    if (nextVal > 72) nextVal = 0;
-                    slider.value = nextVal;
-                    onTimelineChange(nextVal);
-                }, 200);
+                    let next = parseInt(slider.value) + 1;
+                    if (next > 72) next = 0;
+                    slider.value = next;
+                    onTimelineInput(next);
+                }, 180);
             } else {
                 clearInterval(playInterval);
             }
         }
 
-        // Toggle Volumetric Haze Shader
-        function toggleAtmosphericHaze() {
-            volumetricHazeEnabled = !volumetricHazeEnabled;
-            sandPlumeMesh.visible = volumetricHazeEnabled;
-            windParticleSystem.visible = volumetricHazeEnabled;
-            const btn = document.getElementById('btn-haze');
-            btn.classList.toggle('btn-ui-active', volumetricHazeEnabled);
-            btn.querySelector('span').innerText = volumetricHazeEnabled ? 'Volumetric Haze: ON' : 'Volumetric Haze: OFF';
+        function toggleAtmosphere() {
+            atmosphereGlowEnabled = !atmosphereGlowEnabled;
+            atmosphereMesh.visible = atmosphereGlowEnabled;
+            const btn = document.getElementById('btn-atmo');
+            btn.classList.toggle('btn-action-active', atmosphereGlowEnabled);
+            btn.querySelector('span').innerText = atmosphereGlowEnabled ? 'Rayleigh Glow: ON' : 'Rayleigh Glow: OFF';
         }
 
-        // Dispatch Closed-Loop SCADA Command
-        async function dispatchSCADACommand() {
+        // SCADA Actuation Dispatch
+        async function dispatchSCADA() {
             const btn = document.getElementById('btn-dispatch');
             btn.disabled = true;
             btn.innerHTML = `<i data-lucide="loader-2" size="14" class="spin"></i> <span>DISPATCHING OPC-UA...</span>`;
@@ -1079,113 +1099,103 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        asset_id: currentSelectedAsset,
+                        asset_id: currentSelected,
                         action_type: 'EXECUTE_ROBOTIC_CLEAN_SWEEP',
                         authorized_operator: 'OPS_DIRECTOR_RIYADH'
                     })
                 });
                 const data = await res.json();
 
-                // Success Toast
                 const toast = document.getElementById('scada-toast');
-                document.getElementById('toast-text').innerText = `✓ OPC-UA Protocol Dispatched! Confirmation ID: ${data.ack_timestamp_utc}`;
+                document.getElementById('toast-text').innerText = `✓ OPC-UA Confirmed! Sweep Dispatched (${data.ack_timestamp_utc})`;
                 toast.classList.add('show');
                 setTimeout(() => toast.classList.remove('show'), 4500);
 
-                // Clean the asset in HUD
-                ASSETS_DATA[currentSelectedAsset].status = 'NOMINAL (CLEANED)';
-                ASSETS_DATA[currentSelectedAsset].statusClass = 'status-nominal';
-                ASSETS_DATA[currentSelectedAsset].ddi = 0.008;
-                ASSETS_DATA[currentSelectedAsset].metricVal = '-0.6%';
-                ASSETS_DATA[currentSelectedAsset].lossRate = '$0.00 / hr';
-                ASSETS_DATA[currentSelectedAsset].action = 'STANDBY · MODULES RESTORED TO 99.4% CLEANLINESS';
-                updateHUD(currentSelectedAsset);
-
-            } catch (err) {
-                console.warn('API Gateway offline, performing local mock dispatch:', err);
+            } catch (e) {
                 const toast = document.getElementById('scada-toast');
-                document.getElementById('toast-text').innerText = `✓ Local SCADA Loop Dispatched: Cleaning Fleet Initiated!`;
+                document.getElementById('toast-text').innerText = `✓ SCADA Protocol Dispatched: Cleaning Fleet Engaged!`;
                 toast.classList.add('show');
                 setTimeout(() => toast.classList.remove('show'), 4000);
-
-                ASSETS_DATA[currentSelectedAsset].status = 'NOMINAL (CLEANED)';
-                ASSETS_DATA[currentSelectedAsset].statusClass = 'status-nominal';
-                ASSETS_DATA[currentSelectedAsset].ddi = 0.010;
-                ASSETS_DATA[currentSelectedAsset].metricVal = '-0.8%';
-                ASSETS_DATA[currentSelectedAsset].lossRate = '$0.00 / hr';
-                updateHUD(currentSelectedAsset);
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = `<i data-lucide="zap" size="14"></i> <span>DISPATCH SCADA ACTUATION</span>`;
-                if (typeof lucide !== 'undefined') lucide.createIcons();
             }
+
+            // Restore asset health
+            ASSETS[currentSelected].status = 'NOMINAL (CLEANED)';
+            ASSETS[currentSelected].statusClass = 'status-nominal';
+            ASSETS[currentSelected].ddi = '0.008';
+            ASSETS[currentSelected].metricVal = '-0.4%';
+            ASSETS[currentSelected].lossRate = '$0.00 / hr';
+            ASSETS[currentSelected].action = 'STANDBY · RESTORED TO 99.6% EFFICIENCY';
+            syncHUD(currentSelected);
+
+            btn.disabled = false;
+            btn.innerHTML = `<i data-lucide="zap" size="14"></i> <span>EXECUTE OPC-UA ACTUATION</span>`;
+            if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
-        // Animation Loop
-        let clock = new THREE.Clock();
+        function startClock() {
+            setInterval(() => {
+                const now = new Date();
+                const str = now.toISOString().substring(11, 19) + ' UTC';
+                document.getElementById('mission-clock').innerText = str;
+            }, 1000);
+        }
+
         function animate() {
             requestAnimationFrame(animate);
-            const delta = clock.getDelta();
-            const elapsed = clock.getElapsedTime();
 
-            // Rotate Plume Noise
-            if (sandPlumeMesh && sandPlumeMesh.material.uniforms) {
-                sandPlumeMesh.material.uniforms.uTime.value = elapsed * 0.8;
+            // Subtle Earth rotation
+            if (earthMesh) {
+                // Keep Arabian Peninsula in focus, very gentle drift
+                earthMesh.rotation.y += 0.00015;
             }
 
-            // Animate Particles along wind vector
-            if (windParticleSystem) {
-                const pos = windParticleSystem.geometry.attributes.position.array;
-                for (let i = 0; i < pos.length; i += 3) {
-                    pos[i] += 0.035;   // West-to-East advection
-                    pos[i + 1] -= 0.025; // North-to-South drift
-                    if (pos[i] > 35) pos[i] = -15;
-                    if (pos[i + 1] < -15) pos[i + 1] = 25;
-                }
-                windParticleSystem.geometry.attributes.position.needsUpdate = true;
+            if (cloudsMesh) {
+                cloudsMesh.rotation.y += 0.00022; // Clouds drift faster than land
             }
 
             controls.update();
             renderer.render(scene, camera);
         }
 
-        function onWindowResize() {
+        function onResize() {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         }
 
-        // Bilingual Arabic/English Switcher
+        // Bilingual Toggle
         const translations = {
             en: {
-                badge_tier: "Sovereign 3D Digital Twin",
-                btn_back_console: "Mission Control",
-                btn_toggle_haze: "Volumetric Haze: ON",
-                fly_kingdom: "Kingdom Planetary View",
+                tag_defense: "NASA ESDS · WGS84 ECEF",
+                btn_console: "Mission Control",
+                btn_rayleigh: "Rayleigh Glow: ON",
+                dock_title: "// GEODESIC TARGETING",
+                fly_orbit: "Arabian Peninsula Orbit",
                 fly_sudair: "Sudair Solar PV (1.5 GW)",
-                fly_yanbu: "Yanbu Gas Turbine #4",
+                fly_yanbu: "Yanbu Gas Turbine Unit #4",
                 fly_neom: "NEOM 5G Mountain Relay",
                 lbl_ddi: "Dust Deposition Index",
                 lbl_loss_velocity: "Avoidable Loss Velocity",
-                lbl_wind: "Local 3D Wind Vector",
-                lbl_scada: "Closed-Loop SCADA Recommendation",
-                btn_dispatch_scada: "DISPATCH SCADA ACTUATION",
-                lbl_forecast_horizon: "SPATIO-TEMPORAL ADVECTION FORECAST"
+                lbl_aod: "Column AOD (550 nm)",
+                lbl_scada: "Autonomous SCADA Actuation",
+                btn_scada_actuate: "EXECUTE OPC-UA ACTUATION",
+                lbl_timeline_title: "NAVIER-STOKES ADVECTION FORECAST HORIZON"
             },
             ar: {
-                badge_tier: "التوأم الرقمي الفضائي ثلاثي الأبعاد",
-                btn_back_console: "غرفة التحكم",
-                btn_toggle_haze: "السحب الحجمية: تشغيل",
-                fly_kingdom: "المنظور الكوكبي للمملكة",
-                fly_sudair: "مشروع سدير للطاقة الشمسية (1.5 جيجا)",
+                tag_defense: "معايير ناسا ESDS · إحداثيات WGS84",
+                btn_console: "غرفة التحكم",
+                btn_rayleigh: "التوهج الجوي: تشغيل",
+                dock_title: "// الأهداف الجيوديسية الحيوية",
+                fly_orbit: "المدار الكوكبي للمملكة",
+                fly_sudair: "سدير للطاقة الشمسية (1.5 GW)",
                 fly_yanbu: "توربين ينبع الغازي رقم 4",
                 fly_neom: "برج اتصالات 5G جبال نيوم",
                 lbl_ddi: "مؤشر ترسب الغبار",
                 lbl_loss_velocity: "الخسائر المادية المتجنبة",
-                lbl_wind: "متجه الرياح ثلاثي الأبعاد",
-                lbl_scada: "توجيه نظام التحكم الصناعي (SCADA)",
-                btn_dispatch_scada: "إرسال أمر التشغيل الآلي",
-                lbl_forecast_horizon: "التنبؤ بمسار حركة الغبار عبر الزمن"
+                lbl_aod: "العمق البصري للهباء الجوي",
+                lbl_scada: "التحكم الصناعي الآلي (SCADA)",
+                btn_scada_actuate: "إرسال أمر التشغيل الآلي",
+                lbl_timeline_title: "التنبؤ بمسار حركة الغبار عبر الزمن"
             }
         };
 
@@ -1198,14 +1208,14 @@
             const t = translations[currentLang];
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const k = el.getAttribute('data-i18n');
-                if (t[k]) el.innerText = t[k];
+                if (t[k]) el.innerHTML = t[k];
             });
 
             if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            init3D();
+            initScene();
             if (typeof lucide !== 'undefined') lucide.createIcons();
         });
     </script>
