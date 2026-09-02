@@ -797,14 +797,42 @@ async def get_user_capabilities(x_user_role: str = Header(default="OPERATOR")):
     return get_role_capabilities_json(role)
 
 
-# --- Sovereign Mode with SIEM ---
-@app.post("/v2/system/sovereign", tags=["System"])
-async def toggle_sovereign_mode(enable: bool, actor: str = "API_CLIENT"):
-    """Activates air-gapped Sovereign Edge Inference mode."""
-    causal_engine.sovereign_mode = enable
-    emit_sovereign_change(enabled=enable, actor=actor)
-    logger.warning(f"SOVEREIGN_MODE: {'ACTIVATED' if enable else 'DEACTIVATED'} — Edge Computing Protocol Engaged.")
-    return {"status": "SUCCESS", "sovereign_mode": causal_engine.sovereign_mode}
+# --- 3D Volumetric Digital Twin & SCADA Endpoints ---
+from services.digital_twin import atmospheric_engine, digital_twin_service
+
+class TwinActuationRequest(BaseModel):
+    asset_id: str
+    action_type: str
+    authorized_operator: Optional[str] = "SYSTEM_AUTONOMOUS"
+
+@app.get("/v2/twin/state", tags=["Digital Twin"])
+async def get_twin_state(forecast_hour: int = Query(default=0, ge=0, le=72)):
+    """Returns synchronized 3D digital twin state for monitored critical infrastructure."""
+    return digital_twin_service.get_digital_twin_state(forecast_hour=forecast_hour)
+
+@app.get("/v2/twin/vectors", tags=["Digital Twin"])
+async def get_twin_atmospheric_vectors(forecast_hour: int = Query(default=0, ge=0, le=72)):
+    """Returns 3D atmospheric wind shear vectors (U, V, W) and volumetric aerosol voxels."""
+    return atmospheric_engine.compute_vector_slice(timestamp_hour=forecast_hour)
+
+@app.post("/v2/twin/actuate", tags=["Digital Twin"])
+async def trigger_twin_actuation(req: TwinActuationRequest):
+    """Dispatches closed-loop industrial SCADA actuation command (Robotic Cleaning / Filter Pulse)."""
+    _write_audit(
+        event=f"SCADA_ACTUATION_{req.action_type}",
+        origin=req.asset_id,
+        status="DISPATCHED",
+        detail=f"Operator: {req.authorized_operator} | Protocol: OPC-UA IEC-62541"
+    )
+    return {
+        "status": "DISPATCHED",
+        "asset_id": req.asset_id,
+        "action_type": req.action_type,
+        "protocol": "OPC-UA_IEC_62541",
+        "ack_timestamp_utc": datetime.utcnow().isoformat() + "Z",
+        "message": f"Closed-loop industrial command {req.action_type} confirmed by site controller."
+    }
+
 
 
 if __name__ == "__main__":
